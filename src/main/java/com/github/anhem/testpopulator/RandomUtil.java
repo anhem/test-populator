@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +12,7 @@ class RandomUtil {
     private static final int LEFT_LIMIT = 97; // letter 'a'
     private static final int RIGHT_LIMIT = 122; // letter 'z'
     private static final int STRING_LENGTH = 10;
-    private static final Random random = new Random();
+    private static final Random random = new SecureRandom();
 
     public static int getRandomInt() {
         return random.nextInt(RANDOM_INT_MAX_VALUE);
@@ -28,7 +29,7 @@ class RandomUtil {
     }
 
     public static Boolean getRandomBoolean() {
-        return Math.random() < 0.5;
+        return random.nextBoolean();
     }
 
     public static LocalDate getRandomLocalDate() {
