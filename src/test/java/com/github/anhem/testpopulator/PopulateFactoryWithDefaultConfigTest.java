@@ -4,7 +4,10 @@ import com.github.anhem.testpopulator.model.java.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_INSTANCE;
 import static com.github.anhem.testpopulator.testutil.AssertUtil.assertRandomlyPopulatedValues;
+import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryWithDefaultConfigTest {
 
@@ -76,5 +79,16 @@ class PopulateFactoryWithDefaultConfigTest {
         OddAllArgsConstructor value_1 = populateFactory.populate(OddAllArgsConstructor.class);
         OddAllArgsConstructor value_2 = populateFactory.populate(OddAllArgsConstructor.class);
         assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    public void tryingToInstantiateAbstractClassThrowsException() {
+        assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructorAbstract.class))
+                .isInstanceOf(PopulateException.class)
+                .hasMessageContaining(format(FAILED_TO_CREATE_INSTANCE, ""));
+
+        assertThatThrownBy(() -> populateFactory.populate(PojoAbstract.class))
+                .isInstanceOf(PopulateException.class)
+                .hasMessageContaining(format(FAILED_TO_CREATE_INSTANCE, ""));
     }
 }

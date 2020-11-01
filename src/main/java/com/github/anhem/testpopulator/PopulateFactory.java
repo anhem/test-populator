@@ -34,7 +34,7 @@ public class PopulateFactory {
         this.populateConfig = populateConfig;
         valueFactory = new ValueFactory(populateConfig.useRandomValues());
         overridePopulate = populateConfig.getOverridePopulate();
-        if (populateConfig.getStrategyOrder() == null || populateConfig.getStrategyOrder().isEmpty()) {
+        if (populateConfig.getStrategyOrder().isEmpty()) {
             throw new IllegalArgumentException(MISSING_STRATEGIES);
         }
     }
