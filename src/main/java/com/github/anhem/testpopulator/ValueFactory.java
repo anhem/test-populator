@@ -9,7 +9,6 @@ import static com.github.anhem.testpopulator.RandomUtil.*;
 
 class ValueFactory {
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
-    static final String FAILED_TO_CREATE_VALUE = "Failed to create value for class %s";
 
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
     private static final LocalDate LOCAL_DATE = LOCAL_DATE_TIME.toLocalDate();
@@ -30,44 +29,41 @@ class ValueFactory {
 
     @SuppressWarnings("unchecked")
     public <T> T createValue(Class<T> clazz) {
-        try {
-            if (clazz.isEnum()) {
-                return getEnum(clazz);
-            }
-            if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
-                return (T) getInteger();
-            }
-            if (clazz.equals(Long.class) || clazz.equals(long.class)) {
-                return (T) getLong();
-            }
-            if (clazz.equals(Double.class) || clazz.equals(double.class)) {
-                return (T) getDouble();
-            }
-            if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
-                return (T) getBoolean();
-            }
-            if (clazz.equals(BigDecimal.class)) {
-                return (T) getBigDecimal();
-            }
-            if (clazz.equals(String.class)) {
-                return (T) getString();
-            }
-            if (clazz.equals(LocalDate.class)) {
-                return (T) getLocalDate();
-            }
-            if (clazz.equals(LocalDateTime.class)) {
-                return (T) getLocalDateTime();
-            }
-            if (clazz.equals(Character.class) || clazz.equals(char.class)) {
-                return (T) getChar();
-            }
-            if (clazz.equals(UUID.class)) {
-                return (T) getUUID();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(String.format(FAILED_TO_CREATE_VALUE, clazz.getName()), e);
+        if (clazz.isEnum()) {
+            return getEnum(clazz);
         }
-        throw new RuntimeException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
+        if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
+            return (T) getInteger();
+        }
+        if (clazz.equals(Long.class) || clazz.equals(long.class)) {
+            return (T) getLong();
+        }
+        if (clazz.equals(Double.class) || clazz.equals(double.class)) {
+            return (T) getDouble();
+        }
+        if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
+            return (T) getBoolean();
+        }
+        if (clazz.equals(BigDecimal.class)) {
+            return (T) getBigDecimal();
+        }
+        if (clazz.equals(String.class)) {
+            return (T) getString();
+        }
+        if (clazz.equals(LocalDate.class)) {
+            return (T) getLocalDate();
+        }
+        if (clazz.equals(LocalDateTime.class)) {
+            return (T) getLocalDateTime();
+        }
+        if (clazz.equals(Character.class) || clazz.equals(char.class)) {
+            return (T) getChar();
+        }
+        if (clazz.equals(UUID.class)) {
+            return (T) getUUID();
+        }
+
+        throw new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
     private Integer getInteger() {

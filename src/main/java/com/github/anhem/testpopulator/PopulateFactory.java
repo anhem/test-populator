@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.github.anhem.testpopulator.PopulateUtil.*;
+import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
 public class PopulateFactory {
@@ -87,7 +88,7 @@ public class PopulateFactory {
             Object value = populateWithOverrides((Class<?>) argumentTypes.get(0));
             return (T) List.of(value);
         }
-        throw new RuntimeException(String.format(MISSING_COLLECTION_TYPE, clazz.getTypeName()));
+        throw new PopulateException(format(MISSING_COLLECTION_TYPE, clazz.getTypeName()));
     }
 
     private <T> T continuePopulateWithStrategies(Class<?> clazz) {
@@ -99,7 +100,7 @@ public class PopulateFactory {
                 return continuePopulateUsingConstructor(clazz);
             }
         }
-        throw new RuntimeException(String.format(NO_MATCHING_STRATEGY, clazz.getName()));
+        throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName()));
     }
 
     @SuppressWarnings("unchecked")
@@ -110,14 +111,14 @@ public class PopulateFactory {
                     try {
                         return populateWithOverrides(parameter.getType(), parameter, null);
                     } catch (Exception e) {
-                        throw new RuntimeException(String.format(FAILED_TO_POPULATE_CLASS, parameter.getName(), clazz.getName()), e);
+                        throw new PopulateException(format(FAILED_TO_POPULATE_CLASS, parameter.getName(), clazz.getName()), e);
                     }
                 }).toArray();
         try {
             constructor.setAccessible(true); //TODO configurable when private constructors exist?
             return (T) constructor.newInstance(arguments);
         } catch (Exception e) {
-            throw new RuntimeException(String.format(FAILED_TO_CREATE_INSTANCE, constructor.getName()), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_INSTANCE, constructor.getName()), e);
         }
     }
 
@@ -139,12 +140,12 @@ public class PopulateFactory {
                                 field.set(objectOfClass, populateWithOverrides(field.getType()));
                             }
                         } catch (Exception e) {
-                            throw new RuntimeException(String.format(FAILED_TO_SET_FIELD, field.getName(), objectOfClass.getClass().getName()), e);
+                            throw new PopulateException(format(FAILED_TO_SET_FIELD, field.getName(), objectOfClass.getClass().getName()), e);
                         }
                     });
             return objectOfClass;
         } catch (Exception e) {
-            throw new RuntimeException(String.format(FAILED_TO_CREATE_INSTANCE, clazz.getName()), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_INSTANCE, clazz.getName()), e);
         }
     }
 }
