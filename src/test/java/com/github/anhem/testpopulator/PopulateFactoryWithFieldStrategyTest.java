@@ -18,7 +18,7 @@ class PopulateFactoryWithFieldStrategyTest {
     PopulateFactory populateFactory;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(FIELD))
                 .build();
@@ -26,14 +26,14 @@ class PopulateFactoryWithFieldStrategyTest {
     }
 
     @Test
-    public void pojo() {
+    void pojo() {
         Pojo value_1 = populateFactory.populate(Pojo.class);
         Pojo value_2 = populateFactory.populate(Pojo.class);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     @Test
-    public void allArgsConstructor() {
+    void allArgsConstructor() {
         assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructor.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName()));

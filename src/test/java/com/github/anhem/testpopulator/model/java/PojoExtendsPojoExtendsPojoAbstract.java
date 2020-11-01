@@ -8,7 +8,7 @@ public class PojoExtendsPojoExtendsPojoAbstract extends PojoExtendsPojoAbstract 
         return anotherInteger;
     }
 
-    public void setAnotherInteger(Integer anotherInteger) {
+    void setAnotherInteger(Integer anotherInteger) {
         this.anotherInteger = anotherInteger;
     }
 }

@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class PopulateFactoryTest {
 
     @Test
-    public void missingStrategiesThrowsException() {
+    void missingStrategiesThrowsException() {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .strategyOrder(Collections.emptyList())
                 .build();
