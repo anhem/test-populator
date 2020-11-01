@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PopulateUtilTest {
 
     @Test
-    public void toArgumentTypesReturnsTypeArgumentsAsList() throws NoSuchFieldException {
+    void toArgumentTypesReturnsTypeArgumentsAsList() throws NoSuchFieldException {
         Type[] typeArguments = ((ParameterizedType) Pojo.class.getDeclaredField("setOfStrings")
                 .getGenericType()).getActualTypeArguments();
         assertThat(typeArguments).hasSize(1);
@@ -29,7 +29,7 @@ class PopulateUtilTest {
     }
 
     @Test
-    public void toArgumentTypesReturnsParameterArgumentTypes() {
+    void toArgumentTypesReturnsParameterArgumentTypes() {
         Parameter parameter = Arrays.stream(getLargestConstructor(AllArgsConstructor.class).getParameters())
                 .filter(p -> p.getType().equals(Set.class))
                 .findFirst()
@@ -42,7 +42,7 @@ class PopulateUtilTest {
     }
 
     @Test
-    public void getOverridePopulateValueReturnsValue() {
+    void getOverridePopulateValueReturnsValue() {
         Map<Class<MyUUID>, OverridePopulate<?>> overridePopulate = Map.of(MyUUID.class, new MyUUIDOverride());
 
         Object overridePopulateValue = getOverridePopulateValue(MyUUID.class, overridePopulate);
@@ -53,7 +53,7 @@ class PopulateUtilTest {
     }
 
     @Test
-    public void getDeclaredFieldsReturnsAllDeclaredFields() {
+    void getDeclaredFieldsReturnsAllDeclaredFields() {
         List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class);
 
         assertThat(declaredFields).isNotEmpty();
@@ -64,43 +64,43 @@ class PopulateUtilTest {
     }
 
     @Test
-    public void hasOnlyDefaultConstructorReturnsFalse() {
+    void hasOnlyDefaultConstructorReturnsFalse() {
         assertThat(hasOnlyDefaultConstructor(AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
     }
 
     @Test
-    public void hasOnlyDefaultConstructorReturnsTrue() {
+    void hasOnlyDefaultConstructorReturnsTrue() {
         assertThat(hasOnlyDefaultConstructor(PojoExtendsPojoAbstract.class)).isTrue();
     }
 
     @Test
-    public void isSetReturnsFalse() {
+    void isSetReturnsFalse() {
         assertThat(isSet(String.class)).isFalse();
     }
 
     @Test
-    public void isSetReturnsTrue() {
+    void isSetReturnsTrue() {
         assertThat(isSet(Set.class)).isTrue();
     }
 
     @Test
-    public void isMapReturnsFalse() {
+    void isMapReturnsFalse() {
         assertThat(isMap(String.class)).isFalse();
     }
 
     @Test
-    public void isMapReturnsTrue() {
+    void isMapReturnsTrue() {
         assertThat(isMap(Map.class)).isTrue();
     }
 
     @Test
-    public void isCollectionReturnsFalse() {
+    void isCollectionReturnsFalse() {
         assertThat(isCollection(PojoExtendsPojoAbstract.class)).isFalse();
         assertThat(isCollection(String.class)).isFalse();
     }
 
     @Test
-    public void isCollectionReturnsTrue() {
+    void isCollectionReturnsTrue() {
         assertThat(isCollection(List.class)).isTrue();
         assertThat(isCollection(Set.class)).isTrue();
         assertThat(isCollection(Collection.class)).isTrue();
@@ -109,58 +109,58 @@ class PopulateUtilTest {
     }
 
     @Test
-    public void isValueReturnsFalse() {
+    void isValueReturnsFalse() {
         assertThat(isValue(Pojo.class)).isFalse();
     }
 
     @Test
-    public void isValueReturnsTrue() {
+    void isValueReturnsTrue() {
         assertThat(isValue(String.class)).isTrue();
         assertThat(isValue(ArbitraryEnum.class)).isTrue();
     }
 
     @Test
-    public void isJavaBaseClassReturnsFalse() {
+    void isJavaBaseClassReturnsFalse() {
         assertThat(isJavaBaseClass(PojoExtendsPojoAbstract.class)).isFalse();
     }
 
     @Test
-    public void isJavaBaseClassReturnsTrue() {
+    void isJavaBaseClassReturnsTrue() {
         assertThat(isJavaBaseClass(String.class)).isTrue();
     }
 
     @Test
-    public void hasAtLeastOneParameterReturnsFalse() {
+    void hasAtLeastOneParameterReturnsFalse() {
         Method method = getMethod("getStringValue", Pojo.class);
 
         assertThat(hasAtLeastOneParameter(method)).isFalse();
     }
 
     @Test
-    public void hasAtLeastOneParameterReturnsTrue() {
+    void hasAtLeastOneParameterReturnsTrue() {
         Method method = getMethod("setStringValue", Pojo.class);
 
         assertThat(hasAtLeastOneParameter(method)).isTrue();
     }
 
     @Test
-    public void isMatchingFieldStrategyReturnsTrue() {
+    void isMatchingFieldStrategyReturnsTrue() {
         assertThat(isMatchingFieldStrategy(Strategy.FIELD, PojoExtendsPojoAbstract.class)).isTrue();
     }
 
     @Test
-    public void isMatchingFieldStrategyReturnsFalse() {
+    void isMatchingFieldStrategyReturnsFalse() {
         assertThat(isMatchingFieldStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
         assertThat(isMatchingFieldStrategy(Strategy.FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
     }
 
     @Test
-    public void isMatchingConstructorStrategyReturnsTrue() {
+    void isMatchingConstructorStrategyReturnsTrue() {
         assertThat(isMatchingConstructorStrategy(Strategy.CONSTRUCTOR, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isTrue();
     }
 
     @Test
-    public void isMatchingConstructorStrategyReturnsFalse() {
+    void isMatchingConstructorStrategyReturnsFalse() {
         assertThat(isMatchingConstructorStrategy(Strategy.FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
         assertThat(isMatchingConstructorStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
     }

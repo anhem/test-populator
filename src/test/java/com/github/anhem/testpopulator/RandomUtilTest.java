@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RandomUtilTest {
 
     @Test
-    public void getRandomIntIsDifferentEachTime() {
+    void getRandomIntIsDifferentEachTime() {
         int random_1 = getRandomInt();
         int random_2 = getRandomInt();
 
@@ -22,7 +22,7 @@ class RandomUtilTest {
     }
 
     @Test
-    public void getRandomStringIsDifferentEachTime() {
+    void getRandomStringIsDifferentEachTime() {
         String random_1 = getRandomString();
         String random_2 = getRandomString();
 
@@ -32,7 +32,7 @@ class RandomUtilTest {
     }
 
     @Test
-    public void getRandomBooleanCanBeDifferent() {
+    void getRandomBooleanCanBeDifferent() {
         Boolean random_1 = getRandomBoolean();
         Boolean random_2 = getRandomBoolean();
         int retry = 0;
@@ -47,7 +47,7 @@ class RandomUtilTest {
     }
 
     @Test
-    public void getRandomLocalDateIsDifferentEachTime() {
+    void getRandomLocalDateIsDifferentEachTime() {
         LocalDate random_1 = getRandomLocalDate();
         LocalDate random_2 = getRandomLocalDate();
 
@@ -57,7 +57,7 @@ class RandomUtilTest {
     }
 
     @Test
-    public void getRandomLocalDateTimeIsDifferentEachTime() {
+    void getRandomLocalDateTimeIsDifferentEachTime() {
         LocalDateTime random_1 = getRandomLocalDateTime();
         LocalDateTime random_2 = getRandomLocalDateTime();
 
@@ -67,7 +67,7 @@ class RandomUtilTest {
     }
 
     @Test
-    public void getRandomCharacterCanBeDifferent() {
+    void getRandomCharacterCanBeDifferent() {
         Character random_1 = getRandomCharacter();
         Character random_2 = getRandomCharacter();
         int retry = 0;
@@ -82,7 +82,7 @@ class RandomUtilTest {
     }
 
     @Test
-    public void getRandomEnumCanBeDifferent() {
+    void getRandomEnumCanBeDifferent() {
         ArbitraryEnum random_1 = getRandomEnum(ArbitraryEnum.class);
         ArbitraryEnum random_2 = getRandomEnum(ArbitraryEnum.class);
         int retry = 0;

@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PopulateConfigTest {
 
     @Test
-    public void buildingPopulateConfigResultsInDefaultValues() {
+    void buildingPopulateConfigResultsInDefaultValues() {
         PopulateConfig populateConfig = PopulateConfig.builder().build();
 
         assertThat(populateConfig).isNotNull();

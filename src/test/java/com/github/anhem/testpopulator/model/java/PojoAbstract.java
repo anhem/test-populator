@@ -30,7 +30,7 @@ public abstract class PojoAbstract {
         return stringValue;
     }
 
-    public void setStringValue(String stringValue) {
+    void setStringValue(String stringValue) {
         this.stringValue = stringValue;
     }
 
@@ -38,7 +38,7 @@ public abstract class PojoAbstract {
         return primitiveCharacterValue;
     }
 
-    public void setPrimitiveCharacterValue(char primitiveCharacterValue) {
+    void setPrimitiveCharacterValue(char primitiveCharacterValue) {
         this.primitiveCharacterValue = primitiveCharacterValue;
     }
 
@@ -46,7 +46,7 @@ public abstract class PojoAbstract {
         return characterValue;
     }
 
-    public void setCharacterValue(Character characterValue) {
+    void setCharacterValue(Character characterValue) {
         this.characterValue = characterValue;
     }
 
@@ -54,7 +54,7 @@ public abstract class PojoAbstract {
         return primitiveIntegerValue;
     }
 
-    public void setPrimitiveIntegerValue(int primitiveIntegerValue) {
+    void setPrimitiveIntegerValue(int primitiveIntegerValue) {
         this.primitiveIntegerValue = primitiveIntegerValue;
     }
 
@@ -62,7 +62,7 @@ public abstract class PojoAbstract {
         return integerValue;
     }
 
-    public void setIntegerValue(Integer integerValue) {
+    void setIntegerValue(Integer integerValue) {
         this.integerValue = integerValue;
     }
 
@@ -70,7 +70,7 @@ public abstract class PojoAbstract {
         return primitiveLongValue;
     }
 
-    public void setPrimitiveLongValue(long primitiveLongValue) {
+    void setPrimitiveLongValue(long primitiveLongValue) {
         this.primitiveLongValue = primitiveLongValue;
     }
 
@@ -78,7 +78,7 @@ public abstract class PojoAbstract {
         return longValue;
     }
 
-    public void setLongValue(Long longValue) {
+    void setLongValue(Long longValue) {
         this.longValue = longValue;
     }
 
@@ -86,7 +86,7 @@ public abstract class PojoAbstract {
         return primitiveDoubleValue;
     }
 
-    public void setPrimitiveDoubleValue(double primitiveDoubleValue) {
+    void setPrimitiveDoubleValue(double primitiveDoubleValue) {
         this.primitiveDoubleValue = primitiveDoubleValue;
     }
 
@@ -94,7 +94,7 @@ public abstract class PojoAbstract {
         return doubleValue;
     }
 
-    public void setDoubleValue(Double doubleValue) {
+    void setDoubleValue(Double doubleValue) {
         this.doubleValue = doubleValue;
     }
 
@@ -102,7 +102,7 @@ public abstract class PojoAbstract {
         return localDate;
     }
 
-    public void setLocalDate(LocalDate localDate) {
+    void setLocalDate(LocalDate localDate) {
         this.localDate = localDate;
     }
 
@@ -110,7 +110,7 @@ public abstract class PojoAbstract {
         return localDateTime;
     }
 
-    public void setLocalDateTime(LocalDateTime localDateTime) {
+    void setLocalDateTime(LocalDateTime localDateTime) {
         this.localDateTime = localDateTime;
     }
 
@@ -118,7 +118,7 @@ public abstract class PojoAbstract {
         return listOfStrings;
     }
 
-    public void setListOfStrings(List<String> listOfStrings) {
+    void setListOfStrings(List<String> listOfStrings) {
         this.listOfStrings = listOfStrings;
     }
 
@@ -126,7 +126,7 @@ public abstract class PojoAbstract {
         return setOfStrings;
     }
 
-    public void setSetOfStrings(Set<String> setOfStrings) {
+    void setSetOfStrings(Set<String> setOfStrings) {
         this.setOfStrings = setOfStrings;
     }
 
@@ -134,7 +134,7 @@ public abstract class PojoAbstract {
         return mapOfIntegerToString;
     }
 
-    public void setMapOfIntegerToString(Map<Integer, String> mapOfIntegerToString) {
+    void setMapOfIntegerToString(Map<Integer, String> mapOfIntegerToString) {
         this.mapOfIntegerToString = mapOfIntegerToString;
     }
 
@@ -142,7 +142,7 @@ public abstract class PojoAbstract {
         return mapOfStringToInteger;
     }
 
-    public void setMapOfStringToInteger(Map<String, Integer> mapOfStringToInteger) {
+    void setMapOfStringToInteger(Map<String, Integer> mapOfStringToInteger) {
         this.mapOfStringToInteger = mapOfStringToInteger;
     }
 
@@ -150,7 +150,7 @@ public abstract class PojoAbstract {
         return arbitraryEnum;
     }
 
-    public void setArbitraryEnum(ArbitraryEnum arbitraryEnum) {
+    void setArbitraryEnum(ArbitraryEnum arbitraryEnum) {
         this.arbitraryEnum = arbitraryEnum;
     }
 
@@ -158,7 +158,7 @@ public abstract class PojoAbstract {
         return arrayOfStrings;
     }
 
-    public void setArrayOfStrings(String[] arrayOfStrings) {
+    void setArrayOfStrings(String[] arrayOfStrings) {
         this.arrayOfStrings = arrayOfStrings;
     }
 }

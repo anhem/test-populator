@@ -15,7 +15,7 @@ public class OddPojo {
         return pojo;
     }
 
-    public void setPojo(Pojo pojo) {
+    void setPojo(Pojo pojo) {
         this.pojo = pojo;
     }
 
@@ -23,7 +23,7 @@ public class OddPojo {
         return pojoList;
     }
 
-    public void setPojoList(List<Pojo> pojoList) {
+    void setPojoList(List<Pojo> pojoList) {
         this.pojoList = pojoList;
     }
 
@@ -31,7 +31,7 @@ public class OddPojo {
         return pojoSet;
     }
 
-    public void setPojoSet(Set<Pojo> pojoSet) {
+    void setPojoSet(Set<Pojo> pojoSet) {
         this.pojoSet = pojoSet;
     }
 
@@ -39,7 +39,7 @@ public class OddPojo {
         return pojoToPojoMap;
     }
 
-    public void setPojoToPojoMap(Map<Pojo, Pojo> pojoToPojoMap) {
+    void setPojoToPojoMap(Map<Pojo, Pojo> pojoToPojoMap) {
         this.pojoToPojoMap = pojoToPojoMap;
     }
 }

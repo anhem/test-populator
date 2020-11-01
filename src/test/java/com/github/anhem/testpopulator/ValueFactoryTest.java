@@ -18,7 +18,7 @@ class ValueFactoryTest {
     private ValueFactory valueFactory;
 
     @Test
-    public void randomValuesAreCreated() {
+    void randomValuesAreCreated() {
         valueFactory = new ValueFactory(true);
         createAndAssertRandomValues(ArbitraryEnum.class);
         createAndAssertRandomValues(Integer.class);
@@ -34,7 +34,7 @@ class ValueFactoryTest {
     }
 
     @Test
-    public void fixedValuesAreCreated() {
+    void fixedValuesAreCreated() {
         valueFactory = new ValueFactory(false);
         createAndAssertFixedValues(ArbitraryEnum.class);
         createAndAssertFixedValues(Integer.class);
@@ -50,7 +50,7 @@ class ValueFactoryTest {
     }
 
     @Test
-    public void attemptingToCreateValueOfUnsupportedTypeThrowsException() {
+    void attemptingToCreateValueOfUnsupportedTypeThrowsException() {
         valueFactory = new ValueFactory(true);
         assertThatThrownBy(() -> valueFactory.createValue(Pojo.class))
                 .isInstanceOf(RuntimeException.class)

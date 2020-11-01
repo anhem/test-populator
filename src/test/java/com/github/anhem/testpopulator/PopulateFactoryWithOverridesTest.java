@@ -15,7 +15,7 @@ class PopulateFactoryWithOverridesTest {
     PopulateFactory populateFactory;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .overridePopulate(List.of(new MyUUIDOverride()))
                 .build();
@@ -23,7 +23,7 @@ class PopulateFactoryWithOverridesTest {
     }
 
     @Test
-    public void myUUID() {
+    void myUUID() {
         MyUUID value_1 = populateFactory.populate(MyUUID.class);
         MyUUID value_2 = populateFactory.populate(MyUUID.class);
         assertRandomlyPopulatedValues(value_1, value_2);
