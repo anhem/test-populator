@@ -57,6 +57,7 @@
             <properties>
                 <sonar.organization>anhem-github</sonar.organization>
                 <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+                <!--suppress UnresolvedMavenProperty -->
                 <sonar.login>${SONAR_LOGIN}</sonar.login>
                 <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml
                 </sonar.coverage.jacoco.xmlReportPaths>
