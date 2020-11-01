@@ -21,7 +21,7 @@ class ValueFactory {
     private static final String UUID_STRING = "43c6e27d-c0c6-43d6-8462-34ac04c1d5f3";
     private static final BigDecimal BIG_DECIMAL = BigDecimal.ONE;
 
-    private final Boolean setRandomValues;
+    private final boolean setRandomValues;
 
     ValueFactory(boolean setRandomValues) {
         this.setRandomValues = setRandomValues;
