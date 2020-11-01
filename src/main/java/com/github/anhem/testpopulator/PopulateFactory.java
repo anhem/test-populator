@@ -34,12 +34,12 @@ public class PopulateFactory {
         this.populateConfig = populateConfig;
         valueFactory = new ValueFactory(populateConfig.useRandomValues());
         overridePopulate = populateConfig.getOverridePopulate();
-    }
-
-    public <T> T populate(Class<T> clazz) {
         if (populateConfig.getStrategyOrder() == null || populateConfig.getStrategyOrder().isEmpty()) {
             throw new IllegalArgumentException(MISSING_STRATEGIES);
         }
+    }
+
+    public <T> T populate(Class<T> clazz) {
         return populateWithOverrides(clazz);
     }
 
