@@ -7,9 +7,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_INSTANCE;
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.testutil.AssertUtil.assertRandomlyPopulatedValues;
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -69,6 +71,13 @@ class PopulateFactoryWithConstructorStrategyTest {
         assertThat(value_1).hasNoNullFieldsOrPropertiesExcept("privateConstructorField");
         assertThat(value_2).hasNoNullFieldsOrPropertiesExcept("privateConstructorField");
         assertThat(value_1).isNotEqualTo(value_2);
+    }
+
+    @Test
+    void tryingToInstantiateAbstractClassThrowsException() {
+        assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructorAbstract.class))
+                .isInstanceOf(PopulateException.class)
+                .hasMessageContaining(format(FAILED_TO_CREATE_INSTANCE, ""));
     }
 
     @Test

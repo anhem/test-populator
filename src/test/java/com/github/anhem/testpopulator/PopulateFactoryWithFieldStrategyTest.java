@@ -7,9 +7,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_INSTANCE;
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static com.github.anhem.testpopulator.testutil.AssertUtil.assertRandomlyPopulatedValues;
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryWithFieldStrategyTest {
@@ -67,10 +69,16 @@ class PopulateFactoryWithFieldStrategyTest {
     }
 
     @Test
+    void tryingToInstantiateAbstractClassThrowsException() {
+        assertThatThrownBy(() -> populateFactory.populate(PojoAbstract.class))
+                .isInstanceOf(PopulateException.class)
+                .hasMessageContaining(format(FAILED_TO_CREATE_INSTANCE, ""));
+    }
+
+    @Test
     void allArgsConstructor() {
         assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructor.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName()));
     }
-
 }
