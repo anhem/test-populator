@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.PopulateUtil.*;
+import static com.github.anhem.testpopulator.config.Strategy.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateUtilTest {
@@ -57,10 +58,22 @@ class PopulateUtilTest {
         List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class);
 
         assertThat(declaredFields).isNotEmpty();
+        assertThat(declaredFields).hasSize(19);
         List<String> fieldNames = declaredFields.stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());
         assertThat(fieldNames).contains("anotherInteger", "anotherString", "stringValue", "integerValue");
+    }
+
+    @Test
+    void getDeclaredMethodsReturnAllDeclaredMethods() {
+        List<Method> declaredMethods = getDeclaredMethods(PojoExtendsPojoExtendsPojoAbstract.class);
+
+        assertThat(declaredMethods).isNotEmpty();
+        List<String> fieldNames = declaredMethods.stream()
+                .map(Method::getName)
+                .collect(Collectors.toList());
+        assertThat(fieldNames).contains("setAnotherInteger", "setAnotherString", "setStringValue", "setIntegerValue");
     }
 
     @Test
@@ -144,6 +157,29 @@ class PopulateUtilTest {
     }
 
     @Test
+    void isMatchingSetterStrategyReturnsTrue() {
+        assertThat(isMatchingSetterStrategy(SETTER, PojoExtendsPojoAbstract.class)).isTrue();
+    }
+
+    @Test
+    void isMatchingSetterStrategyReturnsFalse() {
+        assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
+        assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
+
+    }
+
+    @Test
+    void isMatchingConstructorStrategyReturnsTrue() {
+        assertThat(isMatchingConstructorStrategy(CONSTRUCTOR, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isTrue();
+    }
+
+    @Test
+    void isMatchingConstructorStrategyReturnsFalse() {
+        assertThat(isMatchingConstructorStrategy(FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
+        assertThat(isMatchingConstructorStrategy(CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
+    }
+
+    @Test
     void isMatchingFieldStrategyReturnsTrue() {
         assertThat(isMatchingFieldStrategy(Strategy.FIELD, PojoExtendsPojoAbstract.class)).isTrue();
     }
@@ -155,14 +191,15 @@ class PopulateUtilTest {
     }
 
     @Test
-    void isMatchingConstructorStrategyReturnsTrue() {
-        assertThat(isMatchingConstructorStrategy(Strategy.CONSTRUCTOR, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isTrue();
-    }
+    void isSetterReturnsTrue() {
+        List<Method> setterMethods = getDeclaredMethods(Pojo.class).stream()
+                .filter(PopulateUtil::isSetter)
+                .collect(Collectors.toList());
 
-    @Test
-    void isMatchingConstructorStrategyReturnsFalse() {
-        assertThat(isMatchingConstructorStrategy(Strategy.FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
-        assertThat(isMatchingConstructorStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
+        assertThat(setterMethods).isNotEmpty();
+        assertThat(setterMethods).hasSize(17);
+        setterMethods.forEach(method -> assertThat(method.getName()).startsWith("set"));
+        setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
 
     private Method getMethod(String methodName, Class<?> clazz) {

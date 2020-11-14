@@ -8,18 +8,18 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
-import static com.github.anhem.testpopulator.config.Strategy.FIELD;
+import static com.github.anhem.testpopulator.config.Strategy.SETTER;
 import static com.github.anhem.testpopulator.testutil.AssertUtil.assertRandomlyPopulatedValues;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class PopulateFactoryWithFieldStrategyTest {
+class PopulateFactoryWithSetterStrategyTest {
 
     PopulateFactory populateFactory;
 
     @BeforeEach
     void setUp() {
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(FIELD))
+                .strategyOrder(List.of(SETTER))
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }

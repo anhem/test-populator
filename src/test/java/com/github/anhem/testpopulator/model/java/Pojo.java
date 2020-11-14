@@ -30,7 +30,7 @@ public class Pojo {
         return stringValue;
     }
 
-    void setStringValue(String stringValue) {
+    public void setStringValue(String stringValue) {
         this.stringValue = stringValue;
     }
 
@@ -38,7 +38,7 @@ public class Pojo {
         return primitiveCharacterValue;
     }
 
-    void setPrimitiveCharacterValue(char primitiveCharacterValue) {
+    public void setPrimitiveCharacterValue(char primitiveCharacterValue) {
         this.primitiveCharacterValue = primitiveCharacterValue;
     }
 
@@ -46,7 +46,7 @@ public class Pojo {
         return characterValue;
     }
 
-    void setCharacterValue(Character characterValue) {
+    public void setCharacterValue(Character characterValue) {
         this.characterValue = characterValue;
     }
 
@@ -54,7 +54,7 @@ public class Pojo {
         return primitiveIntegerValue;
     }
 
-    void setPrimitiveIntegerValue(int primitiveIntegerValue) {
+    public void setPrimitiveIntegerValue(int primitiveIntegerValue) {
         this.primitiveIntegerValue = primitiveIntegerValue;
     }
 
@@ -62,7 +62,7 @@ public class Pojo {
         return integerValue;
     }
 
-    void setIntegerValue(Integer integerValue) {
+    public void setIntegerValue(Integer integerValue) {
         this.integerValue = integerValue;
     }
 
@@ -70,7 +70,7 @@ public class Pojo {
         return primitiveLongValue;
     }
 
-    void setPrimitiveLongValue(long primitiveLongValue) {
+    public void setPrimitiveLongValue(long primitiveLongValue) {
         this.primitiveLongValue = primitiveLongValue;
     }
 
@@ -78,7 +78,7 @@ public class Pojo {
         return longValue;
     }
 
-    void setLongValue(Long longValue) {
+    public void setLongValue(Long longValue) {
         this.longValue = longValue;
     }
 
@@ -86,7 +86,7 @@ public class Pojo {
         return primitiveDoubleValue;
     }
 
-    void setPrimitiveDoubleValue(double primitiveDoubleValue) {
+    public void setPrimitiveDoubleValue(double primitiveDoubleValue) {
         this.primitiveDoubleValue = primitiveDoubleValue;
     }
 
@@ -94,7 +94,7 @@ public class Pojo {
         return doubleValue;
     }
 
-    void setDoubleValue(Double doubleValue) {
+    public void setDoubleValue(Double doubleValue) {
         this.doubleValue = doubleValue;
     }
 
@@ -102,7 +102,7 @@ public class Pojo {
         return localDate;
     }
 
-    void setLocalDate(LocalDate localDate) {
+    public void setLocalDate(LocalDate localDate) {
         this.localDate = localDate;
     }
 
@@ -110,7 +110,7 @@ public class Pojo {
         return localDateTime;
     }
 
-    void setLocalDateTime(LocalDateTime localDateTime) {
+    public void setLocalDateTime(LocalDateTime localDateTime) {
         this.localDateTime = localDateTime;
     }
 
@@ -118,7 +118,7 @@ public class Pojo {
         return listOfStrings;
     }
 
-    void setListOfStrings(List<String> listOfStrings) {
+    public void setListOfStrings(List<String> listOfStrings) {
         this.listOfStrings = listOfStrings;
     }
 
@@ -126,7 +126,7 @@ public class Pojo {
         return setOfStrings;
     }
 
-    void setSetOfStrings(Set<String> setOfStrings) {
+    public void setSetOfStrings(Set<String> setOfStrings) {
         this.setOfStrings = setOfStrings;
     }
 
@@ -134,7 +134,7 @@ public class Pojo {
         return mapOfIntegerToString;
     }
 
-    void setMapOfIntegerToString(Map<Integer, String> mapOfIntegerToString) {
+    public void setMapOfIntegerToString(Map<Integer, String> mapOfIntegerToString) {
         this.mapOfIntegerToString = mapOfIntegerToString;
     }
 
@@ -142,7 +142,7 @@ public class Pojo {
         return mapOfStringToInteger;
     }
 
-    void setMapOfStringToInteger(Map<String, Integer> mapOfStringToInteger) {
+    public void setMapOfStringToInteger(Map<String, Integer> mapOfStringToInteger) {
         this.mapOfStringToInteger = mapOfStringToInteger;
     }
 
@@ -150,7 +150,7 @@ public class Pojo {
         return arbitraryEnum;
     }
 
-    void setArbitraryEnum(ArbitraryEnum arbitraryEnum) {
+    public void setArbitraryEnum(ArbitraryEnum arbitraryEnum) {
         this.arbitraryEnum = arbitraryEnum;
     }
 
@@ -158,8 +158,7 @@ public class Pojo {
         return arrayOfStrings;
     }
 
-    void setArrayOfStrings(String[] arrayOfStrings) {
+    public void setArrayOfStrings(String[] arrayOfStrings) {
         this.arrayOfStrings = arrayOfStrings;
     }
-
 }

@@ -19,7 +19,8 @@ public class PopulateFactory {
     static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection %s";
     static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy. Try another strategy or override population for this class";
     static final String FAILED_TO_POPULATE_CLASS = "Failed while populating %s for class %s";
-    static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s ";
+    static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s";
+    static final String FAILED_TO_CALL_METHOD = "Failed to call method %s in object of class %s";
     static final String FAILED_TO_CREATE_INSTANCE = "Failed to create new instance of %s";
 
     private final PopulateConfig populateConfig;
@@ -93,11 +94,14 @@ public class PopulateFactory {
 
     private <T> T continuePopulateWithStrategies(Class<?> clazz) {
         for (Strategy strategy : populateConfig.getStrategyOrder()) {
-            if (isMatchingFieldStrategy(strategy, clazz)) {
-                return continuePopulateUsingFields(clazz);
-            }
             if (isMatchingConstructorStrategy(strategy, clazz)) {
                 return continuePopulateUsingConstructor(clazz);
+            }
+            if (isMatchingSetterStrategy(strategy, clazz)) {
+                return continuePopulateUsingSetters(clazz);
+            }
+            if (isMatchingFieldStrategy(strategy, clazz)) {
+                return continuePopulateUsingFields(clazz);
             }
         }
         throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName()));
@@ -125,7 +129,6 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingFields(Class<?> clazz) {
         try {
             Constructor<?> constructor = clazz.getDeclaredConstructor();
-            constructor.setAccessible(true);
             T objectOfClass = (T) constructor.newInstance();
             getDeclaredFields(clazz).stream()
                     .filter(field -> !Modifier.isFinal(field.getModifiers()))
@@ -145,6 +148,30 @@ public class PopulateFactory {
             return objectOfClass;
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_INSTANCE, clazz.getName()), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateUsingSetters(Class<?> clazz) {
+        try {
+            Constructor<?> constructor = clazz.getDeclaredConstructor();
+            T objectOfClass = (T) constructor.newInstance();
+            getDeclaredMethods(clazz).stream()
+                    .filter(PopulateUtil::isSetter)
+                    .forEach(method -> continuePopulateForMethod(objectOfClass, method));
+            return objectOfClass;
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CREATE_INSTANCE, clazz.getName()), e);
+        }
+    }
+
+    private <T> void continuePopulateForMethod(T objectOfClass, Method method) {
+        try {
+            method.invoke(objectOfClass, List.of(method.getParameters()).stream()
+                    .map(parameter -> populateWithOverrides(parameter.getType(), parameter, null))
+                    .toArray());
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CALL_METHOD, method.getName(), objectOfClass.getClass().getName()), e);
         }
     }
 }
