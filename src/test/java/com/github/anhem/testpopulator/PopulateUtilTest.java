@@ -30,7 +30,7 @@ class PopulateUtilTest {
 
     @Test
     void toArgumentTypesReturnsParameterArgumentTypes() {
-        Parameter parameter = Arrays.stream(getLargestConstructor(AllArgsConstructor.class).getParameters())
+        Parameter parameter = Arrays.stream(getLargestPublicConstructor(AllArgsConstructor.class).getParameters())
                 .filter(p -> p.getType().equals(Set.class))
                 .findFirst()
                 .orElseThrow();

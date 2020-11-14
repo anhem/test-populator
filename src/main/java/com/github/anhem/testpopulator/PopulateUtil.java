@@ -12,7 +12,7 @@ import static java.util.Arrays.stream;
 public class PopulateUtil {
 
     private static final String JAVA_BASE = "java.base";
-    static final String NO_CONSTRUCTOR_FOUND = "Could not find constructor for %s";
+    static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
 
     static List<Type> toArgumentTypes(Parameter parameter, Type[] typeArguments) {
         if (typeArguments != null) {
@@ -72,8 +72,9 @@ public class PopulateUtil {
         return strategy.equals(Strategy.CONSTRUCTOR) && !hasOnlyDefaultConstructor(clazz);
     }
 
-    static Constructor<?> getLargestConstructor(Class<?> clazz) {
+    static Constructor<?> getLargestPublicConstructor(Class<?> clazz) {
         return stream(clazz.getDeclaredConstructors())
+                .filter(constructor -> Modifier.isPublic(constructor.getModifiers()))
                 .max(Comparator.comparingInt(Constructor::getParameterCount))
                 .orElseThrow(() -> new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName())));
     }
