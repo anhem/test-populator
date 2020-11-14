@@ -118,7 +118,7 @@ public class PopulateFactory {
                     }
                 }).toArray();
         try {
-            return (T) constructor.newInstance(arguments);
+            return constructor.newInstance(arguments);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_INSTANCE, constructor.getName()), e);
         }
