@@ -12,8 +12,8 @@ import static java.util.Arrays.stream;
 public class PopulateUtil {
 
     private static final String JAVA_BASE = "java.base";
-    static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
-    public static final String SETTER_PATTERN = "set\\p{Lu}.*";
+    private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
+    private static final String SETTER_PATTERN = "set\\p{Lu}.*";
 
     static List<Type> toArgumentTypes(Parameter parameter, Type[] typeArguments) {
         if (typeArguments != null) {
