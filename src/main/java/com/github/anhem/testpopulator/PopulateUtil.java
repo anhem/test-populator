@@ -15,6 +15,9 @@ public class PopulateUtil {
     private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
     private static final String SETTER_PATTERN = "set\\p{Lu}.*";
 
+    private PopulateUtil() {
+    }
+
     static List<Type> toArgumentTypes(Parameter parameter, Type[] typeArguments) {
         if (typeArguments != null) {
             return Arrays.asList(typeArguments);
@@ -81,8 +84,9 @@ public class PopulateUtil {
         return strategy.equals(Strategy.FIELD) && hasOnlyDefaultConstructor(clazz);
     }
 
-    static Constructor<?> getLargestPublicConstructor(Class<?> clazz) {
-        return stream(clazz.getDeclaredConstructors())
+    @SuppressWarnings("unchecked")
+    static <T> Constructor<T> getLargestPublicConstructor(Class<T> clazz) {
+        return (Constructor<T>) stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> Modifier.isPublic(constructor.getModifiers()))
                 .max(Comparator.comparingInt(Constructor::getParameterCount))
                 .orElseThrow(() -> new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName())));

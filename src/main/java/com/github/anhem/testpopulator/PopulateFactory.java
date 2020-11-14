@@ -92,7 +92,7 @@ public class PopulateFactory {
         throw new PopulateException(format(MISSING_COLLECTION_TYPE, clazz.getTypeName()));
     }
 
-    private <T> T continuePopulateWithStrategies(Class<?> clazz) {
+    private <T> T continuePopulateWithStrategies(Class<T> clazz) {
         for (Strategy strategy : populateConfig.getStrategyOrder()) {
             if (isMatchingConstructorStrategy(strategy, clazz)) {
                 return continuePopulateUsingConstructor(clazz);
@@ -107,9 +107,8 @@ public class PopulateFactory {
         throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName()));
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T continuePopulateUsingConstructor(Class<?> clazz) {
-        Constructor<?> constructor = getLargestPublicConstructor(clazz);
+    private <T> T continuePopulateUsingConstructor(Class<T> clazz) {
+        Constructor<T> constructor = getLargestPublicConstructor(clazz);
         Object[] arguments = stream(constructor.getParameters())
                 .map(parameter -> {
                     try {
@@ -125,11 +124,10 @@ public class PopulateFactory {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T continuePopulateUsingFields(Class<?> clazz) {
+    private <T> T continuePopulateUsingFields(Class<T> clazz) {
         try {
-            Constructor<?> constructor = clazz.getDeclaredConstructor();
-            T objectOfClass = (T) constructor.newInstance();
+            Constructor<T> constructor = clazz.getDeclaredConstructor();
+            T objectOfClass = constructor.newInstance();
             getDeclaredFields(clazz).stream()
                     .filter(field -> !Modifier.isFinal(field.getModifiers()))
                     .forEach(field -> {
@@ -151,11 +149,10 @@ public class PopulateFactory {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T continuePopulateUsingSetters(Class<?> clazz) {
+    private <T> T continuePopulateUsingSetters(Class<T> clazz) {
         try {
-            Constructor<?> constructor = clazz.getDeclaredConstructor();
-            T objectOfClass = (T) constructor.newInstance();
+            Constructor<T> constructor = clazz.getDeclaredConstructor();
+            T objectOfClass = constructor.newInstance();
             getDeclaredMethods(clazz).stream()
                     .filter(PopulateUtil::isSetter)
                     .forEach(method -> continuePopulateForMethod(objectOfClass, method));

@@ -14,6 +14,9 @@ class RandomUtil {
     private static final int STRING_LENGTH = 10;
     private static final Random random = new SecureRandom();
 
+    private RandomUtil() {
+    }
+
     public static int getRandomInt() {
         return random.nextInt(RANDOM_INT_MAX_VALUE);
     }
