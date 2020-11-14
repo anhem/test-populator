@@ -26,7 +26,7 @@ class PopulateFactoryTest {
     }
 
     @Test
-    public void tryingToInstantiateAbstractClassThrowsException() {
+    void tryingToInstantiateAbstractClassThrowsException() {
         PopulateFactory populateFactory = new PopulateFactory();
         assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructorAbstract.class))
                 .isInstanceOf(PopulateException.class)
