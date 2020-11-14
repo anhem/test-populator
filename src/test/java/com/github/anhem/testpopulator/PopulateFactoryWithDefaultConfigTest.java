@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_INSTANCE;
 import static com.github.anhem.testpopulator.testutil.AssertUtil.assertRandomlyPopulatedValues;
 import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryWithDefaultConfigTest {
@@ -90,5 +91,16 @@ class PopulateFactoryWithDefaultConfigTest {
         assertThatThrownBy(() -> populateFactory.populate(PojoAbstract.class))
                 .isInstanceOf(PopulateException.class)
                 .hasMessageContaining(format(FAILED_TO_CREATE_INSTANCE, ""));
+    }
+
+    @Test
+    void populatedWithPublicConstructor() {
+        DifferentConstructorModifiers value_1 = populateFactory.populate(DifferentConstructorModifiers.class);
+        DifferentConstructorModifiers value_2 = populateFactory.populate(DifferentConstructorModifiers.class);
+        assertThat(value_1).isNotNull();
+        assertThat(value_2).isNotNull();
+        assertThat(value_1).hasNoNullFieldsOrPropertiesExcept("privateConstructorField");
+        assertThat(value_2).hasNoNullFieldsOrPropertiesExcept("privateConstructorField");
+        assertThat(value_1).isNotEqualTo(value_2);
     }
 }

@@ -105,7 +105,7 @@ public class PopulateFactory {
 
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingConstructor(Class<?> clazz) {
-        Constructor<?> constructor = getLargestConstructor(clazz); //TODO configurable when private constructors exist?
+        Constructor<?> constructor = getLargestPublicConstructor(clazz);
         Object[] arguments = stream(constructor.getParameters())
                 .map(parameter -> {
                     try {
@@ -115,7 +115,6 @@ public class PopulateFactory {
                     }
                 }).toArray();
         try {
-            constructor.setAccessible(true); //TODO configurable when private constructors exist?
             return (T) constructor.newInstance(arguments);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_INSTANCE, constructor.getName()), e);
@@ -129,7 +128,7 @@ public class PopulateFactory {
             constructor.setAccessible(true);
             T objectOfClass = (T) constructor.newInstance();
             getDeclaredFields(clazz).stream()
-                    .filter(field -> !Modifier.isFinal(field.getModifiers())) //TODO configurable?
+                    .filter(field -> !Modifier.isFinal(field.getModifiers()))
                     .forEach(field -> {
                         try {
                             field.setAccessible(true);
