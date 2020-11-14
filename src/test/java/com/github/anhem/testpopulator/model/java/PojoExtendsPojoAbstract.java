@@ -9,7 +9,7 @@ public class PojoExtendsPojoAbstract extends PojoAbstract {
         return anotherString;
     }
 
-    void setAnotherString(String anotherString) {
+    public void setAnotherString(String anotherString) {
         this.anotherString = anotherString;
     }
 }

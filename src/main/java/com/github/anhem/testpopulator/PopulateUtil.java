@@ -13,6 +13,7 @@ public class PopulateUtil {
 
     private static final String JAVA_BASE = "java.base";
     static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
+    public static final String SETTER_PATTERN = "set\\p{Lu}.*";
 
     static List<Type> toArgumentTypes(Parameter parameter, Type[] typeArguments) {
         if (typeArguments != null) {
@@ -31,6 +32,10 @@ public class PopulateUtil {
 
     static List<Field> getDeclaredFields(Class<?> clazz) {
         return getDeclaredFields(clazz, new ArrayList<>());
+    }
+
+    static List<Method> getDeclaredMethods(Class<?> clazz) {
+        return getDeclaredMethods(clazz, new ArrayList<>());
     }
 
     static boolean isSet(Class<?> clazz) {
@@ -64,12 +69,16 @@ public class PopulateUtil {
         return method.getParameters().length > 0;
     }
 
-    static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz) {
-        return strategy.equals(Strategy.FIELD) && hasOnlyDefaultConstructor(clazz);
+    static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz) {
+        return strategy.equals(Strategy.SETTER) && hasOnlyDefaultConstructor(clazz);
     }
 
     static boolean isMatchingConstructorStrategy(Strategy strategy, Class<?> clazz) {
         return strategy.equals(Strategy.CONSTRUCTOR) && !hasOnlyDefaultConstructor(clazz);
+    }
+
+    static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz) {
+        return strategy.equals(Strategy.FIELD) && hasOnlyDefaultConstructor(clazz);
     }
 
     static Constructor<?> getLargestPublicConstructor(Class<?> clazz) {
@@ -79,12 +88,24 @@ public class PopulateUtil {
                 .orElseThrow(() -> new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName())));
     }
 
+    static boolean isSetter(Method method) {
+        return method.getName().matches(SETTER_PATTERN) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+    }
+
     private static List<Field> getDeclaredFields(Class<?> clazz, List<Field> declaredFields) {
         declaredFields.addAll(Arrays.asList(clazz.getDeclaredFields()));
         if (clazz.getSuperclass() != null) {
             getDeclaredFields(clazz.getSuperclass(), declaredFields);
         }
         return declaredFields;
+    }
+
+    private static List<Method> getDeclaredMethods(Class<?> clazz, List<Method> declaredMethods) {
+        declaredMethods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
+        if (clazz.getSuperclass() != null) {
+            getDeclaredMethods(clazz.getSuperclass(), declaredMethods);
+        }
+        return declaredMethods;
     }
 
 }
