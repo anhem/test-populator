@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_INSTANCE;
+import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.testutil.AssertUtil.assertRandomlyPopulatedValues;
@@ -31,13 +31,6 @@ class PopulateFactoryWithConstructorStrategyTest {
     void string() {
         String value_1 = populateFactory.populate(String.class);
         String value_2 = populateFactory.populate(String.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-    }
-
-    @Test
-    void integer() {
-        Integer value_1 = populateFactory.populate(Integer.class);
-        Integer value_2 = populateFactory.populate(Integer.class);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
@@ -77,7 +70,7 @@ class PopulateFactoryWithConstructorStrategyTest {
     void tryingToInstantiateAbstractClassThrowsException() {
         assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructorAbstract.class))
                 .isInstanceOf(PopulateException.class)
-                .hasMessageContaining(format(FAILED_TO_CREATE_INSTANCE, ""));
+                .hasMessage(format(FAILED_TO_CREATE_OBJECT, AllArgsConstructorAbstract.class.getName(), CONSTRUCTOR));
     }
 
     @Test

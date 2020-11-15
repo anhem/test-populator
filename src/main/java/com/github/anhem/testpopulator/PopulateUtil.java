@@ -7,6 +7,8 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
+import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.util.Arrays.stream;
 
 public class PopulateUtil {
@@ -63,6 +65,10 @@ public class PopulateUtil {
         return clazz.getModule() != null && JAVA_BASE.equals(clazz.getModule().getName());
     }
 
+    static boolean isDeclaringJavaBaseClass(Method method) {
+        return isJavaBaseClass(method.getDeclaringClass());
+    }
+
     static boolean hasOnlyDefaultConstructor(Class<?> clazz) {
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
         return Arrays.stream(constructors).count() == 1 && constructors[0].getParameterCount() == 0;
@@ -73,15 +79,27 @@ public class PopulateUtil {
     }
 
     static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz) {
-        return strategy.equals(Strategy.SETTER) && hasOnlyDefaultConstructor(clazz);
+        return strategy.equals(SETTER) && hasOnlyDefaultConstructor(clazz);
     }
 
     static boolean isMatchingConstructorStrategy(Strategy strategy, Class<?> clazz) {
-        return strategy.equals(Strategy.CONSTRUCTOR) && !hasOnlyDefaultConstructor(clazz);
+        return strategy.equals(CONSTRUCTOR) && !hasOnlyDefaultConstructor(clazz);
     }
 
     static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz) {
-        return strategy.equals(Strategy.FIELD) && hasOnlyDefaultConstructor(clazz);
+        return strategy.equals(FIELD) && hasOnlyDefaultConstructor(clazz);
+    }
+
+    static boolean isMatchingLombokBuilderStrategy(Strategy strategy, Class<?> clazz) {
+        if (strategy.equals(LOMBOK_BUILDER)) {
+            try {
+                clazz.getDeclaredMethod(BUILDER_METHOD);
+                return true;
+            } catch (NoSuchMethodException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     @SuppressWarnings("unchecked")

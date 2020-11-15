@@ -21,8 +21,8 @@ public class Pojo {
     private LocalDateTime localDateTime;
     private List<String> listOfStrings;
     private Set<String> setOfStrings;
-    private Map<Integer, String> mapOfIntegerToString;
-    private Map<String, Integer> mapOfStringToInteger;
+    private Map<Integer, String> mapOfIntegersToStrings;
+    private Map<String, Integer> mapOfStringsToIntegers;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
 
@@ -130,20 +130,20 @@ public class Pojo {
         this.setOfStrings = setOfStrings;
     }
 
-    public Map<Integer, String> getMapOfIntegerToString() {
-        return mapOfIntegerToString;
+    public Map<Integer, String> getMapOfIntegersToStrings() {
+        return mapOfIntegersToStrings;
     }
 
-    public void setMapOfIntegerToString(Map<Integer, String> mapOfIntegerToString) {
-        this.mapOfIntegerToString = mapOfIntegerToString;
+    public void setMapOfIntegersToStrings(Map<Integer, String> mapOfIntegersToStrings) {
+        this.mapOfIntegersToStrings = mapOfIntegersToStrings;
     }
 
-    public Map<String, Integer> getMapOfStringToInteger() {
-        return mapOfStringToInteger;
+    public Map<String, Integer> getMapOfStringsToIntegers() {
+        return mapOfStringsToIntegers;
     }
 
-    public void setMapOfStringToInteger(Map<String, Integer> mapOfStringToInteger) {
-        this.mapOfStringToInteger = mapOfStringToInteger;
+    public void setMapOfStringsToIntegers(Map<String, Integer> mapOfStringsToIntegers) {
+        this.mapOfStringsToIntegers = mapOfStringsToIntegers;
     }
 
     public ArbitraryEnum getArbitraryEnum() {

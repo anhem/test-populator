@@ -24,7 +24,7 @@ class RandomUtil {
     public static String getRandomString() {
         StringBuilder buffer = new StringBuilder(STRING_LENGTH);
         for (int i = 0; i < STRING_LENGTH; i++) {
-            int randomLimitedInt = LEFT_LIMIT + ((random.nextInt() * (RIGHT_LIMIT - LEFT_LIMIT + 1)));
+            int randomLimitedInt = LEFT_LIMIT + Math.round(random.nextFloat() * (RIGHT_LIMIT - LEFT_LIMIT + 1));
             buffer.append((char) randomLimitedInt);
         }
 
