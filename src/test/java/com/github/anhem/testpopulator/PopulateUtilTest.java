@@ -5,7 +5,7 @@ import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.model.java.*;
 import com.github.anhem.testpopulator.model.java.override.MyUUID;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
-import com.github.anhem.testpopulator.model.lombok.Lombok;
+import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.*;
@@ -184,12 +184,12 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingLombokBuilderStrategyReturnsTrue() {
-        assertThat(isMatchingLombokBuilderStrategy(LOMBOK_BUILDER, Lombok.class)).isTrue();
+        assertThat(isMatchingLombokBuilderStrategy(LOMBOK_BUILDER, LombokImmutable.class)).isTrue();
     }
 
     @Test
     void isMatchingLombokBuilderStrategyReturnsFalse() {
-        assertThat(isMatchingLombokBuilderStrategy(Strategy.CONSTRUCTOR, Lombok.class)).isFalse();
+        assertThat(isMatchingLombokBuilderStrategy(Strategy.CONSTRUCTOR, LombokImmutable.class)).isFalse();
         assertThat(isMatchingLombokBuilderStrategy(LOMBOK_BUILDER, PojoExtendsPojoAbstract.class)).isFalse();
     }
 

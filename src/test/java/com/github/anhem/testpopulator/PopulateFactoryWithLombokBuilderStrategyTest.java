@@ -2,8 +2,9 @@ package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.java.AllArgsConstructor;
-import com.github.anhem.testpopulator.model.lombok.Lombok;
-import com.github.anhem.testpopulator.model.lombok.LombokWithSingular;
+import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
+import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
+import com.github.anhem.testpopulator.model.lombok.LombokImmutableWithSingular;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,26 +36,42 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     }
 
     @Test
-    void LombokBuilder() {
-        Lombok value_1 = populateFactory.populate(Lombok.class);
-        Lombok value_2 = populateFactory.populate(Lombok.class);
+    void LombokImmutable() {
+        LombokImmutable value_1 = populateFactory.populate(LombokImmutable.class);
+        LombokImmutable value_2 = populateFactory.populate(LombokImmutable.class);
         assertRandomlyPopulatedValues(value_1, value_2);
         assertThat(value_1.getListOfStrings()).hasSize(1);
     }
 
     @Test
-    void LombokBuilderWithSingular() {
-        LombokWithSingular value_1 = populateFactory.populate(LombokWithSingular.class);
-        LombokWithSingular value_2 = populateFactory.populate(LombokWithSingular.class);
+    void LombokImmutableWithSingular() {
+        LombokImmutableWithSingular value_1 = populateFactory.populate(LombokImmutableWithSingular.class);
+        LombokImmutableWithSingular value_2 = populateFactory.populate(LombokImmutableWithSingular.class);
         assertRandomlyPopulatedValues(value_1, value_2);
         assertThat(value_1.getListOfStrings()).hasSize(1);
         assertThat(value_1.getSetOfIntegers()).hasSize(1);
     }
 
     @Test
+    void LombokImmutableExtendsLombokAbstractImmutable() {
+        LombokImmutableExtendsLombokAbstractImmutable value_1 = populateFactory.populate(LombokImmutableExtendsLombokAbstractImmutable.class);
+        LombokImmutableExtendsLombokAbstractImmutable value_2 = populateFactory.populate(LombokImmutableExtendsLombokAbstractImmutable.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+        assertThat(value_1.getListOfStrings()).hasSize(1);
+    }
+
+
+    @Test
     void allArgsConstructor() {
         assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructor.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName()));
+    }
+
+    @Test
+    void LombokImmutableBuilder() {
+        assertThatThrownBy(() -> populateFactory.populate(LombokImmutable.LombokImmutableBuilder.class))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, LombokImmutable.LombokImmutableBuilder.class.getName()));
     }
 }
