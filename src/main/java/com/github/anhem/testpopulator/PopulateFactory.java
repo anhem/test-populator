@@ -177,6 +177,7 @@ public class PopulateFactory {
             Optional.ofNullable(methodsGroupedByInvokeOrder.get(3)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
+            buildMethod.setAccessible(true);
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), LOMBOK_BUILDER), e);

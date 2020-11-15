@@ -1,6 +1,6 @@
 package com.github.anhem.testpopulator;
 
-import com.github.anhem.testpopulator.model.lombok.LombokWithSingular;
+import com.github.anhem.testpopulator.model.lombok.LombokImmutableWithSingular;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -15,7 +15,7 @@ class LombokUtilTest {
 
     @Test
     public void lombokMethodInvokeOrderReturnsOrderNumberForMethod() {
-        Map<Integer, List<Method>> methodsGroupedByInvokeOrder = getDeclaredMethodsGroupedByInvokeOrder(LombokWithSingular.LombokWithSingularBuilder.class);
+        Map<Integer, List<Method>> methodsGroupedByInvokeOrder = getDeclaredMethodsGroupedByInvokeOrder(LombokImmutableWithSingular.LombokImmutableWithSingularBuilder.class);
 
         Map<Integer, List<String>> methodNamesGroupedByInvokeOrder = methodsGroupedByInvokeOrder.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()

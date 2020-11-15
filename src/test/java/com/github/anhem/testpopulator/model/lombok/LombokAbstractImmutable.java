@@ -1,9 +1,9 @@
 package com.github.anhem.testpopulator.model.lombok;
 
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
-import lombok.Builder;
-import lombok.Singular;
 import lombok.Value;
+import lombok.experimental.NonFinal;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,8 +12,9 @@ import java.util.Map;
 import java.util.Set;
 
 @Value
-@Builder
-public class LombokWithSingular {
+@NonFinal
+@SuperBuilder
+public abstract class LombokAbstractImmutable {
 
     String stringValue;
     char primitiveCharacterValue;
@@ -26,15 +27,9 @@ public class LombokWithSingular {
     Double doubleValue;
     LocalDate localDate;
     LocalDateTime localDateTime;
-    @Singular
     List<String> listOfStrings;
-    @Singular
     Set<String> setOfStrings;
-    @Singular("setOfIntegerOverride")
-    Set<Integer> setOfIntegers;
-    @Singular
     Map<Integer, String> mapOfIntegersToStrings;
-    @Singular
     Map<String, Integer> mapOfStringsToIntegers;
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
