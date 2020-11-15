@@ -70,11 +70,6 @@ public class PopulateUtil {
         return isJavaBaseClass(method.getDeclaringClass());
     }
 
-    static boolean hasOnlyDefaultConstructor(Class<?> clazz) {
-        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-        return Arrays.stream(constructors).count() == 1 && constructors[0].getParameterCount() == 0;
-    }
-
     static boolean hasAtLeastOneParameter(Method method) {
         return method.getParameters().length > 0;
     }
@@ -117,6 +112,11 @@ public class PopulateUtil {
 
     static boolean isSetter(Method method) {
         return method.getName().matches(SETTER_PATTERN) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+    }
+
+    private static boolean hasOnlyDefaultConstructor(Class<?> clazz) {
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        return Arrays.stream(constructors).count() == 1 && constructors[0].getParameterCount() == 0;
     }
 
     private static List<Field> getDeclaredFields(Class<?> clazz, List<Field> declaredFields) {

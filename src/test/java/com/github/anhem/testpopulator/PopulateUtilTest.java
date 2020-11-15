@@ -78,16 +78,6 @@ class PopulateUtilTest {
     }
 
     @Test
-    void hasOnlyDefaultConstructorReturnsFalse() {
-        assertThat(hasOnlyDefaultConstructor(AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
-    }
-
-    @Test
-    void hasOnlyDefaultConstructorReturnsTrue() {
-        assertThat(hasOnlyDefaultConstructor(PojoExtendsPojoAbstract.class)).isTrue();
-    }
-
-    @Test
     void isSetReturnsFalse() {
         assertThat(isSet(String.class)).isFalse();
     }
