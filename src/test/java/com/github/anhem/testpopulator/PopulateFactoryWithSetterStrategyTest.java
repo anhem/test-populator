@@ -10,7 +10,7 @@ import java.util.List;
 import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.Strategy.SETTER;
-import static com.github.anhem.testpopulator.testutil.AssertUtil.assertRandomlyPopulatedValues;
+import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

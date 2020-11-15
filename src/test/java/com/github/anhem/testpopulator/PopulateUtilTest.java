@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.testutil.MethodTestUtil.getMethod;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateUtilTest {
@@ -195,7 +196,7 @@ class PopulateUtilTest {
     @Test
     void isSetterReturnsTrue() {
         List<Method> setterMethods = getDeclaredMethods(Pojo.class).stream()
-                .filter(PopulateUtil::isSetter)
+                .filter(PopulateUtil::isSetterMethod)
                 .collect(Collectors.toList());
 
         assertThat(setterMethods).isNotEmpty();
@@ -217,12 +218,4 @@ class PopulateUtilTest {
 
         assertThat(isBlackListedMethod(method)).isFalse();
     }
-
-    private Method getMethod(String methodName, Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredMethods())
-                .filter(m -> m.getName().equals(methodName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Could not find method with name " + methodName));
-    }
-
 }

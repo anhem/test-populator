@@ -7,8 +7,10 @@ import com.github.anhem.testpopulator.config.Strategy;
 import java.lang.reflect.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+import static com.github.anhem.testpopulator.LombokUtil.getDeclaredMethodsGroupedByInvokeOrder;
 import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.lang.String.format;
@@ -155,7 +157,7 @@ public class PopulateFactory {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             T objectOfClass = constructor.newInstance();
             getDeclaredMethods(clazz).stream()
-                    .filter(PopulateUtil::isSetter)
+                    .filter(PopulateUtil::isSetterMethod)
                     .forEach(method -> continuePopulateForMethod(objectOfClass, method));
             return objectOfClass;
         } catch (Exception e) {
@@ -166,13 +168,14 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingLombokBuilder(Class<T> clazz) {
         try {
-            Method builderMethod = clazz.getDeclaredMethod(BUILDER_METHOD);
-            Object builderObject = builderMethod.invoke(null);
-            getDeclaredMethods(builderObject.getClass()).stream()
-                    .filter(PopulateUtil::hasAtLeastOneParameter)
-                    .filter(method -> !isDeclaringJavaBaseClass(method))
-                    .filter(method -> !isBlackListedMethod(method))
-                    .forEach(method -> continuePopulateForMethod(builderObject, method));
+            Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
+            Map<Integer, List<Method>> methodsGroupedByInvokeOrder = getDeclaredMethodsGroupedByInvokeOrder(builderObject.getClass());
+            Optional.ofNullable(methodsGroupedByInvokeOrder.get(1)).ifPresent(methods ->
+                    methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
+            Optional.ofNullable(methodsGroupedByInvokeOrder.get(2)).ifPresent(methods ->
+                    methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
+            Optional.ofNullable(methodsGroupedByInvokeOrder.get(3)).ifPresent(methods ->
+                    methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
