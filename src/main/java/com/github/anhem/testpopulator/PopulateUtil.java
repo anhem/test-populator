@@ -13,6 +13,7 @@ import static java.util.Arrays.stream;
 
 public class PopulateUtil {
 
+    private static final List<String> BLACKLISTED_METHODS = List.of("$jacocoInit");
     private static final String JAVA_BASE = "java.base";
     private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
     private static final String SETTER_PATTERN = "set\\p{Lu}.*";
@@ -108,6 +109,10 @@ public class PopulateUtil {
                 .filter(constructor -> Modifier.isPublic(constructor.getModifiers()))
                 .max(Comparator.comparingInt(Constructor::getParameterCount))
                 .orElseThrow(() -> new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName())));
+    }
+
+    static boolean isBlackListedMethod(Method method) {
+        return BLACKLISTED_METHODS.contains(method.getName());
     }
 
     static boolean isSetter(Method method) {
