@@ -11,7 +11,7 @@ import java.util.List;
 
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.Strategy.LOMBOK_BUILDER;
-import static com.github.anhem.testpopulator.testutil.AssertUtil.assertRandomlyPopulatedValues;
+import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -47,7 +47,8 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         LombokWithSingular value_1 = populateFactory.populate(LombokWithSingular.class);
         LombokWithSingular value_2 = populateFactory.populate(LombokWithSingular.class);
         assertRandomlyPopulatedValues(value_1, value_2);
-        //assertThat(value_1.getListOfStrings()).hasSize(1);
+        assertThat(value_1.getListOfStrings()).hasSize(1);
+        assertThat(value_1.getSetOfIntegers()).hasSize(1);
     }
 
     @Test
