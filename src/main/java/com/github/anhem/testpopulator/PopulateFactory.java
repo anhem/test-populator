@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.github.anhem.testpopulator.PopulateUtil.*;
+import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
@@ -18,10 +19,12 @@ public class PopulateFactory {
     static final String MISSING_STRATEGIES = "No strategy order defined";
     static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection %s";
     static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy. Try another strategy or override population for this class";
-    static final String FAILED_TO_POPULATE_CLASS = "Failed while populating %s for class %s";
     static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s";
     static final String FAILED_TO_CALL_METHOD = "Failed to call method %s in object of class %s";
-    static final String FAILED_TO_CREATE_INSTANCE = "Failed to create new instance of %s";
+    static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of %s using %s strategy";
+
+    private static final String BUILD_METHOD = "build";
+    static final String BUILDER_METHOD = "builder";
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
@@ -103,24 +106,22 @@ public class PopulateFactory {
             if (isMatchingFieldStrategy(strategy, clazz)) {
                 return continuePopulateUsingFields(clazz);
             }
+            if (isMatchingLombokBuilderStrategy(strategy, clazz)) {
+                return continuePopulateUsingLombokBuilder(clazz);
+            }
         }
         throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName()));
     }
 
     private <T> T continuePopulateUsingConstructor(Class<T> clazz) {
-        Constructor<T> constructor = getLargestPublicConstructor(clazz);
-        Object[] arguments = stream(constructor.getParameters())
-                .map(parameter -> {
-                    try {
-                        return populateWithOverrides(parameter.getType(), parameter, null);
-                    } catch (Exception e) {
-                        throw new PopulateException(format(FAILED_TO_POPULATE_CLASS, parameter.getName(), clazz.getName()), e);
-                    }
-                }).toArray();
         try {
+            Constructor<T> constructor = getLargestPublicConstructor(clazz);
+            Object[] arguments = stream(constructor.getParameters())
+                    .map(parameter -> populateWithOverrides(parameter.getType(), parameter, null))
+                    .toArray();
             return constructor.newInstance(arguments);
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_INSTANCE, constructor.getName()), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), CONSTRUCTOR), e);
         }
     }
 
@@ -145,7 +146,7 @@ public class PopulateFactory {
                     });
             return objectOfClass;
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_INSTANCE, clazz.getName()), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), FIELD), e);
         }
     }
 
@@ -158,7 +159,23 @@ public class PopulateFactory {
                     .forEach(method -> continuePopulateForMethod(objectOfClass, method));
             return objectOfClass;
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_INSTANCE, clazz.getName()), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), SETTER), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateUsingLombokBuilder(Class<T> clazz) {
+        try {
+            Method builderMethod = clazz.getDeclaredMethod(BUILDER_METHOD);
+            Object builderObject = builderMethod.invoke(null);
+            getDeclaredMethods(builderObject.getClass()).stream()
+                    .filter(PopulateUtil::hasAtLeastOneParameter)
+                    .filter(method -> !isDeclaringJavaBaseClass(method))
+                    .forEach(method -> continuePopulateForMethod(builderObject, method));
+            Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
+            return (T) buildMethod.invoke(builderObject);
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), LOMBOK_BUILDER), e);
         }
     }
 

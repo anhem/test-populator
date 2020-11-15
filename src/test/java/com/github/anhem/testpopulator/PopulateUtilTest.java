@@ -5,6 +5,7 @@ import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.model.java.*;
 import com.github.anhem.testpopulator.model.java.override.MyUUID;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
+import com.github.anhem.testpopulator.model.lombok.Lombok;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.*;
@@ -188,6 +189,17 @@ class PopulateUtilTest {
     void isMatchingFieldStrategyReturnsFalse() {
         assertThat(isMatchingFieldStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
         assertThat(isMatchingFieldStrategy(Strategy.FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
+    }
+
+    @Test
+    void isMatchingLombokBuilderStrategyReturnsTrue() {
+        assertThat(isMatchingLombokBuilderStrategy(LOMBOK_BUILDER, Lombok.class)).isTrue();
+    }
+
+    @Test
+    void isMatchingLombokBuilderStrategyReturnsFalse() {
+        assertThat(isMatchingLombokBuilderStrategy(Strategy.CONSTRUCTOR, Lombok.class)).isFalse();
+        assertThat(isMatchingLombokBuilderStrategy(LOMBOK_BUILDER, PojoExtendsPojoAbstract.class)).isFalse();
     }
 
     @Test

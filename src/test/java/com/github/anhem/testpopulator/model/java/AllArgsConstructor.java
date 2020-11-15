@@ -21,12 +21,12 @@ public class AllArgsConstructor {
     private final LocalDateTime localDateTime;
     private final List<String> listOfStrings;
     private final Set<String> setOfStrings;
-    private final Map<Integer, String> mapOfIntegerToString;
-    private final Map<String, Integer> mapOfStringToInteger;
+    private final Map<Integer, String> mapOfIntegersToStrings;
+    private final Map<String, Integer> mapOfStringsToIntegers;
     private final ArbitraryEnum arbitraryEnum;
     private final String[] arrayOfStrings;
 
-    public AllArgsConstructor(String stringValue, char primitiveCharacterValue, Character characterValue, int primitiveIntegerValue, Integer integerValue, long primitiveLongValue, Long longValue, double primitiveDoubleValue, Double doubleValue, LocalDate localDate, LocalDateTime localDateTime, List<String> listOfStrings, Set<String> setOfStrings, Map<Integer, String> mapOfIntegerToString, Map<String, Integer> mapOfStringToInteger, ArbitraryEnum arbitraryEnum, String[] arrayOfStrings) {
+    public AllArgsConstructor(String stringValue, char primitiveCharacterValue, Character characterValue, int primitiveIntegerValue, Integer integerValue, long primitiveLongValue, Long longValue, double primitiveDoubleValue, Double doubleValue, LocalDate localDate, LocalDateTime localDateTime, List<String> listOfStrings, Set<String> setOfStrings, Map<Integer, String> mapOfIntegersToStrings, Map<String, Integer> mapOfStringsToIntegers, ArbitraryEnum arbitraryEnum, String[] arrayOfStrings) {
         this.stringValue = stringValue;
         this.primitiveCharacterValue = primitiveCharacterValue;
         this.characterValue = characterValue;
@@ -40,8 +40,8 @@ public class AllArgsConstructor {
         this.localDateTime = localDateTime;
         this.listOfStrings = listOfStrings;
         this.setOfStrings = setOfStrings;
-        this.mapOfIntegerToString = mapOfIntegerToString;
-        this.mapOfStringToInteger = mapOfStringToInteger;
+        this.mapOfIntegersToStrings = mapOfIntegersToStrings;
+        this.mapOfStringsToIntegers = mapOfStringsToIntegers;
         this.arbitraryEnum = arbitraryEnum;
         this.arrayOfStrings = arrayOfStrings;
     }
@@ -98,12 +98,12 @@ public class AllArgsConstructor {
         return setOfStrings;
     }
 
-    public Map<Integer, String> getMapOfIntegerToString() {
-        return mapOfIntegerToString;
+    public Map<Integer, String> getMapOfIntegersToStrings() {
+        return mapOfIntegersToStrings;
     }
 
-    public Map<String, Integer> getMapOfStringToInteger() {
-        return mapOfStringToInteger;
+    public Map<String, Integer> getMapOfStringsToIntegers() {
+        return mapOfStringsToIntegers;
     }
 
     public ArbitraryEnum getArbitraryEnum() {
