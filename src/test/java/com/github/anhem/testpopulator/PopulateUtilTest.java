@@ -214,6 +214,20 @@ class PopulateUtilTest {
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
 
+    @Test
+    void isBlackListedMethodReturnsTrue() {
+        Method method = getMethod("$jacocoInit", HasBlackListedMethod.class);
+
+        assertThat(isBlackListedMethod(method)).isTrue();
+    }
+
+    @Test
+    void isBlackListedMethodReturnsFalse() {
+        Method method = getMethod("getStringValue", Pojo.class);
+
+        assertThat(isBlackListedMethod(method)).isFalse();
+    }
+
     private Method getMethod(String methodName, Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredMethods())
                 .filter(m -> m.getName().equals(methodName))

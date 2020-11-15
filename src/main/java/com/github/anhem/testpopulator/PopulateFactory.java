@@ -171,6 +171,7 @@ public class PopulateFactory {
             getDeclaredMethods(builderObject.getClass()).stream()
                     .filter(PopulateUtil::hasAtLeastOneParameter)
                     .filter(method -> !isDeclaringJavaBaseClass(method))
+                    .filter(method -> !isBlackListedMethod(method))
                     .forEach(method -> continuePopulateForMethod(builderObject, method));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             return (T) buildMethod.invoke(builderObject);
