@@ -5,5 +5,5 @@ public enum Strategy {
     CONSTRUCTOR,
     FIELD,
     SETTER,
-    LOMBOK_BUILDER
+    BUILDER
 }

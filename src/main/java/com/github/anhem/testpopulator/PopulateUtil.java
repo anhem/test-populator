@@ -13,10 +13,12 @@ import static java.util.Arrays.stream;
 
 public class PopulateUtil {
 
+    static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
+
     private static final List<String> BLACKLISTED_METHODS = List.of("$jacocoInit");
     private static final String JAVA_BASE = "java.base";
     private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
-    private static final String SETTER_METHOD_PATTERN = "set\\p{Lu}.*";
+    private static final String SETTER_METHOD_PATTERN = String.format("%s%s", "set", MATCH_FIRST_CHARACTER_UPPERCASE);
 
     private PopulateUtil() {
     }
@@ -58,6 +60,10 @@ public class PopulateUtil {
                 Iterable.class.isAssignableFrom(clazz);
     }
 
+    static <T> boolean isMapEntry(Class<T> clazz) {
+        return clazz.isAssignableFrom(Map.Entry.class);
+    }
+
     static boolean isValue(Class<?> clazz) {
         return clazz.isEnum() || isJavaBaseClass(clazz);
     }
@@ -86,8 +92,8 @@ public class PopulateUtil {
         return strategy.equals(FIELD) && hasOnlyDefaultConstructor(clazz);
     }
 
-    static boolean isMatchingLombokBuilderStrategy(Strategy strategy, Class<?> clazz) {
-        if (strategy.equals(LOMBOK_BUILDER)) {
+    static boolean isMatchingBuilderStrategy(Strategy strategy, Class<?> clazz) {
+        if (strategy.equals(BUILDER)) {
             try {
                 clazz.getDeclaredMethod(BUILDER_METHOD);
                 return true;
@@ -112,6 +118,11 @@ public class PopulateUtil {
 
     static boolean isSetterMethod(Method method) {
         return method.getName().matches(SETTER_METHOD_PATTERN) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+    }
+
+    static <T> boolean isSameMethodParameterAsClass(Class<T> clazz, Method method) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        return parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(clazz);
     }
 
     private static boolean hasOnlyDefaultConstructor(Class<?> clazz) {

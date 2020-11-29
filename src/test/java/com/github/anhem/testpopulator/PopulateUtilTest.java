@@ -157,7 +157,6 @@ class PopulateUtilTest {
     void isMatchingSetterStrategyReturnsFalse() {
         assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
         assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
-
     }
 
     @Test
@@ -183,14 +182,14 @@ class PopulateUtilTest {
     }
 
     @Test
-    void isMatchingLombokBuilderStrategyReturnsTrue() {
-        assertThat(isMatchingLombokBuilderStrategy(LOMBOK_BUILDER, LombokImmutable.class)).isTrue();
+    void isMatchingBuilderStrategyReturnsTrue() {
+        assertThat(isMatchingBuilderStrategy(BUILDER, LombokImmutable.class)).isTrue();
     }
 
     @Test
-    void isMatchingLombokBuilderStrategyReturnsFalse() {
-        assertThat(isMatchingLombokBuilderStrategy(Strategy.CONSTRUCTOR, LombokImmutable.class)).isFalse();
-        assertThat(isMatchingLombokBuilderStrategy(LOMBOK_BUILDER, PojoExtendsPojoAbstract.class)).isFalse();
+    void isMatchingBuilderStrategyReturnsFalse() {
+        assertThat(isMatchingBuilderStrategy(Strategy.CONSTRUCTOR, LombokImmutable.class)).isFalse();
+        assertThat(isMatchingBuilderStrategy(BUILDER, PojoExtendsPojoAbstract.class)).isFalse();
     }
 
     @Test

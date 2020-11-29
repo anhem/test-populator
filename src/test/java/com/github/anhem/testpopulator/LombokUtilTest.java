@@ -8,20 +8,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.LombokUtil.getDeclaredMethodsGroupedByInvokeOrder;
+import static com.github.anhem.testpopulator.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LombokUtilTest {
 
     @Test
     public void lombokMethodInvokeOrderReturnsOrderNumberForMethod() {
-        Map<Integer, List<Method>> methodsGroupedByInvokeOrder = getDeclaredMethodsGroupedByInvokeOrder(LombokImmutableWithSingular.LombokImmutableWithSingularBuilder.class);
+        Map<Integer, List<Method>> methodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(LombokImmutableWithSingular.LombokImmutableWithSingularBuilder.class);
 
         Map<Integer, List<String>> methodNamesGroupedByInvokeOrder = methodsGroupedByInvokeOrder.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                         .map(Method::getName)
                         .collect(Collectors.toList())));
 
+        assertThat(methodNamesGroupedByInvokeOrder.keySet()).hasSize(4);
         assertThat(methodNamesGroupedByInvokeOrder.get(0)).contains("build");
         assertThat(methodNamesGroupedByInvokeOrder.get(1)).contains("stringValue");
         assertThat(methodNamesGroupedByInvokeOrder.get(1)).contains("setOfString");

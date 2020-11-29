@@ -1,17 +1,18 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 
 import java.lang.reflect.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-import static com.github.anhem.testpopulator.LombokUtil.getDeclaredMethodsGroupedByInvokeOrder;
+import static com.github.anhem.testpopulator.ImmutablesUtil.getMethodsForImmutablesBuilder;
+import static com.github.anhem.testpopulator.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
 import static com.github.anhem.testpopulator.PopulateUtil.*;
+import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
+import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -19,6 +20,7 @@ import static java.util.Arrays.stream;
 public class PopulateFactory {
 
     static final String MISSING_STRATEGIES = "No strategy order defined";
+    static final String MISSING_BUILDER_PATTERN = "%s strategy configured, but no builderPattern specified. Should be one of %s";
     static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection %s";
     static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy. Try another strategy or override population for this class";
     static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s";
@@ -43,6 +45,9 @@ public class PopulateFactory {
         if (populateConfig.getStrategyOrder().isEmpty()) {
             throw new IllegalArgumentException(MISSING_STRATEGIES);
         }
+        if (populateConfig.getStrategyOrder().contains(BUILDER) && populateConfig.getBuilderPattern() == null) {
+            throw new IllegalArgumentException(format(MISSING_BUILDER_PATTERN, BUILDER, Arrays.toString(BuilderPattern.values())));
+        }
     }
 
     public <T> T populate(Class<T> clazz) {
@@ -62,6 +67,9 @@ public class PopulateFactory {
         }
         if (isCollection(clazz)) {
             return continuePopulateForCollection(clazz, parameter, typeArguments);
+        }
+        if (isMapEntry(clazz)) {
+            return continuePopulateForMapEntry(parameter, typeArguments);
         }
         if (isValue(clazz)) {
             return valueFactory.createValue(clazz);
@@ -97,6 +105,14 @@ public class PopulateFactory {
         throw new PopulateException(format(MISSING_COLLECTION_TYPE, clazz.getTypeName()));
     }
 
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateForMapEntry(Parameter parameter, Type[] typeArguments) {
+        List<Type> argumentTypes = toArgumentTypes(parameter, typeArguments);
+        Object key = populateWithOverrides((Class<?>) argumentTypes.get(0));
+        Object value = populateWithOverrides((Class<?>) argumentTypes.get(1));
+        return (T) new AbstractMap.SimpleEntry<>(key, value);
+    }
+
     private <T> T continuePopulateWithStrategies(Class<T> clazz) {
         for (Strategy strategy : populateConfig.getStrategyOrder()) {
             if (isMatchingConstructorStrategy(strategy, clazz)) {
@@ -108,8 +124,8 @@ public class PopulateFactory {
             if (isMatchingFieldStrategy(strategy, clazz)) {
                 return continuePopulateUsingFields(clazz);
             }
-            if (isMatchingLombokBuilderStrategy(strategy, clazz)) {
-                return continuePopulateUsingLombokBuilder(clazz);
+            if (isMatchingBuilderStrategy(strategy, clazz)) {
+                return continuePopulateUsingBuilder(clazz);
             }
         }
         throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName()));
@@ -165,22 +181,45 @@ public class PopulateFactory {
         }
     }
 
+    private <T> T continuePopulateUsingBuilder(Class<T> clazz) {
+        if (populateConfig.getBuilderPattern().equals(LOMBOK)) {
+            return continuePopulateUsingLombokBuilder(clazz);
+        }
+        if (populateConfig.getBuilderPattern().equals(IMMUTABLES)) {
+            return continuePopulateUsingImmutablesBuilder(clazz);
+        }
+        throw new PopulateException("");
+    }
+
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingLombokBuilder(Class<T> clazz) {
         try {
             Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
-            Map<Integer, List<Method>> methodsGroupedByInvokeOrder = getDeclaredMethodsGroupedByInvokeOrder(builderObject.getClass());
-            Optional.ofNullable(methodsGroupedByInvokeOrder.get(1)).ifPresent(methods ->
+            Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(builderObject.getClass());
+            Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(1)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
-            Optional.ofNullable(methodsGroupedByInvokeOrder.get(2)).ifPresent(methods ->
+            Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(2)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
-            Optional.ofNullable(methodsGroupedByInvokeOrder.get(3)).ifPresent(methods ->
+            Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(3)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             buildMethod.setAccessible(true);
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), LOMBOK_BUILDER), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, LOMBOK)), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateUsingImmutablesBuilder(Class<T> clazz) {
+        try {
+            Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
+            List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(clazz, builderObject);
+            builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method));
+            Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
+            return (T) buildMethod.invoke(builderObject);
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, IMMUTABLES)), e);
         }
     }
 
