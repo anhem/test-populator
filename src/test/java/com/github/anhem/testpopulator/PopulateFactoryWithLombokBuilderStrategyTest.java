@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.java.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
-import static com.github.anhem.testpopulator.config.Strategy.LOMBOK_BUILDER;
+import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,7 +24,8 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     @BeforeEach
     void setUp() {
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(LOMBOK_BUILDER))
+                .strategyOrder(List.of(BUILDER))
+                .builderPattern(BuilderPattern.LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -41,6 +43,8 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         LombokImmutable value_2 = populateFactory.populate(LombokImmutable.class);
         assertRandomlyPopulatedValues(value_1, value_2);
         assertThat(value_1.getListOfStrings()).hasSize(1);
+        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
+        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
     }
 
     @Test
@@ -49,6 +53,8 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         LombokImmutableWithSingular value_2 = populateFactory.populate(LombokImmutableWithSingular.class);
         assertRandomlyPopulatedValues(value_1, value_2);
         assertThat(value_1.getListOfStrings()).hasSize(1);
+        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
+        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
         assertThat(value_1.getSetOfIntegers()).hasSize(1);
     }
 

@@ -21,6 +21,7 @@ public class PopulateConfig {
         private List<Strategy> strategyOrder;
         private List<OverridePopulate<?>> overridePopulate;
         private Boolean randomValues;
+        private BuilderPattern builderPattern;
 
         public PopulateConfigBuilder strategyOrder(List<Strategy> strategyOrder) {
             this.strategyOrder = strategyOrder;
@@ -37,8 +38,13 @@ public class PopulateConfig {
             return this;
         }
 
+        public PopulateConfigBuilder builderPattern(BuilderPattern builderPattern) {
+            this.builderPattern = builderPattern;
+            return this;
+        }
+
         public PopulateConfig build() {
-            return new PopulateConfig(strategyOrder, overridePopulate, randomValues);
+            return new PopulateConfig(strategyOrder, overridePopulate, randomValues, builderPattern);
         }
     }
 
@@ -49,13 +55,17 @@ public class PopulateConfig {
     private final List<Strategy> strategyOrder;
     private final List<OverridePopulate<?>> overridePopulate;
     private final boolean randomValues;
+    private final BuilderPattern builderPattern;
 
     private PopulateConfig(List<Strategy> strategyOrder,
                            List<OverridePopulate<?>> overridePopulate,
-                           Boolean randomValues) {
+                           Boolean randomValues,
+                           BuilderPattern builderPattern
+    ) {
         this.strategyOrder = strategyOrder == null ? defaultStrategyOrder : strategyOrder;
         this.overridePopulate = overridePopulate == null ? defaultOverridePopulate : overridePopulate;
         this.randomValues = randomValues == null ? defaultRandomValues : randomValues;
+        this.builderPattern = builderPattern;
     }
 
     public List<Strategy> getStrategyOrder() {
@@ -73,5 +83,9 @@ public class PopulateConfig {
 
     public boolean useRandomValues() {
         return randomValues;
+    }
+
+    public BuilderPattern getBuilderPattern() {
+        return builderPattern;
     }
 }

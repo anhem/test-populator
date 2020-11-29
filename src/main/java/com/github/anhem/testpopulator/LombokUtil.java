@@ -9,13 +9,12 @@ import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static java.util.Arrays.stream;
 
 public class LombokUtil {
-
-    private static final String CLEAR_METHOD_PATTERN = "clear\\p{Lu}.*";
+    private static final String CLEAR_METHOD_PATTERN = String.format("%s%s", "clear", MATCH_FIRST_CHARACTER_UPPERCASE);
 
     private LombokUtil() {
     }
 
-    static Map<Integer, List<Method>> getDeclaredMethodsGroupedByInvokeOrder(Class<?> clazz) {
+    static Map<Integer, List<Method>> getMethodsForLombokBuilderGroupedByInvokeOrder(Class<?> clazz) {
         return getDeclaredMethods(clazz).stream()
                 .filter(method -> !isDeclaringJavaBaseClass(method))
                 .filter(method -> !isBlackListedMethod(method))
