@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class MyUUID {
 
-    private UUID uuid;
+    private final UUID uuid;
 
     public MyUUID(String uuid) {
         this.uuid = UUID.fromString(uuid);
