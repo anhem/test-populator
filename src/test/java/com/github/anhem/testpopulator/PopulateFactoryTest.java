@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
+import com.github.anhem.testpopulator.model.java.MyClass;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -17,6 +18,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryTest {
+
+
+    @Test
+    public void myClass() {
+        MyClass myClass = new PopulateFactory().populate(MyClass.class);
+
+        assertThat(myClass).hasNoNullFieldsOrProperties();
+    }
 
     @Test
     void missingStrategiesThrowsException() {
