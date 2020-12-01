@@ -25,7 +25,14 @@ public class MyClass {
 ```
 Results in this:
 ```
-MyClass{stringValue='xksqbhddha', listWithEnums=[B], myInnerClass=InnerClass{integer=789707, stringToLocalDateMap={dsyyjxizvp=2021-02-14}}}
+MyClass{
+    stringValue='xksqbhddha', 
+    listWithEnums=[B], 
+    myInnerClass=InnerClass{
+        integer=789707, 
+        stringToLocalDateMap={dsyyjxizvp=2021-02-14}
+    }
+}
 ```
 
 # Configuration
