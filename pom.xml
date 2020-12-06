@@ -12,6 +12,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <scm>
+        <connection>scm:git:git:github.com/anhem/test-populator.git</connection>
+        <developerConnection>scm:git:git@github.com:anhem/test-populator.git</developerConnection>
+        <url>https://github.com/anhem/test-populator</url>
+        <tag>develop</tag>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>Apache 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
