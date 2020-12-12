@@ -27,10 +27,6 @@
         </license>
     </licenses>
 
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
-
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -80,7 +76,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>3.0.0-M1</version>
                 <configuration>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                     <useReleaseProfile>false</useReleaseProfile>
