@@ -9,6 +9,20 @@
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <name>test-populator</name>
+    <description>
+        Populate java classes with fixed or random data using reflection. Facilitates the creation of objects in tests.
+    </description>
+    <url>https://github.com/anhem/test-populator</url>
+
+    <developers>
+        <developer>
+            <id>anhem</id>
+            <name>Andreas Hemmingsson</name>
+            <email>andhem@gmail.com</email>
+        </developer>
+    </developers>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
