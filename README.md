@@ -1,9 +1,9 @@
 # test-populator
-
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://search.maven.org/search?q=g:com.github.anhem%20a:test-populator)
 [![Build Status](https://travis-ci.org/anhem/test-populator.svg?branch=main)](https://travis-ci.org/github/anhem/test-populator)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.anhem%3Atest-populator&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.anhem%3Atest-populator)
 
-This library populates java classes with fixed or random data using reflection. It makes it easy to create objects in tests.
+Populate java classes with fixed or random data using reflection. Facilitates the creation of objects in tests.
 
 Doing this:
 ```java
@@ -35,11 +35,23 @@ MyClass{
 }
 ```
 
+# Maven
+
+```xml
+
+<dependency>
+    <groupId>com.github.anhem</groupId>
+    <artifactId>test-populator</artifactId>
+    <version>0.1.1</version>
+    <scope>test</scope>
+</dependency>
+```
+
 # Configuration
 
-Use PopulateConfig to configure how object-populator should run. 
+Use PopulateConfig to configure how object-populator should run.
 
-| config | Values | Default 
+| config | Values | Default
 |---|---|---
 | strategy | Any of CONSTRUCTOR,FIELD,SETTER,BUILDER | CONSTRUCTOR,FIELD
 | builderPattern | LOMBOK / IMMUTABLES | -
