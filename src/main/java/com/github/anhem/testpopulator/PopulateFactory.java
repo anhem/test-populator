@@ -17,6 +17,9 @@ import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
+/**
+ * Factory for creating fully a populated object from class
+ */
 public class PopulateFactory {
 
     static final String MISSING_STRATEGIES = "No strategy order defined";
@@ -34,10 +37,18 @@ public class PopulateFactory {
     private final ValueFactory valueFactory;
     private final Map<? extends Class<?>, OverridePopulate<?>> overridePopulate;
 
+    /**
+     * Create new instance of PopulateFactory with default configuration
+     */
     public PopulateFactory() {
         this(PopulateConfig.builder().build());
     }
 
+    /**
+     * Create new instance of PopulateFactory
+     *
+     * @param populateConfig configuration properties for PopulateFactory
+     */
     public PopulateFactory(PopulateConfig populateConfig) {
         this.populateConfig = populateConfig;
         valueFactory = new ValueFactory(populateConfig.useRandomValues());
@@ -50,6 +61,12 @@ public class PopulateFactory {
         }
     }
 
+    /**
+     * Call to create a fully populated object from a class
+     *
+     * @param clazz Class that should be populated
+     * @return object of clazz
+     */
     public <T> T populate(Class<T> clazz) {
         return populateWithOverrides(clazz);
     }
