@@ -10,12 +10,18 @@ import java.util.stream.Collectors;
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 
+/**
+ * Configuration for PopulateFactory
+ */
 public class PopulateConfig {
 
     private static final List<Strategy> defaultStrategyOrder = Arrays.asList(CONSTRUCTOR, FIELD);
     private static final List<OverridePopulate<?>> defaultOverridePopulate = Collections.emptyList();
     private static final boolean defaultRandomValues = true;
 
+    /**
+     * Builder for PopulateConfig
+     */
     public static class PopulateConfigBuilder {
 
         private List<Strategy> strategyOrder;
