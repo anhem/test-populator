@@ -55,7 +55,7 @@ MyClass{
 
 # Configuration
 
-Use PopulateConfig to configure how object-populator should run.
+Use PopulateConfig to configure how test-populator should run.
 
 | config | Values | Default
 |---|---|---
