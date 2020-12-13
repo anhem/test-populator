@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReadMeTest {
 
     @Test
-    public void myClass() {
+    void myClass() {
         MyClass myClass = new PopulateFactory().populate(MyClass.class);
 
         assertThat(myClass).hasNoNullFieldsOrProperties();
