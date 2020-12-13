@@ -18,7 +18,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
 /**
- * Factory for creating fully a populated object from class
+ * Factory for creating populated objects from classes
  */
 public class PopulateFactory {
 

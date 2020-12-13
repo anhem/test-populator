@@ -1,4 +1,6 @@
-package com.github.anhem.testpopulator.model.java;
+package com.github.anhem.testpopulator.readme.model;
+
+import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 
 import java.time.LocalDate;
 import java.util.List;
