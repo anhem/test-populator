@@ -22,7 +22,6 @@ import static java.util.Arrays.stream;
  */
 public class PopulateFactory {
 
-    static final String MISSING_STRATEGIES = "No strategy order defined";
     static final String MISSING_BUILDER_PATTERN = "%s strategy configured, but no builderPattern specified. Should be one of %s";
     static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection %s";
     static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy. Try another strategy or override population for this class";
@@ -53,9 +52,6 @@ public class PopulateFactory {
         this.populateConfig = populateConfig;
         valueFactory = new ValueFactory(populateConfig.useRandomValues());
         overridePopulate = populateConfig.getOverridePopulate();
-        if (populateConfig.getStrategyOrder().isEmpty()) {
-            throw new IllegalArgumentException(MISSING_STRATEGIES);
-        }
         if (populateConfig.getStrategyOrder().contains(BUILDER) && populateConfig.getBuilderPattern() == null) {
             throw new IllegalArgumentException(format(MISSING_BUILDER_PATTERN, BUILDER, Arrays.toString(BuilderPattern.values())));
         }
@@ -190,7 +186,7 @@ public class PopulateFactory {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             T objectOfClass = constructor.newInstance();
             getDeclaredMethods(clazz).stream()
-                    .filter(PopulateUtil::isSetterMethod)
+                    .filter(method -> PopulateUtil.isSetterMethod(method, populateConfig.getSetterPrefix()))
                     .forEach(method -> continuePopulateForMethod(objectOfClass, method));
             return objectOfClass;
         } catch (Exception e) {

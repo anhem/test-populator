@@ -166,7 +166,7 @@ public class TestPopulator {
 }
 ```
 
-### Use
+### Usage
 
 ```java
 MyClass2 myClass2=TestPopulator.populate(MyClass2.class);

@@ -18,7 +18,6 @@ public class PopulateUtil {
     private static final List<String> BLACKLISTED_METHODS = List.of("$jacocoInit");
     private static final String JAVA_BASE = "java.base";
     private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
-    private static final String SETTER_METHOD_PATTERN = String.format("%s%s", "set", MATCH_FIRST_CHARACTER_UPPERCASE);
 
     private PopulateUtil() {
     }
@@ -116,8 +115,9 @@ public class PopulateUtil {
         return BLACKLISTED_METHODS.contains(method.getName());
     }
 
-    static boolean isSetterMethod(Method method) {
-        return method.getName().matches(SETTER_METHOD_PATTERN) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+    static boolean isSetterMethod(Method method, String setterPrefix) {
+        String methodFormat = setterPrefix.equals("") ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
+        return method.getName().matches(methodFormat) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
     }
 
     static <T> boolean isSameMethodParameterAsClass(Class<T> clazz, Method method) {

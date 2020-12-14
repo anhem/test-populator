@@ -74,4 +74,19 @@ class PopulateFactoryWithSetterStrategyTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName()));
     }
+
+    @Test
+    void PojoWithCustomSetters() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .strategyOrder(List.of(SETTER))
+                .setterPrefix("with")
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        PojoWithCustomSetters value_1 = populateFactory.populate(PojoWithCustomSetters.class);
+        PojoWithCustomSetters value_2 = populateFactory.populate(PojoWithCustomSetters.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+
+    }
+
+
 }
