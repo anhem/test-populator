@@ -195,7 +195,7 @@ class PopulateUtilTest {
     @Test
     void isSetterReturnsTrue() {
         List<Method> setterMethods = getDeclaredMethods(Pojo.class).stream()
-                .filter(PopulateUtil::isSetterMethod)
+                .filter(method -> PopulateUtil.isSetterMethod(method, "set"))
                 .collect(Collectors.toList());
 
         assertThat(setterMethods).isNotEmpty();

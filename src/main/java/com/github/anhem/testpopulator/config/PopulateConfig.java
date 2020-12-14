@@ -1,9 +1,6 @@
 package com.github.anhem.testpopulator.config;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -16,26 +13,37 @@ import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 public class PopulateConfig {
 
     private static final List<Strategy> defaultStrategyOrder = Arrays.asList(CONSTRUCTOR, FIELD);
-    private static final List<OverridePopulate<?>> defaultOverridePopulate = Collections.emptyList();
     private static final boolean defaultRandomValues = true;
+    private static final String defaultSetterPrefix = "set";
 
     /**
      * Builder for PopulateConfig
      */
     public static class PopulateConfigBuilder {
 
-        private List<Strategy> strategyOrder;
-        private List<OverridePopulate<?>> overridePopulate;
+        private List<Strategy> strategyOrder = new ArrayList<>();
+        private List<OverridePopulate<?>> overridePopulate = new ArrayList<>();
         private Boolean randomValues;
         private BuilderPattern builderPattern;
+        private String setterPrefix;
 
         public PopulateConfigBuilder strategyOrder(List<Strategy> strategyOrder) {
             this.strategyOrder = strategyOrder;
             return this;
         }
 
+        public PopulateConfigBuilder strategyOrder(Strategy strategy) {
+            strategyOrder.add(strategy);
+            return this;
+        }
+
         public PopulateConfigBuilder overridePopulate(List<OverridePopulate<?>> overridePopulates) {
             this.overridePopulate = overridePopulates;
+            return this;
+        }
+
+        public PopulateConfigBuilder overridePopulate(OverridePopulate<?> overridePopulate) {
+            this.overridePopulate.add(overridePopulate);
             return this;
         }
 
@@ -49,8 +57,13 @@ public class PopulateConfig {
             return this;
         }
 
+        public PopulateConfigBuilder setterPrefix(String setterPrefix) {
+            this.setterPrefix = setterPrefix;
+            return this;
+        }
+
         public PopulateConfig build() {
-            return new PopulateConfig(strategyOrder, overridePopulate, randomValues, builderPattern);
+            return new PopulateConfig(strategyOrder, overridePopulate, randomValues, builderPattern, setterPrefix);
         }
     }
 
@@ -62,16 +75,18 @@ public class PopulateConfig {
     private final List<OverridePopulate<?>> overridePopulate;
     private final boolean randomValues;
     private final BuilderPattern builderPattern;
+    private final String setterPrefix;
 
     private PopulateConfig(List<Strategy> strategyOrder,
                            List<OverridePopulate<?>> overridePopulate,
                            Boolean randomValues,
-                           BuilderPattern builderPattern
-    ) {
-        this.strategyOrder = strategyOrder == null ? defaultStrategyOrder : strategyOrder;
-        this.overridePopulate = overridePopulate == null ? defaultOverridePopulate : overridePopulate;
+                           BuilderPattern builderPattern,
+                           String setterPrefix) {
+        this.strategyOrder = strategyOrder.isEmpty() ? defaultStrategyOrder : strategyOrder;
+        this.overridePopulate = overridePopulate;
         this.randomValues = randomValues == null ? defaultRandomValues : randomValues;
         this.builderPattern = builderPattern;
+        this.setterPrefix = setterPrefix == null ? defaultSetterPrefix : setterPrefix;
     }
 
     public List<Strategy> getStrategyOrder() {
@@ -93,5 +108,9 @@ public class PopulateConfig {
 
     public BuilderPattern getBuilderPattern() {
         return builderPattern;
+    }
+
+    public String getSetterPrefix() {
+        return setterPrefix;
     }
 }
