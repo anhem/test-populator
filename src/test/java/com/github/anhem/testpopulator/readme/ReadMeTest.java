@@ -14,6 +14,8 @@ public class ReadMeTest {
         MyClass myClass = new PopulateFactory().populate(MyClass.class);
 
         assertThat(myClass).hasNoNullFieldsOrProperties();
+        assertThat(myClass).extracting("myInnerClass.integer").isNotNull();
+        assertThat(myClass).extracting("myInnerClass.stringToLocalDateMap").isNotEmpty();
         System.out.println("myClass = " + myClass);
     }
 
@@ -22,6 +24,8 @@ public class ReadMeTest {
         MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 
         assertThat(myClass2).hasNoNullFieldsOrProperties();
+        assertThat(myClass2).extracting("myInnerClass.integer").isNotNull();
+        assertThat(myClass2).extracting("myInnerClass.stringToLocalDateMap").isNotEmpty();
     }
 
 }
