@@ -48,7 +48,7 @@ MyClass{
 <dependency>
     <groupId>com.github.anhem</groupId>
     <artifactId>test-populator</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -62,6 +62,7 @@ Use PopulateConfig to configure how test-populator should run.
 | strategy | Any of CONSTRUCTOR,FIELD,SETTER,BUILDER | CONSTRUCTOR,FIELD
 | builderPattern | LOMBOK / IMMUTABLES | -
 | randomValues | true / false | true
+| setterPrefix | prefix of setter methods | set
 | overridePopulates | List of OverridePopulate implementations | -
 
 ### Strategy
@@ -94,8 +95,14 @@ Different builders behave slightly different. The builderPattern tells test-popu
 
 ### randomValues
 
-When set to true will randomize everything. When set to false fixed values will be used. I.e. populating the same class
+Set to true will randomize everything. When set to false fixed values will be used. I.e. populating the same class
 twice will give the same result.
+
+### setterPrefix
+
+(Applied when using strategy: SETTER)
+
+Use setters with a different format than set*
 
 ### overridePopulates
 
