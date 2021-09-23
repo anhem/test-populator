@@ -125,6 +125,17 @@ public class PopulateUtil {
         return parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(clazz);
     }
 
+    static Class<?> getClassFromType(Type type) {
+        if (type instanceof ParameterizedType) {
+            try {
+                return (Class<?>) (((ParameterizedType) type).getActualTypeArguments()[0]);
+            } catch (Exception e) {
+                throw e;
+            }
+        }
+        return (Class<?>) type;
+    }
+
     private static boolean hasOnlyDefaultConstructor(Class<?> clazz) {
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
         return Arrays.stream(constructors).count() == 1 && constructors[0].getParameterCount() == 0;

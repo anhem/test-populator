@@ -217,4 +217,31 @@ class PopulateUtilTest {
 
         assertThat(isBlackListedMethod(method)).isFalse();
     }
+
+    @Test
+    void getClassFromTypeReturnsClassFromClass() {
+        assertThat(getClassFromType(String.class)).isEqualTo(String.class);
+    }
+
+    @Test
+    void getClassFromTypeReturnsClassFromType() {
+        Type type = new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+                return new Type[] { String.class };
+            }
+
+            @Override
+            public Type getRawType() {
+                return null;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return null;
+            }
+        };
+
+        assertThat(getClassFromType(type)).isEqualTo(String.class);
+    }
 }

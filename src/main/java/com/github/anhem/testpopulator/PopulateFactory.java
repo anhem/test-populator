@@ -103,16 +103,16 @@ public class PopulateFactory {
     private <T> T continuePopulateForCollection(Class<T> clazz, Parameter parameter, Type[] typeArguments) {
         List<Type> argumentTypes = toArgumentTypes(parameter, typeArguments);
         if (isMap(clazz)) {
-            Object key = populateWithOverrides((Class<?>) argumentTypes.get(0));
-            Object value = populateWithOverrides((Class<?>) argumentTypes.get(1));
+            Object key = populateWithOverrides(getClassFromType(argumentTypes.get(0)));
+            Object value = populateWithOverrides(getClassFromType(argumentTypes.get(1)));
             return (T) Map.of(key, value);
         }
         if (isSet(clazz)) {
-            Object value = populateWithOverrides((Class<?>) argumentTypes.get(0));
+            Object value = populateWithOverrides(getClassFromType(argumentTypes.get(0)));
             return (T) Set.of(value);
         }
         if (isCollection(clazz)) {
-            Object value = populateWithOverrides((Class<?>) argumentTypes.get(0));
+            Object value = populateWithOverrides(getClassFromType(argumentTypes.get(0)));
             return (T) List.of(value);
         }
         throw new PopulateException(format(MISSING_COLLECTION_TYPE, clazz.getTypeName()));
