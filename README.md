@@ -1,7 +1,7 @@
 # test-populator
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://search.maven.org/search?q=g:com.github.anhem%20a:test-populator)
-[![Build Status](https://travis-ci.com/anhem/test-populator.svg?branch=main)](https://travis-ci.org/github/anhem/test-populator)
+[![Build Status](https://travis-ci.com/anhem/test-populator.svg?branch=main)](https://travis-ci.com/github/anhem/test-populator)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.anhem%3Atest-populator&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.anhem%3Atest-populator)
 
 Populate java classes with fixed or random data using reflection. Facilitates the creation of objects in tests.
