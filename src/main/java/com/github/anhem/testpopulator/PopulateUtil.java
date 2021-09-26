@@ -127,11 +127,7 @@ public class PopulateUtil {
 
     static Class<?> getClassFromType(Type type) {
         if (type instanceof ParameterizedType) {
-            try {
-                return (Class<?>) (((ParameterizedType) type).getActualTypeArguments()[0]);
-            } catch (Exception e) {
-                throw e;
-            }
+            return (Class<?>) (((ParameterizedType) type).getActualTypeArguments()[0]);
         }
         return (Class<?>) type;
     }
