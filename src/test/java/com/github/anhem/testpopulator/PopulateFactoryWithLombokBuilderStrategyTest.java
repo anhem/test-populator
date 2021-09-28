@@ -6,6 +6,8 @@ import com.github.anhem.testpopulator.model.java.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableWithSingular;
+import com.github.anhem.testpopulator.model.lombok.LombokOddImmutable;
+import org.assertj.core.api.ObjectAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -79,5 +81,19 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         assertThatThrownBy(() -> populateFactory.populate(LombokImmutable.LombokImmutableBuilder.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, LombokImmutable.LombokImmutableBuilder.class.getName()));
+    }
+
+    @Test
+    public void LombokOddImmutable() {
+        LombokOddImmutable value_1 = populateFactory.populate(LombokOddImmutable.class);
+        LombokOddImmutable value_2 = populateFactory.populate(LombokOddImmutable.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+
+        assertObjectCanBeRebuilt(value_1);
+        assertObjectCanBeRebuilt(value_2);
+    }
+
+    private ObjectAssert<LombokOddImmutable> assertObjectCanBeRebuilt(LombokOddImmutable value_1) {
+        return assertThat(value_1.toBuilder().build()).isEqualTo(value_1);
     }
 }
