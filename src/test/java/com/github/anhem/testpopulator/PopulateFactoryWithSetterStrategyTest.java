@@ -100,4 +100,22 @@ class PopulateFactoryWithSetterStrategyTest {
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
+    @Test
+    void PojoPrivateConstructor() {
+        populateConfig = PopulateConfig.builder()
+                .strategyOrder(List.of(SETTER))
+                .accessNonPublicConstructor(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        PojoPrivateConstructor value_1 = populateFactory.populate(PojoPrivateConstructor.class);
+        PojoPrivateConstructor value_2 = populateFactory.populate(PojoPrivateConstructor.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void tryingToAccessPrivateConstructorThrowsException() {
+        assertThatThrownBy(() -> populateFactory.populate(PojoPrivateConstructor.class))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, PojoPrivateConstructor.class.getName(), populateConfig.getStrategyOrder()));
+    }
 }

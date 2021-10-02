@@ -59,10 +59,11 @@ Use PopulateConfig to configure how test-populator should run.
 
 | config | Values | Default
 |---|---|---
-| strategy | Any of CONSTRUCTOR,FIELD,SETTER,BUILDER | CONSTRUCTOR,FIELD
+| strategy | Any of CONSTRUCTOR,FIELD,SETTER,BUILDER | CONSTRUCTOR,SETTER,FIELD
 | builderPattern | LOMBOK / IMMUTABLES | -
 | randomValues | true / false | true
 | setterPrefix | prefix of setter methods | set
+| accessNonPublicConstructor | control if allowed to access non public constructors | false
 | overridePopulates | List of OverridePopulate implementations | -
 
 ### Strategy
@@ -77,13 +78,13 @@ argument.
 
 ##### FIELD
 
-Use a no-arguments constructor to instantiate and then use reflection to populate all the fields. Applied to classes
-that only have a no-arguments- or default-constructor.
+Use a no-arguments/default constructor to instantiate and then use reflection to populate all the fields. Applied to
+classes that only have a no-arguments/default constructor.
 
 ##### SETTER
 
-Use a no-arguments constructor to instantiate and then setter methods to populate fields. Applied to classes that have
-at least one setter method, and that only have a no-arguments- or default-constructor.
+Use a no-arguments/default constructor to instantiate and setter methods to populate fields. Applied to classes that
+only have a no-arguments/default constructor and at least one setter method.
 
 ##### BUILDER
 

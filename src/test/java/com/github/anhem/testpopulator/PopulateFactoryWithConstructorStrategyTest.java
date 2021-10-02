@@ -80,4 +80,24 @@ class PopulateFactoryWithConstructorStrategyTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, Pojo.class.getName(), populateConfig.getStrategyOrder()));
     }
+
+    @Test
+    void allArgsConstructorPrivate() {
+        populateConfig = PopulateConfig.builder()
+                .strategyOrder(List.of(CONSTRUCTOR))
+                .accessNonPublicConstructor(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        AllArgsConstructorPrivate value_1 = populateFactory.populate(AllArgsConstructorPrivate.class);
+        AllArgsConstructorPrivate value_2 = populateFactory.populate(AllArgsConstructorPrivate.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void tryingToAccessPrivateConstructorThrowsException() {
+        assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructorPrivate.class))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructorPrivate.class.getName(), populateConfig.getStrategyOrder()));
+    }
+
 }
