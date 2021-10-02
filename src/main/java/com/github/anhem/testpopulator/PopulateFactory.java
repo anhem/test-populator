@@ -24,7 +24,7 @@ public class PopulateFactory {
 
     static final String MISSING_BUILDER_PATTERN = "%s strategy configured, but no builderPattern specified. Should be one of %s";
     static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection %s";
-    static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy. Try another strategy or override population for this class";
+    static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy found. Tried with %s. Try another strategy or override population for this class";
     static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s";
     static final String FAILED_TO_CALL_METHOD = "Failed to call method %s in object of class %s";
     static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of %s using %s strategy";
@@ -149,7 +149,7 @@ public class PopulateFactory {
                 return continuePopulateUsingBuilder(clazz);
             }
         }
-        throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName()));
+        throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName(), populateConfig.getStrategyOrder()));
     }
 
     private <T> T continuePopulateUsingConstructor(Class<T> clazz) {

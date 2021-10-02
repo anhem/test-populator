@@ -17,11 +17,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryWithConstructorStrategyTest {
 
-    PopulateFactory populateFactory;
+    private PopulateConfig populateConfig;
+    private PopulateFactory populateFactory;
 
     @BeforeEach
     void setUp() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(CONSTRUCTOR))
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -77,6 +78,6 @@ class PopulateFactoryWithConstructorStrategyTest {
     void pojo() {
         assertThatThrownBy(() -> populateFactory.populate(Pojo.class))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, Pojo.class.getName()));
+                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, Pojo.class.getName(), populateConfig.getStrategyOrder()));
     }
 }

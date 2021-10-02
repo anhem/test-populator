@@ -17,11 +17,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryWithImmutablesBuilderStrategyTest {
 
-    PopulateFactory populateFactory;
+    private PopulateConfig populateConfig;
+    private PopulateFactory populateFactory;
 
     @BeforeEach
     void setUp() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(BUILDER))
                 .builderPattern(BuilderPattern.IMMUTABLES)
                 .build();
@@ -49,6 +50,6 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
     void allArgsConstructor() {
         assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructor.class))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName()));
+                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName(), populateConfig.getStrategyOrder()));
     }
 }
