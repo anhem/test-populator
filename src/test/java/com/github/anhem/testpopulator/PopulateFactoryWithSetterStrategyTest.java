@@ -16,11 +16,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryWithSetterStrategyTest {
 
-    PopulateFactory populateFactory;
+    private PopulateConfig populateConfig;
+    private PopulateFactory populateFactory;
 
     @BeforeEach
     void setUp() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(SETTER))
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -72,7 +73,7 @@ class PopulateFactoryWithSetterStrategyTest {
     void allArgsConstructor() {
         assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructor.class))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName()));
+                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName(), populateConfig.getStrategyOrder()));
     }
 
     @Test
@@ -85,8 +86,6 @@ class PopulateFactoryWithSetterStrategyTest {
         PojoWithCustomSetters value_1 = populateFactory.populate(PojoWithCustomSetters.class);
         PojoWithCustomSetters value_2 = populateFactory.populate(PojoWithCustomSetters.class);
         assertRandomlyPopulatedValues(value_1, value_2);
-
     }
-
 
 }
