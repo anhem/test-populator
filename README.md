@@ -59,7 +59,7 @@ Use PopulateConfig to configure how test-populator should run.
 
 | config | Values | Default
 |---|---|---
-| strategy | Any of CONSTRUCTOR,FIELD,SETTER,BUILDER | CONSTRUCTOR,SETTER,FIELD
+| strategyOrder | Any of CONSTRUCTOR,FIELD,SETTER,BUILDER | CONSTRUCTOR,SETTER,FIELD
 | builderPattern | LOMBOK / IMMUTABLES | -
 | randomValues | true / false | true
 | setterPrefix | prefix of setter methods | set
