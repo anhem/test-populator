@@ -88,4 +88,16 @@ class PopulateFactoryWithSetterStrategyTest {
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
+    @Test
+    void PojoWithBlankSetters() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .strategyOrder(List.of(SETTER))
+                .setterPrefix("")
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        PojoWithCustomSetters value_1 = populateFactory.populate(PojoWithCustomSetters.class);
+        PojoWithCustomSetters value_2 = populateFactory.populate(PojoWithCustomSetters.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
 }

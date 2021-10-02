@@ -197,12 +197,38 @@ class PopulateUtilTest {
     @Test
     void isSetterReturnsTrue() {
         List<Method> setterMethods = getDeclaredMethods(Pojo.class).stream()
-                .filter(method -> PopulateUtil.isSetterMethod(method, SETTER_PREFIX))
+                .filter(method -> isSetterMethod(method, SETTER_PREFIX))
                 .collect(Collectors.toList());
 
         assertThat(setterMethods).isNotEmpty();
         assertThat(setterMethods).hasSize(17);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
+        setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
+    }
+
+    @Test
+    void isSetterReturnsTrueForCustomerSetter() {
+        String setterPrefix = "with";
+        List<Method> setterMethods = getDeclaredMethods(PojoWithCustomSetters.class).stream()
+                .filter(method -> isSetterMethod(method, setterPrefix))
+                .collect(Collectors.toList());
+
+        assertThat(setterMethods).isNotEmpty();
+        assertThat(setterMethods).hasSize(17);
+        setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
+        setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
+    }
+
+    @Test
+    void isSetterReturnsTrueForBlankSetter() {
+        String setterPrefix = "";
+        List<Method> setterMethods = getDeclaredMethods(PojoWithCustomSetters.class).stream()
+                .filter(method -> isSetterMethod(method, setterPrefix))
+                .collect(Collectors.toList());
+
+        assertThat(setterMethods).isNotEmpty();
+        assertThat(setterMethods).hasSize(17);
+        setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
 

@@ -25,7 +25,6 @@ public class ImmutablesUtil {
         return removeMethodsDoingTheSameThing(declaredMethods).stream()
                 .filter(PopulateUtil::hasAtLeastOneParameter)
                 .filter(method -> !isDeclaringJavaBaseClass(method))
-                .filter(method -> !isBlackListedMethod(method))
                 .filter(method -> !isSameMethodParameterAsClass(clazz, method))
                 .collect(Collectors.toList());
     }
