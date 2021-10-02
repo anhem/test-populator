@@ -139,7 +139,7 @@ public class PopulateFactory {
             if (isMatchingConstructorStrategy(strategy, clazz)) {
                 return continuePopulateUsingConstructor(clazz);
             }
-            if (isMatchingSetterStrategy(strategy, clazz)) {
+            if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefix())) {
                 return continuePopulateUsingSetters(clazz);
             }
             if (isMatchingFieldStrategy(strategy, clazz)) {
@@ -194,7 +194,7 @@ public class PopulateFactory {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             T objectOfClass = constructor.newInstance();
             getDeclaredMethods(clazz).stream()
-                    .filter(method -> PopulateUtil.isSetterMethod(method, populateConfig.getSetterPrefix()))
+                    .filter(method -> isSetterMethod(method, populateConfig.getSetterPrefix()))
                     .forEach(method -> continuePopulateForMethod(objectOfClass, method));
             return objectOfClass;
         } catch (Exception e) {
