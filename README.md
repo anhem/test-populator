@@ -76,15 +76,15 @@ strategy is not suitable for populating, the next will be tried and so on.
 Use the constructor with most parameters to populate. Applied to classes that have a constructor with at least one
 argument.
 
-##### FIELD
-
-Use a no-arguments/default constructor to instantiate and then use reflection to populate all the fields. Applied to
-classes that only have a no-arguments/default constructor.
-
 ##### SETTER
 
 Use a no-arguments/default constructor to instantiate and setter methods to populate fields. Applied to classes that
 only have a no-arguments/default constructor and at least one setter method.
+
+##### FIELD
+
+Use a no-arguments/default constructor to instantiate and then use reflection to populate all the fields. Applied to
+classes that only have a no-arguments/default constructor.
 
 ##### BUILDER
 
