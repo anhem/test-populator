@@ -66,7 +66,7 @@ Use PopulateConfig to configure how test-populator should run.
 | accessNonPublicConstructor | control if allowed to access non public constructors | false
 | overridePopulates | List of OverridePopulate implementations | -
 
-### Strategy
+### strategyOrder
 
 There are a some different strategies used to populate, and they are being used in the order specified. I.e if the first
 strategy is not suitable for populating, the next will be tried and so on.
@@ -91,7 +91,7 @@ only have a no-arguments/default constructor and at least one setter method.
 Use builders to populate. Supports [Lombok](https://projectlombok.org/) and [Immutables](https://immutables.github.io/).
 Configured by setting [builderPattern](#builderpattern). Applied to classes with a builder method.
 
-### BuilderPattern
+### builderPattern
 
 (Applied when using strategy: BUILDER)
 
@@ -99,14 +99,18 @@ Different builders behave slightly different. The builderPattern tells test-popu
 
 ### randomValues
 
-Set to true will randomize everything. When set to false fixed values will be used. I.e. populating the same class
-twice will give the same result.
+Set to true will randomize everything. When set to false fixed values will be used. I.e. populating the same class twice
+will give the same result.
 
 ### setterPrefix
 
 (Applied when using strategy: SETTER)
 
 Use setters with a different format than set*
+
+### accessNonPublicConstructor
+
+Controls whether to allow access to private constructors when populating.
 
 ### overridePopulates
 
