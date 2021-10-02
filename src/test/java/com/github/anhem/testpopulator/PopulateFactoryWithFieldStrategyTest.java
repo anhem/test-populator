@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.java.*;
+import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -74,5 +75,36 @@ class PopulateFactoryWithFieldStrategyTest {
         assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructor.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName(), populateConfig.getStrategyOrder()));
+    }
+
+    @Test
+    void PojoPrivateConstructor() {
+        populateConfig = PopulateConfig.builder()
+                .strategyOrder(List.of(FIELD))
+                .accessNonPublicConstructor(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        PojoPrivateConstructor value_1 = populateFactory.populate(PojoPrivateConstructor.class);
+        PojoPrivateConstructor value_2 = populateFactory.populate(PojoPrivateConstructor.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void tryingToAccessPrivateConstructorThrowsException() {
+        assertThatThrownBy(() -> populateFactory.populate(PojoPrivateConstructor.class))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, PojoPrivateConstructor.class.getName(), populateConfig.getStrategyOrder()));
+    }
+
+    @Test
+    void lombokBuilderClass() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .strategyOrder(List.of(FIELD))
+                .accessNonPublicConstructor(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        LombokImmutable value_1 = populateFactory.populate(LombokImmutable.LombokImmutableBuilder.class).build();
+        LombokImmutable value_2 = populateFactory.populate(LombokImmutable.LombokImmutableBuilder.class).build();
+        assertRandomlyPopulatedValues(value_1, value_2);
     }
 }

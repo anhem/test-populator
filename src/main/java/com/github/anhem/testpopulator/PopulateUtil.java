@@ -16,6 +16,7 @@ public class PopulateUtil {
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
 
     private static final List<String> BLACKLISTED_METHODS = List.of("$jacocoInit");
+    private static final List<String> BLACKLISTED_FIELDS = List.of("__$lineHits$__");
     private static final String JAVA_BASE = "java.base";
     private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
 
@@ -80,17 +81,17 @@ public class PopulateUtil {
         return method.getParameters().length > 0;
     }
 
-    static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz, String setterPrefix) {
-        return strategy.equals(SETTER) && hasOnlyNoArgumentConstructor(clazz) && getDeclaredMethods(clazz).stream()
+    static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz, String setterPrefix, boolean accessNonPublicConstructor) {
+        return strategy.equals(SETTER) && hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor) && getDeclaredMethods(clazz).stream()
                 .anyMatch(method -> isSetterMethod(method, setterPrefix));
     }
 
-    static boolean isMatchingConstructorStrategy(Strategy strategy, Class<?> clazz) {
-        return strategy.equals(CONSTRUCTOR) && !hasOnlyNoArgumentConstructor(clazz);
+    static boolean isMatchingConstructorStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
+        return strategy.equals(CONSTRUCTOR) && !hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor) && hasConstructorWithArguments(clazz, accessNonPublicConstructor);
     }
 
-    static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz) {
-        return strategy.equals(FIELD) && hasOnlyNoArgumentConstructor(clazz);
+    static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
+        return strategy.equals(FIELD) && hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor);
     }
 
     static boolean isMatchingBuilderStrategy(Strategy strategy, Class<?> clazz) {
@@ -106,15 +107,20 @@ public class PopulateUtil {
     }
 
     @SuppressWarnings("unchecked")
-    static <T> Constructor<T> getLargestPublicConstructor(Class<T> clazz) {
-        return (Constructor<T>) stream(clazz.getDeclaredConstructors())
-                .filter(constructor -> Modifier.isPublic(constructor.getModifiers()))
+    static <T> Constructor<T> getLargestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
+        Constructor<?> constructor1 = stream(clazz.getDeclaredConstructors())
+                .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
                 .max(Comparator.comparingInt(Constructor::getParameterCount))
                 .orElseThrow(() -> new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName())));
+        return (Constructor<T>) constructor1;
     }
 
     static boolean isBlackListedMethod(Method method) {
         return BLACKLISTED_METHODS.contains(method.getName());
+    }
+
+    static boolean isBlackListedField(Field field) {
+        return BLACKLISTED_FIELDS.contains(field.getName());
     }
 
     static boolean isSetterMethod(Method method, String setterPrefix) {
@@ -131,9 +137,31 @@ public class PopulateUtil {
         return parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(clazz);
     }
 
-    private static boolean hasOnlyNoArgumentConstructor(Class<?> clazz) {
+    static <T> void setAccessible(Constructor<T> constructor, boolean canAccessNonPublicConstructor) {
+        if (canAccessNonPublicConstructor) {
+            constructor.setAccessible(true);
+        }
+    }
+
+    private static boolean hasOnlyNoArgumentConstructor(Class<?> clazz, boolean canAccessNonPublicConstructor) {
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-        return Arrays.stream(constructors).count() == 1 && constructors[0].getParameterCount() == 0;
+        if (Arrays.stream(constructors).count() == 1) {
+            Constructor<?> constructor = constructors[0];
+            if (constructor.getParameterCount() == 0) {
+                if (canAccessNonPublicConstructor) {
+                    return true;
+                } else {
+                    return Modifier.isPublic(constructor.getModifiers());
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasConstructorWithArguments(Class<?> clazz, boolean canAccessNonPublicConstructor) {
+        return stream(clazz.getDeclaredConstructors())
+                .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
+                .anyMatch(constructor -> constructor.getParameterCount() > 0);
     }
 
     private static List<Field> getDeclaredFields(Class<?> clazz, List<Field> declaredFields) {

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.testutil.FieldTestUtil.getField;
 import static com.github.anhem.testpopulator.testutil.MethodTestUtil.getMethod;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,7 +36,7 @@ class PopulateUtilTest {
 
     @Test
     void toArgumentTypesReturnsParameterArgumentTypes() {
-        Parameter parameter = Arrays.stream(getLargestPublicConstructor(AllArgsConstructor.class).getParameters())
+        Parameter parameter = Arrays.stream(getLargestConstructor(AllArgsConstructor.class, false).getParameters())
                 .filter(p -> p.getType().equals(Set.class))
                 .findFirst()
                 .orElseThrow();
@@ -59,7 +60,9 @@ class PopulateUtilTest {
 
     @Test
     void getDeclaredFieldsReturnsAllDeclaredFields() {
-        List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class);
+        List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class).stream()
+                .filter(field -> !isBlackListedField(field))
+                .collect(Collectors.toList());
 
         assertThat(declaredFields).isNotEmpty();
         assertThat(declaredFields).hasSize(19);
@@ -152,35 +155,42 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingSetterStrategyReturnsTrue() {
-        assertThat(isMatchingSetterStrategy(SETTER, PojoExtendsPojoAbstract.class, SETTER_PREFIX)).isTrue();
+        assertThat(isMatchingSetterStrategy(SETTER, PojoExtendsPojoAbstract.class, SETTER_PREFIX, false)).isTrue();
+        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIX, true)).isTrue();
     }
 
     @Test
     void isMatchingSetterStrategyReturnsFalse() {
-        assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIX)).isFalse();
-        assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIX)).isFalse();
+        assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIX, false)).isFalse();
+        assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIX, false)).isFalse();
+        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIX, false)).isFalse();
     }
 
     @Test
     void isMatchingConstructorStrategyReturnsTrue() {
-        assertThat(isMatchingConstructorStrategy(CONSTRUCTOR, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isTrue();
+        assertThat(isMatchingConstructorStrategy(CONSTRUCTOR, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, false)).isTrue();
+        assertThat(isMatchingConstructorStrategy(CONSTRUCTOR, AllArgsConstructorPrivate.class, true)).isTrue();
     }
 
     @Test
     void isMatchingConstructorStrategyReturnsFalse() {
-        assertThat(isMatchingConstructorStrategy(FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
-        assertThat(isMatchingConstructorStrategy(CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
+        assertThat(isMatchingConstructorStrategy(FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, false)).isFalse();
+        assertThat(isMatchingConstructorStrategy(CONSTRUCTOR, PojoExtendsPojoAbstract.class, false)).isFalse();
+        assertThat(isMatchingConstructorStrategy(CONSTRUCTOR, PojoPrivateConstructor.class, true)).isFalse();
+        assertThat(isMatchingConstructorStrategy(CONSTRUCTOR, AllArgsConstructorPrivate.class, false)).isFalse();
     }
 
     @Test
     void isMatchingFieldStrategyReturnsTrue() {
-        assertThat(isMatchingFieldStrategy(Strategy.FIELD, PojoExtendsPojoAbstract.class)).isTrue();
+        assertThat(isMatchingFieldStrategy(Strategy.FIELD, PojoExtendsPojoAbstract.class, false)).isTrue();
+        assertThat(isMatchingFieldStrategy(Strategy.FIELD, PojoPrivateConstructor.class, true)).isTrue();
     }
 
     @Test
     void isMatchingFieldStrategyReturnsFalse() {
-        assertThat(isMatchingFieldStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
-        assertThat(isMatchingFieldStrategy(Strategy.FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
+        assertThat(isMatchingFieldStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class, false)).isFalse();
+        assertThat(isMatchingFieldStrategy(Strategy.FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, false)).isFalse();
+        assertThat(isMatchingFieldStrategy(Strategy.FIELD, PojoPrivateConstructor.class, false)).isFalse();
     }
 
     @Test
@@ -234,7 +244,7 @@ class PopulateUtilTest {
 
     @Test
     void isBlackListedMethodReturnsTrue() {
-        Method method = getMethod("$jacocoInit", HasBlackListedMethod.class);
+        Method method = getMethod("$jacocoInit", HasBlackListed.class);
 
         assertThat(isBlackListedMethod(method)).isTrue();
     }
@@ -245,4 +255,19 @@ class PopulateUtilTest {
 
         assertThat(isBlackListedMethod(method)).isFalse();
     }
+
+    @Test
+    void isBlackListedFieldsReturnsTrue() {
+        Field field = getField("__$lineHits$__", HasBlackListed.class);
+
+        assertThat(isBlackListedField(field)).isTrue();
+    }
+
+    @Test
+    void isBlackListedFieldReturnsFalse() {
+        Field field = getField("stringValue", Pojo.class);
+
+        assertThat(isBlackListedField(field)).isFalse();
+    }
+
 }

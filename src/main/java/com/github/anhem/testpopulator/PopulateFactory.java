@@ -136,13 +136,13 @@ public class PopulateFactory {
 
     private <T> T continuePopulateWithStrategies(Class<T> clazz) {
         for (Strategy strategy : populateConfig.getStrategyOrder()) {
-            if (isMatchingConstructorStrategy(strategy, clazz)) {
+            if (isMatchingConstructorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructor())) {
                 return continuePopulateUsingConstructor(clazz);
             }
-            if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefix())) {
+            if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefix(), populateConfig.canAccessNonPublicConstructor())) {
                 return continuePopulateUsingSetters(clazz);
             }
-            if (isMatchingFieldStrategy(strategy, clazz)) {
+            if (isMatchingFieldStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructor())) {
                 return continuePopulateUsingFields(clazz);
             }
             if (isMatchingBuilderStrategy(strategy, clazz)) {
@@ -154,7 +154,8 @@ public class PopulateFactory {
 
     private <T> T continuePopulateUsingConstructor(Class<T> clazz) {
         try {
-            Constructor<T> constructor = getLargestPublicConstructor(clazz);
+            Constructor<T> constructor = getLargestConstructor(clazz, populateConfig.canAccessNonPublicConstructor());
+            setAccessible(constructor, populateConfig.canAccessNonPublicConstructor());
             Object[] arguments = stream(constructor.getParameters())
                     .map(parameter -> populateWithOverrides(parameter.getType(), parameter, null))
                     .toArray();
@@ -167,6 +168,7 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingFields(Class<T> clazz) {
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
+            setAccessible(constructor, populateConfig.canAccessNonPublicConstructor());
             T objectOfClass = constructor.newInstance();
             getDeclaredFields(clazz).stream()
                     .filter(field -> !Modifier.isFinal(field.getModifiers()))
@@ -192,6 +194,7 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingSetters(Class<T> clazz) {
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
+            setAccessible(constructor, populateConfig.canAccessNonPublicConstructor());
             T objectOfClass = constructor.newInstance();
             getDeclaredMethods(clazz).stream()
                     .filter(method -> isSetterMethod(method, populateConfig.getSetterPrefix()))

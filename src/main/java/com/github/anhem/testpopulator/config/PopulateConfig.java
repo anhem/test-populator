@@ -4,17 +4,17 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
-import static com.github.anhem.testpopulator.config.Strategy.FIELD;
+import static com.github.anhem.testpopulator.config.Strategy.*;
 
 /**
  * Configuration for PopulateFactory
  */
 public class PopulateConfig {
 
-    private static final List<Strategy> defaultStrategyOrder = Arrays.asList(CONSTRUCTOR, FIELD);
+    private static final List<Strategy> defaultStrategyOrder = Arrays.asList(CONSTRUCTOR, SETTER, FIELD);
     private static final boolean defaultRandomValues = true;
     private static final String defaultSetterPrefix = "set";
+    private static final boolean defaultAccessNonPublicConstructor = false;
 
     /**
      * Builder for PopulateConfig
@@ -26,6 +26,7 @@ public class PopulateConfig {
         private Boolean randomValues;
         private BuilderPattern builderPattern;
         private String setterPrefix;
+        private Boolean accessNonPublicConstructor;
 
         public PopulateConfigBuilder strategyOrder(List<Strategy> strategyOrder) {
             this.strategyOrder = strategyOrder;
@@ -62,8 +63,13 @@ public class PopulateConfig {
             return this;
         }
 
+        public PopulateConfigBuilder accessNonPublicConstructor(boolean accessNonPublicConstructor) {
+            this.accessNonPublicConstructor = accessNonPublicConstructor;
+            return this;
+        }
+
         public PopulateConfig build() {
-            return new PopulateConfig(strategyOrder, overridePopulate, randomValues, builderPattern, setterPrefix);
+            return new PopulateConfig(strategyOrder, overridePopulate, randomValues, builderPattern, setterPrefix, accessNonPublicConstructor);
         }
     }
 
@@ -76,17 +82,20 @@ public class PopulateConfig {
     private final boolean randomValues;
     private final BuilderPattern builderPattern;
     private final String setterPrefix;
+    private final boolean accessNonPublicConstructor;
 
     private PopulateConfig(List<Strategy> strategyOrder,
                            List<OverridePopulate<?>> overridePopulate,
                            Boolean randomValues,
                            BuilderPattern builderPattern,
-                           String setterPrefix) {
+                           String setterPrefix,
+                           Boolean accessNonPublicConstructor) {
         this.strategyOrder = strategyOrder.isEmpty() ? defaultStrategyOrder : strategyOrder;
         this.overridePopulate = overridePopulate;
         this.randomValues = randomValues == null ? defaultRandomValues : randomValues;
         this.builderPattern = builderPattern;
         this.setterPrefix = setterPrefix == null ? defaultSetterPrefix : setterPrefix;
+        this.accessNonPublicConstructor = accessNonPublicConstructor == null ? defaultAccessNonPublicConstructor : accessNonPublicConstructor;
     }
 
     public List<Strategy> getStrategyOrder() {
@@ -112,5 +121,9 @@ public class PopulateConfig {
 
     public String getSetterPrefix() {
         return setterPrefix;
+    }
+
+    public boolean canAccessNonPublicConstructor() {
+        return accessNonPublicConstructor;
     }
 }
