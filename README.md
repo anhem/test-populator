@@ -72,20 +72,23 @@ strategy is not suitable for populating, the next will be tried and so on.
 
 ##### CONSTRUCTOR
 
-Use the constructor with most parameters to populate.
+Use the constructor with most parameters to populate. Applied to classes that have a constructor with at least one
+argument.
 
 ##### FIELD
 
-Use the default constructor to instantiate and then use reflection to populate all the fields.
+Use a no-arguments constructor to instantiate and then use reflection to populate all the fields. Applied to classes
+that only have a no-arguments- or default-constructor.
 
 ##### SETTER
 
-Use the default constructor to instantiate and then setter methods to populate fields.
+Use a no-arguments constructor to instantiate and then setter methods to populate fields. Applied to classes that have
+at least one setter method, and that only have a no-arguments- or default-constructor.
 
 ##### BUILDER
 
 Use builders to populate. Supports [Lombok](https://projectlombok.org/) and [Immutables](https://immutables.github.io/).
-Configured by setting [builderPattern](#builderpattern).
+Configured by setting [builderPattern](#builderpattern). Applied to classes with a builder method.
 
 ### BuilderPattern
 

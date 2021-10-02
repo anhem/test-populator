@@ -79,16 +79,17 @@ public class PopulateUtil {
         return method.getParameters().length > 0;
     }
 
-    static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz) {
-        return strategy.equals(SETTER) && hasOnlyDefaultConstructor(clazz);
+    static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz, String setterPrefix) {
+        return strategy.equals(SETTER) && hasOnlyNoArgumentConstructor(clazz) && getDeclaredMethods(clazz).stream()
+                .anyMatch(method -> isSetterMethod(method, setterPrefix));
     }
 
     static boolean isMatchingConstructorStrategy(Strategy strategy, Class<?> clazz) {
-        return strategy.equals(CONSTRUCTOR) && !hasOnlyDefaultConstructor(clazz);
+        return strategy.equals(CONSTRUCTOR) && !hasOnlyNoArgumentConstructor(clazz);
     }
 
     static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz) {
-        return strategy.equals(FIELD) && hasOnlyDefaultConstructor(clazz);
+        return strategy.equals(FIELD) && hasOnlyNoArgumentConstructor(clazz);
     }
 
     static boolean isMatchingBuilderStrategy(Strategy strategy, Class<?> clazz) {
@@ -116,7 +117,7 @@ public class PopulateUtil {
     }
 
     static boolean isSetterMethod(Method method, String setterPrefix) {
-        String methodFormat = setterPrefix.equals("") ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
+        String methodFormat = getSetterMethodFormat(setterPrefix);
         return method.getName().matches(methodFormat) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
     }
 
@@ -125,7 +126,7 @@ public class PopulateUtil {
         return parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(clazz);
     }
 
-    private static boolean hasOnlyDefaultConstructor(Class<?> clazz) {
+    private static boolean hasOnlyNoArgumentConstructor(Class<?> clazz) {
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
         return Arrays.stream(constructors).count() == 1 && constructors[0].getParameterCount() == 0;
     }
@@ -144,6 +145,10 @@ public class PopulateUtil {
             getDeclaredMethods(clazz.getSuperclass(), declaredMethods);
         }
         return declaredMethods;
+    }
+
+    private static String getSetterMethodFormat(String setterPrefix) {
+        return setterPrefix.equals("") ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
     }
 
 }

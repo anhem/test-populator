@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateUtilTest {
 
+    private static final String SETTER_PREFIX = "set";
+
     @Test
     void toArgumentTypesReturnsTypeArgumentsAsList() throws NoSuchFieldException {
         Type[] typeArguments = ((ParameterizedType) Pojo.class.getDeclaredField("setOfStrings")
@@ -150,13 +152,13 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingSetterStrategyReturnsTrue() {
-        assertThat(isMatchingSetterStrategy(SETTER, PojoExtendsPojoAbstract.class)).isTrue();
+        assertThat(isMatchingSetterStrategy(SETTER, PojoExtendsPojoAbstract.class, SETTER_PREFIX)).isTrue();
     }
 
     @Test
     void isMatchingSetterStrategyReturnsFalse() {
-        assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class)).isFalse();
-        assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class)).isFalse();
+        assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIX)).isFalse();
+        assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIX)).isFalse();
     }
 
     @Test
@@ -195,12 +197,12 @@ class PopulateUtilTest {
     @Test
     void isSetterReturnsTrue() {
         List<Method> setterMethods = getDeclaredMethods(Pojo.class).stream()
-                .filter(method -> PopulateUtil.isSetterMethod(method, "set"))
+                .filter(method -> PopulateUtil.isSetterMethod(method, SETTER_PREFIX))
                 .collect(Collectors.toList());
 
         assertThat(setterMethods).isNotEmpty();
         assertThat(setterMethods).hasSize(17);
-        setterMethods.forEach(method -> assertThat(method.getName()).startsWith("set"));
+        setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
 
