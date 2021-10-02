@@ -42,7 +42,8 @@ public class PopulateUtil {
     }
 
     static List<Method> getDeclaredMethods(Class<?> clazz) {
-        return getDeclaredMethods(clazz, new ArrayList<>());
+        List<Method> declaredMethods = getDeclaredMethods(clazz, new ArrayList<>());
+        return removeUnwantedMethods(declaredMethods);
     }
 
     static boolean isSet(Class<?> clazz) {
@@ -118,8 +119,12 @@ public class PopulateUtil {
 
     static boolean isSetterMethod(Method method, String setterPrefix) {
         String methodFormat = getSetterMethodFormat(setterPrefix);
+        if (methodFormat.isBlank()) {
+            return method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+        }
         return method.getName().matches(methodFormat) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
     }
+
 
     static <T> boolean isSameMethodParameterAsClass(Class<T> clazz, Method method) {
         Class<?>[] parameterTypes = method.getParameterTypes();
@@ -149,6 +154,26 @@ public class PopulateUtil {
 
     private static String getSetterMethodFormat(String setterPrefix) {
         return setterPrefix.equals("") ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
+    }
+
+    private static List<Method> removeUnwantedMethods(List<Method> declaredMethods) {
+        return declaredMethods.stream()
+                .filter(method -> {
+                    if (isBlackListedMethod(method)) {
+                        return false;
+                    }
+                    int modifiers = method.getModifiers();
+                    if (Modifier.isNative(modifiers)) {
+                        return false;
+                    }
+                    if (Modifier.isFinal(modifiers) && method.getName().equals("wait") && method.getParameters().length == 0) {
+                        return false;
+                    }
+                    if (Modifier.isFinal(modifiers) && method.getName().equals("wait") && method.getParameters().length == 1 && method.getParameters()[0].getType().equals(long.class)) {
+                        return false;
+                    }
+                    return true;
+                }).collect(Collectors.toList());
     }
 
 }
