@@ -201,18 +201,22 @@ public class PopulateUtil {
                     if (isBlackListedMethod(method)) {
                         return false;
                     }
-                    int modifiers = method.getModifiers();
-                    if (Modifier.isNative(modifiers)) {
+                    if (isNativeMethod(method)) {
                         return false;
                     }
-                    if (Modifier.isFinal(modifiers) && method.getName().equals("wait") && method.getParameters().length == 0) {
-                        return false;
-                    }
-                    if (Modifier.isFinal(modifiers) && method.getName().equals("wait") && method.getParameters().length == 1 && method.getParameters()[0].getType().equals(long.class)) {
-                        return false;
-                    }
-                    return true;
+                    return !isWaitMethod(method);
                 }).collect(Collectors.toList());
+    }
+
+    private static boolean isNativeMethod(Method method) {
+        return Modifier.isNative(method.getModifiers());
+    }
+
+    private static boolean isWaitMethod(Method method) {
+        if (Modifier.isFinal(method.getModifiers()) && method.getName().equals("wait")) {
+            return method.getParameters().length == 0 || (method.getParameters().length == 1 && method.getParameters()[0].getType().equals(long.class));
+        }
+        return false;
     }
 
 }
