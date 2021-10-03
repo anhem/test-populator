@@ -81,7 +81,7 @@ class PopulateFactoryWithFieldStrategyTest {
     void PojoPrivateConstructor() {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(FIELD))
-                .accessNonPublicConstructor(true)
+                .accessNonPublicConstructors(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoPrivateConstructor value_1 = populateFactory.populate(PojoPrivateConstructor.class);
@@ -100,7 +100,7 @@ class PopulateFactoryWithFieldStrategyTest {
     void lombokBuilderClass() {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(FIELD))
-                .accessNonPublicConstructor(true)
+                .accessNonPublicConstructors(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         LombokImmutable value_1 = populateFactory.populate(LombokImmutable.LombokImmutableBuilder.class).build();
