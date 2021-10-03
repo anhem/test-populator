@@ -174,7 +174,7 @@ public class PopulateFactory {
                     .filter(field -> !Modifier.isFinal(field.getModifiers()))
                     .forEach(field -> {
                         try {
-                            field.setAccessible(true);
+                            setAccessible(field, objectOfClass);
                             if (isCollection(field.getType())) {
                                 Type[] typeArguments = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
                                 field.set(objectOfClass, populateWithOverrides(field.getType(), null, typeArguments));
@@ -227,7 +227,7 @@ public class PopulateFactory {
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(3)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
-            buildMethod.setAccessible(true);
+            setAccessible(buildMethod, builderObject);
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, LOMBOK)), e);
