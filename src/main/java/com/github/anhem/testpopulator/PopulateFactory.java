@@ -34,7 +34,7 @@ public class PopulateFactory {
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
-    private final Map<? extends Class<?>, OverridePopulate<?>> overridePopulate;
+    private final Map<Class<?>, OverridePopulate<?>> overridePopulates;
 
     /**
      * Create new instance of PopulateFactory with default configuration
@@ -51,7 +51,7 @@ public class PopulateFactory {
     public PopulateFactory(PopulateConfig populateConfig) {
         this.populateConfig = populateConfig;
         valueFactory = new ValueFactory(populateConfig.useRandomValues());
-        overridePopulate = populateConfig.getOverridePopulate();
+        overridePopulates = populateConfig.createOverridePopulates();
         if (populateConfig.getStrategyOrder().contains(BUILDER) && populateConfig.getBuilderPattern() == null) {
             throw new IllegalArgumentException(format(MISSING_BUILDER_PATTERN, BUILDER, Arrays.toString(BuilderPattern.values())));
         }
@@ -72,8 +72,8 @@ public class PopulateFactory {
     }
 
     private <T> T populateWithOverrides(Class<T> clazz, Parameter parameter, Type[] typeArguments) {
-        if (overridePopulate.containsKey(clazz)) {
-            return getOverridePopulateValue(clazz, overridePopulate);
+        if (overridePopulates.containsKey(clazz)) {
+            return getOverridePopulateValue(clazz, overridePopulates);
         }
         if (clazz.isArray()) {
             return continuePopulateForArray(clazz);

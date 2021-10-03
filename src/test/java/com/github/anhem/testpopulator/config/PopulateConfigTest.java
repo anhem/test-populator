@@ -16,8 +16,8 @@ class PopulateConfigTest {
 
         assertThat(populateConfig).isNotNull();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER, FIELD);
-        assertThat(populateConfig.getOverridePopulate()).isNotNull();
-        assertThat(populateConfig.getOverridePopulate()).isEmpty();
+        assertThat(populateConfig.createOverridePopulates()).isNotNull();
+        assertThat(populateConfig.createOverridePopulates()).isEmpty();
         assertThat(populateConfig.useRandomValues()).isTrue();
         assertThat(populateConfig.canAccessNonPublicConstructors()).isFalse();
         assertThat(populateConfig.getSetterPrefix()).isEqualTo("set");
@@ -41,8 +41,8 @@ class PopulateConfigTest {
 
         assertThat(populateConfig.getStrategyOrder()).hasSize(2);
         assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER, SETTER);
-        assertThat(populateConfig.getOverridePopulate()).hasSize(1);
-        assertThat(populateConfig.getOverridePopulate()).containsEntry(overriddenClass, overridePopulate);
+        assertThat(populateConfig.createOverridePopulates()).hasSize(1);
+        assertThat(populateConfig.createOverridePopulates()).containsEntry(overriddenClass, overridePopulate);
         assertThat(populateConfig.useRandomValues()).isFalse();
         assertThat(populateConfig.canAccessNonPublicConstructors()).isTrue();
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
