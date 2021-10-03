@@ -104,7 +104,7 @@ class PopulateFactoryWithSetterStrategyTest {
     void PojoPrivateConstructor() {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(SETTER))
-                .accessNonPublicConstructor(true)
+                .accessNonPublicConstructors(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoPrivateConstructor value_1 = populateFactory.populate(PojoPrivateConstructor.class);

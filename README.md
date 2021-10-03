@@ -63,7 +63,7 @@ Use PopulateConfig to configure how test-populator should run.
 | builderPattern | LOMBOK / IMMUTABLES | -
 | randomValues | true / false | true
 | setterPrefix | prefix of setter methods | set
-| accessNonPublicConstructor | control if allowed to access non public constructors | false
+| accessNonPublicConstructors | control if allowed to access non public constructors | false
 | overridePopulates | List of OverridePopulate implementations | -
 
 ### strategyOrder
@@ -108,7 +108,7 @@ will give the same result.
 
 Use setters with a different format than set*
 
-### accessNonPublicConstructor
+### accessNonPublicConstructors
 
 Controls whether to allow access to private constructors when populating.
 
