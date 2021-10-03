@@ -14,7 +14,6 @@ import static java.util.Arrays.stream;
 public class PopulateUtil {
 
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
-
     private static final List<String> BLACKLISTED_METHODS = List.of("$jacocoInit");
     private static final List<String> BLACKLISTED_FIELDS = List.of("__$lineHits$__");
     private static final String JAVA_BASE = "java.base";
@@ -138,8 +137,20 @@ public class PopulateUtil {
     }
 
     static <T> void setAccessible(Constructor<T> constructor, boolean canAccessNonPublicConstructor) {
-        if (canAccessNonPublicConstructor) {
+        if (canAccessNonPublicConstructor && !constructor.canAccess(null)) {
             constructor.setAccessible(true);
+        }
+    }
+
+    static <T> void setAccessible(Method method, T object) {
+        if (!method.canAccess(object)) {
+            method.setAccessible(true);
+        }
+    }
+
+    static <T> void setAccessible(Field field, T object) {
+        if (!field.canAccess(object)) {
+            field.setAccessible(true);
         }
     }
 

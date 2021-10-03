@@ -69,7 +69,6 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         assertThat(value_1.getListOfStrings()).hasSize(1);
     }
 
-
     @Test
     void allArgsConstructor() {
         assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructor.class))
