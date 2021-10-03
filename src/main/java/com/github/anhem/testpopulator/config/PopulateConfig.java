@@ -102,7 +102,7 @@ public class PopulateConfig {
         return strategyOrder;
     }
 
-    public Map<Class<?>, OverridePopulate<?>> getOverridePopulate() {
+    public Map<Class<?>, OverridePopulate<?>> createOverridePopulates() {
         if (overridePopulate == null || overridePopulate.isEmpty()) {
             return Collections.emptyMap();
         }
