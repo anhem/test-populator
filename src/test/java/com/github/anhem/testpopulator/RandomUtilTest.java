@@ -16,8 +16,8 @@ class RandomUtilTest {
         int random_1 = getRandomInt();
         int random_2 = getRandomInt();
 
-        assertThat(random_1).isGreaterThan(0);
-        assertThat(random_2).isGreaterThan(0);
+        assertThat(random_1).isPositive();
+        assertThat(random_2).isPositive();
         assertThat(random_1).isNotEqualTo(random_2);
     }
 
