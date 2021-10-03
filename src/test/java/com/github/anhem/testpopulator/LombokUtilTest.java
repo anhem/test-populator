@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LombokUtilTest {
 
     @Test
-    public void lombokMethodInvokeOrderReturnsOrderNumberForMethod() {
+    void lombokMethodInvokeOrderReturnsOrderNumberForMethod() {
         Map<Integer, List<Method>> methodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(LombokImmutableWithSingular.LombokImmutableWithSingularBuilder.class);
 
         Map<Integer, List<String>> methodNamesGroupedByInvokeOrder = methodsGroupedByInvokeOrder.entrySet().stream()

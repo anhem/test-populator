@@ -84,7 +84,7 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     }
 
     @Test
-    public void LombokOddImmutable() {
+    void LombokOddImmutable() {
         LombokOddImmutable value_1 = populateFactory.populate(LombokOddImmutable.class);
         LombokOddImmutable value_2 = populateFactory.populate(LombokOddImmutable.class);
         assertRandomlyPopulatedValues(value_1, value_2);

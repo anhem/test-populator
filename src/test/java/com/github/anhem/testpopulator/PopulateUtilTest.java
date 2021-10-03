@@ -64,8 +64,7 @@ class PopulateUtilTest {
                 .filter(field -> !isBlackListedField(field))
                 .collect(Collectors.toList());
 
-        assertThat(declaredFields).isNotEmpty();
-        assertThat(declaredFields).hasSize(19);
+        assertThat(declaredFields).isNotEmpty().hasSize(19);
         List<String> fieldNames = declaredFields.stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());
@@ -210,8 +209,7 @@ class PopulateUtilTest {
                 .filter(method -> isSetterMethod(method, SETTER_PREFIX))
                 .collect(Collectors.toList());
 
-        assertThat(setterMethods).isNotEmpty();
-        assertThat(setterMethods).hasSize(17);
+        assertThat(setterMethods).isNotEmpty().hasSize(17);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
@@ -223,8 +221,7 @@ class PopulateUtilTest {
                 .filter(method -> isSetterMethod(method, setterPrefix))
                 .collect(Collectors.toList());
 
-        assertThat(setterMethods).isNotEmpty();
-        assertThat(setterMethods).hasSize(17);
+        assertThat(setterMethods).isNotEmpty().hasSize(17);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
@@ -236,8 +233,7 @@ class PopulateUtilTest {
                 .filter(method -> isSetterMethod(method, setterPrefix))
                 .collect(Collectors.toList());
 
-        assertThat(setterMethods).isNotEmpty();
-        assertThat(setterMethods).hasSize(17);
+        assertThat(setterMethods).isNotEmpty().hasSize(17);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
