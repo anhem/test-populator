@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Value
@@ -16,5 +18,10 @@ public class LombokOddImmutable {
     @Singular
     List<List<List<LombokImmutable>>> singularWeirdLombokImmutables;
     List<List<List<LombokImmutable>>> weirdLombokImmutables;
+
+    ArrayList<HashMap<String, LombokImmutable>> arrayListWithHashMap;
+    ArrayList<HashMap<String, ArrayList<LombokImmutable>>> arrayListWithHashMapWithArrayList;
+
+    HashMap<Integer, ArrayList<String>> hashMapWithArrayList;
 
 }
