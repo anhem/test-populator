@@ -38,7 +38,8 @@ public class PopulateUtil {
     }
 
     static List<Field> getDeclaredFields(Class<?> clazz) {
-        return getDeclaredFields(clazz, new ArrayList<>());
+        List<Field> declaredFields = getDeclaredFields(clazz, new ArrayList<>());
+        return removeUnwantedFields(declaredFields);
     }
 
     static List<Method> getDeclaredMethods(Class<?> clazz) {
@@ -114,11 +115,11 @@ public class PopulateUtil {
         return (Constructor<T>) constructor1;
     }
 
-    static boolean isBlackListedMethod(Method method) {
+    static boolean isBlackListed(Method method) {
         return BLACKLISTED_METHODS.contains(method.getName());
     }
 
-    static boolean isBlackListedField(Field field) {
+    static boolean isBlackListed(Field field) {
         return BLACKLISTED_FIELDS.contains(field.getName());
     }
 
@@ -195,10 +196,16 @@ public class PopulateUtil {
         return setterPrefix.equals("") ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
     }
 
+    private static List<Field> removeUnwantedFields(List<Field> declaredFields) {
+        return declaredFields.stream()
+                .filter(field -> !isBlackListed(field))
+                .collect(Collectors.toList());
+    }
+
     private static List<Method> removeUnwantedMethods(List<Method> declaredMethods) {
         return declaredMethods.stream()
                 .filter(method -> {
-                    if (isBlackListedMethod(method)) {
+                    if (isBlackListed(method)) {
                         return false;
                     }
                     if (isNativeMethod(method)) {
