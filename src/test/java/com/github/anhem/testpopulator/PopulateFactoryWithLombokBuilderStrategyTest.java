@@ -48,6 +48,8 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         assertThat(value_1.getListOfStrings()).hasSize(1);
         assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
         assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
+        assertObjectCanBeRebuilt(value_1);
+        assertObjectCanBeRebuilt(value_2);
     }
 
     @Test
@@ -93,7 +95,11 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         assertObjectCanBeRebuilt(value_2);
     }
 
-    private ObjectAssert<LombokOddImmutable> assertObjectCanBeRebuilt(LombokOddImmutable value_1) {
-        return assertThat(value_1.toBuilder().build()).isEqualTo(value_1);
+    private ObjectAssert<LombokImmutable> assertObjectCanBeRebuilt(LombokImmutable lombokImmutable) {
+        return assertThat(lombokImmutable.toBuilder().build()).isEqualTo(lombokImmutable);
+    }
+
+    private ObjectAssert<LombokOddImmutable> assertObjectCanBeRebuilt(LombokOddImmutable lombokOddImmutable) {
+        return assertThat(lombokOddImmutable.toBuilder().build()).isEqualTo(lombokOddImmutable);
     }
 }

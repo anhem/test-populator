@@ -6,12 +6,10 @@ import lombok.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class LombokImmutable {
 
     String stringValue;
@@ -31,4 +29,7 @@ public class LombokImmutable {
     Map<String, Integer> mapOfStringsToIntegers;
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
+    ArrayList<String> arrayList;
+    HashMap<String, String> hashMap;
+    HashSet<String> hashSet;
 }
