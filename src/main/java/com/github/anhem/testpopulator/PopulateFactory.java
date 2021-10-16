@@ -102,18 +102,38 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateForCollection(Class<T> clazz, Parameter parameter, Type[] typeArguments) {
         List<Type> argumentTypes = toArgumentTypes(parameter, typeArguments);
-        if (isMap(clazz)) {
-            Object key = continuePopulateWithType(argumentTypes.get(0));
-            Object value = continuePopulateWithType(argumentTypes.get(1));
-            return (T) Map.of(key, value);
-        }
-        if (isSet(clazz)) {
-            Object value = continuePopulateWithType(argumentTypes.get(0));
-            return (T) Set.of(value);
-        }
-        if (isCollection(clazz)) {
-            Object value = continuePopulateWithType(argumentTypes.get(0));
-            return (T) List.of(value);
+        try {
+            if (isMap(clazz)) {
+                Object key = continuePopulateWithType(argumentTypes.get(0));
+                Object value = continuePopulateWithType(argumentTypes.get(1));
+                if (clazz.getConstructors().length > 0) {
+                    Map map = (Map) clazz.getConstructor().newInstance();
+                    map.put(key, value);
+                    return (T) map;
+                }
+                return (T) Map.of(key, value);
+            }
+            if (isSet(clazz)) {
+                Object value = continuePopulateWithType(argumentTypes.get(0));
+                if (clazz.getConstructors().length > 0) {
+                    Set set = (Set) clazz.getConstructor().newInstance();
+                    set.add(value);
+                    return (T) set;
+                }
+                return (T) Set.of(value);
+            }
+            if (isCollection(clazz)) {
+                Object value = continuePopulateWithType(argumentTypes.get(0));
+                if (clazz.getConstructors().length > 0) {
+                    List list = (List) clazz.getConstructor().newInstance();
+                    list.add(value);
+                    return (T) list;
+                }
+                return (T) List.of(value);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         throw new PopulateException(format(MISSING_COLLECTION_TYPE, clazz.getTypeName()));
     }
