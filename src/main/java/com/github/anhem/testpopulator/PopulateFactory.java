@@ -28,6 +28,7 @@ public class PopulateFactory {
     static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s";
     static final String FAILED_TO_CALL_METHOD = "Failed to call method %s in object of class %s";
     static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of %s using %s strategy";
+    static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection %s";
 
     private static final String BUILD_METHOD = "build";
     static final String BUILDER_METHOD = "builder";
@@ -107,7 +108,7 @@ public class PopulateFactory {
                 Object key = continuePopulateWithType(argumentTypes.get(0));
                 Object value = continuePopulateWithType(argumentTypes.get(1));
                 if (clazz.getConstructors().length > 0) {
-                    Map map = (Map) clazz.getConstructor().newInstance();
+                    Map<Object, Object> map = (Map<Object, Object>) clazz.getConstructor().newInstance();
                     map.put(key, value);
                     return (T) map;
                 }
@@ -116,7 +117,7 @@ public class PopulateFactory {
             if (isSet(clazz)) {
                 Object value = continuePopulateWithType(argumentTypes.get(0));
                 if (clazz.getConstructors().length > 0) {
-                    Set set = (Set) clazz.getConstructor().newInstance();
+                    Set<Object> set = (Set<Object>) clazz.getConstructor().newInstance();
                     set.add(value);
                     return (T) set;
                 }
@@ -125,7 +126,7 @@ public class PopulateFactory {
             if (isCollection(clazz)) {
                 Object value = continuePopulateWithType(argumentTypes.get(0));
                 if (clazz.getConstructors().length > 0) {
-                    List list = (List) clazz.getConstructor().newInstance();
+                    List<Object> list = (List<Object>) clazz.getConstructor().newInstance();
                     list.add(value);
                     return (T) list;
                 }
@@ -133,7 +134,7 @@ public class PopulateFactory {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new PopulateException(format(FAILED_TO_CREATE_COLLECTION, clazz.getTypeName()), e);
         }
         throw new PopulateException(format(MISSING_COLLECTION_TYPE, clazz.getTypeName()));
     }
