@@ -61,7 +61,7 @@ class PopulateUtilTest {
     @Test
     void getDeclaredFieldsReturnsAllDeclaredFields() {
         List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class).stream()
-                .filter(field -> !isBlackListedField(field))
+                .filter(field -> !isBlackListed(field))
                 .collect(Collectors.toList());
 
         assertThat(declaredFields).isNotEmpty().hasSize(19);
@@ -242,28 +242,28 @@ class PopulateUtilTest {
     void isBlackListedMethodReturnsTrue() {
         Method method = getMethod("$jacocoInit", HasBlackListed.class);
 
-        assertThat(isBlackListedMethod(method)).isTrue();
+        assertThat(PopulateUtil.isBlackListed(method)).isTrue();
     }
 
     @Test
     void isBlackListedMethodReturnsFalse() {
         Method method = getMethod("getStringValue", Pojo.class);
 
-        assertThat(isBlackListedMethod(method)).isFalse();
+        assertThat(PopulateUtil.isBlackListed(method)).isFalse();
     }
 
     @Test
     void isBlackListedFieldsReturnsTrue() {
         Field field = getField("__$lineHits$__", HasBlackListed.class);
 
-        assertThat(isBlackListedField(field)).isTrue();
+        assertThat(isBlackListed(field)).isTrue();
     }
 
     @Test
     void isBlackListedFieldReturnsFalse() {
         Field field = getField("stringValue", Pojo.class);
 
-        assertThat(isBlackListedField(field)).isFalse();
+        assertThat(isBlackListed(field)).isFalse();
     }
 
 }
