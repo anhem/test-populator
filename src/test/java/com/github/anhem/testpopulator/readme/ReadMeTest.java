@@ -3,7 +3,10 @@ package com.github.anhem.testpopulator.readme;
 import com.github.anhem.testpopulator.PopulateFactory;
 import com.github.anhem.testpopulator.readme.model.MyClass;
 import com.github.anhem.testpopulator.readme.model.MyClass2;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,7 +18,7 @@ class ReadMeTest {
 
         assertThat(myClass).hasNoNullFieldsOrProperties();
         assertThat(myClass).extracting("myInnerClass.integer").isNotNull();
-        assertThat(myClass).extracting("myInnerClass.stringToLocalDateMap").isNotEmpty();
+        assertThat(myClass).extracting("myInnerClass.stringToLocalDateMap").is(new Condition<>(m -> ((Map<?, ?>) m).size() > 0, "not empty"));
         System.out.println("myClass = " + myClass);
     }
 
@@ -25,7 +28,7 @@ class ReadMeTest {
 
         assertThat(myClass2).hasNoNullFieldsOrProperties();
         assertThat(myClass2).extracting("myInnerClass.integer").isNotNull();
-        assertThat(myClass2).extracting("myInnerClass.stringToLocalDateMap").isNotEmpty();
+        assertThat(myClass2).extracting("myInnerClass.stringToLocalDateMap").is(new Condition<>(o -> ((Map<?, ?>) o).size() > 0, "not empty"));
     }
 
 }
