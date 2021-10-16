@@ -2,9 +2,7 @@ package com.github.anhem.testpopulator.model.java;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Pojo {
 
@@ -25,6 +23,9 @@ public class Pojo {
     private Map<String, Integer> mapOfStringsToIntegers;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
+    private ArrayList<String> arrayList;
+    private HashMap<String, String> hashMap;
+    private HashSet<String> hashSet;
 
     public String getStringValue() {
         return stringValue;
@@ -160,5 +161,29 @@ public class Pojo {
 
     public void setArrayOfStrings(String[] arrayOfStrings) {
         this.arrayOfStrings = arrayOfStrings;
+    }
+
+    public ArrayList<String> getArrayList() {
+        return arrayList;
+    }
+
+    public void setArrayList(ArrayList<String> arrayList) {
+        this.arrayList = arrayList;
+    }
+
+    public HashMap<String, String> getHashMap() {
+        return hashMap;
+    }
+
+    public void setHashMap(HashMap<String, String> hashMap) {
+        this.hashMap = hashMap;
+    }
+
+    public HashSet<String> getHashSet() {
+        return hashSet;
+    }
+
+    public void setHashSet(HashSet<String> hashSet) {
+        this.hashSet = hashSet;
     }
 }
