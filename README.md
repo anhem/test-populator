@@ -59,11 +59,11 @@ Use PopulateConfig to configure how test-populator should run.
 
 | config | Values | Default
 |---|---|---
-| strategyOrder | Any of CONSTRUCTOR,FIELD,SETTER,BUILDER | CONSTRUCTOR,SETTER,FIELD
+| strategyOrder | CONSTRUCTOR, SETTER, FIELD, BUILDER | CONSTRUCTOR,SETTER,FIELD
 | builderPattern | LOMBOK / IMMUTABLES | -
 | randomValues | true / false | true
 | setterPrefix | prefix of setter methods | set
-| accessNonPublicConstructors | control if allowed to access non public constructors | false
+| accessNonPublicConstructors | true / false | false
 | overridePopulates | List of OverridePopulate implementations | -
 
 ### strategyOrder
