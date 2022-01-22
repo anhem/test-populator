@@ -11,7 +11,7 @@ class RandomUtil {
     private static final int RANDOM_INT_MAX_VALUE = 1000000;
     private static final int LEFT_LIMIT = 97; // letter 'a'
     private static final int RIGHT_LIMIT = 122; // letter 'z'
-    private static final int STRING_LENGTH = 10;
+    static final int STRING_LENGTH = 10;
     private static final Random random = new SecureRandom();
 
     private RandomUtil() {
@@ -22,13 +22,10 @@ class RandomUtil {
     }
 
     public static String getRandomString() {
-        StringBuilder buffer = new StringBuilder(STRING_LENGTH);
-        for (int i = 0; i < STRING_LENGTH; i++) {
-            int randomLimitedInt = LEFT_LIMIT + Math.round(random.nextFloat() * (RIGHT_LIMIT - LEFT_LIMIT + 1));
-            buffer.append((char) randomLimitedInt);
-        }
-
-        return buffer.toString();
+        return random.ints(LEFT_LIMIT, RIGHT_LIMIT + 1)
+                .limit(STRING_LENGTH)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
     }
 
     public static Boolean getRandomBoolean() {
