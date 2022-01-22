@@ -28,6 +28,8 @@ class RandomUtilTest {
 
         assertThat(random_1).isNotNull();
         assertThat(random_2).isNotNull();
+        assertThat(random_1).hasSize(STRING_LENGTH);
+        assertThat(random_2).hasSize(STRING_LENGTH);
         assertThat(random_1).isNotEqualTo(random_2);
     }
 
