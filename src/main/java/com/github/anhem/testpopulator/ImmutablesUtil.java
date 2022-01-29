@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ public class ImmutablesUtil {
     }
 
     static Class<?> getImmutablesGeneratedClass(Class<?> clazz) {
-        if (clazz.isInterface()) {
+        if (clazz.isInterface() || isAbstract(clazz)) {
             try {
                 String packageName = clazz.getName().substring(0, clazz.getName().lastIndexOf(DOT));
                 String className = String.format("%s.%s%s", packageName, CLASS_PREFIX, clazz.getSimpleName());
@@ -86,5 +87,9 @@ public class ImmutablesUtil {
 
     private static boolean isPutAllMethod(Method method) {
         return method.getName().matches(PUT_ALL_METHOD_PATTERN);
+    }
+
+    private static boolean isAbstract(Class<?> clazz) {
+        return Modifier.isAbstract(clazz.getModifiers());
     }
 }
