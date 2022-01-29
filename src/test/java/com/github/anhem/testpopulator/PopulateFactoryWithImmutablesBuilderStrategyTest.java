@@ -2,7 +2,9 @@ package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesAbstract;
 import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesInterface;
+import com.github.anhem.testpopulator.model.immutables.ImmutablesAbstract;
 import com.github.anhem.testpopulator.model.immutables.ImmutablesInterface;
 import com.github.anhem.testpopulator.model.java.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +53,26 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
     void immutablesInterface() {
         ImmutablesInterface value_1 = populateFactory.populate(ImmutablesInterface.class);
         ImmutablesInterface value_2 = populateFactory.populate(ImmutablesInterface.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+        assertThat(value_1.getListOfStrings()).hasSize(1);
+        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
+        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
+    }
+
+    @Test
+    void immutablesAbstractImplementation() {
+        ImmutableImmutablesAbstract value_1 = populateFactory.populate(ImmutableImmutablesAbstract.class);
+        ImmutableImmutablesAbstract value_2 = populateFactory.populate(ImmutableImmutablesAbstract.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+        assertThat(value_1.getListOfStrings()).hasSize(1);
+        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
+        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
+    }
+
+    @Test
+    void immutablesAbstract() {
+        ImmutablesAbstract value_1 = populateFactory.populate(ImmutablesAbstract.class);
+        ImmutablesAbstract value_2 = populateFactory.populate(ImmutablesAbstract.class);
         assertRandomlyPopulatedValues(value_1, value_2);
         assertThat(value_1.getListOfStrings()).hasSize(1);
         assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
