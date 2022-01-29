@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.model.java.*;
@@ -194,13 +195,13 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingBuilderStrategyReturnsTrue() {
-        assertThat(isMatchingBuilderStrategy(BUILDER, LombokImmutable.class)).isTrue();
+        assertThat(isMatchingBuilderStrategy(BUILDER, LombokImmutable.class, BuilderPattern.LOMBOK)).isTrue();
     }
 
     @Test
     void isMatchingBuilderStrategyReturnsFalse() {
-        assertThat(isMatchingBuilderStrategy(Strategy.CONSTRUCTOR, LombokImmutable.class)).isFalse();
-        assertThat(isMatchingBuilderStrategy(BUILDER, PojoExtendsPojoAbstract.class)).isFalse();
+        assertThat(isMatchingBuilderStrategy(Strategy.CONSTRUCTOR, LombokImmutable.class, BuilderPattern.LOMBOK)).isFalse();
+        assertThat(isMatchingBuilderStrategy(BUILDER, PojoExtendsPojoAbstract.class, BuilderPattern.LOMBOK)).isFalse();
     }
 
     @Test
