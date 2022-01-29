@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
 
@@ -7,7 +8,9 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.anhem.testpopulator.ImmutablesUtil.getImmutablesGeneratedClass;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
+import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.util.Arrays.stream;
 
@@ -94,10 +97,14 @@ public class PopulateUtil {
         return strategy.equals(FIELD) && hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor);
     }
 
-    static boolean isMatchingBuilderStrategy(Strategy strategy, Class<?> clazz) {
+    static boolean isMatchingBuilderStrategy(Strategy strategy, Class<?> clazz, BuilderPattern builderPattern) {
         if (strategy.equals(BUILDER)) {
             try {
-                clazz.getDeclaredMethod(BUILDER_METHOD);
+                if (builderPattern.equals(IMMUTABLES)) {
+                    getImmutablesGeneratedClass(clazz).getDeclaredMethod(BUILDER_METHOD);
+                } else {
+                    clazz.getDeclaredMethod(BUILDER_METHOD);
+                }
                 return true;
             } catch (NoSuchMethodException e) {
                 return false;

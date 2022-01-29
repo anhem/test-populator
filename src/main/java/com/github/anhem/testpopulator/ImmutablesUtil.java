@@ -16,6 +16,9 @@ public class ImmutablesUtil {
     private static final String ADD_ALL_METHOD_PATTERN = String.format("%s%s", ADD_ALL_PREFIX, MATCH_FIRST_CHARACTER_UPPERCASE);
     private static final String PUT_METHOD_PATTERN = String.format("%s%s", PUT_PREFIX, MATCH_FIRST_CHARACTER_UPPERCASE);
     private static final String PUT_ALL_METHOD_PATTERN = String.format("%s%s", PUT_ALL_PREFIX, MATCH_FIRST_CHARACTER_UPPERCASE);
+    public static final String CLASS_PREFIX = "Immutable";
+    public static final String DOT = ".";
+    public static final String FAILED_TO_FIND_CLASS = "Unable to find Immutables generated class for %s";
 
     private ImmutablesUtil() {
     }
@@ -27,6 +30,19 @@ public class ImmutablesUtil {
                 .filter(method -> !isDeclaringJavaBaseClass(method))
                 .filter(method -> !isSameMethodParameterAsClass(clazz, method))
                 .collect(Collectors.toList());
+    }
+
+    static Class<?> getImmutablesGeneratedClass(Class<?> clazz) {
+        if (clazz.isInterface()) {
+            try {
+                String packageName = clazz.getName().substring(0, clazz.getName().lastIndexOf(DOT));
+                String className = String.format("%s.%s%s", packageName, CLASS_PREFIX, clazz.getSimpleName());
+                return Class.forName(className);
+            } catch (Exception e) {
+                throw new PopulateException(String.format(FAILED_TO_FIND_CLASS, clazz.getName()), e);
+            }
+        }
+        return clazz;
     }
 
     private static List<Method> removeMethodsDoingTheSameThing(List<Method> methods) {

@@ -8,6 +8,7 @@ import com.github.anhem.testpopulator.config.Strategy;
 import java.lang.reflect.*;
 import java.util.*;
 
+import static com.github.anhem.testpopulator.ImmutablesUtil.getImmutablesGeneratedClass;
 import static com.github.anhem.testpopulator.ImmutablesUtil.getMethodsForImmutablesBuilder;
 import static com.github.anhem.testpopulator.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
 import static com.github.anhem.testpopulator.PopulateUtil.*;
@@ -166,7 +167,7 @@ public class PopulateFactory {
             if (isMatchingFieldStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
                 return continuePopulateUsingFields(clazz);
             }
-            if (isMatchingBuilderStrategy(strategy, clazz)) {
+            if (isMatchingBuilderStrategy(strategy, clazz, populateConfig.getBuilderPattern())) {
                 return continuePopulateUsingBuilder(clazz);
             }
         }
@@ -258,8 +259,9 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingImmutablesBuilder(Class<T> clazz) {
         try {
-            Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
-            List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(clazz, builderObject);
+            Class<?> immutablesGeneratedClass = getImmutablesGeneratedClass(clazz);
+            Object builderObject = immutablesGeneratedClass.getDeclaredMethod(BUILDER_METHOD).invoke(null);
+            List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(immutablesGeneratedClass, builderObject);
             builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             return (T) buildMethod.invoke(builderObject);
