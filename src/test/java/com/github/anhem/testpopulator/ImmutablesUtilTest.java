@@ -1,6 +1,8 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesAbstract;
 import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesInterface;
+import com.github.anhem.testpopulator.model.immutables.ImmutablesAbstract;
 import com.github.anhem.testpopulator.model.immutables.ImmutablesInterface;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +35,15 @@ class ImmutablesUtilTest {
         assertThat(methodNames.stream().anyMatch(methodName -> methodName.startsWith(ADD_ALL_PREFIX))).isFalse();
         assertThat(methodNames.stream().anyMatch(methodName -> methodName.startsWith(PUT_PREFIX))).isFalse();
         assertThat(methodNames.stream().anyMatch(methodName -> methodName.startsWith(PUT_ALL_PREFIX))).isFalse();
+    }
+
+    @Test
+    public void getImmutablesGeneratedClassReturnsExpectedClass() {
+        assertThat(getImmutablesGeneratedClass(String.class)).isEqualTo(String.class);
+        assertThat(getImmutablesGeneratedClass(ImmutablesInterface.class)).isEqualTo(ImmutableImmutablesInterface.class);
+        assertThat(getImmutablesGeneratedClass(ImmutableImmutablesInterface.class)).isEqualTo(ImmutableImmutablesInterface.class);
+        assertThat(getImmutablesGeneratedClass(ImmutablesAbstract.class)).isEqualTo(ImmutableImmutablesAbstract.class);
+        assertThat(getImmutablesGeneratedClass(ImmutableImmutablesAbstract.class)).isEqualTo(ImmutableImmutablesAbstract.class);
     }
 
     private List<String> getMethodNames(List<Method> methodsForImmutablesBuilder) {
