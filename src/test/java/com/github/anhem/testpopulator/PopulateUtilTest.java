@@ -17,6 +17,7 @@ import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.testutil.FieldTestUtil.getField;
 import static com.github.anhem.testpopulator.testutil.MethodTestUtil.getMethod;
+import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateUtilTest {
@@ -61,9 +62,7 @@ class PopulateUtilTest {
 
     @Test
     void getDeclaredFieldsReturnsAllDeclaredFields() {
-        List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class).stream()
-                .filter(field -> !isBlackListed(field))
-                .collect(Collectors.toList());
+        List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class, DEFAULT_POPULATE_CONFIG.getBlacklistedFields());
 
         assertThat(declaredFields).isNotEmpty().hasSize(19);
         List<String> fieldNames = declaredFields.stream()
@@ -74,7 +73,7 @@ class PopulateUtilTest {
 
     @Test
     void getDeclaredMethodsReturnAllDeclaredMethods() {
-        List<Method> declaredMethods = getDeclaredMethods(PojoExtendsPojoExtendsPojoAbstract.class);
+        List<Method> declaredMethods = getDeclaredMethods(PojoExtendsPojoExtendsPojoAbstract.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods());
 
         assertThat(declaredMethods).isNotEmpty();
         List<String> fieldNames = declaredMethods.stream()
@@ -206,7 +205,7 @@ class PopulateUtilTest {
 
     @Test
     void isSetterReturnsTrue() {
-        List<Method> setterMethods = getDeclaredMethods(Pojo.class).stream()
+        List<Method> setterMethods = getDeclaredMethods(Pojo.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).stream()
                 .filter(method -> isSetterMethod(method, SETTER_PREFIX))
                 .collect(Collectors.toList());
 
@@ -218,7 +217,7 @@ class PopulateUtilTest {
     @Test
     void isSetterReturnsTrueForCustomerSetter() {
         String setterPrefix = "with";
-        List<Method> setterMethods = getDeclaredMethods(PojoWithCustomSetters.class).stream()
+        List<Method> setterMethods = getDeclaredMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).stream()
                 .filter(method -> isSetterMethod(method, setterPrefix))
                 .collect(Collectors.toList());
 
@@ -230,7 +229,7 @@ class PopulateUtilTest {
     @Test
     void isSetterReturnsTrueForBlankSetter() {
         String setterPrefix = "";
-        List<Method> setterMethods = getDeclaredMethods(PojoWithCustomSetters.class).stream()
+        List<Method> setterMethods = getDeclaredMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).stream()
                 .filter(method -> isSetterMethod(method, setterPrefix))
                 .collect(Collectors.toList());
 
@@ -243,28 +242,28 @@ class PopulateUtilTest {
     void isBlackListedMethodReturnsTrue() {
         Method method = getMethod("$jacocoInit", HasBlackListed.class);
 
-        assertThat(PopulateUtil.isBlackListed(method)).isTrue();
+        assertThat(PopulateUtil.isBlackListed(method, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods())).isTrue();
     }
 
     @Test
     void isBlackListedMethodReturnsFalse() {
         Method method = getMethod("getStringValue", Pojo.class);
 
-        assertThat(PopulateUtil.isBlackListed(method)).isFalse();
+        assertThat(PopulateUtil.isBlackListed(method, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods())).isFalse();
     }
 
     @Test
     void isBlackListedFieldsReturnsTrue() {
         Field field = getField("__$lineHits$__", HasBlackListed.class);
 
-        assertThat(isBlackListed(field)).isTrue();
+        assertThat(isBlackListed(field, DEFAULT_POPULATE_CONFIG.getBlacklistedFields())).isTrue();
     }
 
     @Test
     void isBlackListedFieldReturnsFalse() {
         Field field = getField("stringValue", Pojo.class);
 
-        assertThat(isBlackListed(field)).isFalse();
+        assertThat(isBlackListed(field, DEFAULT_POPULATE_CONFIG.getBlacklistedFields())).isFalse();
     }
 
 }

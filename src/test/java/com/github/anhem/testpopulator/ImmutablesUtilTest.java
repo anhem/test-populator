@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import static com.github.anhem.testpopulator.ImmutablesUtil.*;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 import static com.github.anhem.testpopulator.PopulateUtil.getDeclaredMethods;
+import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ImmutablesUtilTest {
@@ -21,15 +22,15 @@ class ImmutablesUtilTest {
     @Test
     void getMethodsForImmutablesBuilderReturnsExpectedMethods() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Object builderObject = ImmutableImmutablesInterface.class.getDeclaredMethod(BUILDER_METHOD).invoke(null);
-        List<String> allMethodNames = getMethodNames(PopulateUtil.getDeclaredMethods(builderObject.getClass()));
+        List<String> allMethodNames = getMethodNames(PopulateUtil.getDeclaredMethods(builderObject.getClass(), DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()));
         assertThat(allMethodNames.stream().anyMatch(methodName -> methodName.startsWith(ADD_PREFIX))).isTrue();
         assertThat(allMethodNames.stream().anyMatch(methodName -> methodName.startsWith(ADD_ALL_PREFIX))).isTrue();
         assertThat(allMethodNames.stream().anyMatch(methodName -> methodName.startsWith(PUT_PREFIX))).isTrue();
         assertThat(allMethodNames.stream().anyMatch(methodName -> methodName.startsWith(PUT_ALL_PREFIX))).isTrue();
 
-        List<Method> methodsForImmutablesBuilder = getMethodsForImmutablesBuilder(ImmutableImmutablesInterface.class, builderObject);
+        List<Method> methodsForImmutablesBuilder = getMethodsForImmutablesBuilder(ImmutableImmutablesInterface.class, builderObject, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods());
 
-        assertThat(methodsForImmutablesBuilder).hasSize(getDeclaredMethods(ImmutablesInterface.class).size());
+        assertThat(methodsForImmutablesBuilder).hasSize(getDeclaredMethods(ImmutablesInterface.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).size());
         List<String> methodNames = getMethodNames(methodsForImmutablesBuilder);
         assertThat(methodNames.stream().anyMatch(methodName -> methodName.startsWith(ADD_PREFIX))).isFalse();
         assertThat(methodNames.stream().anyMatch(methodName -> methodName.startsWith(ADD_ALL_PREFIX))).isFalse();

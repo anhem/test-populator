@@ -24,8 +24,8 @@ public class ImmutablesUtil {
     private ImmutablesUtil() {
     }
 
-    static <T> List<Method> getMethodsForImmutablesBuilder(Class<T> clazz, Object builderObject) {
-        List<Method> declaredMethods = getDeclaredMethods(builderObject.getClass());
+    static <T> List<Method> getMethodsForImmutablesBuilder(Class<T> clazz, Object builderObject, List<String> blacklistedMethods) {
+        List<Method> declaredMethods = getDeclaredMethods(builderObject.getClass(), blacklistedMethods);
         return removeMethodsDoingTheSameThing(declaredMethods).stream()
                 .filter(PopulateUtil::hasAtLeastOneParameter)
                 .filter(method -> !isDeclaringJavaBaseClass(method))

@@ -192,7 +192,7 @@ public class PopulateFactory {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
             T objectOfClass = constructor.newInstance();
-            getDeclaredFields(clazz).stream()
+            getDeclaredFields(clazz, populateConfig.getBlacklistedFields()).stream()
                     .filter(field -> !Modifier.isFinal(field.getModifiers()))
                     .forEach(field -> {
                         try {
@@ -218,7 +218,7 @@ public class PopulateFactory {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
             T objectOfClass = constructor.newInstance();
-            getDeclaredMethods(clazz).stream()
+            getDeclaredMethods(clazz, populateConfig.getBlacklistedMethods()).stream()
                     .filter(method -> isSetterMethod(method, populateConfig.getSetterPrefix()))
                     .forEach(method -> continuePopulateForMethod(objectOfClass, method));
             return objectOfClass;
@@ -241,7 +241,7 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingLombokBuilder(Class<T> clazz) {
         try {
             Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
-            Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(builderObject.getClass());
+            Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(builderObject.getClass(), populateConfig.getBlacklistedMethods());
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(1)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(2)).ifPresent(methods ->
@@ -261,7 +261,7 @@ public class PopulateFactory {
         try {
             Class<?> immutablesGeneratedClass = getImmutablesGeneratedClass(clazz);
             Object builderObject = immutablesGeneratedClass.getDeclaredMethod(BUILDER_METHOD).invoke(null);
-            List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(immutablesGeneratedClass, builderObject);
+            List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(immutablesGeneratedClass, builderObject, populateConfig.getBlacklistedMethods());
             builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             return (T) buildMethod.invoke(builderObject);

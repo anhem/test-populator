@@ -9,13 +9,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
+import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LombokUtilTest {
 
+
     @Test
     void lombokMethodInvokeOrderReturnsOrderNumberForMethod() {
-        Map<Integer, List<Method>> methodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(LombokImmutableWithSingular.LombokImmutableWithSingularBuilder.class);
+        Map<Integer, List<Method>> methodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(LombokImmutableWithSingular.LombokImmutableWithSingularBuilder.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods());
 
         Map<Integer, List<String>> methodNamesGroupedByInvokeOrder = methodsGroupedByInvokeOrder.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()

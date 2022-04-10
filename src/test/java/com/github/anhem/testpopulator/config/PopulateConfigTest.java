@@ -6,22 +6,23 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateConfigTest {
 
     @Test
     void buildingPopulateConfigResultsInDefaultValues() {
-        PopulateConfig populateConfig = PopulateConfig.builder().build();
-
-        assertThat(populateConfig).isNotNull();
-        assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER, FIELD);
-        assertThat(populateConfig.createOverridePopulates()).isNotNull();
-        assertThat(populateConfig.createOverridePopulates()).isEmpty();
-        assertThat(populateConfig.useRandomValues()).isTrue();
-        assertThat(populateConfig.canAccessNonPublicConstructors()).isFalse();
-        assertThat(populateConfig.getSetterPrefix()).isEqualTo("set");
-        assertThat(populateConfig.getBuilderPattern()).isNull();
+        assertThat(DEFAULT_POPULATE_CONFIG).isNotNull();
+        assertThat(DEFAULT_POPULATE_CONFIG.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER, FIELD);
+        assertThat(DEFAULT_POPULATE_CONFIG.createOverridePopulates()).isNotNull();
+        assertThat(DEFAULT_POPULATE_CONFIG.createOverridePopulates()).isEmpty();
+        assertThat(DEFAULT_POPULATE_CONFIG.useRandomValues()).isTrue();
+        assertThat(DEFAULT_POPULATE_CONFIG.canAccessNonPublicConstructors()).isFalse();
+        assertThat(DEFAULT_POPULATE_CONFIG.getSetterPrefix()).isEqualTo("set");
+        assertThat(DEFAULT_POPULATE_CONFIG.getBuilderPattern()).isNull();
+        assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).isNotEmpty();
+        assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedFields()).isNotEmpty();
     }
 
     @Test
