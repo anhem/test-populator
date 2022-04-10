@@ -14,8 +14,8 @@ public class LombokUtil {
     private LombokUtil() {
     }
 
-    static Map<Integer, List<Method>> getMethodsForLombokBuilderGroupedByInvokeOrder(Class<?> clazz) {
-        return getDeclaredMethods(clazz).stream()
+    static Map<Integer, List<Method>> getMethodsForLombokBuilderGroupedByInvokeOrder(Class<?> clazz, List<String> blacklistedMethods) {
+        return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> !isDeclaringJavaBaseClass(method))
                 .collect(Collectors.groupingBy(LombokUtil::lombokMethodInvokeOrder));
     }

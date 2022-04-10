@@ -1,6 +1,9 @@
 package com.github.anhem.testpopulator.config;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -11,22 +14,36 @@ import static com.github.anhem.testpopulator.config.Strategy.*;
  */
 public class PopulateConfig {
 
-    private static final List<Strategy> DEFAULT_STRATEGY_ORDER = Arrays.asList(CONSTRUCTOR, SETTER, FIELD);
+    private static final List<String> DEFAULT_BLACKLISTED_METHODS = List.of("$jacocoInit");
+    private static final List<String> DEFAULT_BLACKLISTED_FIELDS = List.of("__$lineHits$__", "$jacocoData");
+    private static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER, FIELD);
     private static final boolean DEFAULT_RANDOM_VALUES = true;
-    private static final String DEFAULT_SETTER_PREFIX = "set";
     private static final boolean DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS = false;
+    private static final String DEFAULT_SETTER_PREFIX = "set";
 
     /**
      * Builder for PopulateConfig
      */
     public static class PopulateConfigBuilder {
 
+        private List<String> blacklistedMethods = new ArrayList<>();
+        private List<String> blacklistedFields = new ArrayList<>();
         private List<Strategy> strategyOrder = new ArrayList<>();
         private List<OverridePopulate<?>> overridePopulate = new ArrayList<>();
-        private Boolean randomValues;
         private BuilderPattern builderPattern;
-        private String setterPrefix;
+        private Boolean randomValues;
         private Boolean accessNonPublicConstructors;
+        private String setterPrefix;
+
+        public PopulateConfigBuilder blacklistedMethods(List<String> blacklistedMethods) {
+            this.blacklistedMethods = blacklistedMethods;
+            return this;
+        }
+
+        public PopulateConfigBuilder blacklistedFieldsList(List<String> blacklistedFields) {
+            this.blacklistedFields = blacklistedFields;
+            return this;
+        }
 
         public PopulateConfigBuilder strategyOrder(List<Strategy> strategyOrder) {
             this.strategyOrder = strategyOrder;
@@ -48,18 +65,13 @@ public class PopulateConfig {
             return this;
         }
 
-        public PopulateConfigBuilder randomValues(boolean randomValues) {
-            this.randomValues = randomValues;
-            return this;
-        }
-
         public PopulateConfigBuilder builderPattern(BuilderPattern builderPattern) {
             this.builderPattern = builderPattern;
             return this;
         }
 
-        public PopulateConfigBuilder setterPrefix(String setterPrefix) {
-            this.setterPrefix = setterPrefix;
+        public PopulateConfigBuilder randomValues(boolean randomValues) {
+            this.randomValues = randomValues;
             return this;
         }
 
@@ -68,8 +80,13 @@ public class PopulateConfig {
             return this;
         }
 
+        public PopulateConfigBuilder setterPrefix(String setterPrefix) {
+            this.setterPrefix = setterPrefix;
+            return this;
+        }
+
         public PopulateConfig build() {
-            return new PopulateConfig(strategyOrder, overridePopulate, randomValues, builderPattern, setterPrefix, accessNonPublicConstructors);
+            return new PopulateConfig(blacklistedMethods, blacklistedFields, strategyOrder, overridePopulate, builderPattern, randomValues, accessNonPublicConstructors, setterPrefix);
         }
     }
 
@@ -77,25 +94,39 @@ public class PopulateConfig {
         return new PopulateConfigBuilder();
     }
 
+    private final List<String> blacklistedMethods;
+    private final List<String> blacklistedFields;
     private final List<Strategy> strategyOrder;
     private final List<OverridePopulate<?>> overridePopulate;
-    private final boolean randomValues;
     private final BuilderPattern builderPattern;
-    private final String setterPrefix;
+    private final boolean randomValues;
     private final boolean accessNonPublicConstructors;
+    private final String setterPrefix;
 
-    private PopulateConfig(List<Strategy> strategyOrder,
+    private PopulateConfig(List<String> blacklistedMethods,
+                           List<String> blacklistedFields,
+                           List<Strategy> strategyOrder,
                            List<OverridePopulate<?>> overridePopulate,
-                           Boolean randomValues,
                            BuilderPattern builderPattern,
-                           String setterPrefix,
-                           Boolean accessNonPublicConstructors) {
+                           Boolean randomValues,
+                           Boolean accessNonPublicConstructors,
+                           String setterPrefix) {
+        this.blacklistedMethods = blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : blacklistedMethods;
+        this.blacklistedFields = blacklistedFields.isEmpty() ? DEFAULT_BLACKLISTED_FIELDS : blacklistedFields;
         this.strategyOrder = strategyOrder.isEmpty() ? DEFAULT_STRATEGY_ORDER : strategyOrder;
         this.overridePopulate = overridePopulate;
-        this.randomValues = randomValues == null ? DEFAULT_RANDOM_VALUES : randomValues;
         this.builderPattern = builderPattern;
-        this.setterPrefix = setterPrefix == null ? DEFAULT_SETTER_PREFIX : setterPrefix;
+        this.randomValues = randomValues == null ? DEFAULT_RANDOM_VALUES : randomValues;
         this.accessNonPublicConstructors = accessNonPublicConstructors == null ? DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS : accessNonPublicConstructors;
+        this.setterPrefix = setterPrefix == null ? DEFAULT_SETTER_PREFIX : setterPrefix;
+    }
+
+    public List<String> getBlacklistedMethods() {
+        return blacklistedMethods;
+    }
+
+    public List<String> getBlacklistedFields() {
+        return blacklistedFields;
     }
 
     public List<Strategy> getStrategyOrder() {
@@ -111,19 +142,19 @@ public class PopulateConfig {
                 .collect(Collectors.toMap(overridePopulate -> overridePopulate.create().getClass(), Function.identity()));
     }
 
-    public boolean useRandomValues() {
-        return randomValues;
-    }
-
     public BuilderPattern getBuilderPattern() {
         return builderPattern;
     }
 
-    public String getSetterPrefix() {
-        return setterPrefix;
+    public boolean useRandomValues() {
+        return randomValues;
     }
 
     public boolean canAccessNonPublicConstructors() {
         return accessNonPublicConstructors;
+    }
+
+    public String getSetterPrefix() {
+        return setterPrefix;
     }
 }

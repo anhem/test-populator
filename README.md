@@ -57,14 +57,16 @@ MyClass{
 
 Use PopulateConfig to configure how test-populator should run.
 
-| config | Values | Default
-|---|---|---
-| strategyOrder | CONSTRUCTOR, SETTER, FIELD, BUILDER | CONSTRUCTOR, SETTER, FIELD
-| builderPattern | LOMBOK / IMMUTABLES | -
-| randomValues | true / false | true
-| setterPrefix | prefix of setter methods | set
-| accessNonPublicConstructors | true / false | false
-| overridePopulates | List of OverridePopulate implementations | -
+| config                      | Values                                   | Default                         |
+|-----------------------------|------------------------------------------|---------------------------------|
+| strategyOrder               | CONSTRUCTOR, SETTER, FIELD, BUILDER      | CONSTRUCTOR, SETTER, FIELD      |
+| builderPattern              | LOMBOK / IMMUTABLES                      | -                               |
+| randomValues                | true / false                             | true                            |
+| setterPrefix                | prefix of setter methods                 | set                             |
+| accessNonPublicConstructors | true / false                             | false                           |
+| overridePopulates           | List of OverridePopulate implementations | -                               |
+| blacklistedMethods          | List of methods to skip if encountered   | $jacocoInit                     |
+| blacklistedFields           | List of fields to skip if encountered    | \_\_$lineHits$\_\_, $jacocoData |    
 
 ### strategyOrder
 
@@ -111,6 +113,16 @@ Use setters with a different format than set*
 ### accessNonPublicConstructors
 
 Controls whether to allow access to private constructors when populating.
+
+### blacklistedMethods
+
+named methods in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
+needed otherwise.
+
+### blacklistedFields
+
+named fields in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
+needed otherwise.
 
 ### overridePopulates
 

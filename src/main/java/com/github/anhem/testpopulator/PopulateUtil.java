@@ -17,8 +17,6 @@ import static java.util.Arrays.stream;
 public class PopulateUtil {
 
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
-    private static final List<String> BLACKLISTED_METHODS = List.of("$jacocoInit");
-    private static final List<String> BLACKLISTED_FIELDS = List.of("__$lineHits$__");
     private static final String JAVA_BASE = "java.base";
     private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
 
@@ -40,14 +38,14 @@ public class PopulateUtil {
         return (T) (overridePopulate.get(clazz).create());
     }
 
-    static List<Field> getDeclaredFields(Class<?> clazz) {
-        List<Field> declaredFields = getDeclaredFields(clazz, new ArrayList<>());
-        return removeUnwantedFields(declaredFields);
+    static List<Field> getDeclaredFields(Class<?> clazz, List<String> blacklistedFields) {
+        List<Field> declaredFields = getAllDeclaredFields(clazz, new ArrayList<>());
+        return removeUnwantedFields(declaredFields, blacklistedFields);
     }
 
-    static List<Method> getDeclaredMethods(Class<?> clazz) {
-        List<Method> declaredMethods = getDeclaredMethods(clazz, new ArrayList<>());
-        return removeUnwantedMethods(declaredMethods);
+    static List<Method> getDeclaredMethods(Class<?> clazz, List<String> blacklistedMethods) {
+        List<Method> declaredMethods = getAllDeclaredMethods(clazz, new ArrayList<>());
+        return removeUnwantedMethods(declaredMethods, blacklistedMethods);
     }
 
     static boolean isSet(Class<?> clazz) {
@@ -85,7 +83,7 @@ public class PopulateUtil {
     }
 
     static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz, String setterPrefix, boolean accessNonPublicConstructor) {
-        return strategy.equals(SETTER) && hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor) && getDeclaredMethods(clazz).stream()
+        return strategy.equals(SETTER) && hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor) && getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
                 .anyMatch(method -> isSetterMethod(method, setterPrefix));
     }
 
@@ -122,12 +120,12 @@ public class PopulateUtil {
         return (Constructor<T>) constructor1;
     }
 
-    static boolean isBlackListed(Method method) {
-        return BLACKLISTED_METHODS.contains(method.getName());
+    static boolean isBlackListed(Method method, List<String> blacklistedMethods) {
+        return blacklistedMethods.contains(method.getName());
     }
 
-    static boolean isBlackListed(Field field) {
-        return BLACKLISTED_FIELDS.contains(field.getName());
+    static boolean isBlackListed(Field field, List<String> blacklistedFields) {
+        return blacklistedFields.contains(field.getName());
     }
 
     static boolean isSetterMethod(Method method, String setterPrefix) {
@@ -183,18 +181,18 @@ public class PopulateUtil {
                 .anyMatch(constructor -> constructor.getParameterCount() > 0);
     }
 
-    private static List<Field> getDeclaredFields(Class<?> clazz, List<Field> declaredFields) {
+    private static List<Field> getAllDeclaredFields(Class<?> clazz, List<Field> declaredFields) {
         declaredFields.addAll(Arrays.asList(clazz.getDeclaredFields()));
         if (clazz.getSuperclass() != null) {
-            getDeclaredFields(clazz.getSuperclass(), declaredFields);
+            getAllDeclaredFields(clazz.getSuperclass(), declaredFields);
         }
         return declaredFields;
     }
 
-    private static List<Method> getDeclaredMethods(Class<?> clazz, List<Method> declaredMethods) {
+    private static List<Method> getAllDeclaredMethods(Class<?> clazz, List<Method> declaredMethods) {
         declaredMethods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
         if (clazz.getSuperclass() != null) {
-            getDeclaredMethods(clazz.getSuperclass(), declaredMethods);
+            getAllDeclaredMethods(clazz.getSuperclass(), declaredMethods);
         }
         return declaredMethods;
     }
@@ -203,16 +201,16 @@ public class PopulateUtil {
         return setterPrefix.equals("") ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
     }
 
-    private static List<Field> removeUnwantedFields(List<Field> declaredFields) {
+    private static List<Field> removeUnwantedFields(List<Field> declaredFields, List<String> blacklistedFields) {
         return declaredFields.stream()
-                .filter(field -> !isBlackListed(field))
+                .filter(field -> !isBlackListed(field, blacklistedFields))
                 .collect(Collectors.toList());
     }
 
-    private static List<Method> removeUnwantedMethods(List<Method> declaredMethods) {
+    private static List<Method> removeUnwantedMethods(List<Method> declaredMethods, List<String> blacklistedMethods) {
         return declaredMethods.stream()
                 .filter(method -> {
-                    if (isBlackListed(method)) {
+                    if (isBlackListed(method, blacklistedMethods)) {
                         return false;
                     }
                     if (isNativeMethod(method)) {
