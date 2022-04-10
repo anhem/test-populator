@@ -114,16 +114,6 @@ Use setters with a different format than set*
 
 Controls whether to allow access to private constructors when populating.
 
-### blacklistedMethods
-
-named methods in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
-needed otherwise.
-
-### blacklistedFields
-
-named fields in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
-needed otherwise.
-
 ### overridePopulates
 
 Some classes might be difficult to populate automatically.
@@ -153,6 +143,16 @@ public class MyUUIDOverride implements OverridePopulate<MyUUID> {
     }
 }
 ```
+
+### blacklistedMethods
+
+named methods in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
+needed otherwise.
+
+### blacklistedFields
+
+named fields in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
+needed otherwise.
 
 # Examples
 
