@@ -1,0 +1,14 @@
+version: 2.1
+jobs:
+  install:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: mvn clean install sonar:sonar -Psonar
+workflows:
+  sample:
+    jobs:
+      - install
