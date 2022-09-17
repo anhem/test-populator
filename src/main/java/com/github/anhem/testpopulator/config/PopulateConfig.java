@@ -40,7 +40,7 @@ public class PopulateConfig {
             return this;
         }
 
-        public PopulateConfigBuilder blacklistedFieldsList(List<String> blacklistedFields) {
+        public PopulateConfigBuilder blacklistedFields(List<String> blacklistedFields) {
             this.blacklistedFields = blacklistedFields;
             return this;
         }
@@ -156,5 +156,17 @@ public class PopulateConfig {
 
     public String getSetterPrefix() {
         return setterPrefix;
+    }
+
+    public PopulateConfigBuilder toBuilder() {
+        return PopulateConfig.builder()
+                .blacklistedMethods(blacklistedMethods)
+                .blacklistedFields(blacklistedFields)
+                .strategyOrder(strategyOrder)
+                .overridePopulate(overridePopulate)
+                .builderPattern(builderPattern)
+                .randomValues(randomValues)
+                .accessNonPublicConstructors(accessNonPublicConstructors)
+                .setterPrefix(setterPrefix);
     }
 }
