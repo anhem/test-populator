@@ -48,7 +48,7 @@ MyClass{
 <dependency>
     <groupId>com.github.anhem</groupId>
     <artifactId>test-populator</artifactId>
-    <version>0.1.8</version>
+    <version>0.1.9</version>
     <scope>test</scope>
 </dependency>
 ```
