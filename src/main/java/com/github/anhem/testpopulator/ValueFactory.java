@@ -1,8 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.UUID;
 
 import static com.github.anhem.testpopulator.RandomUtil.*;
@@ -11,6 +10,8 @@ class ValueFactory {
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
 
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
+    private static final ZonedDateTime ZONED_DATE_TIME = LOCAL_DATE_TIME.atZone(ZoneId.of("Etc/GMT"));
+    private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();
     private static final LocalDate LOCAL_DATE = LOCAL_DATE_TIME.toLocalDate();
     private static final String STRING = "string";
     private static final Boolean BOOLEAN = Boolean.TRUE;
@@ -56,6 +57,12 @@ class ValueFactory {
         if (clazz.equals(LocalDateTime.class)) {
             return (T) getLocalDateTime();
         }
+        if (clazz.equals(ZonedDateTime.class)) {
+            return (T) getZonedDateTime();
+        }
+        if (clazz.equals(Instant.class)) {
+            return (T) getInstant();
+        }
         if (clazz.equals(Character.class) || clazz.equals(char.class)) {
             return (T) getChar();
         }
@@ -92,6 +99,14 @@ class ValueFactory {
 
     private LocalDateTime getLocalDateTime() {
         return setRandomValues ? getRandomLocalDateTime() : LOCAL_DATE_TIME;
+    }
+
+    private ZonedDateTime getZonedDateTime() {
+        return setRandomValues ? getRandomLocalDateTime().atZone(ZoneId.systemDefault()) : ZONED_DATE_TIME;
+    }
+
+    private Instant getInstant() {
+        return setRandomValues ? getRandomLocalDateTime().atZone(ZoneId.systemDefault()).toInstant() : INSTANT;
     }
 
     private LocalDate getLocalDate() {

@@ -1,7 +1,9 @@
 package com.github.anhem.testpopulator.model.java;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public class Pojo {
@@ -17,6 +19,8 @@ public class Pojo {
     private Double doubleValue;
     private LocalDate localDate;
     private LocalDateTime localDateTime;
+    private ZonedDateTime zonedDateTime;
+    private Instant instant;
     private List<String> listOfStrings;
     private Set<String> setOfStrings;
     private Map<Integer, String> mapOfIntegersToStrings;
@@ -113,6 +117,22 @@ public class Pojo {
 
     public void setLocalDateTime(LocalDateTime localDateTime) {
         this.localDateTime = localDateTime;
+    }
+
+    public ZonedDateTime getZonedDateTime() {
+        return zonedDateTime;
+    }
+
+    public void setZonedDateTime(ZonedDateTime zonedDateTime) {
+        this.zonedDateTime = zonedDateTime;
+    }
+
+    public Instant getInstant() {
+        return instant;
+    }
+
+    public void setInstant(Instant instant) {
+        this.instant = instant;
     }
 
     public List<String> getListOfStrings() {
