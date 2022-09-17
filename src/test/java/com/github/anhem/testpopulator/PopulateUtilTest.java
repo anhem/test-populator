@@ -209,7 +209,7 @@ class PopulateUtilTest {
                 .filter(method -> isSetterMethod(method, SETTER_PREFIX))
                 .collect(Collectors.toList());
 
-        assertThat(setterMethods).isNotEmpty().hasSize(20);
+        assertThat(setterMethods).isNotEmpty().hasSize(22);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
