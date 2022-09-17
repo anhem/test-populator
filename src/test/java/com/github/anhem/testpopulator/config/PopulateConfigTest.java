@@ -23,6 +23,7 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.getBuilderPattern()).isNull();
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedFields()).isNotEmpty();
+        assertEqual(DEFAULT_POPULATE_CONFIG.toBuilder().build(), DEFAULT_POPULATE_CONFIG);
     }
 
     @Test
@@ -48,5 +49,12 @@ class PopulateConfigTest {
         assertThat(populateConfig.canAccessNonPublicConstructors()).isTrue();
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
         assertThat(populateConfig.getSetterPrefix()).isEqualTo("with");
+        assertEqual(populateConfig.toBuilder().build(), populateConfig);
+    }
+
+    private static void assertEqual(PopulateConfig populateConfig, PopulateConfig expectedPopulateConfig) {
+        assertThat(populateConfig)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedPopulateConfig);
     }
 }

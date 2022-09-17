@@ -154,6 +154,11 @@ needed otherwise.
 named fields in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
 needed otherwise.
 
+## ToBuilder
+
+calling `toBuilder()` on a PopulateConfig object will convert it back to a builder, making it easy to make copies of a
+configuration with slightly different settings.
+
 # Examples
 
 ## Simple setup
