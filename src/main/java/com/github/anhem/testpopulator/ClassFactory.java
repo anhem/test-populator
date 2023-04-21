@@ -22,7 +22,7 @@ public class ClassFactory {
     }
 
     public void startConstructor(Class<?> clazz) {
-        setNextClassBuilder(clazz);
+        createAndSetNextClassBuilder(clazz);
         currentClassBuilder.getStringBuilder().append(String.format("new %s(", clazz.getSimpleName()));
     }
 
@@ -133,7 +133,7 @@ public class ClassFactory {
         throw new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
-    private void setNextClassBuilder(Class<?> clazz) {
+    private void createAndSetNextClassBuilder(Class<?> clazz) {
         String name = getName(clazz);
         if (currentClassBuilder == null) {
             currentClassBuilder = new ClassBuilder(clazz, name);
