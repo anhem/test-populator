@@ -7,6 +7,7 @@ import com.github.anhem.testpopulator.config.Strategy;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static com.github.anhem.testpopulator.ImmutablesUtil.getImmutablesGeneratedClass;
 import static com.github.anhem.testpopulator.ImmutablesUtil.getMethodsForImmutablesBuilder;
@@ -16,7 +17,6 @@ import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.lang.String.format;
-import static java.util.Arrays.stream;
 
 /**
  * Factory for creating populated objects from classes
@@ -38,6 +38,8 @@ public class PopulateFactory {
     private final ValueFactory valueFactory;
     private final Map<Class<?>, OverridePopulate<?>> overridePopulates;
 
+    private final ClassFactory classFactory;
+
     /**
      * Create new instance of PopulateFactory with default configuration
      */
@@ -54,6 +56,7 @@ public class PopulateFactory {
         this.populateConfig = populateConfig;
         valueFactory = new ValueFactory(populateConfig.useRandomValues());
         overridePopulates = populateConfig.createOverridePopulates();
+        this.classFactory = new ClassFactory();
         if (populateConfig.getStrategyOrder().contains(BUILDER) && populateConfig.getBuilderPattern() == null) {
             throw new IllegalArgumentException(format(MISSING_BUILDER_PATTERN, BUILDER, Arrays.toString(BuilderPattern.values())));
         }
@@ -66,7 +69,10 @@ public class PopulateFactory {
      * @return object of clazz
      */
     public <T> T populate(Class<T> clazz) {
-        return populateWithOverrides(clazz);
+        T t = populateWithOverrides(clazz);
+        ClassBuilder classBuilder = classFactory.getTopClassBuilder();
+        System.out.println(classBuilder.build());
+        return t;
     }
 
     private <T> T populateWithOverrides(Class<T> clazz) {
@@ -87,7 +93,9 @@ public class PopulateFactory {
             return continuePopulateForMapEntry(parameter, typeArguments);
         }
         if (isValue(clazz)) {
-            return valueFactory.createValue(clazz);
+            T value = valueFactory.createValue(clazz);
+            classFactory.value(value);
+            return value;
         }
         return continuePopulateWithStrategies(clazz);
     }
@@ -95,7 +103,9 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateForArray(Class<T> clazz) {
         Class<?> componentType = clazz.getComponentType();
+        classFactory.startArray(componentType);
         Object value = populateWithOverrides(componentType);
+        classFactory.endArray();
         Object array = Array.newInstance(componentType, 1);
         Array.set(array, 0, value);
         return (T) array;
@@ -106,8 +116,11 @@ public class PopulateFactory {
         List<Type> argumentTypes = toArgumentTypes(parameter, typeArguments);
         try {
             if (isMap(clazz)) {
+                classFactory.startMap();
                 Object key = continuePopulateWithType(argumentTypes.get(0));
+                classFactory.keyValueDividerForMap();
                 Object value = continuePopulateWithType(argumentTypes.get(1));
+                classFactory.endMap();
                 if (clazz.getConstructors().length > 0) {
                     Map<Object, Object> map = (Map<Object, Object>) clazz.getConstructor().newInstance();
                     map.put(key, value);
@@ -116,16 +129,21 @@ public class PopulateFactory {
                 return (T) Map.of(key, value);
             }
             if (isSet(clazz)) {
+                classFactory.startSet();
                 Object value = continuePopulateWithType(argumentTypes.get(0));
+                classFactory.endSet();
                 if (clazz.getConstructors().length > 0) {
                     Set<Object> set = (Set<Object>) clazz.getConstructor().newInstance();
                     set.add(value);
                     return (T) set;
                 }
-                return (T) Set.of(value);
+                Set<Object> set = Set.of(value);
+                return (T) set;
             }
             if (isCollection(clazz)) {
+                classFactory.startList();
                 Object value = continuePopulateWithType(argumentTypes.get(0));
+                classFactory.endList();
                 if (clazz.getConstructors().length > 0) {
                     List<Object> list = (List<Object>) clazz.getConstructor().newInstance();
                     list.add(value);
@@ -151,8 +169,11 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateForMapEntry(Parameter parameter, Type[] typeArguments) {
         List<Type> argumentTypes = toArgumentTypes(parameter, typeArguments);
+        classFactory.startMapEntry();
         Object key = populateWithOverrides((Class<?>) argumentTypes.get(0));
+        classFactory.keyValueDividerForMap();
         Object value = populateWithOverrides((Class<?>) argumentTypes.get(1));
+        classFactory.endMap();
         return (T) new AbstractMap.SimpleEntry<>(key, value);
     }
 
@@ -178,9 +199,13 @@ public class PopulateFactory {
         try {
             Constructor<T> constructor = getLargestConstructor(clazz, populateConfig.canAccessNonPublicConstructors());
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
-            Object[] arguments = stream(constructor.getParameters())
-                    .map(parameter -> populateWithOverrides(parameter.getType(), parameter, null))
-                    .toArray();
+            classFactory.startConstructor(clazz);
+            Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
+                Parameter parameter = constructor.getParameters()[i];
+                classFactory.parameterDividerForConstructor(i);
+                return populateWithOverrides(parameter.getType(), parameter, null);
+            }).toArray();
+            classFactory.endConstructor();
             return constructor.newInstance(arguments);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), CONSTRUCTOR), e);
