@@ -31,7 +31,7 @@ public class PopulateFactory {
     static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of %s using %s strategy";
     static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection %s";
 
-    private static final String BUILD_METHOD = "build";
+    static final String BUILD_METHOD = "build";
     static final String BUILDER_METHOD = "builder";
 
     private final PopulateConfig populateConfig;
@@ -81,7 +81,9 @@ public class PopulateFactory {
 
     private <T> T populateWithOverrides(Class<T> clazz, Parameter parameter, Type[] typeArguments) {
         if (overridePopulates.containsKey(clazz)) {
-            return getOverridePopulateValue(clazz, overridePopulates);
+            T overridePopulateValue = getOverridePopulateValue(clazz, overridePopulates);
+            classFactory.overridePopulateValue(clazz, overridePopulates.get(clazz));
+            return overridePopulateValue;
         }
         if (clazz.isArray()) {
             return continuePopulateForArray(clazz);
@@ -242,10 +244,12 @@ public class PopulateFactory {
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
+            classFactory.startSetter(clazz);
             T objectOfClass = constructor.newInstance();
             getDeclaredMethods(clazz, populateConfig.getBlacklistedMethods()).stream()
                     .filter(method -> isSetterMethod(method, populateConfig.getSetterPrefix()))
-                    .forEach(method -> continuePopulateForMethod(objectOfClass, method));
+                    .forEach(method -> continuePopulateForMethod(objectOfClass, method, SETTER));
+            classFactory.endSetter();
             return objectOfClass;
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), SETTER), e);
@@ -265,17 +269,20 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingLombokBuilder(Class<T> clazz) {
         try {
+            classFactory.startBuilder(clazz);
             Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
             Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(builderObject.getClass(), populateConfig.getBlacklistedMethods());
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(1)).ifPresent(methods ->
-                    methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
+                    methods.forEach(method -> continuePopulateForMethod(builderObject, method, BUILDER)));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(2)).ifPresent(methods ->
-                    methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
+                    methods.forEach(method -> continuePopulateForMethod(builderObject, method, BUILDER)));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(3)).ifPresent(methods ->
-                    methods.forEach(method -> continuePopulateForMethod(builderObject, method)));
+                    methods.forEach(method -> continuePopulateForMethod(builderObject, method, BUILDER)));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             setAccessible(buildMethod, builderObject);
-            return (T) buildMethod.invoke(builderObject);
+            T object = (T) buildMethod.invoke(builderObject);
+            classFactory.endBuilder();
+            return object;
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, LOMBOK)), e);
         }
@@ -285,20 +292,29 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingImmutablesBuilder(Class<T> clazz) {
         try {
             Class<?> immutablesGeneratedClass = getImmutablesGeneratedClass(clazz);
+            classFactory.startBuilder(clazz, immutablesGeneratedClass);
             Object builderObject = immutablesGeneratedClass.getDeclaredMethod(BUILDER_METHOD).invoke(null);
             List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(immutablesGeneratedClass, builderObject, populateConfig.getBlacklistedMethods());
-            builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method));
+            builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method, BUILDER));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
-            return (T) buildMethod.invoke(builderObject);
+            T object = (T) buildMethod.invoke(builderObject);
+            classFactory.endBuilder();
+            return object;
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, IMMUTABLES)), e);
         }
     }
 
-    private <T> void continuePopulateForMethod(T objectOfClass, Method method) {
+    private <T> void continuePopulateForMethod(T objectOfClass, Method method, Strategy strategy) {
         try {
+
             method.invoke(objectOfClass, List.of(method.getParameters()).stream()
-                    .map(parameter -> populateWithOverrides(parameter.getType(), parameter, null))
+                    .map(parameter -> {
+                        classFactory.startMethod(method, strategy);
+                        Object object = populateWithOverrides(parameter.getType(), parameter, null);
+                        classFactory.endMethod(strategy);
+                        return object;
+                    })
                     .toArray());
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CALL_METHOD, method.getName(), objectOfClass.getClass().getName()), e);

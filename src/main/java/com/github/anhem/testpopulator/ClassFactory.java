@@ -1,5 +1,9 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.Strategy;
+
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -10,6 +14,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
+
+import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
+import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
 
 public class ClassFactory {
 
@@ -35,7 +42,62 @@ public class ClassFactory {
     public void endConstructor() {
         currentClassBuilder.getStringBuilder().append(");");
         finalizeAndSetPreviousClassBuilder();
+    }
 
+    public void startSetter(Class<?> clazz) {
+        createAndSetNextClassBuilder(clazz);
+        currentClassBuilder.getStringBuilder().append(String.format("new %s();", clazz.getSimpleName()));
+    }
+
+    public void endSetter() {
+        finalizeAndSetPreviousClassBuilder();
+    }
+
+    public void startBuilder(Class<?> clazz) {
+        createAndSetNextClassBuilder(clazz);
+        currentClassBuilder.getStringBuilder().append(String.format("%s.%s()", clazz.getSimpleName(), BUILDER_METHOD));
+    }
+
+    public void startBuilder(Class<?> clazz, Class<?> generatedClass) {
+        createAndSetNextClassBuilder(clazz);
+        currentClassBuilder.getStringBuilder().append(String.format("%s.%s()", generatedClass.getSimpleName(), BUILDER_METHOD));
+    }
+
+    public void endBuilder() {
+        currentClassBuilder.getStringBuilder()
+                .append(System.lineSeparator())
+                .append(String.format(".%s();", BUILD_METHOD));
+        finalizeAndSetPreviousClassBuilder();
+    }
+
+    public void startMethod(Method method, Strategy strategy) {
+        switch (strategy) {
+            case SETTER:
+                currentClassBuilder.getStringBuilder()
+                        .append(System.lineSeparator())
+                        .append(String.format("%s.%s(", currentClassBuilder.getName(), method.getName()));
+                break;
+            case BUILDER:
+                currentClassBuilder.getStringBuilder()
+                        .append(System.lineSeparator())
+                        .append(String.format(".%s(", method.getName()));
+                break;
+            default:
+                throw new PopulateException(String.format("Invalid strategy %s on startMethod", strategy));
+        }
+    }
+
+    public void endMethod(Strategy strategy) {
+        switch (strategy) {
+            case SETTER:
+                currentClassBuilder.getStringBuilder().append(");");
+                break;
+            case BUILDER:
+                currentClassBuilder.getStringBuilder().append(")");
+                break;
+            default:
+                throw new PopulateException(String.format("Invalid strategy %s on endMethod", strategy));
+        }
     }
 
     public void startSet() {
@@ -78,7 +140,18 @@ public class ClassFactory {
         currentClassBuilder.getStringBuilder().append("}");
     }
 
+    public <T> void overridePopulateValue(Class<?> clazz, OverridePopulate<T> overridePopulateValue) {
+        if (currentClassBuilder == null) {
+            currentClassBuilder = new ClassBuilder(clazz, getName(clazz));
+        }
+        currentClassBuilder.getStringBuilder().append(overridePopulateValue.createString());
+        finalizeAndSetPreviousClassBuilder();
+    }
+
     public <T> void value(T value) {
+        if (currentClassBuilder == null) {
+            currentClassBuilder = new ClassBuilder(value.getClass(), getName(value.getClass()));
+        }
         currentClassBuilder.getStringBuilder().append(getValue(value));
     }
 
@@ -148,7 +221,7 @@ public class ClassFactory {
     private void finalizeAndSetPreviousClassBuilder() {
         if (currentClassBuilder.getParent() != null) {
             currentClassBuilder.getParent().getStringBuilder().append(currentClassBuilder.getName());
-            currentClassBuilder = getTopClassBuilder();
+            currentClassBuilder = currentClassBuilder.getParent();
         }
     }
 
@@ -165,5 +238,4 @@ public class ClassFactory {
         }
         return Character.toLowerCase(str.charAt(0)) + str.substring(1);
     }
-
 }
