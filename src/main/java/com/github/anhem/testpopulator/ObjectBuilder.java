@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class ClassBuilder {
+class ObjectBuilder {
 
     private final Class<?> clazz;
     private final String name;
-    private ClassBuilder parent;
-    private final List<ClassBuilder> children;
+    private ObjectBuilder parent;
+    private final List<ObjectBuilder> children;
     private final StringBuilder stringBuilder;
 
-    public ClassBuilder(Class<?> clazz, String name) {
+    public ObjectBuilder(Class<?> clazz, String name) {
         this.clazz = clazz;
         this.name = name;
         this.children = new ArrayList<>();
@@ -24,7 +24,7 @@ class ClassBuilder {
         return clazz;
     }
 
-    public List<ClassBuilder> getChildren() {
+    public List<ObjectBuilder> getChildren() {
         return children;
     }
 
@@ -36,11 +36,11 @@ class ClassBuilder {
         return name;
     }
 
-    public ClassBuilder getParent() {
+    public ObjectBuilder getParent() {
         return parent;
     }
 
-    public void setParent(ClassBuilder parent) {
+    public void setParent(ObjectBuilder parent) {
         this.parent = parent;
     }
 
@@ -48,14 +48,14 @@ class ClassBuilder {
         return build(this);
     }
 
-    private String build(ClassBuilder classBuilder) {
+    private String build(ObjectBuilder objectBuilder) {
         return Stream.concat(
-                classBuilder.children.stream().map(this::build),
-                Stream.of(buildClass(classBuilder))
+                objectBuilder.children.stream().map(this::build),
+                Stream.of(buildClass(objectBuilder))
         ).collect(Collectors.joining(System.lineSeparator()));
     }
 
-    private static String buildClass(ClassBuilder classBuilder) {
-        return String.format("public static final %s %s = %s", classBuilder.getClazz().getSimpleName(), classBuilder.getName(), classBuilder.getStringBuilder());
+    private static String buildClass(ObjectBuilder objectBuilder) {
+        return String.format("public static final %s %s = %s", objectBuilder.getClazz().getSimpleName(), objectBuilder.getName(), objectBuilder.getStringBuilder());
     }
 }

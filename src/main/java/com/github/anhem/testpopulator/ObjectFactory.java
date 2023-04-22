@@ -18,35 +18,35 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
 
-public class ClassFactory {
+public class ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
     private final Map<Class<?>, Integer> classCounters;
-    private ClassBuilder currentClassBuilder;
+    private ObjectBuilder currentObjectBuilder;
 
-    public ClassFactory() {
+    public ObjectFactory() {
         this.classCounters = new HashMap<>();
     }
 
     public void startConstructor(Class<?> clazz) {
         createAndSetNextClassBuilder(clazz);
-        currentClassBuilder.getStringBuilder().append(String.format("new %s(", clazz.getSimpleName()));
+        currentObjectBuilder.getStringBuilder().append(String.format("new %s(", clazz.getSimpleName()));
     }
 
     public void parameterDividerForConstructor(int parameterPosition) {
         if (parameterPosition > 0) {
-            currentClassBuilder.getStringBuilder().append(", ");
+            currentObjectBuilder.getStringBuilder().append(", ");
         }
     }
 
     public void endConstructor() {
-        currentClassBuilder.getStringBuilder().append(");");
+        currentObjectBuilder.getStringBuilder().append(");");
         finalizeAndSetPreviousClassBuilder();
     }
 
     public void startSetter(Class<?> clazz) {
         createAndSetNextClassBuilder(clazz);
-        currentClassBuilder.getStringBuilder().append(String.format("new %s();", clazz.getSimpleName()));
+        currentObjectBuilder.getStringBuilder().append(String.format("new %s();", clazz.getSimpleName()));
     }
 
     public void endSetter() {
@@ -55,16 +55,16 @@ public class ClassFactory {
 
     public void startBuilder(Class<?> clazz) {
         createAndSetNextClassBuilder(clazz);
-        currentClassBuilder.getStringBuilder().append(String.format("%s.%s()", clazz.getSimpleName(), BUILDER_METHOD));
+        currentObjectBuilder.getStringBuilder().append(String.format("%s.%s()", clazz.getSimpleName(), BUILDER_METHOD));
     }
 
     public void startBuilder(Class<?> clazz, Class<?> generatedClass) {
         createAndSetNextClassBuilder(clazz);
-        currentClassBuilder.getStringBuilder().append(String.format("%s.%s()", generatedClass.getSimpleName(), BUILDER_METHOD));
+        currentObjectBuilder.getStringBuilder().append(String.format("%s.%s()", generatedClass.getSimpleName(), BUILDER_METHOD));
     }
 
     public void endBuilder() {
-        currentClassBuilder.getStringBuilder()
+        currentObjectBuilder.getStringBuilder()
                 .append(System.lineSeparator())
                 .append(String.format(".%s();", BUILD_METHOD));
         finalizeAndSetPreviousClassBuilder();
@@ -73,12 +73,12 @@ public class ClassFactory {
     public void startMethod(Method method, Strategy strategy) {
         switch (strategy) {
             case SETTER:
-                currentClassBuilder.getStringBuilder()
+                currentObjectBuilder.getStringBuilder()
                         .append(System.lineSeparator())
-                        .append(String.format("%s.%s(", currentClassBuilder.getName(), method.getName()));
+                        .append(String.format("%s.%s(", currentObjectBuilder.getName(), method.getName()));
                 break;
             case BUILDER:
-                currentClassBuilder.getStringBuilder()
+                currentObjectBuilder.getStringBuilder()
                         .append(System.lineSeparator())
                         .append(String.format(".%s(", method.getName()));
                 break;
@@ -90,10 +90,10 @@ public class ClassFactory {
     public void endMethod(Strategy strategy) {
         switch (strategy) {
             case SETTER:
-                currentClassBuilder.getStringBuilder().append(");");
+                currentObjectBuilder.getStringBuilder().append(");");
                 break;
             case BUILDER:
-                currentClassBuilder.getStringBuilder().append(")");
+                currentObjectBuilder.getStringBuilder().append(")");
                 break;
             default:
                 throw new PopulateException(String.format("Invalid strategy %s on endMethod", strategy));
@@ -101,62 +101,62 @@ public class ClassFactory {
     }
 
     public void startSet() {
-        currentClassBuilder.getStringBuilder().append("Set.of(");
+        currentObjectBuilder.getStringBuilder().append("Set.of(");
     }
 
     public void endSet() {
-        currentClassBuilder.getStringBuilder().append(")");
+        currentObjectBuilder.getStringBuilder().append(")");
     }
 
     public void startList() {
-        currentClassBuilder.getStringBuilder().append("List.of(");
+        currentObjectBuilder.getStringBuilder().append("List.of(");
     }
 
     public void endList() {
-        currentClassBuilder.getStringBuilder().append(")");
+        currentObjectBuilder.getStringBuilder().append(")");
     }
 
     public void startMap() {
-        currentClassBuilder.getStringBuilder().append("Map.of(");
+        currentObjectBuilder.getStringBuilder().append("Map.of(");
     }
 
     public void keyValueDividerForMap() {
-        currentClassBuilder.getStringBuilder().append(",");
+        currentObjectBuilder.getStringBuilder().append(", ");
     }
 
     public void endMap() {
-        currentClassBuilder.getStringBuilder().append(")");
+        currentObjectBuilder.getStringBuilder().append(")");
     }
 
     public void startMapEntry() {
-        currentClassBuilder.getStringBuilder().append("new AbstractMap.SimpleEntry<>(");
+        currentObjectBuilder.getStringBuilder().append("new AbstractMap.SimpleEntry<>(");
     }
 
     public void startArray(Class<?> clazz) {
-        currentClassBuilder.getStringBuilder().append(String.format("new %s[]{", clazz.getSimpleName()));
+        currentObjectBuilder.getStringBuilder().append(String.format("new %s[]{", clazz.getSimpleName()));
     }
 
     public void endArray() {
-        currentClassBuilder.getStringBuilder().append("}");
+        currentObjectBuilder.getStringBuilder().append("}");
     }
 
-    public <T> void overridePopulateValue(Class<?> clazz, OverridePopulate<T> overridePopulateValue) {
-        if (currentClassBuilder == null) {
-            currentClassBuilder = new ClassBuilder(clazz, getName(clazz));
+    public <T> void addOverridePopulate(Class<?> clazz, OverridePopulate<T> overridePopulateValue) {
+        if (currentObjectBuilder == null) {
+            currentObjectBuilder = new ObjectBuilder(clazz, getName(clazz));
         }
-        currentClassBuilder.getStringBuilder().append(overridePopulateValue.createString());
+        currentObjectBuilder.getStringBuilder().append(overridePopulateValue.createString());
         finalizeAndSetPreviousClassBuilder();
     }
 
-    public <T> void value(T value) {
-        if (currentClassBuilder == null) {
-            currentClassBuilder = new ClassBuilder(value.getClass(), getName(value.getClass()));
+    public <T> void addValue(T value) {
+        if (currentObjectBuilder == null) {
+            currentObjectBuilder = new ObjectBuilder(value.getClass(), getName(value.getClass()));
         }
-        currentClassBuilder.getStringBuilder().append(getValue(value));
+        currentObjectBuilder.getStringBuilder().append(getValue(value));
     }
 
-    public ClassBuilder getTopClassBuilder() {
-        return Stream.iterate(currentClassBuilder, Objects::nonNull, ClassBuilder::getParent)
+    public ObjectBuilder getTopClassBuilder() {
+        return Stream.iterate(currentObjectBuilder, Objects::nonNull, ObjectBuilder::getParent)
                 .reduce((child, parent) -> parent)
                 .orElse(null);
     }
@@ -208,34 +208,28 @@ public class ClassFactory {
 
     private void createAndSetNextClassBuilder(Class<?> clazz) {
         String name = getName(clazz);
-        if (currentClassBuilder == null) {
-            currentClassBuilder = new ClassBuilder(clazz, name);
+        if (currentObjectBuilder == null) {
+            currentObjectBuilder = new ObjectBuilder(clazz, name);
         } else {
-            ClassBuilder child = new ClassBuilder(clazz, name);
-            currentClassBuilder.getChildren().add(child);
-            child.setParent(currentClassBuilder);
-            currentClassBuilder = child;
+            ObjectBuilder child = new ObjectBuilder(clazz, name);
+            currentObjectBuilder.getChildren().add(child);
+            child.setParent(currentObjectBuilder);
+            currentObjectBuilder = child;
         }
     }
 
     private void finalizeAndSetPreviousClassBuilder() {
-        if (currentClassBuilder.getParent() != null) {
-            currentClassBuilder.getParent().getStringBuilder().append(currentClassBuilder.getName());
-            currentClassBuilder = currentClassBuilder.getParent();
+        if (currentObjectBuilder.getParent() != null) {
+            currentObjectBuilder.getParent().getStringBuilder().append(currentObjectBuilder.getName());
+            currentObjectBuilder = currentObjectBuilder.getParent();
         }
     }
 
     private String getName(Class<?> clazz) {
         int classCounter = classCounters.computeIfAbsent(clazz, (k) -> 0);
-        String name = String.format("%s%d", lowerCaseFirstChar(clazz.getSimpleName()), classCounter);
+        String string = clazz.getSimpleName();
+        String name = String.format("%s%d", Character.toLowerCase(string.charAt(0)) + string.substring(1), classCounter);
         classCounters.put(clazz, ++classCounter);
         return name;
-    }
-
-    private String lowerCaseFirstChar(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        return Character.toLowerCase(str.charAt(0)) + str.substring(1);
     }
 }

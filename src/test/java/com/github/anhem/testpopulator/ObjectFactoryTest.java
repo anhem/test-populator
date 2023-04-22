@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class ClassFactoryTest {
+public class ObjectFactoryTest {
 
     @Test
     void test1() {
