@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,12 +41,18 @@ public class ObjectBuilder {
         return name;
     }
 
-    public List<Type> getTypes() {
-        return types;
+    public void addTypes(Type... types) {
+        this.types.addAll(Arrays.stream(types).map(type -> {
+            if (type instanceof ParameterizedType) {
+                return ((ParameterizedType) type).getRawType();
+            } else {
+                return type;
+            }
+        }).collect(Collectors.toList()));
     }
 
-    public void addTypes(Type... types) {
-        this.types.addAll(Arrays.asList(types));
+    public List<Type> getTypes() {
+        return types;
     }
 
     public ObjectBuilder getParent() {
@@ -57,26 +64,22 @@ public class ObjectBuilder {
     }
 
     public String build() {
-        return build(this);
-    }
-
-    private String build(ObjectBuilder objectBuilder) {
         return Stream.concat(
-                objectBuilder.children.stream().map(this::build),
-                Stream.of(buildClass(objectBuilder))
+                children.stream().map(ObjectBuilder::build),
+                Stream.of(buildClass())
         ).collect(Collectors.joining(System.lineSeparator()));
     }
 
-    private static String buildClass(ObjectBuilder objectBuilder) {
-        if (objectBuilder.getTypes().isEmpty()) {
-            return String.format("public static final %s %s = %s", objectBuilder.getClazz().getSimpleName(), objectBuilder.getName(), objectBuilder.getStringBuilder());
+    private String buildClass() {
+        if (types.isEmpty()) {
+            return String.format("public static final %s %s = %s", clazz.getSimpleName(), name, stringBuilder);
         } else {
-            return String.format("public static final %s<%s> %s = %s", objectBuilder.getClazz().getSimpleName(), toTypesString(objectBuilder), objectBuilder.getName(), objectBuilder.getStringBuilder());
+            return String.format("public static final %s<%s> %s = %s", clazz.getSimpleName(), formatTypes(), name, stringBuilder);
         }
     }
 
-    private static String toTypesString(ObjectBuilder objectBuilder) {
-        return objectBuilder.getTypes().stream()
+    private String formatTypes() {
+        return types.stream()
                 .map(type -> ((Class<?>) type).getSimpleName())
                 .collect(Collectors.joining(", "));
     }
