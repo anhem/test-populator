@@ -8,6 +8,7 @@ import com.github.anhem.testpopulator.config.Strategy;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.ImmutablesUtil.getImmutablesGeneratedClass;
 import static com.github.anhem.testpopulator.ImmutablesUtil.getMethodsForImmutablesBuilder;
@@ -68,7 +69,7 @@ public class PopulateFactory {
     public <T> T populate(Class<T> clazz) {
         ObjectFactory objectFactory = new ObjectFactory();
         T t = populateWithOverrides(clazz, objectFactory);
-        ObjectBuilder objectBuilder = objectFactory.getTopClassBuilder();
+        ObjectBuilder objectBuilder = objectFactory.getTopObjectBuilder();
         System.out.println(objectBuilder.build());
         return t;
     }
@@ -88,9 +89,6 @@ public class PopulateFactory {
         }
         if (isCollection(clazz)) {
             return continuePopulateForCollection(clazz, parameter, typeArguments, objectFactory);
-        }
-        if (isMapEntry(clazz)) {
-            return continuePopulateForMapEntry(parameter, typeArguments, objectFactory);
         }
         if (isValue(clazz)) {
             T value = valueFactory.createValue(clazz);
@@ -116,42 +114,56 @@ public class PopulateFactory {
         List<Type> argumentTypes = toArgumentTypes(parameter, typeArguments);
         try {
             if (isMap(clazz)) {
-                objectFactory.startMap();
-                Object key = continuePopulateWithType(argumentTypes.get(0), objectFactory);
-                objectFactory.keyValueDividerForMap();
-                Object value = continuePopulateWithType(argumentTypes.get(1), objectFactory);
-                objectFactory.endMap();
                 if (clazz.getConstructors().length > 0) {
+                    objectFactory.startMap(clazz, argumentTypes.get(0), argumentTypes.get(1));
+                    objectFactory.startPutMap();
+                    Object key = continuePopulateWithType(argumentTypes.get(0), objectFactory);
+                    objectFactory.keyValueDividerForPutMap();
+                    Object value = continuePopulateWithType(argumentTypes.get(1), objectFactory);
+                    objectFactory.endPutMap();
+                    objectFactory.endMap();
                     Map<Object, Object> map = (Map<Object, Object>) clazz.getConstructor().newInstance();
                     map.put(key, value);
                     return (T) map;
+                } else {
+                    objectFactory.startMapOf();
+                    Object key = continuePopulateWithType(argumentTypes.get(0), objectFactory);
+                    objectFactory.keyValueDividerForMapOf();
+                    Object value = continuePopulateWithType(argumentTypes.get(1), objectFactory);
+                    objectFactory.endMapOf();
+                    return (T) Map.of(key, value);
                 }
-                return (T) Map.of(key, value);
             }
             if (isSet(clazz)) {
-                objectFactory.startSet();
-                Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
-                objectFactory.endSet();
                 if (clazz.getConstructors().length > 0) {
+                    objectFactory.startSet(clazz, argumentTypes.get(0));
+                    Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
+                    objectFactory.endSet();
                     Set<Object> set = (Set<Object>) clazz.getConstructor().newInstance();
                     set.add(value);
                     return (T) set;
+                } else {
+                    objectFactory.startSetOf();
+                    Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
+                    objectFactory.endSetOf();
+                    return (T) Set.of(value);
                 }
-                Set<Object> set = Set.of(value);
-                return (T) set;
             }
             if (isCollection(clazz)) {
-                objectFactory.startList();
-                Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
-                objectFactory.endList();
                 if (clazz.getConstructors().length > 0) {
+                    objectFactory.startList(clazz, argumentTypes.get(0));
+                    Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
+                    objectFactory.endList();
                     List<Object> list = (List<Object>) clazz.getConstructor().newInstance();
                     list.add(value);
                     return (T) list;
+                } else {
+                    objectFactory.startListOf();
+                    Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
+                    objectFactory.endListOf();
+                    return (T) List.of(value);
                 }
-                return (T) List.of(value);
             }
-
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_COLLECTION, clazz.getTypeName()), e);
         }
@@ -164,17 +176,6 @@ public class PopulateFactory {
             return populateWithOverrides((Class<?>) parameterizedType.getRawType(), null, parameterizedType.getActualTypeArguments(), objectFactory);
         }
         return populateWithOverrides((Class<?>) type, objectFactory);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> T continuePopulateForMapEntry(Parameter parameter, Type[] typeArguments, ObjectFactory objectFactory) {
-        List<Type> argumentTypes = toArgumentTypes(parameter, typeArguments);
-        objectFactory.startMapEntry();
-        Object key = populateWithOverrides((Class<?>) argumentTypes.get(0), objectFactory);
-        objectFactory.keyValueDividerForMap();
-        Object value = populateWithOverrides((Class<?>) argumentTypes.get(1), objectFactory);
-        objectFactory.endMap();
-        return (T) new AbstractMap.SimpleEntry<>(key, value);
     }
 
     private <T> T continuePopulateWithStrategies(Class<T> clazz, ObjectFactory objectFactory) {
@@ -303,10 +304,9 @@ public class PopulateFactory {
 
     private <T> void continuePopulateForMethod(T objectOfClass, Method method, Strategy strategy, ObjectFactory objectFactory) {
         try {
-
-            method.invoke(objectOfClass, List.of(method.getParameters()).stream()
+            method.invoke(objectOfClass, Stream.of(method.getParameters())
                     .map(parameter -> {
-                        objectFactory.startMethod(method, strategy);
+                        objectFactory.startMethod(strategy, method.getName());
                         Object object = populateWithOverrides(parameter.getType(), parameter, null, objectFactory);
                         objectFactory.endMethod(strategy);
                         return object;

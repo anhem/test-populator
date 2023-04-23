@@ -11,7 +11,7 @@ public interface OverridePopulate<T> {
     T create();
 
     /**
-     * Own implementation required only if ClassFactory is used.
+     * Own implementation required _only_ if ObjectFactory is used.
      *
      * @return a string representation of how to create an object of T.
      * Examples:

@@ -3,7 +3,7 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -70,20 +70,20 @@ public class ObjectFactory {
         finalizeAndSetPreviousClassBuilder();
     }
 
-    public void startMethod(Method method, Strategy strategy) {
+    public void startMethod(Strategy strategy, String methodName) {
         switch (strategy) {
             case SETTER:
                 currentObjectBuilder.getStringBuilder()
                         .append(System.lineSeparator())
-                        .append(String.format("%s.%s(", currentObjectBuilder.getName(), method.getName()));
+                        .append(String.format("%s.%s(", currentObjectBuilder.getName(), methodName));
                 break;
             case BUILDER:
                 currentObjectBuilder.getStringBuilder()
                         .append(System.lineSeparator())
-                        .append(String.format(".%s(", method.getName()));
+                        .append(String.format(".%s(", methodName));
                 break;
             default:
-                throw new PopulateException(String.format("Invalid strategy %s on startMethod", strategy));
+                throw new ObjectException(String.format("Invalid strategy %s on startMethod", strategy));
         }
     }
 
@@ -96,40 +96,90 @@ public class ObjectFactory {
                 currentObjectBuilder.getStringBuilder().append(")");
                 break;
             default:
-                throw new PopulateException(String.format("Invalid strategy %s on endMethod", strategy));
+                throw new ObjectException(String.format("Invalid strategy %s on endMethod", strategy));
         }
     }
 
-    public void startSet() {
+    public void startSetOf() {
         currentObjectBuilder.getStringBuilder().append("Set.of(");
     }
 
-    public void endSet() {
+    public void endSetOf() {
         currentObjectBuilder.getStringBuilder().append(")");
     }
 
-    public void startList() {
+    public void startSet(Class<?> clazz, Type type) {
+        createAndSetNextClassBuilder(clazz);
+        currentObjectBuilder.addTypes(type);
+        currentObjectBuilder.getStringBuilder()
+                .append(String.format("new %s();", clazz.getSimpleName()))
+                .append(System.lineSeparator())
+                .append(String.format("%s.add(", currentObjectBuilder.getName()));
+    }
+
+    public void endSet() {
+        currentObjectBuilder.getStringBuilder().append(");");
+        finalizeAndSetPreviousClassBuilder();
+    }
+
+    public void startListOf() {
         currentObjectBuilder.getStringBuilder().append("List.of(");
     }
 
-    public void endList() {
+    public void endListOf() {
         currentObjectBuilder.getStringBuilder().append(")");
     }
 
-    public void startMap() {
+    public void startList(Class<?> clazz, Type type) {
+        createAndSetNextClassBuilder(clazz);
+        currentObjectBuilder.addTypes(type);
+        currentObjectBuilder.getStringBuilder()
+                .append(String.format("new %s();", clazz.getSimpleName()))
+                .append(System.lineSeparator())
+                .append(String.format("%s.add(", currentObjectBuilder.getName()));
+    }
+
+    public void endList() {
+        currentObjectBuilder.getStringBuilder().append(");");
+        finalizeAndSetPreviousClassBuilder();
+    }
+
+    public void startMapOf() {
         currentObjectBuilder.getStringBuilder().append("Map.of(");
     }
 
-    public void keyValueDividerForMap() {
-        currentObjectBuilder.getStringBuilder().append(", ");
+    public void startMap(Class<?> clazz, Type keyType, Type valueType) {
+        createAndSetNextClassBuilder(clazz);
+        currentObjectBuilder.addTypes(keyType, valueType);
+        currentObjectBuilder.getStringBuilder()
+                .append(String.format("new %s();", clazz.getSimpleName()))
+                .append(System.lineSeparator());
+    }
+
+    public void startPutMap() {
+        currentObjectBuilder.getStringBuilder()
+                .append(String.format("%s.put(", currentObjectBuilder.getName()));
+    }
+
+    public void keyValueDividerForPutMap() {
+        currentObjectBuilder.getStringBuilder()
+                .append(", ");
+    }
+
+    public void endPutMap() {
+        currentObjectBuilder.getStringBuilder().append(");");
     }
 
     public void endMap() {
-        currentObjectBuilder.getStringBuilder().append(")");
+        finalizeAndSetPreviousClassBuilder();
     }
 
-    public void startMapEntry() {
-        currentObjectBuilder.getStringBuilder().append("new AbstractMap.SimpleEntry<>(");
+    public void keyValueDividerForMapOf() {
+        currentObjectBuilder.getStringBuilder().append(", ");
+    }
+
+    public void endMapOf() {
+        currentObjectBuilder.getStringBuilder().append(")");
     }
 
     public void startArray(Class<?> clazz) {
@@ -155,7 +205,7 @@ public class ObjectFactory {
         currentObjectBuilder.getStringBuilder().append(getValue(value));
     }
 
-    public ObjectBuilder getTopClassBuilder() {
+    public ObjectBuilder getTopObjectBuilder() {
         return Stream.iterate(currentObjectBuilder, Objects::nonNull, ObjectBuilder::getParent)
                 .reduce((child, parent) -> parent)
                 .orElse(null);
@@ -203,7 +253,7 @@ public class ObjectFactory {
             return String.format("UUID.fromString(%s)", object);
         }
 
-        throw new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
+        throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
     private void createAndSetNextClassBuilder(Class<?> clazz) {

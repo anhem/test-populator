@@ -1,14 +1,17 @@
 package com.github.anhem.testpopulator;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class ObjectBuilder {
+public class ObjectBuilder {
 
     private final Class<?> clazz;
     private final String name;
+    private final List<Type> types;
     private ObjectBuilder parent;
     private final List<ObjectBuilder> children;
     private final StringBuilder stringBuilder;
@@ -16,6 +19,7 @@ class ObjectBuilder {
     public ObjectBuilder(Class<?> clazz, String name) {
         this.clazz = clazz;
         this.name = name;
+        this.types = new ArrayList<>();
         this.children = new ArrayList<>();
         this.stringBuilder = new StringBuilder();
     }
@@ -34,6 +38,14 @@ class ObjectBuilder {
 
     public String getName() {
         return name;
+    }
+
+    public List<Type> getTypes() {
+        return types;
+    }
+
+    public void addTypes(Type... types) {
+        this.types.addAll(Arrays.asList(types));
     }
 
     public ObjectBuilder getParent() {
@@ -56,6 +68,16 @@ class ObjectBuilder {
     }
 
     private static String buildClass(ObjectBuilder objectBuilder) {
-        return String.format("public static final %s %s = %s", objectBuilder.getClazz().getSimpleName(), objectBuilder.getName(), objectBuilder.getStringBuilder());
+        if (objectBuilder.getTypes().isEmpty()) {
+            return String.format("public static final %s %s = %s", objectBuilder.getClazz().getSimpleName(), objectBuilder.getName(), objectBuilder.getStringBuilder());
+        } else {
+            return String.format("public static final %s<%s> %s = %s", objectBuilder.getClazz().getSimpleName(), toTypesString(objectBuilder), objectBuilder.getName(), objectBuilder.getStringBuilder());
+        }
+    }
+
+    private static String toTypesString(ObjectBuilder objectBuilder) {
+        return objectBuilder.getTypes().stream()
+                .map(type -> ((Class<?>) type).getSimpleName())
+                .collect(Collectors.joining(", "));
     }
 }
