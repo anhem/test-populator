@@ -1,6 +1,5 @@
 package com.github.anhem.testpopulator;
 
-import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.Pojo;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
@@ -30,28 +29,22 @@ public class ObjectFactoryTest {
 
     @Test
     void createObjectUsingConstructor() {
-        objectFactory.startConstructor(MyClass.class);
-        objectFactory.parameterDividerForConstructor(0);
-        objectFactory.addValue("myString");
-        objectFactory.parameterDividerForConstructor(1);
-        objectFactory.addValue(1);
-        objectFactory.endConstructor();
+        objectFactory.constructor(MyClass.class);
+        objectFactory.value("myString");
+        objectFactory.value(1);
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(\"myString\", 1);");
+        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(\"myString\", 1);");
     }
 
     @Test
     void createObjectUsingSetter() {
-        objectFactory.startSetter(MyClass.class);
-        objectFactory.startMethod(Strategy.SETTER, "setString");
-        objectFactory.addValue("myString");
-        objectFactory.endMethod(Strategy.SETTER);
-        objectFactory.startMethod(Strategy.SETTER, "setInteger");
-        objectFactory.addValue(1);
-        objectFactory.endMethod(Strategy.SETTER);
-        objectFactory.endSetter();
+        objectFactory.setter(MyClass.class);
+        objectFactory.method("setString");
+        objectFactory.value("myString");
+        objectFactory.method("setInteger");
+        objectFactory.value(1);
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo(String.format(
+        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
                 "public static final MyClass myClass0 = new MyClass();%s" +
                         "myClass0.setString(\"myString\");%s" +
                         "myClass0.setInteger(1);",
@@ -60,16 +53,13 @@ public class ObjectFactoryTest {
 
     @Test
     void createObjectUsingLombokBuilder() {
-        objectFactory.startBuilder(MyClass.class);
-        objectFactory.startMethod(Strategy.BUILDER, "string");
-        objectFactory.addValue("myString");
-        objectFactory.endMethod(Strategy.BUILDER);
-        objectFactory.startMethod(Strategy.BUILDER, "integer");
-        objectFactory.addValue(1);
-        objectFactory.endMethod(Strategy.BUILDER);
-        objectFactory.endBuilder();
+        objectFactory.builder(MyClass.class);
+        objectFactory.method("string");
+        objectFactory.value("myString");
+        objectFactory.method("integer");
+        objectFactory.value(1);
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo(String.format(
+        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
                 "public static final MyClass myClass0 = MyClass.builder()%s" +
                         ".string(\"myString\")%s" +
                         ".integer(1)%s" +
@@ -79,16 +69,13 @@ public class ObjectFactoryTest {
 
     @Test
     void createObjectUsingImmutablesBuilder() {
-        objectFactory.startBuilder(MyClass.class, ImmutableMyClass.class);
-        objectFactory.startMethod(Strategy.BUILDER, "string");
-        objectFactory.addValue("myString");
-        objectFactory.endMethod(Strategy.BUILDER);
-        objectFactory.startMethod(Strategy.BUILDER, "integer");
-        objectFactory.addValue(1);
-        objectFactory.endMethod(Strategy.BUILDER);
-        objectFactory.endBuilder();
+        objectFactory.builder(ImmutableMyClass.class);
+        objectFactory.method("string");
+        objectFactory.value("myString");
+        objectFactory.method("integer");
+        objectFactory.value(1);
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo(String.format(
+        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
                 "public static final MyClass myClass0 = ImmutableMyClass.builder()%s" +
                         ".string(\"myString\")%s" +
                         ".integer(1)%s" +
@@ -97,37 +84,21 @@ public class ObjectFactoryTest {
     }
 
     @Test
-    void startMethodThrowsExceptionWhenWrongStrategy() {
-        Assertions.assertThrows(ObjectException.class, () -> objectFactory.startMethod(Strategy.FIELD, "methodName"));
-    }
-
-    @Test
-    void endMethodThrowsExceptionWhenWrongStrategy() {
-        Assertions.assertThrows(ObjectException.class, () -> objectFactory.endMethod(Strategy.FIELD));
-    }
-
-    @Test
     void createSetOf() {
-        objectFactory.startConstructor(MyClass.class);
-        objectFactory.parameterDividerForConstructor(0);
-        objectFactory.startSetOf();
-        objectFactory.addValue("myString");
-        objectFactory.endSetOf();
-        objectFactory.endConstructor();
+        objectFactory.constructor(MyClass.class);
+        objectFactory.setOf();
+        objectFactory.value("myString");
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(Set.of(\"myString\"));");
+        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(Set.of(\"myString\"));");
     }
 
     @Test
     void createSet() {
-        objectFactory.startConstructor(MyClass.class);
-        objectFactory.parameterDividerForConstructor(0);
-        objectFactory.startSet(ArrayList.class, String.class);
-        objectFactory.addValue("myString");
-        objectFactory.endSet();
-        objectFactory.endConstructor();
+        objectFactory.constructor(MyClass.class);
+        objectFactory.set(ArrayList.class);
+        objectFactory.value("myString");
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo(String.format(
+        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
                 "public static final ArrayList<String> arrayList0 = new ArrayList();%s" +
                         "arrayList0.add(\"myString\");%s" +
                         "public static final MyClass myClass0 = new MyClass(arrayList0);",
@@ -136,32 +107,22 @@ public class ObjectFactoryTest {
 
     @Test
     void createMapOf() {
-        objectFactory.startConstructor(MyClass.class);
-        objectFactory.parameterDividerForConstructor(0);
-        objectFactory.startMapOf();
-        objectFactory.addValue("myKey");
-        objectFactory.keyValueDividerForMapOf();
-        objectFactory.addValue("myValue");
-        objectFactory.endMapOf();
-        objectFactory.endConstructor();
+        objectFactory.constructor(MyClass.class);
+        objectFactory.mapOf();
+        objectFactory.value("myKey");
+        objectFactory.value("myValue");
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(Map.of(\"myKey\", \"myValue\"));");
+        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(Map.of(\"myKey\", \"myValue\"));");
     }
 
     @Test
     void createMap() {
-        objectFactory.startConstructor(MyClass.class);
-        objectFactory.parameterDividerForConstructor(0);
-        objectFactory.startMap(HashMap.class, String.class, String.class);
-        objectFactory.startPutMap();
-        objectFactory.addValue("myKey");
-        objectFactory.keyValueDividerForPutMap();
-        objectFactory.addValue("myValue");
-        objectFactory.endPutMap();
-        objectFactory.endMap();
-        objectFactory.endConstructor();
+        objectFactory.constructor(MyClass.class);
+        objectFactory.map(HashMap.class);
+        objectFactory.value("myKey");
+        objectFactory.value("myValue");
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo(String.format(
+        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
                 "public static final HashMap<String, String> hashMap0 = new HashMap();%s" +
                         "hashMap0.put(\"myKey\", \"myValue\");%s" +
                         "public static final MyClass myClass0 = new MyClass(hashMap0);",
@@ -170,26 +131,20 @@ public class ObjectFactoryTest {
 
     @Test
     void createListOf() {
-        objectFactory.startConstructor(MyClass.class);
-        objectFactory.parameterDividerForConstructor(0);
-        objectFactory.startListOf();
-        objectFactory.addValue("myString");
-        objectFactory.endListOf();
-        objectFactory.endConstructor();
+        objectFactory.constructor(MyClass.class);
+        objectFactory.listOf();
+        objectFactory.value("myString");
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(List.of(\"myString\"));");
+        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(List.of(\"myString\"));");
     }
 
     @Test
     void createList() {
-        objectFactory.startConstructor(MyClass.class);
-        objectFactory.parameterDividerForConstructor(0);
-        objectFactory.startList(ArrayList.class, String.class);
-        objectFactory.addValue("myString");
-        objectFactory.endList();
-        objectFactory.endConstructor();
+        objectFactory.constructor(MyClass.class);
+        objectFactory.list(ArrayList.class);
+        objectFactory.value("myString");
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo(String.format(
+        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
                 "public static final ArrayList<String> arrayList0 = new ArrayList();%s" +
                         "arrayList0.add(\"myString\");%s" +
                         "public static final MyClass myClass0 = new MyClass(arrayList0);",
@@ -198,61 +153,44 @@ public class ObjectFactoryTest {
 
     @Test
     void createArray() {
-        objectFactory.startConstructor(MyClass.class);
-        objectFactory.startArray(Boolean.class);
-        objectFactory.addValue(true);
-        objectFactory.endArray();
-        objectFactory.parameterDividerForConstructor(0);
-        objectFactory.endConstructor();
+        objectFactory.constructor(MyClass.class);
+        objectFactory.array(Boolean.class);
+        objectFactory.value(true);
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(new Boolean[]{true});");
+        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(new Boolean[]{true});");
     }
 
     @Test
     void overrideValue() {
-        objectFactory.addOverridePopulate(UUID.class, new MyUUIDOverride());
+        objectFactory.overridePopulate(UUID.class, new MyUUIDOverride());
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo("public static final UUID uUID0 = UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\");");
+        assertThat(objectFactory.toTop().build()).isEqualTo("public static final UUID uUID0 = UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\");");
     }
 
     @Test
     void value() {
-        objectFactory.addValue("myString");
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo("public static final String string0 = \"myString\"");
+        objectFactory.value("myString");
+        assertThat(objectFactory.toTop().build()).isEqualTo("public static final String string0 = \"myString\";");
     }
 
     @Test
     void allValues() {
-        objectFactory.startConstructor(MyClass.class);
-        objectFactory.parameterDividerForConstructor(0);
-        objectFactory.addValue(ArbitraryEnum.A);
-        objectFactory.parameterDividerForConstructor(1);
-        objectFactory.addValue(1);
-        objectFactory.parameterDividerForConstructor(2);
-        objectFactory.addValue(2L);
-        objectFactory.parameterDividerForConstructor(3);
-        objectFactory.addValue(3D);
-        objectFactory.parameterDividerForConstructor(4);
-        objectFactory.addValue(true);
-        objectFactory.parameterDividerForConstructor(5);
-        objectFactory.addValue(BigDecimal.ONE);
-        objectFactory.parameterDividerForConstructor(6);
-        objectFactory.addValue("myString");
-        objectFactory.parameterDividerForConstructor(7);
-        objectFactory.addValue(LocalDate.EPOCH);
-        objectFactory.parameterDividerForConstructor(8);
-        objectFactory.addValue(LocalDate.EPOCH.atTime(0, 0, 0));
-        objectFactory.parameterDividerForConstructor(9);
-        objectFactory.addValue(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")));
-        objectFactory.parameterDividerForConstructor(10);
-        objectFactory.addValue(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")).toInstant());
-        objectFactory.parameterDividerForConstructor(11);
-        objectFactory.addValue('c');
-        objectFactory.parameterDividerForConstructor(12);
-        objectFactory.addValue(UUID.fromString("82e8962f-885d-4845-914b-c206a42d7c91"));
-        objectFactory.endConstructor();
+        objectFactory.constructor(MyClass.class);
+        objectFactory.value(ArbitraryEnum.A);
+        objectFactory.value(1);
+        objectFactory.value(2L);
+        objectFactory.value(3D);
+        objectFactory.value(true);
+        objectFactory.value(BigDecimal.ONE);
+        objectFactory.value("myString");
+        objectFactory.value(LocalDate.EPOCH);
+        objectFactory.value(LocalDate.EPOCH.atTime(0, 0, 0));
+        objectFactory.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")));
+        objectFactory.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")).toInstant());
+        objectFactory.value('c');
+        objectFactory.value(UUID.fromString("82e8962f-885d-4845-914b-c206a42d7c91"));
 
-        assertThat(objectFactory.getTopObjectBuilder().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(" +
+        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(" +
                 "A, " +
                 "1, " +
                 "2L, " +
@@ -271,7 +209,7 @@ public class ObjectFactoryTest {
 
     @Test
     void valueThrowsException() {
-        Assertions.assertThrows(ObjectException.class, () -> objectFactory.addValue(Pojo.class));
+        Assertions.assertThrows(ObjectException.class, () -> objectFactory.value(Pojo.class));
     }
 
 

@@ -69,7 +69,7 @@ public class PopulateFactory {
     public <T> T populate(Class<T> clazz) {
         ObjectFactory objectFactory = new ObjectFactory();
         T t = populateWithOverrides(clazz, objectFactory);
-        ObjectBuilder objectBuilder = objectFactory.getTopObjectBuilder();
+        ObjectBuilder objectBuilder = objectFactory.toTop();
         System.out.println(objectBuilder.build());
         return t;
     }
@@ -81,7 +81,7 @@ public class PopulateFactory {
     private <T> T populateWithOverrides(Class<T> clazz, Parameter parameter, Type[] typeArguments, ObjectFactory objectFactory) {
         if (overridePopulates.containsKey(clazz)) {
             T overridePopulateValue = getOverridePopulateValue(clazz, overridePopulates);
-            objectFactory.addOverridePopulate(clazz, overridePopulates.get(clazz));
+            objectFactory.overridePopulate(clazz, overridePopulates.get(clazz));
             return overridePopulateValue;
         }
         if (clazz.isArray()) {
@@ -92,7 +92,7 @@ public class PopulateFactory {
         }
         if (isValue(clazz)) {
             T value = valueFactory.createValue(clazz);
-            objectFactory.addValue(value);
+            objectFactory.value(value);
             return value;
         }
         return continuePopulateWithStrategies(clazz, objectFactory);
@@ -101,9 +101,8 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateForArray(Class<T> clazz, ObjectFactory objectFactory) {
         Class<?> componentType = clazz.getComponentType();
-        objectFactory.startArray(componentType);
+        objectFactory.array(componentType);
         Object value = populateWithOverrides(componentType, objectFactory);
-        objectFactory.endArray();
         Object array = Array.newInstance(componentType, 1);
         Array.set(array, 0, value);
         return (T) array;
@@ -115,52 +114,42 @@ public class PopulateFactory {
         try {
             if (isMap(clazz)) {
                 if (clazz.getConstructors().length > 0) {
-                    objectFactory.startMap(clazz, argumentTypes.get(0), argumentTypes.get(1));
-                    objectFactory.startPutMap();
+                    objectFactory.map(clazz);
                     Object key = continuePopulateWithType(argumentTypes.get(0), objectFactory);
-                    objectFactory.keyValueDividerForPutMap();
                     Object value = continuePopulateWithType(argumentTypes.get(1), objectFactory);
-                    objectFactory.endPutMap();
-                    objectFactory.endMap();
                     Map<Object, Object> map = (Map<Object, Object>) clazz.getConstructor().newInstance();
                     map.put(key, value);
                     return (T) map;
                 } else {
-                    objectFactory.startMapOf();
+                    objectFactory.mapOf();
                     Object key = continuePopulateWithType(argumentTypes.get(0), objectFactory);
-                    objectFactory.keyValueDividerForMapOf();
                     Object value = continuePopulateWithType(argumentTypes.get(1), objectFactory);
-                    objectFactory.endMapOf();
                     return (T) Map.of(key, value);
                 }
             }
             if (isSet(clazz)) {
                 if (clazz.getConstructors().length > 0) {
-                    objectFactory.startSet(clazz, argumentTypes.get(0));
+                    objectFactory.set(clazz);
                     Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
-                    objectFactory.endSet();
                     Set<Object> set = (Set<Object>) clazz.getConstructor().newInstance();
                     set.add(value);
                     return (T) set;
                 } else {
-                    objectFactory.startSetOf();
+                    objectFactory.setOf();
                     Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
-                    objectFactory.endSetOf();
                     return (T) Set.of(value);
                 }
             }
             if (isCollection(clazz)) {
                 if (clazz.getConstructors().length > 0) {
-                    objectFactory.startList(clazz, argumentTypes.get(0));
+                    objectFactory.list(clazz);
                     Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
-                    objectFactory.endList();
                     List<Object> list = (List<Object>) clazz.getConstructor().newInstance();
                     list.add(value);
                     return (T) list;
                 } else {
-                    objectFactory.startListOf();
+                    objectFactory.listOf();
                     Object value = continuePopulateWithType(argumentTypes.get(0), objectFactory);
-                    objectFactory.endListOf();
                     return (T) List.of(value);
                 }
             }
@@ -200,13 +189,11 @@ public class PopulateFactory {
         try {
             Constructor<T> constructor = getLargestConstructor(clazz, populateConfig.canAccessNonPublicConstructors());
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
-            objectFactory.startConstructor(clazz);
+            objectFactory.constructor(clazz);
             Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
                 Parameter parameter = constructor.getParameters()[i];
-                objectFactory.parameterDividerForConstructor(i);
                 return populateWithOverrides(parameter.getType(), parameter, null, objectFactory);
             }).toArray();
-            objectFactory.endConstructor();
             return constructor.newInstance(arguments);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), CONSTRUCTOR), e);
@@ -243,12 +230,11 @@ public class PopulateFactory {
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
-            objectFactory.startSetter(clazz);
+            objectFactory.setter(clazz);
             T objectOfClass = constructor.newInstance();
             getDeclaredMethods(clazz, populateConfig.getBlacklistedMethods()).stream()
                     .filter(method -> isSetterMethod(method, populateConfig.getSetterPrefix()))
-                    .forEach(method -> continuePopulateForMethod(objectOfClass, method, SETTER, objectFactory));
-            objectFactory.endSetter();
+                    .forEach(method -> continuePopulateForMethod(objectOfClass, method, objectFactory));
             return objectOfClass;
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), SETTER), e);
@@ -268,18 +254,17 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingLombokBuilder(Class<T> clazz, ObjectFactory objectFactory) {
         try {
-            objectFactory.startBuilder(clazz);
+            objectFactory.builder(clazz);
             Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
             Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(builderObject.getClass(), populateConfig.getBlacklistedMethods());
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(1)).ifPresent(methods ->
-                    methods.forEach(method -> continuePopulateForMethod(builderObject, method, BUILDER, objectFactory)));
+                    methods.forEach(method -> continuePopulateForMethod(builderObject, method, objectFactory)));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(2)).ifPresent(methods ->
-                    methods.forEach(method -> continuePopulateForMethod(builderObject, method, BUILDER, objectFactory)));
+                    methods.forEach(method -> continuePopulateForMethod(builderObject, method, objectFactory)));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(3)).ifPresent(methods ->
-                    methods.forEach(method -> continuePopulateForMethod(builderObject, method, BUILDER, objectFactory)));
+                    methods.forEach(method -> continuePopulateForMethod(builderObject, method, objectFactory)));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             setAccessible(buildMethod, builderObject);
-            objectFactory.endBuilder();
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, LOMBOK)), e);
@@ -290,27 +275,22 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingImmutablesBuilder(Class<T> clazz, ObjectFactory objectFactory) {
         try {
             Class<?> immutablesGeneratedClass = getImmutablesGeneratedClass(clazz);
-            objectFactory.startBuilder(clazz, immutablesGeneratedClass);
+            objectFactory.builder(clazz);
             Object builderObject = immutablesGeneratedClass.getDeclaredMethod(BUILDER_METHOD).invoke(null);
             List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(immutablesGeneratedClass, builderObject, populateConfig.getBlacklistedMethods());
-            builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method, BUILDER, objectFactory));
+            builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method, objectFactory));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
-            objectFactory.endBuilder();
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, IMMUTABLES)), e);
         }
     }
 
-    private <T> void continuePopulateForMethod(T objectOfClass, Method method, Strategy strategy, ObjectFactory objectFactory) {
+    private <T> void continuePopulateForMethod(T objectOfClass, Method method, ObjectFactory objectFactory) {
         try {
+            objectFactory.method(method.getName());
             method.invoke(objectOfClass, Stream.of(method.getParameters())
-                    .map(parameter -> {
-                        objectFactory.startMethod(strategy, method.getName());
-                        Object object = populateWithOverrides(parameter.getType(), parameter, null, objectFactory);
-                        objectFactory.endMethod(strategy);
-                        return object;
-                    })
+                    .map(parameter -> populateWithOverrides(parameter.getType(), parameter, null, objectFactory))
                     .toArray());
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CALL_METHOD, method.getName(), objectOfClass.getClass().getName()), e);
