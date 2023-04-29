@@ -112,7 +112,7 @@ public class ObjectFactory {
         createAndSetNextClassBuilder(clazz);
         currentObjectBuilder.addTypes(type);
         currentObjectBuilder.getStringBuilder()
-                .append(String.format("new %s();", clazz.getSimpleName()))
+                .append(String.format("new %s<>();", clazz.getSimpleName()))
                 .append(System.lineSeparator())
                 .append(String.format("%s.add(", currentObjectBuilder.getName()));
     }
@@ -134,7 +134,7 @@ public class ObjectFactory {
         createAndSetNextClassBuilder(clazz);
         currentObjectBuilder.addTypes(type);
         currentObjectBuilder.getStringBuilder()
-                .append(String.format("new %s();", clazz.getSimpleName()))
+                .append(String.format("new %s<>();", clazz.getSimpleName()))
                 .append(System.lineSeparator())
                 .append(String.format("%s.add(", currentObjectBuilder.getName()));
     }
@@ -152,7 +152,7 @@ public class ObjectFactory {
         createAndSetNextClassBuilder(clazz);
         currentObjectBuilder.addTypes(keyType, valueType);
         currentObjectBuilder.getStringBuilder()
-                .append(String.format("new %s();", clazz.getSimpleName()))
+                .append(String.format("new %s<>();", clazz.getSimpleName()))
                 .append(System.lineSeparator());
     }
 
@@ -191,18 +191,15 @@ public class ObjectFactory {
     }
 
     public <T> void addOverridePopulate(Class<?> clazz, OverridePopulate<T> overridePopulateValue) {
-        if (currentObjectBuilder == null) {
-            currentObjectBuilder = new ObjectBuilder(clazz, getName(clazz));
-        }
+        createAndSetNextClassBuilder(clazz);
         currentObjectBuilder.getStringBuilder().append(overridePopulateValue.createString());
         finalizeAndSetPreviousClassBuilder();
     }
 
     public <T> void addValue(T value) {
-        if (currentObjectBuilder == null) {
-            currentObjectBuilder = new ObjectBuilder(value.getClass(), getName(value.getClass()));
-        }
+        createAndSetNextClassBuilder(value.getClass());
         currentObjectBuilder.getStringBuilder().append(getValue(value));
+        finalizeAndSetPreviousClassBuilder();
     }
 
     public ObjectBuilder getTopObjectBuilder() {

@@ -64,23 +64,29 @@ public class ObjectBuilder {
     }
 
     public String build() {
-        return Stream.concat(
-                children.stream().map(ObjectBuilder::build),
-                Stream.of(buildClass())
-        ).collect(Collectors.joining(System.lineSeparator()));
+        return Stream.concat(children.stream().map(ObjectBuilder::build), Stream.of(buildClass())).collect(Collectors.joining(System.lineSeparator()));
     }
 
     private String buildClass() {
         if (types.isEmpty()) {
-            return String.format("public static final %s %s = %s", clazz.getSimpleName(), name, stringBuilder);
+            return String.format("%s %s = %s", clazz.getSimpleName(), name, stringBuilder);
         } else {
-            return String.format("public static final %s<%s> %s = %s", clazz.getSimpleName(), formatTypes(), name, stringBuilder);
+            return String.format("%s<%s> %s = %s", clazz.getSimpleName(), formatTypes(), name, stringBuilder);
         }
     }
 
     private String formatTypes() {
-        return types.stream()
-                .map(type -> ((Class<?>) type).getSimpleName())
-                .collect(Collectors.joining(", "));
+        if (!types.isEmpty()) {
+            return children.stream()
+                    .map(child -> {
+                        if (!child.getTypes().isEmpty()) {
+                            return String.format("%s<%s>", child.getClazz().getSimpleName(), child.formatTypes());
+                        } else {
+                            return child.getClazz().getSimpleName();
+                        }
+                    }).collect(Collectors.joining(", "));
+        }
+        return "";
     }
 }
+
