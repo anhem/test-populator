@@ -169,6 +169,8 @@ public class ObjectFactory {
                 } else {
                     currentObjectBuilder = currentObjectBuilder.getParent();
                 }
+            } else {
+                currentObjectBuilder = currentObjectBuilder.getParent();
             }
         }
     }
