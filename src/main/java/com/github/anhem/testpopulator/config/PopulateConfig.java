@@ -36,7 +36,7 @@ public class PopulateConfig {
         private Boolean accessNonPublicConstructors;
         private String setterPrefix;
 
-        private boolean objectFactoryEnabled;
+        private Boolean objectFactoryEnabled;
 
         public PopulateConfigBuilder blacklistedMethods(List<String> blacklistedMethods) {
             this.blacklistedMethods = blacklistedMethods;
