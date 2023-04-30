@@ -147,7 +147,7 @@ public class ObjectFactory {
 
     private void setPreviousObjectBuilder() {
         if (currentObjectBuilder.getParent() != null) {
-            if (currentObjectBuilder.getParent().getExpectedChildren() == currentObjectBuilder.getParent().getChildren().size()) {
+            if (currentObjectBuilder.getParent().hasAllChildren()) {
                 if (currentObjectBuilder.getParent().getParent() != null) {
                     currentObjectBuilder = currentObjectBuilder.getParent().getParent();
                 } else {

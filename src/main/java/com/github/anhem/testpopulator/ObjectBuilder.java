@@ -38,6 +38,10 @@ public class ObjectBuilder {
         children.add(child);
     }
 
+    public boolean hasAllChildren() {
+        return expectedChildren == children.size();
+    }
+
     public Class<?> getClazz() {
         return clazz;
     }
@@ -48,14 +52,6 @@ public class ObjectBuilder {
 
     public BuildType getBuildType() {
         return buildType;
-    }
-
-    public List<ObjectBuilder> getChildren() {
-        return children;
-    }
-
-    public int getExpectedChildren() {
-        return expectedChildren;
     }
 
     public ObjectBuilder getParent() {
