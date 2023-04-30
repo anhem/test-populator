@@ -30,7 +30,7 @@ public class ObjectFactoryTest {
 
     @Test
     void createObjectUsingConstructor() {
-        objectFactory.constructor(MyClass.class);
+        objectFactory.constructor(MyClass.class, 2);
         objectFactory.value("myString");
         objectFactory.value(1);
 
@@ -40,9 +40,9 @@ public class ObjectFactoryTest {
     @Test
     void createObjectUsingSetter() {
         objectFactory.setter(MyClass.class);
-        objectFactory.method("setString");
+        objectFactory.method("setString", 1);
         objectFactory.value("myString");
-        objectFactory.method("setInteger");
+        objectFactory.method("setInteger", 1);
         objectFactory.value(1);
 
         assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
@@ -54,10 +54,10 @@ public class ObjectFactoryTest {
 
     @Test
     void createObjectUsingBuilder() {
-        objectFactory.builder(MyClass.class);
-        objectFactory.method("string");
+        objectFactory.builder(MyClass.class, 2);
+        objectFactory.method("string", 1);
         objectFactory.value("myString");
-        objectFactory.method("integer");
+        objectFactory.method("integer", 1);
         objectFactory.value(1);
 
         assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
@@ -70,7 +70,7 @@ public class ObjectFactoryTest {
 
     @Test
     void createSetOf() {
-        objectFactory.constructor(MyClass.class);
+        objectFactory.constructor(MyClass.class, 1);
         objectFactory.setOf();
         objectFactory.value("myString");
 
@@ -82,7 +82,7 @@ public class ObjectFactoryTest {
 
     @Test
     void createSet() {
-        objectFactory.constructor(MyClass.class);
+        objectFactory.constructor(MyClass.class, 1);
         objectFactory.set(ArrayList.class);
         objectFactory.value("myString");
 
@@ -95,7 +95,7 @@ public class ObjectFactoryTest {
 
     @Test
     void createMapOf() {
-        objectFactory.constructor(MyClass.class);
+        objectFactory.constructor(MyClass.class, 1);
         objectFactory.mapOf();
         objectFactory.value("myKey");
         objectFactory.value("myValue");
@@ -108,7 +108,7 @@ public class ObjectFactoryTest {
 
     @Test
     void createMap() {
-        objectFactory.constructor(MyClass.class);
+        objectFactory.constructor(MyClass.class, 1);
         objectFactory.map(HashMap.class);
         objectFactory.value("myKey");
         objectFactory.value("myValue");
@@ -122,7 +122,7 @@ public class ObjectFactoryTest {
 
     @Test
     void createListOf() {
-        objectFactory.constructor(MyClass.class);
+        objectFactory.constructor(MyClass.class, 1);
         objectFactory.listOf();
         objectFactory.value("myString");
 
@@ -134,7 +134,7 @@ public class ObjectFactoryTest {
 
     @Test
     void createList() {
-        objectFactory.constructor(MyClass.class);
+        objectFactory.constructor(MyClass.class, 1);
         objectFactory.list(ArrayList.class);
         objectFactory.value("myString");
 
@@ -147,7 +147,7 @@ public class ObjectFactoryTest {
 
     @Test
     void createArray() {
-        objectFactory.constructor(MyClass.class);
+        objectFactory.constructor(MyClass.class, 1);
         objectFactory.array(Boolean.class);
         objectFactory.value(true);
         assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
@@ -173,7 +173,7 @@ public class ObjectFactoryTest {
 
     @Test
     void allValues() {
-        objectFactory.constructor(MyClass.class);
+        objectFactory.constructor(MyClass.class, 13);
         objectFactory.value(ArbitraryEnum.A);
         objectFactory.value(1);
         objectFactory.value(2L);

@@ -17,19 +17,21 @@ public class ObjectBuilder {
     private final String name;
     private final BuildType buildType;
     private final List<ObjectBuilder> children = new ArrayList<>();
+    private final int expectedChildren;
     private ObjectBuilder parent;
     private String value;
 
-    public ObjectBuilder(Class<?> clazz, String name, BuildType buildType) {
+    public ObjectBuilder(Class<?> clazz, String name, BuildType buildType, int expectedChildren) {
         this.clazz = clazz;
         this.name = name;
         this.buildType = buildType;
+        this.expectedChildren = expectedChildren;
     }
 
-
-    public ObjectBuilder(String name, BuildType buildType) {
+    public ObjectBuilder(String name, BuildType buildType, int expectedChildren) {
         this.name = name;
         this.buildType = buildType;
+        this.expectedChildren = expectedChildren;
     }
 
     public void addChild(ObjectBuilder child) {
@@ -38,10 +40,6 @@ public class ObjectBuilder {
 
     public Class<?> getClazz() {
         return clazz;
-    }
-
-    public void setClazz(Class<?> clazz) {
-        this.clazz = clazz;
     }
 
     public String getName() {
@@ -56,16 +54,16 @@ public class ObjectBuilder {
         return children;
     }
 
+    public int getExpectedChildren() {
+        return expectedChildren;
+    }
+
     public ObjectBuilder getParent() {
         return parent;
     }
 
     public void setParent(ObjectBuilder parent) {
         this.parent = parent;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public void setValue(String value) {

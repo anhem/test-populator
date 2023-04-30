@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.ImmutablesUtil.getImmutablesGeneratedClass;
 import static com.github.anhem.testpopulator.ImmutablesUtil.getMethodsForImmutablesBuilder;
+import static com.github.anhem.testpopulator.LombokUtil.calculateExpectedChildren;
 import static com.github.anhem.testpopulator.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
 import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
@@ -189,7 +190,7 @@ public class PopulateFactory {
         try {
             Constructor<T> constructor = getLargestConstructor(clazz, populateConfig.canAccessNonPublicConstructors());
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
-            objectFactory.constructor(clazz);
+            objectFactory.constructor(clazz, constructor.getParameterCount());
             Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
                 Parameter parameter = constructor.getParameters()[i];
                 return populateWithOverrides(parameter.getType(), parameter, null, objectFactory);
@@ -254,9 +255,9 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingLombokBuilder(Class<T> clazz, ObjectFactory objectFactory) {
         try {
-            objectFactory.builder(clazz);
             Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
             Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(builderObject.getClass(), populateConfig.getBlacklistedMethods());
+            objectFactory.builder(clazz, calculateExpectedChildren(builderObjectMethodsGroupedByInvokeOrder));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(1)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method, objectFactory)));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(2)).ifPresent(methods ->
@@ -275,9 +276,9 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingImmutablesBuilder(Class<T> clazz, ObjectFactory objectFactory) {
         try {
             Class<?> immutablesGeneratedClass = getImmutablesGeneratedClass(clazz);
-            objectFactory.builder(clazz);
             Object builderObject = immutablesGeneratedClass.getDeclaredMethod(BUILDER_METHOD).invoke(null);
             List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(immutablesGeneratedClass, builderObject, populateConfig.getBlacklistedMethods());
+            objectFactory.builder(clazz, builderObjectMethods.size());
             builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method, objectFactory));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             return (T) buildMethod.invoke(builderObject);
@@ -288,7 +289,7 @@ public class PopulateFactory {
 
     private <T> void continuePopulateForMethod(T objectOfClass, Method method, ObjectFactory objectFactory) {
         try {
-            objectFactory.method(method.getName());
+            objectFactory.method(method.getName(), method.getParameters().length);
             method.invoke(objectOfClass, Stream.of(method.getParameters())
                     .map(parameter -> populateWithOverrides(parameter.getType(), parameter, null, objectFactory))
                     .toArray());

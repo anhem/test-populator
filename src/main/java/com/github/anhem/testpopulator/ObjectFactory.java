@@ -22,58 +22,58 @@ public class ObjectFactory {
         this.classCounters = new HashMap<>();
     }
 
-    public void constructor(Class<?> clazz) {
-        setNextObjectBuilder(clazz, CONSTRUCTOR);
+    public void constructor(Class<?> clazz, int expectedChildren) {
+        setNextObjectBuilder(clazz, CONSTRUCTOR, expectedChildren);
     }
 
     public void setter(Class<?> clazz) {
-        setNextObjectBuilder(clazz, SETTER);
+        setNextObjectBuilder(clazz, SETTER, 1);
     }
 
-    public void builder(Class<?> clazz) {
-        setNextObjectBuilder(clazz, BUILDER);
+    public void builder(Class<?> clazz, int expectedChildren) {
+        setNextObjectBuilder(clazz, BUILDER, expectedChildren);
     }
 
-    public void method(String methodName) {
-        setNextObjectBuilder(new ObjectBuilder(methodName, METHOD));
+    public void method(String methodName, int expectedChildren) {
+        setNextObjectBuilder(new ObjectBuilder(methodName, METHOD, expectedChildren));
     }
 
     public void set(Class<?> clazz) {
-        setNextObjectBuilder(clazz, SET);
+        setNextObjectBuilder(clazz, SET, 1);
     }
 
     public void setOf() {
-        setNextObjectBuilder(Set.class, SET_OF);
+        setNextObjectBuilder(Set.class, SET_OF, 1);
     }
 
     public void list(Class<?> clazz) {
-        setNextObjectBuilder(clazz, LIST);
+        setNextObjectBuilder(clazz, LIST, 1);
     }
 
     public void listOf() {
-        setNextObjectBuilder(List.class, LIST_OF);
+        setNextObjectBuilder(List.class, LIST_OF, 1);
     }
 
     public void map(Class<?> clazz) {
-        setNextObjectBuilder(clazz, MAP);
+        setNextObjectBuilder(clazz, MAP, 2);
     }
 
     public void mapOf() {
-        setNextObjectBuilder(Map.class, MAP_OF);
+        setNextObjectBuilder(Map.class, MAP_OF, 2);
     }
 
     public void array(Class<?> clazz) {
-        setNextObjectBuilder(clazz, ARRAY);
+        setNextObjectBuilder(clazz, ARRAY, 1);
     }
 
     public <T> void overridePopulate(Class<?> clazz, OverridePopulate<T> overridePopulateValue) {
-        setNextObjectBuilder(clazz, OVERRIDE_VALUE);
+        setNextObjectBuilder(clazz, OVERRIDE_VALUE, 0);
         currentObjectBuilder.setValue(overridePopulateValue.createString());
         setPreviousObjectBuilder();
     }
 
     public <T> void value(T value) {
-        setNextObjectBuilder(value.getClass(), VALUE);
+        setNextObjectBuilder(value.getClass(), VALUE, 0);
         currentObjectBuilder.setValue(toStringValue(value));
         setPreviousObjectBuilder();
     }
@@ -129,12 +129,12 @@ public class ObjectFactory {
         throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
-    private void setNextObjectBuilder(Class<?> clazz, BuildType buildType) {
+    private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
         String name = getName(clazz);
         if (currentObjectBuilder == null) {
-            currentObjectBuilder = new ObjectBuilder(clazz, name, buildType);
+            currentObjectBuilder = new ObjectBuilder(clazz, name, buildType, expectedChildren);
         } else {
-            ObjectBuilder child = new ObjectBuilder(clazz, name, buildType);
+            ObjectBuilder child = new ObjectBuilder(clazz, name, buildType, expectedChildren);
             setNextObjectBuilder(child);
         }
     }
@@ -147,13 +147,8 @@ public class ObjectFactory {
 
     private void setPreviousObjectBuilder() {
         if (currentObjectBuilder.getParent() != null) {
-            BuildType buildType = currentObjectBuilder.getParent().getBuildType();
-            if (buildType.isExpectingOneArgument()) {
-                if (currentObjectBuilder.getParent().getChildren().size() == 1) {
-                    currentObjectBuilder = currentObjectBuilder.getParent().getParent();
-                }
-            } else if (buildType.isExpectingTwoArguments()) {
-                if (currentObjectBuilder.getParent().getChildren().size() == 2) {
+            if (currentObjectBuilder.getParent().getExpectedChildren() == currentObjectBuilder.getParent().getChildren().size()) {
+                if (currentObjectBuilder.getParent().getParent() != null) {
                     currentObjectBuilder = currentObjectBuilder.getParent().getParent();
                 } else {
                     currentObjectBuilder = currentObjectBuilder.getParent();
