@@ -84,7 +84,7 @@ public class ObjectBuilder {
             case BUILDER:
                 return buildBuilder();
             case METHOD:
-                return buildChildren().collect(Collectors.toList());
+                return buildMethod();
             case SET:
                 return buildSet();
             case SET_OF:
@@ -135,6 +135,10 @@ public class ObjectBuilder {
                 createMethods(),
                 Stream.of(String.format(".%s();", BUILD_METHOD))
         ).collect(Collectors.toList());
+    }
+
+    private List<String> buildMethod() {
+        return buildChildren().collect(Collectors.toList());
     }
 
     private Stream<String> createMethods() {
