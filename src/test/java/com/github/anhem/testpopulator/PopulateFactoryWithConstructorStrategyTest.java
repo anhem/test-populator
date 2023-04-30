@@ -100,4 +100,10 @@ class PopulateFactoryWithConstructorStrategyTest {
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructorPrivate.class.getName(), populateConfig.getStrategyOrder()));
     }
 
+    @Test
+    void nestedCollections() {
+        NestedCollections value_1 = populateFactory.populate(NestedCollections.class);
+        NestedCollections value_2 = populateFactory.populate(NestedCollections.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
 }
