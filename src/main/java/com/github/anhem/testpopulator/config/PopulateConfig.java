@@ -20,6 +20,7 @@ public class PopulateConfig {
     private static final boolean DEFAULT_RANDOM_VALUES = true;
     private static final boolean DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS = false;
     private static final String DEFAULT_SETTER_PREFIX = "set";
+    private static final boolean DEFAULT_OBJECT_FACTORY_ENABLED = false;
 
     /**
      * Builder for PopulateConfig
@@ -34,6 +35,8 @@ public class PopulateConfig {
         private Boolean randomValues;
         private Boolean accessNonPublicConstructors;
         private String setterPrefix;
+
+        private boolean objectFactoryEnabled;
 
         public PopulateConfigBuilder blacklistedMethods(List<String> blacklistedMethods) {
             this.blacklistedMethods = blacklistedMethods;
@@ -85,8 +88,23 @@ public class PopulateConfig {
             return this;
         }
 
+        public PopulateConfigBuilder objectFactoryEnabled(boolean objectFactoryEnabled) {
+            this.objectFactoryEnabled = objectFactoryEnabled;
+            return this;
+        }
+
         public PopulateConfig build() {
-            return new PopulateConfig(blacklistedMethods, blacklistedFields, strategyOrder, overridePopulate, builderPattern, randomValues, accessNonPublicConstructors, setterPrefix);
+            return new PopulateConfig(
+                    blacklistedMethods,
+                    blacklistedFields,
+                    strategyOrder,
+                    overridePopulate,
+                    builderPattern,
+                    randomValues,
+                    accessNonPublicConstructors,
+                    setterPrefix,
+                    objectFactoryEnabled
+            );
         }
     }
 
@@ -103,6 +121,8 @@ public class PopulateConfig {
     private final boolean accessNonPublicConstructors;
     private final String setterPrefix;
 
+    private final boolean objectFactoryEnabled;
+
     private PopulateConfig(List<String> blacklistedMethods,
                            List<String> blacklistedFields,
                            List<Strategy> strategyOrder,
@@ -110,7 +130,8 @@ public class PopulateConfig {
                            BuilderPattern builderPattern,
                            Boolean randomValues,
                            Boolean accessNonPublicConstructors,
-                           String setterPrefix) {
+                           String setterPrefix,
+                           Boolean objectFactoryEnabled) {
         this.blacklistedMethods = blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : blacklistedMethods;
         this.blacklistedFields = blacklistedFields.isEmpty() ? DEFAULT_BLACKLISTED_FIELDS : blacklistedFields;
         this.strategyOrder = strategyOrder.isEmpty() ? DEFAULT_STRATEGY_ORDER : strategyOrder;
@@ -119,6 +140,7 @@ public class PopulateConfig {
         this.randomValues = randomValues == null ? DEFAULT_RANDOM_VALUES : randomValues;
         this.accessNonPublicConstructors = accessNonPublicConstructors == null ? DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS : accessNonPublicConstructors;
         this.setterPrefix = setterPrefix == null ? DEFAULT_SETTER_PREFIX : setterPrefix;
+        this.objectFactoryEnabled = objectFactoryEnabled == null ? DEFAULT_OBJECT_FACTORY_ENABLED : objectFactoryEnabled;
     }
 
     public List<String> getBlacklistedMethods() {
@@ -158,6 +180,10 @@ public class PopulateConfig {
         return setterPrefix;
     }
 
+    public boolean isObjectFactoryEnabled() {
+        return objectFactoryEnabled;
+    }
+
     public PopulateConfigBuilder toBuilder() {
         return PopulateConfig.builder()
                 .blacklistedMethods(blacklistedMethods)
@@ -167,6 +193,7 @@ public class PopulateConfig {
                 .builderPattern(builderPattern)
                 .randomValues(randomValues)
                 .accessNonPublicConstructors(accessNonPublicConstructors)
-                .setterPrefix(setterPrefix);
+                .setterPrefix(setterPrefix)
+                .objectFactoryEnabled(objectFactoryEnabled);
     }
 }

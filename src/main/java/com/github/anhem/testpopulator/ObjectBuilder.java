@@ -66,7 +66,7 @@ public class ObjectBuilder {
         this.value = value;
     }
 
-    public String build() {
+    public String buildString() {
         return buildByBuildType().stream()
                 .collect(Collectors.joining(System.lineSeparator()));
     }

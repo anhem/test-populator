@@ -68,10 +68,9 @@ public class PopulateFactory {
      * @return object of clazz
      */
     public <T> T populate(Class<T> clazz) {
-        ObjectFactory objectFactory = new ObjectFactory();
+        ObjectFactory objectFactory = populateConfig.isObjectFactoryEnabled() ? new ObjectFactoryImpl() : new ObjectFactoryVoid();
         T t = populateWithOverrides(clazz, objectFactory);
-        ObjectBuilder objectBuilder = objectFactory.toTop();
-        System.out.println(objectBuilder.build());
+        objectFactory.build().forEach(System.out::println);
         return t;
     }
 
