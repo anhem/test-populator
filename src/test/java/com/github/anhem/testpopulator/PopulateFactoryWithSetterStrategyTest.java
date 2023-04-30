@@ -23,6 +23,7 @@ class PopulateFactoryWithSetterStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(SETTER))
+                .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -102,8 +103,7 @@ class PopulateFactoryWithSetterStrategyTest {
 
     @Test
     void PojoPrivateConstructor() {
-        populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(SETTER))
+        populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

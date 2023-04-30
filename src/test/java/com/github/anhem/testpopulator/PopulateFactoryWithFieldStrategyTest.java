@@ -24,6 +24,7 @@ class PopulateFactoryWithFieldStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(FIELD))
+                .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -79,8 +80,7 @@ class PopulateFactoryWithFieldStrategyTest {
 
     @Test
     void PojoPrivateConstructor() {
-        populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(FIELD))
+        populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

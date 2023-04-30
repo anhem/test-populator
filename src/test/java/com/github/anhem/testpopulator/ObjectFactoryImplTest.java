@@ -20,32 +20,31 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ObjectFactoryImplTest {
 
-    public static final String LS = System.lineSeparator();
-    private ObjectFactoryImpl objectFactory;
+    private ObjectFactoryImpl objectFactoryImpl;
 
     @BeforeEach
     void setUp() {
-        objectFactory = new ObjectFactoryImpl();
+        objectFactoryImpl = new ObjectFactoryImpl();
     }
 
     @Test
     void createObjectUsingConstructor() {
-        objectFactory.constructor(MyClass.class, 2);
-        objectFactory.value("myString");
-        objectFactory.value(1);
+        objectFactoryImpl.constructor(MyClass.class, 2);
+        objectFactoryImpl.value("myString");
+        objectFactoryImpl.value(1);
 
-        assertThat(objectFactory.build()).isEqualTo(List.of("public static final MyClass myClass0 = new MyClass(\"myString\", 1);"));
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of("public static final MyClass myClass0 = new MyClass(\"myString\", 1);"));
     }
 
     @Test
     void createObjectUsingSetter() {
-        objectFactory.setter(MyClass.class);
-        objectFactory.method("setString", 1);
-        objectFactory.value("myString");
-        objectFactory.method("setInteger", 1);
-        objectFactory.value(1);
+        objectFactoryImpl.setter(MyClass.class);
+        objectFactoryImpl.method("setString", 1);
+        objectFactoryImpl.value("myString");
+        objectFactoryImpl.method("setInteger", 1);
+        objectFactoryImpl.value(1);
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final MyClass myClass0 = new MyClass();",
                 "myClass0.setString(\"myString\");",
                 "myClass0.setInteger(1);"
@@ -54,13 +53,13 @@ public class ObjectFactoryImplTest {
 
     @Test
     void createObjectUsingBuilder() {
-        objectFactory.builder(MyClass.class, 2);
-        objectFactory.method("string", 1);
-        objectFactory.value("myString");
-        objectFactory.method("integer", 1);
-        objectFactory.value(1);
+        objectFactoryImpl.builder(MyClass.class, 2);
+        objectFactoryImpl.method("string", 1);
+        objectFactoryImpl.value("myString");
+        objectFactoryImpl.method("integer", 1);
+        objectFactoryImpl.value(1);
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final MyClass myClass0 = MyClass.builder()",
                 ".string(\"myString\")",
                 ".integer(1)",
@@ -70,11 +69,11 @@ public class ObjectFactoryImplTest {
 
     @Test
     void createSetOf() {
-        objectFactory.constructor(MyClass.class, 1);
-        objectFactory.setOf();
-        objectFactory.value("myString");
+        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.setOf();
+        objectFactoryImpl.value("myString");
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final Set<String> set0 = Set.of(\"myString\");",
                 "public static final MyClass myClass0 = new MyClass(set0);"
         ));
@@ -82,11 +81,11 @@ public class ObjectFactoryImplTest {
 
     @Test
     void createSet() {
-        objectFactory.constructor(MyClass.class, 1);
-        objectFactory.set(ArrayList.class);
-        objectFactory.value("myString");
+        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.set(ArrayList.class);
+        objectFactoryImpl.value("myString");
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final ArrayList<String> arrayList0 = new ArrayList<>();",
                 "arrayList0.add(\"myString\");",
                 "public static final MyClass myClass0 = new MyClass(arrayList0);"
@@ -95,12 +94,12 @@ public class ObjectFactoryImplTest {
 
     @Test
     void createMapOf() {
-        objectFactory.constructor(MyClass.class, 1);
-        objectFactory.mapOf();
-        objectFactory.value("myKey");
-        objectFactory.value("myValue");
+        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.mapOf();
+        objectFactoryImpl.value("myKey");
+        objectFactoryImpl.value("myValue");
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final Map<String, String> map0 = Map.of(\"myKey\", \"myValue\");",
                 "public static final MyClass myClass0 = new MyClass(map0);"
         ));
@@ -108,12 +107,12 @@ public class ObjectFactoryImplTest {
 
     @Test
     void createMap() {
-        objectFactory.constructor(MyClass.class, 1);
-        objectFactory.map(HashMap.class);
-        objectFactory.value("myKey");
-        objectFactory.value("myValue");
+        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.map(HashMap.class);
+        objectFactoryImpl.value("myKey");
+        objectFactoryImpl.value("myValue");
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final HashMap<String, String> hashMap0 = new HashMap<>();",
                 "hashMap0.put(\"myKey\", \"myValue\");",
                 "public static final MyClass myClass0 = new MyClass(hashMap0);"
@@ -122,11 +121,11 @@ public class ObjectFactoryImplTest {
 
     @Test
     void createListOf() {
-        objectFactory.constructor(MyClass.class, 1);
-        objectFactory.listOf();
-        objectFactory.value("myString");
+        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.listOf();
+        objectFactoryImpl.value("myString");
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final List<String> list0 = List.of(\"myString\");",
                 "public static final MyClass myClass0 = new MyClass(list0);"
         ));
@@ -134,11 +133,11 @@ public class ObjectFactoryImplTest {
 
     @Test
     void createList() {
-        objectFactory.constructor(MyClass.class, 1);
-        objectFactory.list(ArrayList.class);
-        objectFactory.value("myString");
+        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.list(ArrayList.class);
+        objectFactoryImpl.value("myString");
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final ArrayList<String> arrayList0 = new ArrayList<>();",
                 "arrayList0.add(\"myString\");",
                 "public static final MyClass myClass0 = new MyClass(arrayList0);"
@@ -147,10 +146,10 @@ public class ObjectFactoryImplTest {
 
     @Test
     void createArray() {
-        objectFactory.constructor(MyClass.class, 1);
-        objectFactory.array(Boolean.class);
-        objectFactory.value(true);
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.array(Boolean.class);
+        objectFactoryImpl.value(true);
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final Boolean[] boolean0 = new Boolean[]{true};",
                 "public static final MyClass myClass0 = new MyClass(boolean0);"
         ));
@@ -158,37 +157,37 @@ public class ObjectFactoryImplTest {
 
     @Test
     void overrideValue() {
-        objectFactory.overridePopulate(UUID.class, new MyUUIDOverride());
+        objectFactoryImpl.overridePopulate(UUID.class, new MyUUIDOverride());
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final UUID uUID0 = UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\");"
         ));
     }
 
     @Test
     void value() {
-        objectFactory.value("myString");
-        assertThat(objectFactory.build()).isEqualTo(List.of("public static final String string0 = \"myString\";"));
+        objectFactoryImpl.value("myString");
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of("public static final String string0 = \"myString\";"));
     }
 
     @Test
     void allValues() {
-        objectFactory.constructor(MyClass.class, 13);
-        objectFactory.value(ArbitraryEnum.A);
-        objectFactory.value(1);
-        objectFactory.value(2L);
-        objectFactory.value(3D);
-        objectFactory.value(true);
-        objectFactory.value(BigDecimal.ONE);
-        objectFactory.value("myString");
-        objectFactory.value(LocalDate.EPOCH);
-        objectFactory.value(LocalDate.EPOCH.atTime(0, 0, 0));
-        objectFactory.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")));
-        objectFactory.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")).toInstant());
-        objectFactory.value('c');
-        objectFactory.value(UUID.fromString("82e8962f-885d-4845-914b-c206a42d7c91"));
+        objectFactoryImpl.constructor(MyClass.class, 13);
+        objectFactoryImpl.value(ArbitraryEnum.A);
+        objectFactoryImpl.value(1);
+        objectFactoryImpl.value(2L);
+        objectFactoryImpl.value(3D);
+        objectFactoryImpl.value(true);
+        objectFactoryImpl.value(BigDecimal.ONE);
+        objectFactoryImpl.value("myString");
+        objectFactoryImpl.value(LocalDate.EPOCH);
+        objectFactoryImpl.value(LocalDate.EPOCH.atTime(0, 0, 0));
+        objectFactoryImpl.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")));
+        objectFactoryImpl.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")).toInstant());
+        objectFactoryImpl.value('c');
+        objectFactoryImpl.value(UUID.fromString("82e8962f-885d-4845-914b-c206a42d7c91"));
 
-        assertThat(objectFactory.build()).isEqualTo(List.of(
+        assertThat(objectFactoryImpl.build()).isEqualTo(List.of(
                 "public static final MyClass myClass0 = new MyClass(" +
                         "A, " +
                         "1, " +
@@ -208,7 +207,7 @@ public class ObjectFactoryImplTest {
 
     @Test
     void valueThrowsException() {
-        Assertions.assertThrows(ObjectException.class, () -> objectFactory.value(Pojo.class));
+        Assertions.assertThrows(ObjectException.class, () -> objectFactoryImpl.value(Pojo.class));
     }
 
     private static class MyClass {
