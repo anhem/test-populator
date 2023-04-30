@@ -53,7 +53,7 @@ public class ObjectFactoryTest {
     }
 
     @Test
-    void createObjectUsingLombokBuilder() {
+    void createObjectUsingBuilder() {
         objectFactory.builder(MyClass.class);
         objectFactory.method("string");
         objectFactory.value("myString");
@@ -64,22 +64,6 @@ public class ObjectFactoryTest {
                 "public static final MyClass myClass0 = MyClass.builder()",
                 ".string(\"myString\")",
                 ".integer(1)",
-                ".build();"
-        ));
-    }
-
-    @Test
-    void createObjectUsingImmutablesBuilder() {
-        objectFactory.builder(ImmutableMyClass.class);
-        objectFactory.method("string");
-        objectFactory.value("myString");
-        objectFactory.method("integer");
-        objectFactory.value(1);
-
-        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
-                "public static final MyClass myClass0 = ImmutableMyClass.builder()",
-                ".string(\"myString\")",
-                "integer(1)",
                 ".build();"
         ));
     }
@@ -227,11 +211,7 @@ public class ObjectFactoryTest {
         Assertions.assertThrows(ObjectException.class, () -> objectFactory.value(Pojo.class));
     }
 
-
     private static class MyClass {
-    }
-
-    private static class ImmutableMyClass {
     }
 
 }
