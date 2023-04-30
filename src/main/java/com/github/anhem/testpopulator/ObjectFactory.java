@@ -36,44 +36,45 @@ public class ObjectFactory {
 
     public void method(String methodName) {
         setNextObjectBuilder(new ObjectBuilder(methodName, METHOD));
-
     }
 
     public void set(Class<?> clazz) {
-        setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), SET));
+        setNextObjectBuilder(clazz, SET);
     }
 
     public void setOf() {
-        setNextObjectBuilder(new ObjectBuilder(Set.class, getName(Set.class), SET_OF));
+        setNextObjectBuilder(Set.class, SET_OF);
     }
 
     public void list(Class<?> clazz) {
-        setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), LIST));
+        setNextObjectBuilder(clazz, LIST);
     }
 
     public void listOf() {
-        setNextObjectBuilder(new ObjectBuilder(List.class, getName(List.class), LIST_OF));
+        setNextObjectBuilder(List.class, LIST_OF);
     }
 
     public void map(Class<?> clazz) {
-        setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), MAP));
+        setNextObjectBuilder(clazz, MAP);
     }
 
     public void mapOf() {
-        setNextObjectBuilder(new ObjectBuilder(Map.class, getName(Map.class), MAP_OF));
+        setNextObjectBuilder(Map.class, MAP_OF);
     }
 
     public void array(Class<?> clazz) {
-        setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), ARRAY));
+        setNextObjectBuilder(clazz, ARRAY);
     }
 
     public <T> void overridePopulate(Class<?> clazz, OverridePopulate<T> overridePopulateValue) {
-        setNextObjectBuilder(clazz, overridePopulateValue.createString(), OVERRIDE_VALUE);
+        setNextObjectBuilder(clazz, OVERRIDE_VALUE);
+        currentObjectBuilder.setValue(overridePopulateValue.createString());
         setPreviousObjectBuilder();
     }
 
     public <T> void value(T value) {
-        setNextObjectBuilder(value.getClass(), toStringValue(value), VALUE);
+        setNextObjectBuilder(value.getClass(), VALUE);
+        currentObjectBuilder.setValue(toStringValue(value));
         setPreviousObjectBuilder();
     }
 
@@ -137,18 +138,6 @@ public class ObjectFactory {
             setNextObjectBuilder(child);
         }
     }
-
-    private void setNextObjectBuilder(Class<?> clazz, String value, BuildType buildType) {
-        String name = getName(clazz);
-        if (currentObjectBuilder == null) {
-            currentObjectBuilder = new ObjectBuilder(clazz, name, buildType);
-        } else {
-            ObjectBuilder child = new ObjectBuilder(clazz, name, buildType);
-            setNextObjectBuilder(child);
-        }
-        currentObjectBuilder.setValue(value);
-    }
-
 
     private void setNextObjectBuilder(ObjectBuilder objectBuilder) {
         currentObjectBuilder.addChild(objectBuilder);
