@@ -13,6 +13,6 @@ public class MyUUIDOverride implements OverridePopulate<MyUUID> {
 
     @Override
     public String createString() {
-        return String.format("UUID.fromString(\"%s\");", UUID);
+        return String.format("UUID.fromString(\"%s\")", UUID);
     }
 }

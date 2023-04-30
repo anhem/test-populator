@@ -3,11 +3,13 @@ package com.github.anhem.testpopulator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
+import static com.github.anhem.testpopulator.PopulateUtil.isJavaBaseClass;
 
 public class ObjectBuilder {
 
@@ -75,7 +77,7 @@ public class ObjectBuilder {
                 .collect(Collectors.joining(System.lineSeparator()));
     }
 
-    private List<String> buildByBuildType() {
+    List<String> buildByBuildType() {
         switch (buildType) {
             case CONSTRUCTOR:
                 return buildConstructor();
@@ -109,6 +111,7 @@ public class ObjectBuilder {
 
     private Stream<String> buildChildren() {
         return children.stream()
+                .filter(child -> !isBasicValue(child))
                 .map(ObjectBuilder::buildByBuildType)
                 .flatMap(Collection::stream);
     }
@@ -131,7 +134,7 @@ public class ObjectBuilder {
     private List<String> buildBuilder() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s.%s()", clazz.getSimpleName(), BUILDER_METHOD)),
+                Stream.of(String.format("public static final %s %s = %s.%s()", clazz.getSimpleName(), name, clazz.getSimpleName(), BUILDER_METHOD)),
                 createMethods(),
                 Stream.of(String.format(".%s();", BUILD_METHOD))
         ).collect(Collectors.toList());
@@ -152,7 +155,7 @@ public class ObjectBuilder {
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format("public static final %s<%s> %s = new %s<>();", clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                children.stream().map(child -> String.format("%s.add(%s);", name, child.getName())))
+                children.stream().map(child -> String.format("%s.add(%s);", name, buildArguments())))
                 .collect(Collectors.toList());
     }
 
@@ -167,7 +170,7 @@ public class ObjectBuilder {
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format("public static final %s<%s> %s = new %s<>();", clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                children.stream().map(child -> String.format("%s.add(%s);", name, child.getName())))
+                children.stream().map(child -> String.format("%s.add(%s);", name, buildArguments())))
                 .collect(Collectors.toList());
     }
 
@@ -204,9 +207,18 @@ public class ObjectBuilder {
         return List.of(String.format("public static final %s %s = %s;", clazz.getSimpleName(), name, this.value));
     }
 
+    private List<String> buildInlineArgument() {
+        return List.of(String.format("%s", this.value));
+    }
+
     private String buildArguments() {
         return children.stream()
-                .map(ObjectBuilder::getName)
+                .map(child -> {
+                    if (isBasicValue(child)) {
+                        return child.buildInlineArgument();
+                    }
+                    return List.of(child.getName());
+                }).flatMap(Collection::stream)
                 .collect(Collectors.joining(", "));
     }
 
@@ -226,6 +238,11 @@ public class ObjectBuilder {
         }
         return "";
     }
+
+    private static boolean isBasicValue(ObjectBuilder objectBuilder) {
+        return Objects.requireNonNull(objectBuilder.buildType) == BuildType.VALUE && (isJavaBaseClass(objectBuilder.getClazz()) || objectBuilder.getClazz().isEnum());
+    }
+
 
     @SafeVarargs
     private <T> Stream<T> concatenate(Stream<T>... streams) {

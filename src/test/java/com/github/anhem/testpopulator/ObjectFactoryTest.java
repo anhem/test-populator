@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -59,12 +60,12 @@ public class ObjectFactoryTest {
         objectFactory.method("integer");
         objectFactory.value(1);
 
-        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
-                "public static final MyClass myClass0 = MyClass.builder()%s" +
-                        ".string(\"myString\")%s" +
-                        ".integer(1)%s" +
-                        ".build();",
-                LS, LS, LS));
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final MyClass myClass0 = MyClass.builder()",
+                ".string(\"myString\")",
+                ".integer(1)",
+                ".build();"
+        ));
     }
 
     @Test
@@ -75,12 +76,12 @@ public class ObjectFactoryTest {
         objectFactory.method("integer");
         objectFactory.value(1);
 
-        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
-                "public static final MyClass myClass0 = ImmutableMyClass.builder()%s" +
-                        ".string(\"myString\")%s" +
-                        ".integer(1)%s" +
-                        ".build();",
-                LS, LS, LS));
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final MyClass myClass0 = ImmutableMyClass.builder()",
+                ".string(\"myString\")",
+                "integer(1)",
+                ".build();"
+        ));
     }
 
     @Test
@@ -89,7 +90,10 @@ public class ObjectFactoryTest {
         objectFactory.setOf();
         objectFactory.value("myString");
 
-        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(Set.of(\"myString\"));");
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final Set<String> set0 = Set.of(\"myString\");",
+                "public static final MyClass myClass0 = new MyClass(set0);"
+        ));
     }
 
     @Test
@@ -98,11 +102,11 @@ public class ObjectFactoryTest {
         objectFactory.set(ArrayList.class);
         objectFactory.value("myString");
 
-        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
-                "public static final ArrayList<String> arrayList0 = new ArrayList();%s" +
-                        "arrayList0.add(\"myString\");%s" +
-                        "public static final MyClass myClass0 = new MyClass(arrayList0);",
-                LS, LS));
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final ArrayList<String> arrayList0 = new ArrayList<>();",
+                "arrayList0.add(\"myString\");",
+                "public static final MyClass myClass0 = new MyClass(arrayList0);"
+        ));
     }
 
     @Test
@@ -112,7 +116,10 @@ public class ObjectFactoryTest {
         objectFactory.value("myKey");
         objectFactory.value("myValue");
 
-        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(Map.of(\"myKey\", \"myValue\"));");
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final Map<String, String> map0 = Map.of(\"myKey\", \"myValue\");",
+                "public static final MyClass myClass0 = new MyClass(map0);"
+        ));
     }
 
     @Test
@@ -122,11 +129,11 @@ public class ObjectFactoryTest {
         objectFactory.value("myKey");
         objectFactory.value("myValue");
 
-        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
-                "public static final HashMap<String, String> hashMap0 = new HashMap();%s" +
-                        "hashMap0.put(\"myKey\", \"myValue\");%s" +
-                        "public static final MyClass myClass0 = new MyClass(hashMap0);",
-                LS, LS));
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final HashMap<String, String> hashMap0 = new HashMap<>();",
+                "hashMap0.put(\"myKey\", \"myValue\");",
+                "public static final MyClass myClass0 = new MyClass(hashMap0);"
+        ));
     }
 
     @Test
@@ -135,7 +142,10 @@ public class ObjectFactoryTest {
         objectFactory.listOf();
         objectFactory.value("myString");
 
-        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(List.of(\"myString\"));");
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final List<String> list0 = List.of(\"myString\");",
+                "public static final MyClass myClass0 = new MyClass(list0);"
+        ));
     }
 
     @Test
@@ -144,11 +154,11 @@ public class ObjectFactoryTest {
         objectFactory.list(ArrayList.class);
         objectFactory.value("myString");
 
-        assertThat(objectFactory.toTop().build()).isEqualTo(String.format(
-                "public static final ArrayList<String> arrayList0 = new ArrayList();%s" +
-                        "arrayList0.add(\"myString\");%s" +
-                        "public static final MyClass myClass0 = new MyClass(arrayList0);",
-                LS, LS));
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final ArrayList<String> arrayList0 = new ArrayList<>();",
+                "arrayList0.add(\"myString\");",
+                "public static final MyClass myClass0 = new MyClass(arrayList0);"
+        ));
     }
 
     @Test
@@ -156,15 +166,19 @@ public class ObjectFactoryTest {
         objectFactory.constructor(MyClass.class);
         objectFactory.array(Boolean.class);
         objectFactory.value(true);
-
-        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(new Boolean[]{true});");
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final Boolean[] boolean0 = new Boolean[]{true};",
+                "public static final MyClass myClass0 = new MyClass(boolean0);"
+        ));
     }
 
     @Test
     void overrideValue() {
         objectFactory.overridePopulate(UUID.class, new MyUUIDOverride());
 
-        assertThat(objectFactory.toTop().build()).isEqualTo("public static final UUID uUID0 = UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\");");
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final UUID uUID0 = UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\");"
+        ));
     }
 
     @Test
@@ -190,21 +204,22 @@ public class ObjectFactoryTest {
         objectFactory.value('c');
         objectFactory.value(UUID.fromString("82e8962f-885d-4845-914b-c206a42d7c91"));
 
-        assertThat(objectFactory.toTop().build()).isEqualTo("public static final MyClass myClass0 = new MyClass(" +
-                "A, " +
-                "1, " +
-                "2L, " +
-                "3.0, " +
-                "true, " +
-                "BigDecimal.valueOf(1), " +
-                "\"myString\", " +
-                "LocalDate.parse(\"1970-01-01\"), " +
-                "LocalDateTime.parse(\"1970-01-01T00:00\"), " +
-                "ZonedDateTime.parse(\"1970-01-01T00:00Z[UTC]\"), " +
-                "Instant.parse(\"1970-01-01T00:00:00Z\"), " +
-                "'c', " +
-                "UUID.fromString(82e8962f-885d-4845-914b-c206a42d7c91)" +
-                ");");
+        assertThat(objectFactory.toTop().buildByBuildType()).isEqualTo(List.of(
+                "public static final MyClass myClass0 = new MyClass(" +
+                        "A, " +
+                        "1, " +
+                        "2L, " +
+                        "3.0, " +
+                        "true, " +
+                        "BigDecimal.valueOf(1), " +
+                        "\"myString\", " +
+                        "LocalDate.parse(\"1970-01-01\"), " +
+                        "LocalDateTime.parse(\"1970-01-01T00:00\"), " +
+                        "ZonedDateTime.parse(\"1970-01-01T00:00Z[UTC]\"), " +
+                        "Instant.parse(\"1970-01-01T00:00:00Z\"), " +
+                        "'c', " +
+                        "UUID.fromString(82e8962f-885d-4845-914b-c206a42d7c91)" +
+                        ");"));
     }
 
     @Test

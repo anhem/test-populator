@@ -15,8 +15,8 @@ public interface OverridePopulate<T> {
      *
      * @return a string representation of how to create an object of T.
      * Examples:
-     * "UUID.fromString("156585fd-4fe5-4ed4-8d59-d8d70d8b96f5");"
-     * "new MyFutureDate(LocalDate.of(3000, 1, 1));"
+     * "UUID.fromString("156585fd-4fe5-4ed4-8d59-d8d70d8b96f5")"
+     * "new MyFutureDate(LocalDate.of(3000, 1, 1))"
      */
     default String createString() {
         throw new PopulateException(String.format("createString() is not implemented in class %s", this.getClass().getName()));
