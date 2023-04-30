@@ -28,30 +28,4 @@ public enum BuildType {
                 return false;
         }
     }
-
-    public boolean isExpectingOneArgument() {
-        switch (this) {
-            case METHOD:
-            case SET:
-            case SET_OF:
-            case LIST:
-            case LIST_OF:
-            case ARRAY:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    public boolean isExpectingTwoArguments() {
-        switch (this) {
-            case MAP:
-            case MAP_OF:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-
 }
