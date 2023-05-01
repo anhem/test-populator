@@ -50,6 +50,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public void set(Class<?> clazz) {
         setNextObjectBuilder(clazz, SET, 1);
+        method("add", 1);
     }
 
     @Override
@@ -60,6 +61,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public void list(Class<?> clazz) {
         setNextObjectBuilder(clazz, LIST, 1);
+        method("add", 1);
     }
 
     @Override
@@ -69,7 +71,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public void map(Class<?> clazz) {
-        setNextObjectBuilder(clazz, MAP, 2);
+        setNextObjectBuilder(clazz, MAP, 1);
+        method("put", 2);
     }
 
     @Override

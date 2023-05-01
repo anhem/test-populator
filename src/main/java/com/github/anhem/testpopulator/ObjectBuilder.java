@@ -169,7 +169,7 @@ public class ObjectBuilder {
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format("public static final %s<%s> %s = new %s<>();", clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                children.stream().map(child -> String.format("%s.add(%s);", name, buildArguments())))
+                createMethods())
                 .collect(Collectors.toList());
     }
 
@@ -184,7 +184,7 @@ public class ObjectBuilder {
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format("public static final %s<%s> %s = new %s<>();", clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                children.stream().map(child -> String.format("%s.add(%s);", name, buildArguments())))
+                createMethods())
                 .collect(Collectors.toList());
     }
 
@@ -199,7 +199,7 @@ public class ObjectBuilder {
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format("public static final %s<%s> %s = new %s<>();", clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                Stream.of(String.format("%s.put(%s);", name, buildArguments())))
+                createMethods())
                 .collect(Collectors.toList());
     }
 
@@ -237,20 +237,18 @@ public class ObjectBuilder {
     }
 
     private String formatTypes() {
-        if (buildType.isParameterizedType()) {
-            return children.stream()
-                    .map(child -> {
-                        if (child.getBuildType() == BuildType.METHOD) {
-                            return child.formatTypes();
-                        }
-                        if (child.getBuildType().isParameterizedType()) {
-                            return String.format("%s<%s>", child.getClazz().getSimpleName(), child.formatTypes());
-                        } else {
-                            return child.getClazz().getSimpleName();
-                        }
-                    }).collect(Collectors.joining(", "));
-        }
-        return "";
+        return children.stream()
+                .map(child -> {
+                    if (child.getClazz() == null) {
+                        return child.formatTypes();
+                    }
+                    if (child.getBuildType().isParameterizedType()) {
+                        return String.format("%s<%s>", child.getClazz().getSimpleName(), child.formatTypes());
+                    } else {
+                        return child.getClazz().getSimpleName();
+                    }
+                }).collect(Collectors.joining(", "));
+
     }
 
     private static boolean isBasicValue(ObjectBuilder objectBuilder) {
