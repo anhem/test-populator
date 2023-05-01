@@ -122,14 +122,14 @@ public class ObjectFactoryImpl implements ObjectFactory {
         }
     }
 
-    private void writeImports(Path path, List<String> imports) {
+    private void writeImports(Path path, Set<String> imports) {
         imports.stream()
                 .sorted()
                 .forEach(s -> writeLine(path, String.format("import %s;", s)));
         writeLine(path, "");
     }
 
-    private void writeStaticImports(Path path, List<String> staticImports) {
+    private void writeStaticImports(Path path, Set<String> staticImports) {
         staticImports.stream()
                 .sorted()
                 .forEach(s -> writeLine(path, String.format("import static %s;", s)));

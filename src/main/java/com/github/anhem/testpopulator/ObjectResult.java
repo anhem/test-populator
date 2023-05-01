@@ -1,19 +1,22 @@
 package com.github.anhem.testpopulator;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 
 public class ObjectResult {
 
-    public static final ObjectResult EMPTY_OBJECT_RESULT = new ObjectResult(null, null, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+    public static final ObjectResult EMPTY_OBJECT_RESULT = new ObjectResult(null, null, emptySet(), emptySet(), emptyList());
 
     private final String packageName;
     private final String name;
-    private final List<String> imports;
-    private final List<String> staticImports;
+    private final Set<String> imports;
+    private final Set<String> staticImports;
     private final List<String> objects;
 
-    public ObjectResult(String packageName, String name, List<String> imports, List<String> staticImports, List<String> objects) {
+    public ObjectResult(String packageName, String name, Set<String> imports, Set<String> staticImports, List<String> objects) {
         this.packageName = packageName;
         this.name = name;
         this.imports = imports;
@@ -29,11 +32,11 @@ public class ObjectResult {
         return name;
     }
 
-    public List<String> getImports() {
+    public Set<String> getImports() {
         return imports;
     }
 
-    public List<String> getStaticImports() {
+    public Set<String> getStaticImports() {
         return staticImports;
     }
 

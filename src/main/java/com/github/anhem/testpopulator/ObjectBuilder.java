@@ -1,10 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,20 +67,20 @@ public class ObjectBuilder {
     public ObjectResult build() {
         String packageName = clazz.getName().startsWith("java.") ? ObjectBuilder.class.getPackageName() : clazz.getPackageName();
         String name = String.format("%sTestData", clazz.getSimpleName());
-        List<String> imports = new ArrayList<>();
-        List<String> staticImports = new ArrayList<>();
+        Set<String> imports = new HashSet<>();
+        Set<String> staticImports = new HashSet<>();
         getImports(imports, staticImports);
         List<String> objects = buildByBuildType();
 
         return new ObjectResult(packageName, name, imports, staticImports, objects);
     }
 
-    private void getImports(List<String> imports, List<String> staticImports) {
+    private void getImports(Set<String> imports, Set<String> staticImports) {
         addImport(imports, staticImports);
         children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
     }
 
-    private void addImport(List<String> imports, List<String> staticImports) {
+    private void addImport(Set<String> imports, Set<String> staticImports) {
         if (clazz != null && !clazz.getName().startsWith("java.lang.")) {
             if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
                 staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
