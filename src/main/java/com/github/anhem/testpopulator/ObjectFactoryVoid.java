@@ -2,8 +2,7 @@ package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
 
-import java.util.Collections;
-import java.util.List;
+import static com.github.anhem.testpopulator.ObjectResult.EMPTY_OBJECT_RESULT;
 
 public class ObjectFactoryVoid implements ObjectFactory {
     @Override
@@ -72,7 +71,12 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
-    public List<String> build() {
-        return Collections.emptyList();
+    public ObjectResult build() {
+        return EMPTY_OBJECT_RESULT;
+    }
+
+    @Override
+    public void writeToFile() {
+
     }
 }

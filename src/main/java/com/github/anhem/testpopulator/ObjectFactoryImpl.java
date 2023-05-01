@@ -2,7 +2,12 @@ package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -92,8 +97,52 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public List<String> build() {
-        return toTop().buildByBuildType();
+    public ObjectResult build() {
+        return toTop().build();
+    }
+
+    @Override
+    public void writeToFile() {
+        ObjectResult objectResult = build();
+        if (objectResult.isValid()) {
+            Path path = Paths.get(String.format("target/generated-test-sources/test-populator/%s/%s.java", objectResult.getPackageName(), objectResult.getName()));
+            try {
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, String.format("package %s;%s%s", objectResult.getPackageName(), System.lineSeparator(), System.lineSeparator()), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                writeImports(path, objectResult.getImports());
+                writeStaticImports(path, objectResult.getStaticImports());
+                Files.writeString(path, String.format("public class %s {%s", objectResult.getName(), System.lineSeparator()), StandardOpenOption.APPEND);
+                Files.writeString(path, System.lineSeparator(), StandardOpenOption.APPEND);
+                Files.write(path, objectResult.getObjects(), StandardOpenOption.APPEND);
+                Files.writeString(path, "}", StandardOpenOption.APPEND);
+                Files.writeString(path, System.lineSeparator(), StandardOpenOption.APPEND);
+            } catch (IOException e) {
+                throw new ObjectException(String.format("Write to %s failed", path.toAbsolutePath()), e);
+            }
+        }
+    }
+
+    private void writeImports(Path path, List<String> imports) {
+        imports.stream()
+                .sorted()
+                .forEach(s -> writeLine(path, String.format("import %s;", s)));
+        writeLine(path, "");
+    }
+
+    private void writeStaticImports(Path path, List<String> staticImports) {
+        staticImports.stream()
+                .sorted()
+                .forEach(s -> writeLine(path, String.format("import static %s;", s)));
+        writeLine(path, "");
+    }
+
+    private void writeLine(Path path, String line) {
+        String formattedLine = String.format("%s%s", line, System.lineSeparator());
+        try {
+            Files.writeString(path, formattedLine, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new ObjectException(String.format("Write %s to %s failed", formattedLine, path.toAbsolutePath()), e);
+        }
     }
 
     private ObjectBuilder toTop() {
@@ -141,7 +190,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
             return String.format("'%s'", object);
         }
         if (clazz.equals(UUID.class)) {
-            return String.format("UUID.fromString(%s)", object);
+            return String.format("UUID.fromString(\"%s\")", object);
         }
 
         throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));

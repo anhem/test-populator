@@ -70,7 +70,7 @@ public class PopulateFactory {
     public <T> T populate(Class<T> clazz) {
         ObjectFactory objectFactory = populateConfig.isObjectFactoryEnabled() ? new ObjectFactoryImpl() : new ObjectFactoryVoid();
         T t = populateWithOverrides(clazz, objectFactory);
-        objectFactory.build().forEach(System.out::println);
+        //objectFactory.writeToFile();
         return t;
     }
 

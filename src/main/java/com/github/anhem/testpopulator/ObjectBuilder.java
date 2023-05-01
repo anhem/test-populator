@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -66,12 +67,36 @@ public class ObjectBuilder {
         this.value = value;
     }
 
-    public String buildString() {
-        return buildByBuildType().stream()
-                .collect(Collectors.joining(System.lineSeparator()));
+    public ObjectResult build() {
+        String packageName = clazz.getName().startsWith("java.") ? ObjectBuilder.class.getPackageName() : clazz.getPackageName();
+        String name = String.format("%sTestData", clazz.getSimpleName());
+        List<String> imports = new ArrayList<>();
+        List<String> staticImports = new ArrayList<>();
+        getImports(imports, staticImports);
+        List<String> objects = buildByBuildType();
+
+        return new ObjectResult(packageName, name, imports, staticImports, objects);
     }
 
-    List<String> buildByBuildType() {
+    private void addImport(List<String> imports, List<String> staticImports) {
+        if (clazz != null && !clazz.getName().startsWith("java.lang.")) {
+            if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
+                staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
+            } else if (value != null && clazz.isEnum()) {
+                staticImports.add(String.format("%s.%s", clazz.getName(), value));
+            } else {
+                imports.add(String.format("%s", clazz.getName()));
+            }
+        }
+
+    }
+
+    private void getImports(List<String> imports, List<String> staticImports) {
+        addImport(imports, staticImports);
+        children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
+    }
+
+    private List<String> buildByBuildType() {
         switch (buildType) {
             case CONSTRUCTOR:
                 return buildConstructor();
@@ -241,6 +266,11 @@ public class ObjectBuilder {
     @SafeVarargs
     private <T> Stream<T> concatenate(Stream<T>... streams) {
         return Stream.of(streams).flatMap(s -> s);
+    }
+
+    private enum ImportType {
+        REGULAR,
+        STATIC
     }
 
 }

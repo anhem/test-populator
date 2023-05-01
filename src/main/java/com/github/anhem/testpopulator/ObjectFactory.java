@@ -2,8 +2,6 @@ package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
 
-import java.util.List;
-
 public interface ObjectFactory {
 
     void constructor(Class<?> clazz, int expectedChildren);
@@ -32,5 +30,7 @@ public interface ObjectFactory {
 
     <T> void value(T value);
 
-    List<String> build();
+    ObjectResult build();
+
+    void writeToFile();
 }
