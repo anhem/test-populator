@@ -78,6 +78,11 @@ public class ObjectBuilder {
         return new ObjectResult(packageName, name, imports, staticImports, objects);
     }
 
+    private void getImports(List<String> imports, List<String> staticImports) {
+        addImport(imports, staticImports);
+        children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
+    }
+
     private void addImport(List<String> imports, List<String> staticImports) {
         if (clazz != null && !clazz.getName().startsWith("java.lang.")) {
             if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
@@ -88,12 +93,6 @@ public class ObjectBuilder {
                 imports.add(String.format("%s", clazz.getName()));
             }
         }
-
-    }
-
-    private void getImports(List<String> imports, List<String> staticImports) {
-        addImport(imports, staticImports);
-        children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
     }
 
     private List<String> buildByBuildType() {
@@ -134,7 +133,6 @@ public class ObjectBuilder {
                 .map(ObjectBuilder::buildByBuildType)
                 .flatMap(Collection::stream);
     }
-
 
     private List<String> buildConstructor() {
         return concatenate(buildChildren(),
@@ -266,11 +264,6 @@ public class ObjectBuilder {
     @SafeVarargs
     private <T> Stream<T> concatenate(Stream<T>... streams) {
         return Stream.of(streams).flatMap(s -> s);
-    }
-
-    private enum ImportType {
-        REGULAR,
-        STATIC
     }
 
 }
