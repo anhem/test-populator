@@ -213,16 +213,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private void setPreviousObjectBuilder() {
-        if (currentObjectBuilder.getParent() != null) {
-            if (currentObjectBuilder.getParent().hasAllChildren()) {
-                if (currentObjectBuilder.getParent().getParent() != null) {
-                    currentObjectBuilder = currentObjectBuilder.getParent().getParent();
-                } else {
-                    currentObjectBuilder = currentObjectBuilder.getParent();
-                }
-            } else {
-                currentObjectBuilder = currentObjectBuilder.getParent();
-            }
+        while (currentObjectBuilder.getParent() != null && currentObjectBuilder.hasAllChildren()) {
+            currentObjectBuilder = currentObjectBuilder.getParent();
         }
     }
 
