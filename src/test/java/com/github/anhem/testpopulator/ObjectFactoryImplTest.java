@@ -56,8 +56,10 @@ public class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final MyClass myClass0 = new MyClass();",
+                "static {",
                 "myClass0.setString(\"myString\");",
-                "myClass0.setInteger(1);"
+                "myClass0.setInteger(1);",
+                "}"
         ));
     }
 
@@ -122,8 +124,11 @@ public class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final HashSet<String> hashSet0 = new HashSet<>();",
+                "static {",
                 "hashSet0.add(\"myString\");",
+                "}",
                 "public static final MyClass myClass0 = new MyClass(hashSet0);"
+
         ));
     }
 
@@ -166,8 +171,11 @@ public class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final HashMap<String, String> hashMap0 = new HashMap<>();",
+                "static {",
                 "hashMap0.put(\"myKey\", \"myValue\");",
+                "}",
                 "public static final MyClass myClass0 = new MyClass(hashMap0);"
+
         ));
     }
 
@@ -209,7 +217,9 @@ public class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final ArrayList<String> arrayList0 = new ArrayList<>();",
+                "static {",
                 "arrayList0.add(\"myString\");",
+                "}",
                 "public static final MyClass myClass0 = new MyClass(arrayList0);"
         ));
     }
