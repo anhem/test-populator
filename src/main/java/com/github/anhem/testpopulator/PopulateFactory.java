@@ -279,7 +279,7 @@ public class PopulateFactory {
             Class<?> immutablesGeneratedClass = getImmutablesGeneratedClass(clazz);
             Object builderObject = immutablesGeneratedClass.getDeclaredMethod(BUILDER_METHOD).invoke(null);
             List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(immutablesGeneratedClass, builderObject, populateConfig.getBlacklistedMethods());
-            objectFactory.builder(clazz, builderObjectMethods.size());
+            objectFactory.builder(immutablesGeneratedClass, builderObjectMethods.size());
             builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method, objectFactory));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             return (T) buildMethod.invoke(builderObject);
