@@ -1,22 +1,22 @@
 package com.github.anhem.testpopulator.config;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.Strategy.*;
+import static java.lang.String.format;
 
 /**
  * Configuration for PopulateFactory
  */
 public class PopulateConfig {
-
+    public static final String INVALID_CONFIG_MISSING_BUILDER_PATTERN = "%s strategy configured, but no builderPattern specified. Should be one of %s";
+    public static final String INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY = "objectFactory can not be enabled while accessNonPublicConstructors is true";
+    public static final String INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY = "objectFactory can not be enabled while strategyOrder contains FIELD";
     private static final List<String> DEFAULT_BLACKLISTED_METHODS = List.of("$jacocoInit");
     private static final List<String> DEFAULT_BLACKLISTED_FIELDS = List.of("__$lineHits$__", "$jacocoData");
-    private static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER, FIELD);
+    private static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER);
     private static final boolean DEFAULT_RANDOM_VALUES = true;
     private static final boolean DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS = false;
     private static final String DEFAULT_SETTER_PREFIX = "set";
@@ -94,7 +94,7 @@ public class PopulateConfig {
         }
 
         public PopulateConfig build() {
-            return new PopulateConfig(
+            PopulateConfig populateConfig = new PopulateConfig(
                     blacklistedMethods,
                     blacklistedFields,
                     strategyOrder,
@@ -105,12 +105,15 @@ public class PopulateConfig {
                     setterPrefix,
                     objectFactoryEnabled
             );
+            populateConfig.validate();
+            return populateConfig;
         }
     }
 
     public static PopulateConfigBuilder builder() {
         return new PopulateConfigBuilder();
     }
+
 
     private final List<String> blacklistedMethods;
     private final List<String> blacklistedFields;
@@ -122,6 +125,7 @@ public class PopulateConfig {
     private final String setterPrefix;
 
     private final boolean objectFactoryEnabled;
+
 
     private PopulateConfig(List<String> blacklistedMethods,
                            List<String> blacklistedFields,
@@ -179,21 +183,31 @@ public class PopulateConfig {
     public String getSetterPrefix() {
         return setterPrefix;
     }
-
     public boolean isObjectFactoryEnabled() {
         return objectFactoryEnabled;
     }
-
     public PopulateConfigBuilder toBuilder() {
         return PopulateConfig.builder()
-                .blacklistedMethods(blacklistedMethods)
-                .blacklistedFields(blacklistedFields)
-                .strategyOrder(strategyOrder)
-                .overridePopulate(overridePopulate)
+                .blacklistedMethods(new ArrayList<>(blacklistedMethods))
+                .blacklistedFields(new ArrayList<>(blacklistedFields))
+                .strategyOrder(new ArrayList<>(strategyOrder))
+                .overridePopulate(new ArrayList<>(overridePopulate))
                 .builderPattern(builderPattern)
                 .randomValues(randomValues)
                 .accessNonPublicConstructors(accessNonPublicConstructors)
                 .setterPrefix(setterPrefix)
                 .objectFactoryEnabled(objectFactoryEnabled);
+    }
+
+    private void validate() {
+        if (strategyOrder.contains(BUILDER) && builderPattern == null) {
+            throw new IllegalArgumentException(format(INVALID_CONFIG_MISSING_BUILDER_PATTERN, BUILDER, Arrays.toString(BuilderPattern.values())));
+        }
+        if (accessNonPublicConstructors && objectFactoryEnabled) {
+            throw new IllegalArgumentException(INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY);
+        }
+        if (strategyOrder.contains(FIELD) && objectFactoryEnabled) {
+            throw new IllegalArgumentException(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
+        }
     }
 }

@@ -24,7 +24,6 @@ class PopulateFactoryWithFieldStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(FIELD))
-                .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }

@@ -1,12 +1,14 @@
 package com.github.anhem.testpopulator;
 
-import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 
 import java.lang.reflect.*;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -26,7 +28,6 @@ import static java.lang.String.format;
  */
 public class PopulateFactory {
 
-    static final String MISSING_BUILDER_PATTERN = "%s strategy configured, but no builderPattern specified. Should be one of %s";
     static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection %s";
     static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy found. Tried with %s. Try another strategy or override population for this class";
     static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s";
@@ -57,9 +58,6 @@ public class PopulateFactory {
         this.populateConfig = populateConfig;
         valueFactory = new ValueFactory(populateConfig.useRandomValues());
         overridePopulates = populateConfig.createOverridePopulates();
-        if (populateConfig.getStrategyOrder().contains(BUILDER) && populateConfig.getBuilderPattern() == null) {
-            throw new IllegalArgumentException(format(MISSING_BUILDER_PATTERN, BUILDER, Arrays.toString(BuilderPattern.values())));
-        }
     }
 
     /**
@@ -71,7 +69,7 @@ public class PopulateFactory {
     public <T> T populate(Class<T> clazz) {
         ObjectFactory objectFactory = populateConfig.isObjectFactoryEnabled() ? new ObjectFactoryImpl() : new ObjectFactoryVoid();
         T t = populateWithOverrides(clazz, objectFactory);
-        //objectFactory.writeToFile();
+        objectFactory.writeToFile();
         return t;
     }
 

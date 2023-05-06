@@ -18,7 +18,6 @@ class PopulateFactoryWithOverridesTest {
     void setUp() {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .overridePopulate(List.of(new MyUUIDOverride()))
-                .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }

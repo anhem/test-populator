@@ -86,6 +86,7 @@ class PopulateFactoryWithConstructorStrategyTest {
     void allArgsConstructorPrivate() {
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
+                .objectFactoryEnabled(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         AllArgsConstructorPrivate value_1 = populateFactory.populate(AllArgsConstructorPrivate.class);
