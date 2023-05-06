@@ -1,16 +1,15 @@
 package com.github.anhem.testpopulator;
 
-import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.anhem.testpopulator.ObjectBuilderUtil.*;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
-import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
-import static com.github.anhem.testpopulator.PopulateUtil.isJavaBaseClass;
 
 public class ObjectBuilder {
 
+    private static final String PSF = "public static final";
     private Class<?> clazz;
     private final String name;
     private final BuildType buildType;
@@ -65,31 +64,19 @@ public class ObjectBuilder {
     }
 
     public ObjectResult build() {
-        String packageName = clazz.getName().startsWith("java.") ? ObjectBuilder.class.getPackageName() : clazz.getPackageName();
-        String name = String.format("%sTestData", clazz.getSimpleName());
+        String packageName = getPackageName(clazz);
+        String className = formatClassName(clazz);
         Set<String> imports = new HashSet<>();
         Set<String> staticImports = new HashSet<>();
         getImports(imports, staticImports);
         List<String> objects = buildByBuildType();
 
-        return new ObjectResult(packageName, name, imports, staticImports, objects);
+        return new ObjectResult(packageName, className, imports, staticImports, objects);
     }
 
     private void getImports(Set<String> imports, Set<String> staticImports) {
-        addImport(imports, staticImports);
+        addImport(clazz, value, imports, staticImports);
         children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
-    }
-
-    private void addImport(Set<String> imports, Set<String> staticImports) {
-        if (clazz != null && !clazz.getName().startsWith("java.lang.")) {
-            if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
-                staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
-            } else if (value != null && clazz.isEnum()) {
-                staticImports.add(String.format("%s.%s", clazz.getName(), value));
-            } else {
-                imports.add(String.format("%s", clazz.getName()));
-            }
-        }
     }
 
     private List<String> buildByBuildType() {
@@ -133,24 +120,26 @@ public class ObjectBuilder {
 
     private List<String> buildConstructor() {
         return concatenate(buildChildren(),
-                Stream.of(String.format("public static final %s %s = new %s(%s);", clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
+                Stream.of(String.format("%s %s %s = new %s(%s);", PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildSetter() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("public static final %s %s = new %s();", clazz.getSimpleName(), name, clazz.getSimpleName())),
-                createMethods()
+                Stream.of(String.format("%s %s %s = new %s();", PSF, clazz.getSimpleName(), name, clazz.getSimpleName())),
+                startStaticBlock(),
+                createMethods(),
+                endStaticBlock()
         ).collect(Collectors.toList());
     }
 
     private List<String> buildBuilder() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("public static final %s %s = %s.%s()", clazz.getSimpleName(), name, clazz.getSimpleName(), BUILDER_METHOD)),
+                Stream.of(String.format("%s %s %s = %s.%s()", PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), BUILDER_METHOD)),
                 createMethods(),
-                Stream.of(String.format(".%s();", BUILD_METHOD))
+                endBuilder()
         ).collect(Collectors.toList());
     }
 
@@ -158,71 +147,73 @@ public class ObjectBuilder {
         return buildChildren().collect(Collectors.toList());
     }
 
-    private Stream<String> createMethods() {
-        return children.stream()
-                .map(child -> buildType == BuildType.BUILDER ?
-                        String.format(".%s(%s)", child.getName(), child.buildArguments()) :
-                        String.format("%s.%s(%s);", name, child.getName(), child.buildArguments()));
-    }
-
     private List<String> buildSet() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("public static final %s<%s> %s = new %s<>();", clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                createMethods())
-                .collect(Collectors.toList());
+                Stream.of(String.format("%s %s<%s> %s = new %s<>();", PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
+                startStaticBlock(),
+                createMethods(),
+                endStaticBlock()
+        ).collect(Collectors.toList());
     }
 
     private List<String> buildSetOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("public static final %s<%s> %s = Set.of(%s);", clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format("%s %s<%s> %s = Set.of(%s);", PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildList() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("public static final %s<%s> %s = new %s<>();", clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                createMethods())
-                .collect(Collectors.toList());
+                Stream.of(String.format("%s %s<%s> %s = new %s<>();", PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
+                startStaticBlock(),
+                createMethods(),
+                endStaticBlock()
+        ).collect(Collectors.toList());
     }
 
     private List<String> buildListOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("public static final %s<%s> %s = List.of(%s);", clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format("%s %s<%s> %s = List.of(%s);", PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildMap() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("public static final %s<%s> %s = new %s<>();", clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                createMethods())
-                .collect(Collectors.toList());
+                Stream.of(String.format("%s %s<%s> %s = new %s<>();", PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
+                startStaticBlock(),
+                createMethods(),
+                endStaticBlock()
+        ).collect(Collectors.toList());
     }
 
     private List<String> buildMapOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("public static final %s<%s> %s = Map.of(%s);", clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format("%s %s<%s> %s = Map.of(%s);", PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildArray() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("public static final %s[] %s = new %s[]{%s};", clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
+                Stream.of(String.format("%s %s[] %s = new %s[]{%s};", PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildValue() {
-        return List.of(String.format("public static final %s %s = %s;", clazz.getSimpleName(), name, this.value));
+        return List.of(String.format("%s %s %s = %s;", PSF, clazz.getSimpleName(), name, this.value));
     }
 
-    private List<String> buildInlineArgument() {
-        return List.of(String.format("%s", this.value));
+    private Stream<String> createMethods() {
+        return children.stream()
+                .map(child -> buildType == BuildType.BUILDER ?
+                        String.format(".%s(%s)", child.getName(), child.buildArguments()) :
+                        String.format("%s.%s(%s);", name, child.getName(), child.buildArguments()));
     }
 
     private String buildArguments() {
@@ -234,6 +225,10 @@ public class ObjectBuilder {
                     return List.of(child.getName());
                 }).flatMap(Collection::stream)
                 .collect(Collectors.joining(", "));
+    }
+
+    private List<String> buildInlineArgument() {
+        return List.of(this.value);
     }
 
     private String formatTypes() {
@@ -250,16 +245,4 @@ public class ObjectBuilder {
                 }).collect(Collectors.joining(", "));
 
     }
-
-    private static boolean isBasicValue(ObjectBuilder objectBuilder) {
-        return Objects.requireNonNull(objectBuilder.buildType) == BuildType.VALUE && (isJavaBaseClass(objectBuilder.getClazz()) || objectBuilder.getClazz().isEnum());
-    }
-
-
-    @SafeVarargs
-    private <T> Stream<T> concatenate(Stream<T>... streams) {
-        return Stream.of(streams).flatMap(s -> s);
-    }
-
 }
-

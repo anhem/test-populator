@@ -108,13 +108,13 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public void writeToFile() {
         ObjectResult objectResult = build();
         if (objectResult.isValid()) {
-            Path path = Paths.get(String.format("target/generated-test-sources/test-populator/%s/%s.java", objectResult.getPackageName(), objectResult.getName()));
+            Path path = Paths.get(String.format("target/generated-test-sources/test-populator/%s/%s.java", objectResult.getPackageName(), objectResult.getClassName()));
             try {
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, String.format("package %s;%s%s", objectResult.getPackageName(), System.lineSeparator(), System.lineSeparator()), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                 writeImports(path, objectResult.getImports());
                 writeStaticImports(path, objectResult.getStaticImports());
-                Files.writeString(path, String.format("public class %s {%s", objectResult.getName(), System.lineSeparator()), StandardOpenOption.APPEND);
+                Files.writeString(path, String.format("public class %s {%s", objectResult.getClassName(), System.lineSeparator()), StandardOpenOption.APPEND);
                 Files.writeString(path, System.lineSeparator(), StandardOpenOption.APPEND);
                 Files.write(path, objectResult.getObjects(), StandardOpenOption.APPEND);
                 Files.writeString(path, "}", StandardOpenOption.APPEND);

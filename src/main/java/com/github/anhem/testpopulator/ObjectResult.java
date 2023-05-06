@@ -11,14 +11,14 @@ public class ObjectResult {
     public static final ObjectResult EMPTY_OBJECT_RESULT = new ObjectResult(null, null, emptySet(), emptySet(), emptyList());
 
     private final String packageName;
-    private final String name;
+    private final String className;
     private final Set<String> imports;
     private final Set<String> staticImports;
     private final List<String> objects;
 
-    public ObjectResult(String packageName, String name, Set<String> imports, Set<String> staticImports, List<String> objects) {
+    public ObjectResult(String packageName, String className, Set<String> imports, Set<String> staticImports, List<String> objects) {
         this.packageName = packageName;
-        this.name = name;
+        this.className = className;
         this.imports = imports;
         this.staticImports = staticImports;
         this.objects = objects;
@@ -28,8 +28,8 @@ public class ObjectResult {
         return packageName;
     }
 
-    public String getName() {
-        return name;
+    public String getClassName() {
+        return className;
     }
 
     public Set<String> getImports() {
@@ -45,6 +45,6 @@ public class ObjectResult {
     }
 
     public boolean isValid() {
-        return packageName != null && name != null && !objects.isEmpty();
+        return packageName != null && className != null && !objects.isEmpty();
     }
 }
