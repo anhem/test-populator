@@ -122,7 +122,6 @@ public class ObjectFactoryImpl implements ObjectFactory {
         }
     }
 
-
     private static void createOrOverwriteFile(Path path) {
         try {
             Files.createDirectories(path.getParent());
