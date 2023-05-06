@@ -48,6 +48,9 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public void method(String methodName, int expectedChildren) {
         setNextObjectBuilder(new ObjectBuilder(methodName, METHOD, expectedChildren));
+        if (expectedChildren == 0) {
+            setPreviousObjectBuilder();
+        }
     }
 
     @Override
