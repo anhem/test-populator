@@ -16,6 +16,9 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.BuildType.*;
+import static com.github.anhem.testpopulator.ObjectBuilder.PSF;
+import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_END;
+import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_START;
 
 public class ObjectFactoryImpl implements ObjectFactory {
 
@@ -109,20 +112,50 @@ public class ObjectFactoryImpl implements ObjectFactory {
         ObjectResult objectResult = build();
         if (objectResult.isValid()) {
             Path path = Paths.get(String.format("target/generated-test-sources/test-populator/%s/%s.java", objectResult.getPackageName(), objectResult.getClassName()));
-            try {
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, String.format("package %s;%s%s", objectResult.getPackageName(), System.lineSeparator(), System.lineSeparator()), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                writeImports(path, objectResult.getImports());
-                writeStaticImports(path, objectResult.getStaticImports());
-                Files.writeString(path, String.format("public class %s {%s", objectResult.getClassName(), System.lineSeparator()), StandardOpenOption.APPEND);
-                Files.writeString(path, System.lineSeparator(), StandardOpenOption.APPEND);
-                Files.write(path, objectResult.getObjects(), StandardOpenOption.APPEND);
-                Files.writeString(path, "}", StandardOpenOption.APPEND);
-                Files.writeString(path, System.lineSeparator(), StandardOpenOption.APPEND);
-            } catch (IOException e) {
-                throw new ObjectException(String.format("Write to %s failed", path.toAbsolutePath()), e);
-            }
+            createOrOverwriteFile(path);
+            writePackage(objectResult, path);
+            writeImports(path, objectResult.getImports());
+            writeStaticImports(path, objectResult.getStaticImports());
+            writeStartClass(objectResult, path);
+            writeObjects(path, objectResult.getObjects());
+            writeEndClass(path);
         }
+    }
+
+
+    private static void createOrOverwriteFile(Path path) {
+        try {
+            Files.createDirectories(path.getParent());
+            Files.writeString(path, "", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            throw new ObjectException(String.format("Could not create or overwrite %s", path.toAbsolutePath()), e);
+        }
+    }
+
+    private void writePackage(ObjectResult objectResult, Path path) {
+        writeLine(path, String.format("package %s;%s", objectResult.getPackageName(), System.lineSeparator()));
+    }
+
+    private void writeStartClass(ObjectResult objectResult, Path path) {
+        writeLine(path, String.format("public class %s {%s", objectResult.getClassName(), System.lineSeparator()));
+    }
+
+    private void writeEndClass(Path path) {
+        writeLine(path, "}");
+    }
+
+    private void writeObjects(Path path, List<String> objects) {
+        objects.forEach(s -> {
+            if (s.startsWith(STATIC_BLOCK_START)) {
+                writeLine(path, String.format("%s\t%s", System.lineSeparator(), s));
+            } else if (s.startsWith(STATIC_BLOCK_END)) {
+                writeLine(path, String.format("\t%s%s", s, System.lineSeparator()));
+            } else if (s.startsWith(PSF)) {
+                writeLine(path, String.format("\t%s", s));
+            } else {
+                writeLine(path, String.format("\t\t%s", s));
+            }
+        });
     }
 
     private void writeImports(Path path, Set<String> imports) {

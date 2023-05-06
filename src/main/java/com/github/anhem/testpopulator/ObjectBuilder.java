@@ -9,7 +9,7 @@ import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 
 public class ObjectBuilder {
 
-    private static final String PSF = "public static final";
+    static final String PSF = "public static final";
     private Class<?> clazz;
     private final String name;
     private final BuildType buildType;

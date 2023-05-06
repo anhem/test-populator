@@ -10,6 +10,9 @@ import static com.github.anhem.testpopulator.PopulateUtil.isJavaBaseClass;
 
 class ObjectBuilderUtil {
 
+    static final String STATIC_BLOCK_START = "static {";
+    static final String STATIC_BLOCK_END = "}";
+
     private ObjectBuilderUtil() {
     }
 
@@ -42,11 +45,11 @@ class ObjectBuilderUtil {
     }
 
     static Stream<String> startStaticBlock() {
-        return Stream.of("static {");
+        return Stream.of(STATIC_BLOCK_START);
     }
 
     static Stream<String> endStaticBlock() {
-        return Stream.of("}");
+        return Stream.of(STATIC_BLOCK_END);
     }
 
 
