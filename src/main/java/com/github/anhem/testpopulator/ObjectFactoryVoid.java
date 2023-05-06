@@ -11,7 +11,7 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
-    public void setter(Class<?> clazz) {
+    public void setter(Class<?> clazz, int expectedChildren) {
 
     }
 

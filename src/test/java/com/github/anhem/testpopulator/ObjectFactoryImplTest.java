@@ -41,7 +41,7 @@ public class ObjectFactoryImplTest {
 
     @Test
     void createObjectUsingSetter() {
-        objectFactoryImpl.setter(MyClass.class);
+        objectFactoryImpl.setter(MyClass.class, 2);
         objectFactoryImpl.method("setString", 1);
         objectFactoryImpl.value("myString");
         objectFactoryImpl.method("setInteger", 1);

@@ -6,7 +6,7 @@ public interface ObjectFactory {
 
     void constructor(Class<?> clazz, int expectedChildren);
 
-    void setter(Class<?> clazz);
+    void setter(Class<?> clazz, int expectedChildren);
 
     void builder(Class<?> clazz, int expectedChildren);
 

@@ -7,6 +7,7 @@ import com.github.anhem.testpopulator.config.Strategy;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -230,11 +231,12 @@ public class PopulateFactory {
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
-            objectFactory.setter(clazz);
             T objectOfClass = constructor.newInstance();
-            getDeclaredMethods(clazz, populateConfig.getBlacklistedMethods()).stream()
+            List<Method> methods = getDeclaredMethods(clazz, populateConfig.getBlacklistedMethods()).stream()
                     .filter(method -> isSetterMethod(method, populateConfig.getSetterPrefix()))
-                    .forEach(method -> continuePopulateForMethod(objectOfClass, method, objectFactory));
+                    .collect(Collectors.toList());
+            objectFactory.setter(clazz, methods.size());
+            methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, objectFactory));
             return objectOfClass;
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), SETTER), e);
