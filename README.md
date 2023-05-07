@@ -57,8 +57,6 @@ MyClass{
 Use `PopulateConfig` to configure how `test-populator` should run. Calling `populate()` without first providing a
 `PopulateConfig` will result in `test-populator` using default configuration.
 
-Use `PopulateConfig` builder to configure `test-populator`:
-
 ```
 PopulateConfig populateConfig = PopulateConfig.builder()
         ...
