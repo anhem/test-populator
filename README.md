@@ -1,7 +1,6 @@
 # test-populator
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://search.maven.org/search?q=g:com.github.anhem%20a:test-populator)
-[![CircleCI](https://circleci.com/gh/anhem/test-populator/tree/main.svg?style=svg)](https://circleci.com/gh/anhem/test-populator/tree/main)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.anhem%3Atest-populator&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.anhem%3Atest-populator)
 
 Populate java classes with fixed or random data. Facilitates the creation of objects in tests.
