@@ -19,6 +19,7 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
+          cache: maven
       - name: print Java version
         run: java -version
       - name: Run tests
