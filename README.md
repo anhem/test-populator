@@ -9,7 +9,7 @@ Populate java classes with fixed or random data using reflection. Facilitates th
 Doing this:
 
 ```java
-MyClass myClass = new PopulateFactory().populate(MyClass.class);
+MyClass myClass=new PopulateFactory().populate(MyClass.class);
 ```
 
 With this:
@@ -55,11 +55,23 @@ MyClass{
 
 # Configuration
 
-Use PopulateConfig to configure how test-populator should run.
+Use PopulateConfig to configure how test-populator should run. Calling populate() without first providing a
+PopulateConfig
+will result in test-populator using default configuration.
+
+Use PopulateConfig builder to configure test-populator:
+
+```java
+PopulateConfig populateConfig=PopulateConfig.builder()
+        ...
+        .build();
+
+        PopulateFactory populateFactory=new PopulateFactory(populateConfig);
+```
 
 | config                      | Values                                   | Default                         |
 |-----------------------------|------------------------------------------|---------------------------------|
-| strategyOrder               | CONSTRUCTOR, SETTER, FIELD, BUILDER      | CONSTRUCTOR, SETTER, FIELD      |
+| strategyOrder               | CONSTRUCTOR, SETTER, FIELD, BUILDER      | CONSTRUCTOR, SETTER             |
 | builderPattern              | LOMBOK / IMMUTABLES                      | -                               |
 | randomValues                | true / false                             | true                            |
 | setterPrefix                | prefix of setter methods                 | set                             |
@@ -67,6 +79,7 @@ Use PopulateConfig to configure how test-populator should run.
 | overridePopulates           | List of OverridePopulate implementations | -                               |
 | blacklistedMethods          | List of methods to skip if encountered   | $jacocoInit                     |
 | blacklistedFields           | List of fields to skip if encountered    | \_\_$lineHits$\_\_, $jacocoData |    
+| objectFactoryEnabled        | Experimental! true / false               | false                           |    
 
 ### strategyOrder
 
@@ -153,6 +166,14 @@ needed otherwise.
 
 named fields in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
 needed otherwise.
+
+### objectFactoryEnabled
+
+Experimental!
+
+This will result in populated objects to also be generated as java code
+in `target/generated-test-sources/test-populator/`.
+These files can then be copied into your project and used as any other java class.
 
 ## ToBuilder
 
