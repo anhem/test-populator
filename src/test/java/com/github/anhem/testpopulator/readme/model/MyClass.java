@@ -8,13 +8,24 @@ import java.util.Map;
 
 public class MyClass {
 
-    private String stringValue;
-    private List<ArbitraryEnum> listWithEnums;
-    private InnerClass myInnerClass;
+    private final String stringValue;
+    private final List<ArbitraryEnum> listWithEnums;
+    private final InnerClass myInnerClass;
+
+    public MyClass(String stringValue, List<ArbitraryEnum> listWithEnums, InnerClass myInnerClass) {
+        this.stringValue = stringValue;
+        this.listWithEnums = listWithEnums;
+        this.myInnerClass = myInnerClass;
+    }
 
     public static class InnerClass {
-        private int integer;
-        private Map<String, LocalDate> stringToLocalDateMap;
+        private final int integer;
+        private final Map<String, LocalDate> stringToLocalDateMap;
+
+        public InnerClass(int integer, Map<String, LocalDate> stringToLocalDateMap) {
+            this.integer = integer;
+            this.stringToLocalDateMap = stringToLocalDateMap;
+        }
 
         @Override
         public String toString() {

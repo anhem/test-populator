@@ -4,7 +4,7 @@
 [![CircleCI](https://circleci.com/gh/anhem/test-populator/tree/main.svg?style=svg)](https://circleci.com/gh/anhem/test-populator/tree/main)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.anhem%3Atest-populator&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.anhem%3Atest-populator)
 
-Populate java classes with fixed or random data using reflection. Facilitates the creation of objects in tests.
+Populate java classes with fixed or random data. Facilitates the creation of objects in tests.
 
 Doing this:
 
@@ -44,7 +44,6 @@ MyClass{
 # Maven
 
 ```xml
-
 <dependency>
     <groupId>com.github.anhem</groupId>
     <artifactId>test-populator</artifactId>
@@ -55,11 +54,22 @@ MyClass{
 
 # Configuration
 
-Use PopulateConfig to configure how test-populator should run.
+Use `PopulateConfig` to configure how `test-populator` should run. Calling `populate()` without first providing a
+`PopulateConfig` will result in `test-populator` using default configuration.
+
+```java
+PopulateConfig populateConfig = PopulateConfig.builder()
+        ...
+        .build();
+
+PopulateFactory populateFactory = new PopulateFactory(populateConfig);
+
+MyClass myClass = populateFactory.populate(myClass.class);
+```
 
 | config                      | Values                                   | Default                         |
 |-----------------------------|------------------------------------------|---------------------------------|
-| strategyOrder               | CONSTRUCTOR, SETTER, FIELD, BUILDER      | CONSTRUCTOR, SETTER, FIELD      |
+| strategyOrder               | CONSTRUCTOR, SETTER, FIELD, BUILDER      | CONSTRUCTOR, SETTER             |
 | builderPattern              | LOMBOK / IMMUTABLES                      | -                               |
 | randomValues                | true / false                             | true                            |
 | setterPrefix                | prefix of setter methods                 | set                             |
@@ -67,6 +77,7 @@ Use PopulateConfig to configure how test-populator should run.
 | overridePopulates           | List of OverridePopulate implementations | -                               |
 | blacklistedMethods          | List of methods to skip if encountered   | $jacocoInit                     |
 | blacklistedFields           | List of fields to skip if encountered    | \_\_$lineHits$\_\_, $jacocoData |    
+| objectFactoryEnabled        | Experimental! true / false               | false                           |    
 
 ### strategyOrder
 
@@ -84,6 +95,9 @@ Use a no-arguments/default constructor to instantiate and setter methods to popu
 only have a no-arguments/default constructor and at least one setter method.
 
 ##### FIELD
+
+(This is recommended to only be use as a last resort. You should consider changing your Class to conform to any of the
+other strategies first)
 
 Use a no-arguments/default constructor to instantiate and then use reflection to populate all the fields. Applied to
 classes that only have a no-arguments/default constructor.
@@ -111,6 +125,9 @@ will give the same result.
 Use setters with a different format than set*
 
 ### accessNonPublicConstructors
+
+(This is recommended to only be use as a last resort. You should consider changing your Class constructor to public
+instead)
 
 Controls whether to allow access to private constructors when populating.
 
@@ -154,6 +171,17 @@ needed otherwise.
 named fields in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
 needed otherwise.
 
+### objectFactoryEnabled
+
+Experimental!
+
+This will result in populated objects to also be generated as java code
+in `target/generated-test-sources/test-populator/`.
+These files can then be copied into your project and used as any other java class.
+
+This will not work when [FIELD](#Field) or [accessNonPublicConstructors](#accessNonPublicConstructors) is used because
+they use reflection to override how class are accessed.
+
 ## ToBuilder
 
 calling `toBuilder()` on a PopulateConfig object will convert it back to a builder, making it easy to make copies of a
@@ -166,7 +194,7 @@ configuration with slightly different settings.
 Simple setup using default configuration.
 
 ```java
-MyClass myClass=new PopulateFactory().populate(MyClass.class);
+MyClass myClass = new PopulateFactory().populate(MyClass.class);
 ```
 
 ## Global setup
@@ -201,5 +229,5 @@ public class TestPopulator {
 ### Usage
 
 ```java
-MyClass2 myClass2=TestPopulator.populate(MyClass2.class);
+MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 ```

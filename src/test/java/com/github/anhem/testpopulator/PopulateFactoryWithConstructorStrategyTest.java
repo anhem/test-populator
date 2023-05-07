@@ -24,6 +24,7 @@ class PopulateFactoryWithConstructorStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(CONSTRUCTOR))
+                .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -83,9 +84,9 @@ class PopulateFactoryWithConstructorStrategyTest {
 
     @Test
     void allArgsConstructorPrivate() {
-        populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(CONSTRUCTOR))
+        populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
+                .objectFactoryEnabled(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         AllArgsConstructorPrivate value_1 = populateFactory.populate(AllArgsConstructorPrivate.class);
@@ -100,4 +101,10 @@ class PopulateFactoryWithConstructorStrategyTest {
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructorPrivate.class.getName(), populateConfig.getStrategyOrder()));
     }
 
+    @Test
+    void nestedCollections() {
+        NestedCollections value_1 = populateFactory.populate(NestedCollections.class);
+        NestedCollections value_2 = populateFactory.populate(NestedCollections.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
 }
