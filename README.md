@@ -62,7 +62,9 @@ PopulateConfig populateConfig = PopulateConfig.builder()
         ...
         .build();
 
-PopulateFactory populateFactory=new PopulateFactory(populateConfig);
+PopulateFactory populateFactory = new PopulateFactory(populateConfig);
+
+MyClass myClass = populateFactory.populate(myClass.class);
 ```
 
 | config                      | Values                                   | Default                         |
