@@ -1,13 +1,10 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.PopulateConfig;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,17 +13,19 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.BuildType.*;
-import static com.github.anhem.testpopulator.ObjectBuilder.PSF;
-import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_END;
-import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_START;
+import static com.github.anhem.testpopulator.FileUtil.*;
 
 public class ObjectFactoryImpl implements ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
+
+
+    private final PopulateConfig populateConfig;
     private final Map<Class<?>, Integer> classCounters;
     private ObjectBuilder currentObjectBuilder;
 
-    public ObjectFactoryImpl() {
+    public ObjectFactoryImpl(PopulateConfig populateConfig) {
+        this.populateConfig = populateConfig;
         this.classCounters = new HashMap<>();
     }
 
@@ -114,72 +113,14 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public void writeToFile() {
         ObjectResult objectResult = build();
         if (objectResult.isValid()) {
-            Path path = Paths.get(String.format("target/generated-test-sources/test-populator/%s/%s.java", objectResult.getPackageName(), objectResult.getClassName()));
+            Path path = getPath(objectResult, populateConfig);
             createOrOverwriteFile(path);
             writePackage(objectResult, path);
-            writeImports(path, objectResult.getImports());
-            writeStaticImports(path, objectResult.getStaticImports());
-            writeStartClass(objectResult, path);
-            writeObjects(path, objectResult.getObjects());
+            writeImports(objectResult, path);
+            writeStaticImports(objectResult, path);
+            writeStartClass(objectResult, path, populateConfig);
+            writeObjects(objectResult, path);
             writeEndClass(path);
-        }
-    }
-
-    private static void createOrOverwriteFile(Path path) {
-        try {
-            Files.createDirectories(path.getParent());
-            Files.writeString(path, "", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        } catch (IOException e) {
-            throw new ObjectException(String.format("Could not create or overwrite %s", path.toAbsolutePath()), e);
-        }
-    }
-
-    private void writePackage(ObjectResult objectResult, Path path) {
-        writeLine(path, String.format("package %s;%s", objectResult.getPackageName(), System.lineSeparator()));
-    }
-
-    private void writeStartClass(ObjectResult objectResult, Path path) {
-        writeLine(path, String.format("public class %s {%s", objectResult.getClassName(), System.lineSeparator()));
-    }
-
-    private void writeEndClass(Path path) {
-        writeLine(path, "}");
-    }
-
-    private void writeObjects(Path path, List<String> objects) {
-        objects.forEach(s -> {
-            if (s.startsWith(STATIC_BLOCK_START)) {
-                writeLine(path, String.format("%s\t%s", System.lineSeparator(), s));
-            } else if (s.startsWith(STATIC_BLOCK_END)) {
-                writeLine(path, String.format("\t%s%s", s, System.lineSeparator()));
-            } else if (s.startsWith(PSF)) {
-                writeLine(path, String.format("\t%s", s));
-            } else {
-                writeLine(path, String.format("\t\t%s", s));
-            }
-        });
-    }
-
-    private void writeImports(Path path, Set<String> imports) {
-        imports.stream()
-                .sorted()
-                .forEach(s -> writeLine(path, String.format("import %s;", s)));
-        writeLine(path, "");
-    }
-
-    private void writeStaticImports(Path path, Set<String> staticImports) {
-        staticImports.stream()
-                .sorted()
-                .forEach(s -> writeLine(path, String.format("import static %s;", s)));
-        writeLine(path, "");
-    }
-
-    private void writeLine(Path path, String line) {
-        String formattedLine = String.format("%s%s", line, System.lineSeparator());
-        try {
-            Files.writeString(path, formattedLine, StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            throw new ObjectException(String.format("Write %s to %s failed", formattedLine, path.toAbsolutePath()), e);
         }
     }
 

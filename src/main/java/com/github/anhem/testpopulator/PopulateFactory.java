@@ -67,7 +67,7 @@ public class PopulateFactory {
      * @return object of clazz
      */
     public <T> T populate(Class<T> clazz) {
-        ObjectFactory objectFactory = populateConfig.isObjectFactoryEnabled() ? new ObjectFactoryImpl() : new ObjectFactoryVoid();
+        ObjectFactory objectFactory = populateConfig.isObjectFactoryEnabled() ? new ObjectFactoryImpl(populateConfig) : new ObjectFactoryVoid();
         T t = populateWithOverrides(clazz, objectFactory);
         objectFactory.writeToFile();
         return t;

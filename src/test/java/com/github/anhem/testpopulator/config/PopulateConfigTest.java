@@ -4,7 +4,11 @@ import com.github.anhem.testpopulator.model.java.override.MyUUID;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.PopulateConfig.*;
@@ -91,5 +95,16 @@ class PopulateConfigTest {
                 .build()
         );
         assertThat(illegalArgumentException.getMessage()).isEqualTo(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
+    }
+
+    @Test
+    void toStringReturnsAllConfiguredFields() {
+        List<String> fieldNames = Arrays.stream(PopulateConfig.class.getDeclaredFields())
+                .filter(field -> !Modifier.isStatic(field.getModifiers()))
+                .map(Field::getName)
+                .map(s -> String.format("%s=", s))
+                .collect(Collectors.toList());
+
+        assertThat(DEFAULT_POPULATE_CONFIG.toString()).contains(fieldNames);
     }
 }

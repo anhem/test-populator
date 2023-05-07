@@ -183,9 +183,11 @@ public class PopulateConfig {
     public String getSetterPrefix() {
         return setterPrefix;
     }
+
     public boolean isObjectFactoryEnabled() {
         return objectFactoryEnabled;
     }
+
     public PopulateConfigBuilder toBuilder() {
         return PopulateConfig.builder()
                 .blacklistedMethods(new ArrayList<>(blacklistedMethods))
@@ -209,5 +211,20 @@ public class PopulateConfig {
         if (strategyOrder.contains(FIELD) && objectFactoryEnabled) {
             throw new IllegalArgumentException(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "PopulateConfig{" +
+                "blacklistedMethods=" + blacklistedMethods +
+                ", blacklistedFields=" + blacklistedFields +
+                ", strategyOrder=" + strategyOrder +
+                ", overridePopulate=" + overridePopulate +
+                ", builderPattern=" + builderPattern +
+                ", randomValues=" + randomValues +
+                ", accessNonPublicConstructors=" + accessNonPublicConstructors +
+                ", setterPrefix='" + setterPrefix + '\'' +
+                ", objectFactoryEnabled=" + objectFactoryEnabled +
+                '}';
     }
 }

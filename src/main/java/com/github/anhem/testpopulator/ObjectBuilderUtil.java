@@ -21,7 +21,7 @@ class ObjectBuilderUtil {
     }
 
     static String formatClassName(Class<?> clazz) {
-        return String.format("%sTestData", clazz.getSimpleName());
+        return String.format("%s_TestData", clazz.getSimpleName());
     }
 
     static void addImport(Class<?> clazz, Object value, Set<String> imports, Set<String> staticImports) {
@@ -51,7 +51,6 @@ class ObjectBuilderUtil {
     static Stream<String> endStaticBlock() {
         return Stream.of(STATIC_BLOCK_END);
     }
-
 
     @SafeVarargs
     static <T> Stream<T> concatenate(Stream<T>... streams) {
