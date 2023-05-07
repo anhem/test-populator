@@ -4,12 +4,12 @@
 [![CircleCI](https://circleci.com/gh/anhem/test-populator/tree/main.svg?style=svg)](https://circleci.com/gh/anhem/test-populator/tree/main)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.anhem%3Atest-populator&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.anhem%3Atest-populator)
 
-Populate java classes with fixed or random data using reflection. Facilitates the creation of objects in tests.
+Populate java classes with fixed or random data. Facilitates the creation of objects in tests.
 
 Doing this:
 
-```java
-MyClass myClass=new PopulateFactory().populate(MyClass.class);
+```
+MyClass myClass = new PopulateFactory().populate(MyClass.class);
 ```
 
 With this:
@@ -43,8 +43,7 @@ MyClass{
 
 # Maven
 
-```xml
-
+```
 <dependency>
     <groupId>com.github.anhem</groupId>
     <artifactId>test-populator</artifactId>
@@ -55,11 +54,10 @@ MyClass{
 
 # Configuration
 
-Use PopulateConfig to configure how test-populator should run. Calling populate() without first providing a
-PopulateConfig
-will result in test-populator using default configuration.
+Use `PopulateConfig` to configure how `test-populator` should run. Calling `populate()` without first providing a
+`PopulateConfig` will result in `test-populator` using default configuration.
 
-Use PopulateConfig builder to configure test-populator:
+Use `PopulateConfig` builder to configure `test-populator`:
 
 ```
 PopulateConfig populateConfig = PopulateConfig.builder()
@@ -98,6 +96,9 @@ only have a no-arguments/default constructor and at least one setter method.
 
 ##### FIELD
 
+(This is recommended to only be use as a last resort. You should consider changing your Class to conform to any of the
+other strategies first)
+
 Use a no-arguments/default constructor to instantiate and then use reflection to populate all the fields. Applied to
 classes that only have a no-arguments/default constructor.
 
@@ -124,6 +125,9 @@ will give the same result.
 Use setters with a different format than set*
 
 ### accessNonPublicConstructors
+
+(This is recommended to only be use as a last resort. You should consider changing your Class constructor to public
+instead)
 
 Controls whether to allow access to private constructors when populating.
 
@@ -174,6 +178,9 @@ Experimental!
 This will result in populated objects to also be generated as java code
 in `target/generated-test-sources/test-populator/`.
 These files can then be copied into your project and used as any other java class.
+
+This will not work when [FIELD](#Field) or [accessNonPublicConstructors](#accessNonPublicConstructors) is used because
+they use reflection to override how class are accessed.
 
 ## ToBuilder
 
