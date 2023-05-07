@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '11', '17', '20' ]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+      - name: print Java version
+        run: java -version
+      - name: Build with sonar
+        env:
+          SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
+        if: matrix.java == '11'
+        run: mvn clean install sonar:sonar -Psonar
+      - name: Build
+        if: matrix.java != '11'
+        run: mvn clean install

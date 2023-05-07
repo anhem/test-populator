@@ -106,7 +106,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public ObjectResult build() {
-        return toTop().build();
+        ObjectBuilder topObjectBuilder = toTop();
+        return topObjectBuilder != null ? topObjectBuilder.build() : ObjectResult.EMPTY_OBJECT_RESULT;
     }
 
     @Override
