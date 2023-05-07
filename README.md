@@ -61,12 +61,12 @@ will result in test-populator using default configuration.
 
 Use PopulateConfig builder to configure test-populator:
 
-```java
-PopulateConfig populateConfig=PopulateConfig.builder()
+```
+PopulateConfig populateConfig = PopulateConfig.builder()
         ...
         .build();
 
-        PopulateFactory populateFactory=new PopulateFactory(populateConfig);
+PopulateFactory populateFactory=new PopulateFactory(populateConfig);
 ```
 
 | config                      | Values                                   | Default                         |
@@ -186,8 +186,8 @@ configuration with slightly different settings.
 
 Simple setup using default configuration.
 
-```java
-MyClass myClass=new PopulateFactory().populate(MyClass.class);
+```
+MyClass myClass = new PopulateFactory().populate(MyClass.class);
 ```
 
 ## Global setup
@@ -221,6 +221,6 @@ public class TestPopulator {
 
 ### Usage
 
-```java
-MyClass2 myClass2=TestPopulator.populate(MyClass2.class);
+```
+MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 ```
