@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.github.anhem.testpopulator.LombokUtil.calculateExpectedChildren;
 import static com.github.anhem.testpopulator.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +31,15 @@ class LombokUtilTest {
         assertThat(methodNamesGroupedByInvokeOrder.get(1)).contains("setOfString");
         assertThat(methodNamesGroupedByInvokeOrder.get(2)).contains("clearSetOfStrings");
         assertThat(methodNamesGroupedByInvokeOrder.get(3)).contains("setOfStrings");
+    }
+
+    @Test
+    void calculateExpectedChildrenReturnsNumberOfMethodsToCallInBuilder() {
+        Map<Integer, List<Method>> methodsForLombokBuilderGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(LombokImmutableWithSingular.LombokImmutableWithSingularBuilder.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods());
+
+        int expectedChildren = calculateExpectedChildren(methodsForLombokBuilderGroupedByInvokeOrder);
+
+        assertThat(expectedChildren).isEqualTo(28);
     }
 
 }

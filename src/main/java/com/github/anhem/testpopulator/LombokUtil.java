@@ -20,6 +20,13 @@ public class LombokUtil {
                 .collect(Collectors.groupingBy(LombokUtil::lombokMethodInvokeOrder));
     }
 
+    static int calculateExpectedChildren(Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder) {
+        return builderObjectMethodsGroupedByInvokeOrder.entrySet().stream()
+                .filter(e -> e.getKey() > 0)
+                .map(e -> e.getValue().size())
+                .reduce(0, Integer::sum);
+    }
+
     private static int lombokMethodInvokeOrder(Method method) {
         if (stream(method.getParameterTypes()).anyMatch(PopulateUtil::isCollection)) {
             return 3;

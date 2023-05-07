@@ -25,6 +25,7 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(BUILDER))
                 .builderPattern(BuilderPattern.IMMUTABLES)
+                .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }

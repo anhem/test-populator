@@ -62,10 +62,6 @@ public class PopulateUtil {
                 Iterable.class.isAssignableFrom(clazz);
     }
 
-    static <T> boolean isMapEntry(Class<T> clazz) {
-        return clazz.isAssignableFrom(Map.Entry.class);
-    }
-
     static boolean isValue(Class<?> clazz) {
         return clazz.isEnum() || isJavaBaseClass(clazz);
     }

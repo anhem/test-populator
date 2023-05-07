@@ -29,6 +29,7 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(BUILDER))
                 .builderPattern(BuilderPattern.LOMBOK)
+                .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
