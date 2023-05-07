@@ -1,0 +1,20 @@
+name: CI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '11', '17', '20' ]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+      - name: print Java version
+        run: java -version
+      - name: Run tests
+        run: mvn clean install
