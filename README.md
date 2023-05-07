@@ -8,7 +8,7 @@ Populate java classes with fixed or random data. Facilitates the creation of obj
 
 Doing this:
 
-```
+```java
 MyClass myClass = new PopulateFactory().populate(MyClass.class);
 ```
 
@@ -43,7 +43,7 @@ MyClass{
 
 # Maven
 
-```
+```xml
 <dependency>
     <groupId>com.github.anhem</groupId>
     <artifactId>test-populator</artifactId>
@@ -57,7 +57,7 @@ MyClass{
 Use `PopulateConfig` to configure how `test-populator` should run. Calling `populate()` without first providing a
 `PopulateConfig` will result in `test-populator` using default configuration.
 
-```
+```java
 PopulateConfig populateConfig = PopulateConfig.builder()
         ...
         .build();
@@ -193,7 +193,7 @@ configuration with slightly different settings.
 
 Simple setup using default configuration.
 
-```
+```java
 MyClass myClass = new PopulateFactory().populate(MyClass.class);
 ```
 
@@ -228,6 +228,6 @@ public class TestPopulator {
 
 ### Usage
 
-```
+```java
 MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 ```
