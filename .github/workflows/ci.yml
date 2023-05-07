@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '11', '17', '20' ]
+        java: [ '11', '17', ${ { env.JAVA_LATEST } } ]
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -22,11 +22,11 @@ jobs:
           cache: maven
       - name: print Java version
         run: java -version
-      - name: Run tests with sonar
+      - name: Build with sonar
         env:
           SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
         if: matrix.java == '11'
         run: mvn clean install sonar:sonar -Psonar
-      - name: Run tests
+      - name: Build
         if: matrix.java != '11'
         run: mvn clean install
