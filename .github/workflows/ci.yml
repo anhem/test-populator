@@ -23,4 +23,6 @@ jobs:
       - name: print Java version
         run: java -version
       - name: Run tests
-        run: mvn -DSONAR_LOGIN=${{ secrets.SONAR_LOGIN }} clean install sonar:sonar -Psonar
+        env:
+          SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
+        run: mvn clean install sonar:sonar -Psonar
