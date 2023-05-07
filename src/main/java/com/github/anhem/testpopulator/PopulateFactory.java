@@ -3,6 +3,11 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
+import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.object.ObjectFactory;
+import com.github.anhem.testpopulator.object.ObjectFactoryImpl;
+import com.github.anhem.testpopulator.object.ObjectFactoryVoid;
+import com.github.anhem.testpopulator.value.ValueFactory;
 
 import java.lang.reflect.*;
 import java.util.List;
@@ -13,14 +18,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.ImmutablesUtil.getImmutablesGeneratedClass;
-import static com.github.anhem.testpopulator.ImmutablesUtil.getMethodsForImmutablesBuilder;
-import static com.github.anhem.testpopulator.LombokUtil.calculateExpectedChildren;
-import static com.github.anhem.testpopulator.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
-import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.util.ImmutablesUtil.getImmutablesGeneratedClass;
+import static com.github.anhem.testpopulator.util.ImmutablesUtil.getMethodsForImmutablesBuilder;
+import static com.github.anhem.testpopulator.util.LombokUtil.calculateExpectedChildren;
+import static com.github.anhem.testpopulator.util.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
+import static com.github.anhem.testpopulator.util.PopulateUtil.*;
 import static java.lang.String.format;
 
 /**
@@ -28,15 +33,15 @@ import static java.lang.String.format;
  */
 public class PopulateFactory {
 
-    static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection %s";
-    static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy found. Tried with %s. Try another strategy or override population for this class";
-    static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s";
-    static final String FAILED_TO_CALL_METHOD = "Failed to call method %s in object of class %s";
-    static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of %s using %s strategy";
-    static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection %s";
+    public static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection %s";
+    public static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy found. Tried with %s. Try another strategy or override population for this class";
+    public static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s";
+    public static final String FAILED_TO_CALL_METHOD = "Failed to call method %s in object of class %s";
+    public static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of %s using %s strategy";
+    public static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection %s";
 
-    static final String BUILD_METHOD = "build";
-    static final String BUILDER_METHOD = "builder";
+    public static final String BUILD_METHOD = "build";
+    public static final String BUILDER_METHOD = "builder";
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;

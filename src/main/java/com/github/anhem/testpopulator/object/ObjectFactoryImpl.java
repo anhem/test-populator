@@ -1,7 +1,8 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.object;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.exception.ObjectException;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -12,12 +13,12 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.BuildType.*;
-import static com.github.anhem.testpopulator.FileUtil.*;
+import static com.github.anhem.testpopulator.object.BuildType.*;
+import static com.github.anhem.testpopulator.object.FileWriterUtil.*;
 
 public class ObjectFactoryImpl implements ObjectFactory {
 
-    static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
+    public static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
 
 
     private final PopulateConfig populateConfig;

@@ -19,7 +19,7 @@ import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRando
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class PopulateFactoryWithLombokBuilderStrategyTest {
+public class PopulateFactoryWithLombokBuilderStrategyTest {
 
     private PopulateConfig populateConfig;
     private PopulateFactory populateFactory;

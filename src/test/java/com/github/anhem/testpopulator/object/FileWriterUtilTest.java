@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.object;
 
 import org.junit.jupiter.api.Test;
 
@@ -7,13 +7,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.anhem.testpopulator.FileUtil.*;
+import static com.github.anhem.testpopulator.object.FileWriterUtil.*;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static java.io.File.createTempFile;
 import static java.nio.file.Files.readAllLines;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-class FileUtilTest {
+public class FileWriterUtilTest {
 
     public static final Set<String> IMPORTS = Set.of("java.util.ArrayList");
     public static final Set<String> STATIC_IMPORTS = Set.of("com.github.anhem.testpopulator.model.java.ArbitraryEnum.A");
@@ -24,8 +24,8 @@ class FileUtilTest {
             "}"
     );
     public static final ObjectResult OBJECT_RESULT = new ObjectResult(
-            FileUtilTest.class.getPackageName(),
-            FileUtilTest.class.getName(),
+            FileWriterUtilTest.class.getPackageName(),
+            FileWriterUtilTest.class.getName(),
             IMPORTS,
             STATIC_IMPORTS,
             OBJECTS
@@ -33,9 +33,9 @@ class FileUtilTest {
 
     @Test
     void getPathReturnsPathBuiltFromObjectResultAndPopulateConfig() {
-        Path path = FileUtil.getPath(OBJECT_RESULT, DEFAULT_POPULATE_CONFIG);
+        Path path = FileWriterUtil.getPath(OBJECT_RESULT, DEFAULT_POPULATE_CONFIG);
 
-        assertThat(path.toString()).isEqualTo("target/generated-test-sources/test-populator/com.github.anhem.testpopulator/com.github.anhem.testpopulator.FileUtilTest_c08d8397e925dd61d36610c8e4e87038.java");
+        assertThat(path.toString()).isEqualTo("target/generated-test-sources/test-populator/com.github.anhem.testpopulator.object/com.github.anhem.testpopulator.object.FileWriterUtilTest_c08d8397e925dd61d36610c8e4e87038.java");
     }
 
     @Test
@@ -50,7 +50,7 @@ class FileUtilTest {
         writePackage(OBJECT_RESULT, path);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
-                "package com.github.anhem.testpopulator;",
+                "package com.github.anhem.testpopulator.object;",
                 ""
         ));
     }
@@ -86,7 +86,7 @@ class FileUtilTest {
         writeStartClass(OBJECT_RESULT, path, DEFAULT_POPULATE_CONFIG);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
-                "public class com.github.anhem.testpopulator.FileUtilTest_c08d8397e925dd61d36610c8e4e87038 {",
+                "public class com.github.anhem.testpopulator.object.FileWriterUtilTest_c08d8397e925dd61d36610c8e4e87038 {",
                 ""
         ));
     }

@@ -1,13 +1,15 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.value;
+
+import com.github.anhem.testpopulator.exception.PopulateException;
 
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.UUID;
 
-import static com.github.anhem.testpopulator.RandomUtil.*;
+import static com.github.anhem.testpopulator.value.RandomUtil.*;
 
-class ValueFactory {
-    static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
+public class ValueFactory {
+    public static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
 
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
     private static final ZonedDateTime ZONED_DATE_TIME = LOCAL_DATE_TIME.atZone(ZoneId.of("UTC"));
@@ -24,7 +26,7 @@ class ValueFactory {
 
     private final boolean setRandomValues;
 
-    ValueFactory(boolean setRandomValues) {
+    public ValueFactory(boolean setRandomValues) {
         this.setRandomValues = setRandomValues;
     }
 

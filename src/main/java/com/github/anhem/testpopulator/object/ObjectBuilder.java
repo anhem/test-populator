@@ -1,15 +1,17 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.object;
+
+import com.github.anhem.testpopulator.exception.ObjectException;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.ObjectBuilderUtil.*;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
+import static com.github.anhem.testpopulator.object.ObjectBuilderUtil.*;
 
 public class ObjectBuilder {
 
-    static final String PSF = "public static final";
+    public static final String PSF = "public static final";
     private Class<?> clazz;
     private final String name;
     private final BuildType buildType;

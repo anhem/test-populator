@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.util;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
@@ -8,22 +8,22 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.ImmutablesUtil.getImmutablesGeneratedClass;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.util.ImmutablesUtil.getImmutablesGeneratedClass;
 import static java.util.Arrays.stream;
 
 public class PopulateUtil {
 
-    static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
+    public static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
     private static final String JAVA_BASE = "java.base";
     private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
 
     private PopulateUtil() {
     }
 
-    static List<Type> toArgumentTypes(Parameter parameter, Type[] typeArguments) {
+    public static List<Type> toArgumentTypes(Parameter parameter, Type[] typeArguments) {
         if (typeArguments != null) {
             return Arrays.asList(typeArguments);
         } else {
@@ -34,64 +34,64 @@ public class PopulateUtil {
     }
 
     @SuppressWarnings("unchecked")
-    static <T> T getOverridePopulateValue(Class<?> clazz, Map<? extends Class<?>, OverridePopulate<?>> overridePopulate) {
+    public static <T> T getOverridePopulateValue(Class<?> clazz, Map<? extends Class<?>, OverridePopulate<?>> overridePopulate) {
         return (T) (overridePopulate.get(clazz).create());
     }
 
-    static List<Field> getDeclaredFields(Class<?> clazz, List<String> blacklistedFields) {
+    public static List<Field> getDeclaredFields(Class<?> clazz, List<String> blacklistedFields) {
         List<Field> declaredFields = getAllDeclaredFields(clazz, new ArrayList<>());
         return removeUnwantedFields(declaredFields, blacklistedFields);
     }
 
-    static List<Method> getDeclaredMethods(Class<?> clazz, List<String> blacklistedMethods) {
+    public static List<Method> getDeclaredMethods(Class<?> clazz, List<String> blacklistedMethods) {
         List<Method> declaredMethods = getAllDeclaredMethods(clazz, new ArrayList<>());
         return removeUnwantedMethods(declaredMethods, blacklistedMethods);
     }
 
-    static boolean isSet(Class<?> clazz) {
+    public static boolean isSet(Class<?> clazz) {
         return Set.class.isAssignableFrom(clazz);
     }
 
-    static boolean isMap(Class<?> clazz) {
+    public static boolean isMap(Class<?> clazz) {
         return Map.class.isAssignableFrom(clazz);
     }
 
-    static boolean isCollection(Class<?> clazz) {
+    public static boolean isCollection(Class<?> clazz) {
         return Collection.class.isAssignableFrom(clazz) ||
                 Map.class.isAssignableFrom(clazz) ||
                 Iterable.class.isAssignableFrom(clazz);
     }
 
-    static boolean isValue(Class<?> clazz) {
+    public static boolean isValue(Class<?> clazz) {
         return clazz.isEnum() || isJavaBaseClass(clazz);
     }
 
-    static boolean isJavaBaseClass(Class<?> clazz) {
+    public static boolean isJavaBaseClass(Class<?> clazz) {
         return clazz.getModule() != null && JAVA_BASE.equals(clazz.getModule().getName());
     }
 
-    static boolean isDeclaringJavaBaseClass(Method method) {
+    public static boolean isDeclaringJavaBaseClass(Method method) {
         return isJavaBaseClass(method.getDeclaringClass());
     }
 
-    static boolean hasAtLeastOneParameter(Method method) {
+    public static boolean hasAtLeastOneParameter(Method method) {
         return method.getParameters().length > 0;
     }
 
-    static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz, String setterPrefix, boolean accessNonPublicConstructor) {
+    public static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz, String setterPrefix, boolean accessNonPublicConstructor) {
         return strategy.equals(SETTER) && hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor) && getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
                 .anyMatch(method -> isSetterMethod(method, setterPrefix));
     }
 
-    static boolean isMatchingConstructorStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
+    public static boolean isMatchingConstructorStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
         return strategy.equals(CONSTRUCTOR) && !hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor) && hasConstructorWithArguments(clazz, accessNonPublicConstructor);
     }
 
-    static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
+    public static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
         return strategy.equals(FIELD) && hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor);
     }
 
-    static boolean isMatchingBuilderStrategy(Strategy strategy, Class<?> clazz, BuilderPattern builderPattern) {
+    public static boolean isMatchingBuilderStrategy(Strategy strategy, Class<?> clazz, BuilderPattern builderPattern) {
         if (strategy.equals(BUILDER)) {
             try {
                 if (builderPattern.equals(IMMUTABLES)) {
@@ -108,7 +108,7 @@ public class PopulateUtil {
     }
 
     @SuppressWarnings("unchecked")
-    static <T> Constructor<T> getLargestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
+    public static <T> Constructor<T> getLargestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
         Constructor<?> constructor1 = stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
                 .max(Comparator.comparingInt(Constructor::getParameterCount))
@@ -116,15 +116,15 @@ public class PopulateUtil {
         return (Constructor<T>) constructor1;
     }
 
-    static boolean isBlackListed(Method method, List<String> blacklistedMethods) {
+    public static boolean isBlackListed(Method method, List<String> blacklistedMethods) {
         return blacklistedMethods.contains(method.getName());
     }
 
-    static boolean isBlackListed(Field field, List<String> blacklistedFields) {
+    public static boolean isBlackListed(Field field, List<String> blacklistedFields) {
         return blacklistedFields.contains(field.getName());
     }
 
-    static boolean isSetterMethod(Method method, String setterPrefix) {
+    public static boolean isSetterMethod(Method method, String setterPrefix) {
         String methodFormat = getSetterMethodFormat(setterPrefix);
         if (methodFormat.isBlank()) {
             return method.getReturnType().equals(void.class) && method.getParameters().length == 1;
@@ -133,24 +133,24 @@ public class PopulateUtil {
     }
 
 
-    static <T> boolean isSameMethodParameterAsClass(Class<T> clazz, Method method) {
+    public static <T> boolean isSameMethodParameterAsClass(Class<T> clazz, Method method) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         return parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(clazz);
     }
 
-    static <T> void setAccessible(Constructor<T> constructor, boolean canAccessNonPublicConstructor) {
+    public static <T> void setAccessible(Constructor<T> constructor, boolean canAccessNonPublicConstructor) {
         if (canAccessNonPublicConstructor && !constructor.canAccess(null)) {
             constructor.setAccessible(true);
         }
     }
 
-    static <T> void setAccessible(Method method, T object) {
+    public static <T> void setAccessible(Method method, T object) {
         if (!method.canAccess(object)) {
             method.setAccessible(true);
         }
     }
 
-    static <T> void setAccessible(Field field, T object) {
+    public static <T> void setAccessible(Field field, T object) {
         if (!field.canAccess(object)) {
             field.setAccessible(true);
         }

@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ReadMeTest {
+public class ReadMeTest {
 
     @Test
     void myClass() {
