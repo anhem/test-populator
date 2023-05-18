@@ -14,7 +14,7 @@ import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.util.Arrays.stream;
 
-public class PopulateUtil {
+class PopulateUtil {
 
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
     private static final String JAVA_BASE = "java.base";

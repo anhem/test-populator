@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.PopulateUtil.*;
 
-public class ImmutablesUtil {
+class ImmutablesUtil {
 
     static final String ADD_PREFIX = "add";
     static final String ADD_ALL_PREFIX = "addAll";

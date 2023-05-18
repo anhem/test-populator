@@ -4,7 +4,7 @@ import com.github.anhem.testpopulator.config.OverridePopulate;
 
 import static com.github.anhem.testpopulator.ObjectResult.EMPTY_OBJECT_RESULT;
 
-public class ObjectFactoryVoid implements ObjectFactory {
+class ObjectFactoryVoid implements ObjectFactory {
     @Override
     public void constructor(Class<?> clazz, int expectedChildren) {
 

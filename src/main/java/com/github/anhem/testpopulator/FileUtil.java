@@ -16,7 +16,7 @@ import static com.github.anhem.testpopulator.ObjectBuilder.PSF;
 import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_END;
 import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_START;
 
-public class FileUtil {
+class FileUtil {
 
     private static final String PATH = "target/generated-test-sources/test-populator/%s/%s_%s.java";
 
