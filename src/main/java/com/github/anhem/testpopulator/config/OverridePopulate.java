@@ -1,6 +1,6 @@
 package com.github.anhem.testpopulator.config;
 
-import com.github.anhem.testpopulator.PopulateException;
+import com.github.anhem.testpopulator.ObjectException;
 
 /**
  * For overriding creation/population of classes that cannot be created automatically
@@ -19,6 +19,6 @@ public interface OverridePopulate<T> {
      * "new MyFutureDate(LocalDate.of(3000, 1, 1))"
      */
     default String createString() {
-        throw new PopulateException(String.format("createString() is not implemented in class %s", this.getClass().getName()));
+        throw new ObjectException(String.format("createString() is not implemented in class %s", this.getClass().getName()));
     }
 }
