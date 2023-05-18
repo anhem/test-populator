@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.ObjectBuilderUtil.*;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 
-public class ObjectBuilder {
+class ObjectBuilder {
 
     static final String PSF = "public static final";
     private Class<?> clazz;

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static java.util.Arrays.stream;
 
-public class LombokUtil {
+class LombokUtil {
     private static final String CLEAR_METHOD_PATTERN = String.format("%s%s", "clear", MATCH_FIRST_CHARACTER_UPPERCASE);
 
     private LombokUtil() {

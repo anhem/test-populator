@@ -6,7 +6,7 @@ import java.util.Set;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 
-public class ObjectResult {
+class ObjectResult {
 
     public static final ObjectResult EMPTY_OBJECT_RESULT = new ObjectResult(null, null, emptySet(), emptySet(), emptyList());
 

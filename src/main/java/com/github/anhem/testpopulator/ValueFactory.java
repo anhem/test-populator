@@ -8,7 +8,6 @@ import static com.github.anhem.testpopulator.RandomUtil.*;
 
 class ValueFactory {
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
-
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
     private static final ZonedDateTime ZONED_DATE_TIME = LOCAL_DATE_TIME.atZone(ZoneId.of("UTC"));
     private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();

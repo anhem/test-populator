@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.BuildType.*;
 import static com.github.anhem.testpopulator.FileUtil.*;
 
-public class ObjectFactoryImpl implements ObjectFactory {
+class ObjectFactoryImpl implements ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
 
