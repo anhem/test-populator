@@ -4,6 +4,7 @@ import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesAbstra
 import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesInterface;
 import com.github.anhem.testpopulator.model.immutables.ImmutablesAbstract;
 import com.github.anhem.testpopulator.model.immutables.ImmutablesInterface;
+import com.github.anhem.testpopulator.populate.PopulateUtil;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,9 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
+import static com.github.anhem.testpopulator.populate.ImmutablesUtil.*;
+import static com.github.anhem.testpopulator.populate.PopulateUtil.getDeclaredMethods;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
-import static com.github.anhem.testpopulator.util.ImmutablesUtil.*;
-import static com.github.anhem.testpopulator.util.PopulateUtil.getDeclaredMethods;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ImmutablesUtilTest {

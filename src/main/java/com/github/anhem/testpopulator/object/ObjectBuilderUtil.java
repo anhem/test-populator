@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
-import static com.github.anhem.testpopulator.util.PopulateUtil.isJavaBaseClass;
+import static com.github.anhem.testpopulator.populate.PopulateUtil.isJavaBaseClass;
 
 public class ObjectBuilderUtil {
 

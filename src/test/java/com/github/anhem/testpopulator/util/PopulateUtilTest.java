@@ -7,6 +7,7 @@ import com.github.anhem.testpopulator.model.java.*;
 import com.github.anhem.testpopulator.model.java.override.MyUUID;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
+import com.github.anhem.testpopulator.populate.PopulateUtil;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.*;
@@ -14,10 +15,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.populate.PopulateUtil.*;
 import static com.github.anhem.testpopulator.testutil.FieldTestUtil.getField;
 import static com.github.anhem.testpopulator.testutil.MethodTestUtil.getMethod;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
-import static com.github.anhem.testpopulator.util.PopulateUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PopulateUtilTest {

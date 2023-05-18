@@ -1,11 +1,11 @@
-package com.github.anhem.testpopulator.util;
+package com.github.anhem.testpopulator.populate;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.util.PopulateUtil.*;
+import static com.github.anhem.testpopulator.populate.PopulateUtil.*;
 import static java.util.Arrays.stream;
 
 public class LombokUtil {

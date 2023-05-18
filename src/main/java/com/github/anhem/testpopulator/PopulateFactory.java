@@ -21,11 +21,11 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.*;
-import static com.github.anhem.testpopulator.util.ImmutablesUtil.getImmutablesGeneratedClass;
-import static com.github.anhem.testpopulator.util.ImmutablesUtil.getMethodsForImmutablesBuilder;
-import static com.github.anhem.testpopulator.util.LombokUtil.calculateExpectedChildren;
-import static com.github.anhem.testpopulator.util.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
-import static com.github.anhem.testpopulator.util.PopulateUtil.*;
+import static com.github.anhem.testpopulator.populate.ImmutablesUtil.getImmutablesGeneratedClass;
+import static com.github.anhem.testpopulator.populate.ImmutablesUtil.getMethodsForImmutablesBuilder;
+import static com.github.anhem.testpopulator.populate.LombokUtil.calculateExpectedChildren;
+import static com.github.anhem.testpopulator.populate.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
+import static com.github.anhem.testpopulator.populate.PopulateUtil.*;
 import static java.lang.String.format;
 
 /**

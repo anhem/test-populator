@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.util;
+package com.github.anhem.testpopulator.populate;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.Strategy.*;
-import static com.github.anhem.testpopulator.util.ImmutablesUtil.getImmutablesGeneratedClass;
+import static com.github.anhem.testpopulator.populate.ImmutablesUtil.getImmutablesGeneratedClass;
 import static java.util.Arrays.stream;
 
 public class PopulateUtil {

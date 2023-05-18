@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.util;
+package com.github.anhem.testpopulator.populate;
 
 import com.github.anhem.testpopulator.exception.PopulateException;
 
@@ -7,18 +7,16 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.util.PopulateUtil.*;
-
 public class ImmutablesUtil {
 
     public static final String ADD_PREFIX = "add";
     public static final String ADD_ALL_PREFIX = "addAll";
     public static final String PUT_PREFIX = "put";
     public static final String PUT_ALL_PREFIX = "putAll";
-    private static final String ADD_METHOD_PATTERN = String.format("%s%s", ADD_PREFIX, MATCH_FIRST_CHARACTER_UPPERCASE);
-    private static final String ADD_ALL_METHOD_PATTERN = String.format("%s%s", ADD_ALL_PREFIX, MATCH_FIRST_CHARACTER_UPPERCASE);
-    private static final String PUT_METHOD_PATTERN = String.format("%s%s", PUT_PREFIX, MATCH_FIRST_CHARACTER_UPPERCASE);
-    private static final String PUT_ALL_METHOD_PATTERN = String.format("%s%s", PUT_ALL_PREFIX, MATCH_FIRST_CHARACTER_UPPERCASE);
+    private static final String ADD_METHOD_PATTERN = String.format("%s%s", ADD_PREFIX, PopulateUtil.MATCH_FIRST_CHARACTER_UPPERCASE);
+    private static final String ADD_ALL_METHOD_PATTERN = String.format("%s%s", ADD_ALL_PREFIX, PopulateUtil.MATCH_FIRST_CHARACTER_UPPERCASE);
+    private static final String PUT_METHOD_PATTERN = String.format("%s%s", PUT_PREFIX, PopulateUtil.MATCH_FIRST_CHARACTER_UPPERCASE);
+    private static final String PUT_ALL_METHOD_PATTERN = String.format("%s%s", PUT_ALL_PREFIX, PopulateUtil.MATCH_FIRST_CHARACTER_UPPERCASE);
     public static final String CLASS_PREFIX = "Immutable";
     public static final String DOT = ".";
     public static final String FAILED_TO_FIND_CLASS = "Unable to find Immutables generated class for %s";
@@ -27,11 +25,11 @@ public class ImmutablesUtil {
     }
 
     public static <T> List<Method> getMethodsForImmutablesBuilder(Class<T> clazz, Object builderObject, List<String> blacklistedMethods) {
-        List<Method> declaredMethods = getDeclaredMethods(builderObject.getClass(), blacklistedMethods);
+        List<Method> declaredMethods = PopulateUtil.getDeclaredMethods(builderObject.getClass(), blacklistedMethods);
         return removeMethodsDoingTheSameThing(declaredMethods).stream()
                 .filter(PopulateUtil::hasAtLeastOneParameter)
-                .filter(method -> !isDeclaringJavaBaseClass(method))
-                .filter(method -> !isSameMethodParameterAsClass(clazz, method))
+                .filter(method -> !PopulateUtil.isDeclaringJavaBaseClass(method))
+                .filter(method -> !PopulateUtil.isSameMethodParameterAsClass(clazz, method))
                 .collect(Collectors.toList());
     }
 
