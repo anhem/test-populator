@@ -51,13 +51,13 @@ class PopulateUtilTest {
 
     @Test
     void getOverridePopulateValueReturnsValue() {
-        Map<Class<MyUUID>, OverridePopulate<?>> overridePopulate = Map.of(MyUUID.class, new MyUUIDOverride());
+        Map<Class<?>, OverridePopulate<?>> overridePopulate = Map.of(MyUUID.class, new MyUUIDOverride());
 
-        Object overridePopulateValue = getOverridePopulateValue(MyUUID.class, overridePopulate);
+        MyUUID myUUID = getOverridePopulateValue(MyUUID.class, overridePopulate);
 
-        assertThat(overridePopulateValue).isNotNull();
-        assertThat(overridePopulateValue.getClass()).isEqualTo(MyUUID.class);
-        assertThat(((MyUUID) overridePopulateValue).getUuid()).isNotNull();
+        assertThat(myUUID).isNotNull();
+        assertThat(myUUID.getClass()).isEqualTo(MyUUID.class);
+        assertThat(myUUID.getUuid()).isNotNull();
     }
 
     @Test

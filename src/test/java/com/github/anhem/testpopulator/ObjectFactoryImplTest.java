@@ -15,7 +15,7 @@ import java.util.*;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ObjectFactoryImplTest {
+class ObjectFactoryImplTest {
 
     private ObjectFactoryImpl objectFactoryImpl;
 
