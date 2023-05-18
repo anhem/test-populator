@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.java.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +16,7 @@ import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRando
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class PopulateFactoryWithFieldStrategyTest {
+public class PopulateFactoryWithFieldStrategyTest {
 
     private PopulateConfig populateConfig;
     private PopulateFactory populateFactory;

@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.object;
 
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.NestedCollections;
@@ -9,10 +9,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.ObjectBuilderUtil.*;
+import static com.github.anhem.testpopulator.object.ObjectBuilderUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ObjectBuilderUtilTest {
+public class ObjectBuilderUtilTest {
 
     @Test
     void getPackageNameReturnsPackageName() {
@@ -21,7 +21,7 @@ class ObjectBuilderUtilTest {
 
     @Test
     void getPackageNameReturnsPackageNameOfObjectBuilderWhenClassNameStartsWithJava() {
-        assertThat(getPackageName(String.class)).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(getPackageName(String.class)).isEqualTo("com.github.anhem.testpopulator.object");
     }
 
     @Test

@@ -10,7 +10,7 @@ import java.util.List;
 
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 
-class PopulateFactoryWithOverridesTest {
+public class PopulateFactoryWithOverridesTest {
 
     PopulateFactory populateFactory;
 

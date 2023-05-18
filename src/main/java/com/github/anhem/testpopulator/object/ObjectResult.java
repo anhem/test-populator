@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.object;
 
 import java.util.List;
 import java.util.Set;

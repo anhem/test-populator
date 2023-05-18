@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.util;
 
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableWithSingular;
 import org.junit.jupiter.api.Test;
@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.LombokUtil.calculateExpectedChildren;
-import static com.github.anhem.testpopulator.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
+import static com.github.anhem.testpopulator.populate.LombokUtil.calculateExpectedChildren;
+import static com.github.anhem.testpopulator.populate.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class LombokUtilTest {
+public class LombokUtilTest {
 
 
     @Test

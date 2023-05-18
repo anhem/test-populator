@@ -1,9 +1,10 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.util;
 
 import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesAbstract;
 import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesInterface;
 import com.github.anhem.testpopulator.model.immutables.ImmutablesAbstract;
 import com.github.anhem.testpopulator.model.immutables.ImmutablesInterface;
+import com.github.anhem.testpopulator.populate.PopulateUtil;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -11,13 +12,13 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.ImmutablesUtil.*;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
-import static com.github.anhem.testpopulator.PopulateUtil.getDeclaredMethods;
+import static com.github.anhem.testpopulator.populate.ImmutablesUtil.*;
+import static com.github.anhem.testpopulator.populate.PopulateUtil.getDeclaredMethods;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ImmutablesUtilTest {
+public class ImmutablesUtilTest {
 
     @Test
     void getMethodsForImmutablesBuilderReturnsExpectedMethods() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {

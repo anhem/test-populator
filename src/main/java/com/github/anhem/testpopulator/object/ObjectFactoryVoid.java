@@ -1,8 +1,8 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.object;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
 
-import static com.github.anhem.testpopulator.ObjectResult.EMPTY_OBJECT_RESULT;
+import static com.github.anhem.testpopulator.object.ObjectResult.EMPTY_OBJECT_RESULT;
 
 public class ObjectFactoryVoid implements ObjectFactory {
     @Override

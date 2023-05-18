@@ -1,5 +1,6 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.object;
 
+import com.github.anhem.testpopulator.exception.ObjectException;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.Pojo;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
@@ -31,11 +32,11 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value(1);
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass0 = new MyClass(\"myString\", 1);"));
     }
@@ -49,11 +50,11 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value(1);
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final MyClass myClass0 = new MyClass();",
@@ -73,11 +74,11 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value(1);
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final MyClass myClass0 = MyClass.builder()",
@@ -94,13 +95,13 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value("myString");
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEqualTo(Set.of(
                 "java.util.Set"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final Set<String> set0 = Set.of(\"myString\");",
@@ -115,13 +116,13 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value("myString");
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEqualTo(Set.of(
                 "java.util.HashSet"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final HashSet<String> hashSet0 = new HashSet<>();",
@@ -141,13 +142,13 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value("myValue");
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEqualTo(Set.of(
                 "java.util.Map"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final Map<String, String> map0 = Map.of(\"myKey\", \"myValue\");",
@@ -162,13 +163,13 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value("myKey");
         objectFactoryImpl.value("myValue");
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEqualTo(Set.of(
                 "java.util.HashMap"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final HashMap<String, String> hashMap0 = new HashMap<>();",
@@ -187,13 +188,13 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value("myString");
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEqualTo(Set.of(
                 "java.util.List"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final List<String> list0 = List.of(\"myString\");",
@@ -208,13 +209,13 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value("myString");
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEqualTo(Set.of(
                 "java.util.ArrayList"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final ArrayList<String> arrayList0 = new ArrayList<>();",
@@ -232,11 +233,11 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value(true);
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final Boolean[] boolean0 = new Boolean[]{true};",
@@ -248,7 +249,7 @@ public class ObjectFactoryImplTest {
     void overrideValue() {
         objectFactoryImpl.overridePopulate(UUID.class, new MyUUIDOverride());
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("UUID_TestData");
         assertThat(objectResult.getImports()).isEqualTo(Set.of("java.util.UUID"));
         assertThat(objectResult.getStaticImports()).isEmpty();
@@ -262,7 +263,7 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value("myString");
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("String_TestData");
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEmpty();
@@ -289,7 +290,7 @@ public class ObjectFactoryImplTest {
         objectFactoryImpl.value(UUID.fromString("82e8962f-885d-4845-914b-c206a42d7c91"));
 
         ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(objectResult.getPackageName()).isEqualTo("com.github.anhem.testpopulator.object");
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEqualTo(Set.of(
                 "java.math.BigDecimal",
@@ -300,7 +301,7 @@ public class ObjectFactoryImplTest {
                 "java.util.UUID"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
-                "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass",
+                "com.github.anhem.testpopulator.object.ObjectFactoryImplTest.MyClass",
                 "com.github.anhem.testpopulator.model.java.ArbitraryEnum.A"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
