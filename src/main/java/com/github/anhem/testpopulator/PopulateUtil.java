@@ -34,7 +34,7 @@ class PopulateUtil {
     }
 
     @SuppressWarnings("unchecked")
-    static <T> T getOverridePopulateValue(Class<?> clazz, Map<? extends Class<?>, OverridePopulate<?>> overridePopulate) {
+    static <T> T getOverridePopulateValue(Class<T> clazz, Map<Class<?>, OverridePopulate<?>> overridePopulate) {
         return (T) (overridePopulate.get(clazz).create());
     }
 

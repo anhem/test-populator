@@ -18,7 +18,7 @@ class ObjectBuilder {
     private static final String LIST_OF = "%s %s<%s> %s = List.of(%s);";
     private static final String MAP_OF = "%s %s<%s> %s = Map.of(%s);";
     private static final String NEW_ARRAY = "%s %s[] %s = new %s[]{%s};";
-    private static final String VALUE = "%s %s %s = %s;";
+    private static final String NEW_VALUE = "%s %s %s = %s;";
     private Class<?> clazz;
     private final String name;
     private final BuildType buildType;
@@ -215,7 +215,7 @@ class ObjectBuilder {
     }
 
     private List<String> buildValue() {
-        return List.of(String.format(VALUE, PSF, clazz.getSimpleName(), name, this.value));
+        return List.of(String.format(NEW_VALUE, PSF, clazz.getSimpleName(), name, this.value));
     }
 
     private Stream<String> createMethods() {
