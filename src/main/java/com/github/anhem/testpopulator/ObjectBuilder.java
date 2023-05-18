@@ -10,6 +10,15 @@ import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 class ObjectBuilder {
 
     static final String PSF = "public static final";
+    private static final String NEW_OBJECT_WITH_ARGUMENTS = "%s %s %s = new %s(%s);";
+    private static final String NEW_OBJECT = "%s %s %s = new %s();";
+    private static final String BUILDER = "%s %s %s = %s.%s()";
+    private static final String NEW_TYPED_OBJECT = "%s %s<%s> %s = new %s<>();";
+    private static final String SET_OF = "%s %s<%s> %s = Set.of(%s);";
+    private static final String LIST_OF = "%s %s<%s> %s = List.of(%s);";
+    private static final String MAP_OF = "%s %s<%s> %s = Map.of(%s);";
+    private static final String NEW_ARRAY = "%s %s[] %s = new %s[]{%s};";
+    private static final String VALUE = "%s %s %s = %s;";
     private Class<?> clazz;
     private final String name;
     private final BuildType buildType;
@@ -120,14 +129,14 @@ class ObjectBuilder {
 
     private List<String> buildConstructor() {
         return concatenate(buildChildren(),
-                Stream.of(String.format("%s %s %s = new %s(%s);", PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
+                Stream.of(String.format(NEW_OBJECT_WITH_ARGUMENTS, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildSetter() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s %s %s = new %s();", PSF, clazz.getSimpleName(), name, clazz.getSimpleName())),
+                Stream.of(String.format(NEW_OBJECT, PSF, clazz.getSimpleName(), name, clazz.getSimpleName())),
                 startStaticBlock(),
                 createMethods(),
                 endStaticBlock()
@@ -137,7 +146,7 @@ class ObjectBuilder {
     private List<String> buildBuilder() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s %s %s = %s.%s()", PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), BUILDER_METHOD)),
+                Stream.of(String.format(BUILDER, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), BUILDER_METHOD)),
                 createMethods(),
                 endBuilder()
         ).collect(Collectors.toList());
@@ -150,7 +159,7 @@ class ObjectBuilder {
     private List<String> buildSet() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s %s<%s> %s = new %s<>();", PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
+                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
                 startStaticBlock(),
                 createMethods(),
                 endStaticBlock()
@@ -160,14 +169,14 @@ class ObjectBuilder {
     private List<String> buildSetOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s %s<%s> %s = Set.of(%s);", PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format(SET_OF, PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildList() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s %s<%s> %s = new %s<>();", PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
+                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
                 startStaticBlock(),
                 createMethods(),
                 endStaticBlock()
@@ -177,14 +186,14 @@ class ObjectBuilder {
     private List<String> buildListOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s %s<%s> %s = List.of(%s);", PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format(LIST_OF, PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildMap() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s %s<%s> %s = new %s<>();", PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
+                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
                 startStaticBlock(),
                 createMethods(),
                 endStaticBlock()
@@ -194,19 +203,19 @@ class ObjectBuilder {
     private List<String> buildMapOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s %s<%s> %s = Map.of(%s);", PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format(MAP_OF, PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildArray() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format("%s %s[] %s = new %s[]{%s};", PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
+                Stream.of(String.format(NEW_ARRAY, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildValue() {
-        return List.of(String.format("%s %s %s = %s;", PSF, clazz.getSimpleName(), name, this.value));
+        return List.of(String.format(VALUE, PSF, clazz.getSimpleName(), name, this.value));
     }
 
     private Stream<String> createMethods() {
