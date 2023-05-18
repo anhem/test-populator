@@ -18,13 +18,24 @@ With this:
 ```java
 public class MyClass {
 
-    private String stringValue;
-    private List<ArbitraryEnum> listWithEnums;
-    private InnerClass myInnerClass;
+    private final String stringValue;
+    private final List<ArbitraryEnum> listWithEnums;
+    private final InnerClass myInnerClass;
+
+    public MyClass(String stringValue, List<ArbitraryEnum> listWithEnums, InnerClass myInnerClass) {
+        this.stringValue = stringValue;
+        this.listWithEnums = listWithEnums;
+        this.myInnerClass = myInnerClass;
+    }
 
     public static class InnerClass {
-        private int integer;
-        private Map<String, LocalDate> stringToLocalDateMap;
+        private final int integer;
+        private final Map<String, LocalDate> stringToLocalDateMap;
+
+        public InnerClass(int integer, Map<String, LocalDate> stringToLocalDateMap) {
+            this.integer = integer;
+            this.stringToLocalDateMap = stringToLocalDateMap;
+        }
     }
 }
 ```
@@ -48,12 +59,15 @@ Use `PopulateConfig` to configure how `test-populator` should run. Calling `popu
 `PopulateConfig` will result in `test-populator` using default configuration.
 
 ```java
+//1. Configure
 PopulateConfig populateConfig = PopulateConfig.builder()
         ...
         .build();
 
+//2. Set up
 PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
+//3. Use
 MyClass myClass = populateFactory.populate(myClass.class);
 ```
 

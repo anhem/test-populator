@@ -35,12 +35,14 @@ class FileWriterUtilTest {
     void getPathReturnsPathBuiltFromObjectResultAndPopulateConfig() {
         Path path = FileWriterUtil.getPath(OBJECT_RESULT, DEFAULT_POPULATE_CONFIG);
 
-        assertThat(path.toString()).isEqualTo("target/generated-test-sources/test-populator/com.github.anhem.testpopulator/com.github.anhem.testpopulator.FileWriterUtilTest_c08d8397e925dd61d36610c8e4e87038.java");
+        assertThat(path).hasToString("target/generated-test-sources/test-populator/com.github.anhem.testpopulator/com.github.anhem.testpopulator.FileWriterUtilTest_c08d8397e925dd61d36610c8e4e87038.java");
     }
 
     @Test
     void createOrOverwriteFileRunsWithoutExceptions() throws IOException {
         createOrOverwriteFile(getTempPath());
+
+        assertThat(getTempPath().toFile()).exists();
     }
 
     @Test

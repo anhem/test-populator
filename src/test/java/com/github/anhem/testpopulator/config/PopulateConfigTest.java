@@ -70,30 +70,30 @@ class PopulateConfigTest {
 
     @Test
     void settingBuilderWithoutBuilderPatternThrowsException() {
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> DEFAULT_POPULATE_CONFIG.toBuilder()
-                .strategyOrder(BUILDER)
-                .build()
-        );
+        PopulateConfigBuilder populateConfigBuilder = DEFAULT_POPULATE_CONFIG.toBuilder()
+                .strategyOrder(BUILDER);
+
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, populateConfigBuilder::build);
         assertThat(illegalArgumentException.getMessage()).isEqualTo(format(INVALID_CONFIG_MISSING_BUILDER_PATTERN, BUILDER, Arrays.toString(BuilderPattern.values())));
     }
 
     @Test
     void combiningAccessNonPublicConstructorsAndObjectFactoryEnabledThrowsException() {
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> DEFAULT_POPULATE_CONFIG.toBuilder()
+        PopulateConfigBuilder populateConfigBuilder = DEFAULT_POPULATE_CONFIG.toBuilder()
                 .accessNonPublicConstructors(true)
-                .objectFactoryEnabled(true)
-                .build()
-        );
+                .objectFactoryEnabled(true);
+
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, populateConfigBuilder::build);
         assertThat(illegalArgumentException.getMessage()).isEqualTo(INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY);
     }
 
     @Test
     void combiningFieldStrategyAndObjectFactoryEnabledThrowsException() {
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> DEFAULT_POPULATE_CONFIG.toBuilder()
+        PopulateConfigBuilder populateConfigBuilder = DEFAULT_POPULATE_CONFIG.toBuilder()
                 .strategyOrder(FIELD)
-                .objectFactoryEnabled(true)
-                .build()
-        );
+                .objectFactoryEnabled(true);
+
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, populateConfigBuilder::build);
         assertThat(illegalArgumentException.getMessage()).isEqualTo(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
     }
 
