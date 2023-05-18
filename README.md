@@ -1,9 +1,9 @@
 # test-populator
 
-![CI](https://github.com/anhem/test-populator/workflows/CI/badge.svg)
+[![CI](https://github.com/anhem/test-populator/workflows/CI/badge.svg)](https://github.com/anhem/test-populator/actions)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.anhem%3Atest-populator&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.anhem%3Atest-populator)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://search.maven.org/search?q=g:com.github.anhem%20a:test-populator)
-![Java](https://img.shields.io/badge/jdk-11-green.svg)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://central.sonatype.com/artifact/com.github.anhem/test-populator/)
+[![OpenJDK](https://img.shields.io/badge/OpenJDK-11-brightgreen)](https://github.com/anhem/test-populator/blob/main/pom.xml#L26)
 
 Populate java classes with fixed or random data. Facilitates the creation of objects in tests.
 
@@ -40,17 +40,6 @@ MyClass{
         stringToLocalDateMap={dsyyjxizvp=2021-02-14}
     }
 }
-```
-
-# Maven
-
-```xml
-<dependency>
-    <groupId>com.github.anhem</groupId>
-    <artifactId>test-populator</artifactId>
-    <version>0.1.9</version>
-    <scope>test</scope>
-</dependency>
 ```
 
 # Configuration
