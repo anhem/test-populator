@@ -39,7 +39,7 @@ class ImmutablesUtilTest {
     }
 
     @Test
-    public void getImmutablesGeneratedClassReturnsExpectedClass() {
+    void getImmutablesGeneratedClassReturnsExpectedClass() {
         assertThat(getImmutablesGeneratedClass(String.class)).isEqualTo(String.class);
         assertThat(getImmutablesGeneratedClass(ImmutablesInterface.class)).isEqualTo(ImmutableImmutablesInterface.class);
         assertThat(getImmutablesGeneratedClass(ImmutableImmutablesInterface.class)).isEqualTo(ImmutableImmutablesInterface.class);
