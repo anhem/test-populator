@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator.model.java;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ public abstract class PojoAbstract {
     private Map<String, Integer> mapOfStringsToIntegers;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
+    private Date date;
 
     public String getStringValue() {
         return stringValue;
@@ -160,5 +162,13 @@ public abstract class PojoAbstract {
 
     public void setArrayOfStrings(String[] arrayOfStrings) {
         this.arrayOfStrings = arrayOfStrings;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

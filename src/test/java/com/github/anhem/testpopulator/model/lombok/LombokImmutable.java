@@ -32,4 +32,5 @@ public class LombokImmutable {
     ArrayList<String> arrayList;
     HashMap<String, String> hashMap;
     HashSet<String> hashSet;
+    Date date;
 }
