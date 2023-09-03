@@ -143,7 +143,14 @@ Controls whether to allow access to private constructors when populating.
 
 ### overridePopulates
 
-Some classes might be difficult to populate automatically.
+This solves a couple of issues that may be encountered:
+
+1. I want to generate my own value for a specific class
+2. test-populator fails to generate a value for a specific class
+3. I get `Failed to find type to create value for <Class>. Not implemented?`
+
+Some classes might be difficult to populate automatically, or you may want to decide what value should be set for a
+specific class.
 
 This class for example cannot be handled by test-populator alone:
 
@@ -171,7 +178,7 @@ public class MyUUIDOverride implements OverridePopulate<MyUUID> {
 }
 ```
 
-Overriding a class can also be done if you get `Failed to find type to create value for <Class>. Not implemented?`
+This can then be added to our configuration and will be used whenever MyUUID is encountered. Also see [Setup](#Setup)
 
 ### blacklistedMethods
 
