@@ -5,6 +5,7 @@ import org.immutables.value.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,5 +46,7 @@ public abstract class ImmutablesAbstract {
     public abstract ArbitraryEnum getArbitraryEnum();
 
     public abstract String[] getArrayOfStrings();
+
+    public abstract Date date();
 
 }

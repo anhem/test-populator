@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator.model.java;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,8 +26,30 @@ public class AllArgsConstructorPrivate {
     private final Map<String, Integer> mapOfStringsToIntegers;
     private final ArbitraryEnum arbitraryEnum;
     private final String[] arrayOfStrings;
+    private final Date date;
 
-    private AllArgsConstructorPrivate(String stringValue, char primitiveCharacterValue, Character characterValue, int primitiveIntegerValue, Integer integerValue, long primitiveLongValue, Long longValue, double primitiveDoubleValue, Double doubleValue, LocalDate localDate, LocalDateTime localDateTime, List<String> listOfStrings, Set<String> setOfStrings, Map<Integer, String> mapOfIntegersToStrings, Map<String, Integer> mapOfStringsToIntegers, ArbitraryEnum arbitraryEnum, String[] arrayOfStrings) {
+    private AllArgsConstructorPrivate(
+            String stringValue,
+            char primitiveCharacterValue,
+            Character characterValue,
+            int primitiveIntegerValue,
+            Integer integerValue,
+            long primitiveLongValue,
+            Long longValue,
+            double primitiveDoubleValue,
+            Double doubleValue,
+            LocalDate localDate,
+            LocalDateTime localDateTime,
+            List<String> listOfStrings,
+            Set<String> setOfStrings,
+            Map<Integer,
+                    String> mapOfIntegersToStrings,
+            Map<String,
+                    Integer> mapOfStringsToIntegers,
+            ArbitraryEnum arbitraryEnum,
+            String[] arrayOfStrings,
+            Date date
+    ) {
         this.stringValue = stringValue;
         this.primitiveCharacterValue = primitiveCharacterValue;
         this.characterValue = characterValue;
@@ -44,6 +67,7 @@ public class AllArgsConstructorPrivate {
         this.mapOfStringsToIntegers = mapOfStringsToIntegers;
         this.arbitraryEnum = arbitraryEnum;
         this.arrayOfStrings = arrayOfStrings;
+        this.date = date;
     }
 
     public String getStringValue() {
@@ -112,5 +136,9 @@ public class AllArgsConstructorPrivate {
 
     public String[] getArrayOfStrings() {
         return arrayOfStrings;
+    }
+
+    public Date getDate() {
+        return date;
     }
 }

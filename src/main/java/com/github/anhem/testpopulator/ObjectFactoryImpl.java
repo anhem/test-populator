@@ -19,7 +19,6 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
 
-
     private final PopulateConfig populateConfig;
     private final Map<Class<?>, Integer> classCounters;
     private ObjectBuilder currentObjectBuilder;
@@ -165,6 +164,9 @@ class ObjectFactoryImpl implements ObjectFactory {
         }
         if (clazz.equals(Instant.class)) {
             return String.format("Instant.parse(\"%s\")", object);
+        }
+        if (clazz.equals(Date.class)) {
+            return String.format("new Date(%sL)", ((Date) object).getTime());
         }
         if (clazz.equals(Character.class)) {
             return String.format("'%s'", object);

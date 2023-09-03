@@ -64,7 +64,7 @@ class PopulateUtilTest {
     void getDeclaredFieldsReturnsAllDeclaredFields() {
         List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class, DEFAULT_POPULATE_CONFIG.getBlacklistedFields());
 
-        assertThat(declaredFields).isNotEmpty().hasSize(19);
+        assertThat(declaredFields).isNotEmpty().hasSize(20);
         List<String> fieldNames = declaredFields.stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());
@@ -209,7 +209,7 @@ class PopulateUtilTest {
                 .filter(method -> isSetterMethod(method, SETTER_PREFIX))
                 .collect(Collectors.toList());
 
-        assertThat(setterMethods).isNotEmpty().hasSize(22);
+        assertThat(setterMethods).isNotEmpty().hasSize(23);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }

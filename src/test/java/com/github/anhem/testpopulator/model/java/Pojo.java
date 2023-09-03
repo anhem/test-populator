@@ -30,6 +30,7 @@ public class Pojo {
     private ArrayList<String> arrayList;
     private HashMap<String, String> hashMap;
     private HashSet<String> hashSet;
+    private Date date;
 
     public String getStringValue() {
         return stringValue;
@@ -205,5 +206,13 @@ public class Pojo {
 
     public void setHashSet(HashSet<String> hashSet) {
         this.hashSet = hashSet;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

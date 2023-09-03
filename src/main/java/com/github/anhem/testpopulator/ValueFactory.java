@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator;
 
 import java.math.BigDecimal;
 import java.time.*;
+import java.util.Date;
 import java.util.UUID;
 
 import static com.github.anhem.testpopulator.RandomUtil.*;
@@ -12,6 +13,7 @@ class ValueFactory {
     private static final ZonedDateTime ZONED_DATE_TIME = LOCAL_DATE_TIME.atZone(ZoneId.of("UTC"));
     private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();
     private static final LocalDate LOCAL_DATE = LOCAL_DATE_TIME.toLocalDate();
+    private static final Date DATE = Date.from(INSTANT);
     private static final String STRING = "string";
     private static final Boolean BOOLEAN = Boolean.TRUE;
     private static final Long LONG = 1L;
@@ -62,6 +64,9 @@ class ValueFactory {
         if (clazz.equals(Instant.class)) {
             return (T) getInstant();
         }
+        if (clazz.equals(Date.class)) {
+            return (T) getDate();
+        }
         if (clazz.equals(Character.class) || clazz.equals(char.class)) {
             return (T) getChar();
         }
@@ -106,6 +111,10 @@ class ValueFactory {
 
     private Instant getInstant() {
         return setRandomValues ? getRandomLocalDateTime().atZone(ZoneId.systemDefault()).toInstant() : INSTANT;
+    }
+
+    private Date getDate() {
+        return setRandomValues ? Date.from(getRandomLocalDateTime().atZone(ZoneId.systemDefault()).toInstant()) : DATE;
     }
 
     private LocalDate getLocalDate() {
