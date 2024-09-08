@@ -2,7 +2,7 @@ package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
 
-interface ObjectFactory {
+public interface ObjectFactory {
 
     void constructor(Class<?> clazz, int expectedChildren);
 

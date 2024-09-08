@@ -23,14 +23,10 @@ class PopulateUtil {
     private PopulateUtil() {
     }
 
-    static List<Type> toArgumentTypes(Parameter parameter, Type[] typeArguments) {
-        if (typeArguments != null) {
-            return Arrays.asList(typeArguments);
-        } else {
-            return Arrays.stream(((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments())
-                    .map(type -> type instanceof WildcardType ? ((WildcardType) type).getUpperBounds()[0] : type)
-                    .collect(Collectors.toList());
-        }
+    static List<Type> toArgumentTypes(Parameter parameter) {
+        return Arrays.stream(((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments())
+                .map(type -> type instanceof WildcardType ? ((WildcardType) type).getUpperBounds()[0] : type)
+                .collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
@@ -60,6 +56,10 @@ class PopulateUtil {
         return Collection.class.isAssignableFrom(clazz) ||
                 Map.class.isAssignableFrom(clazz) ||
                 Iterable.class.isAssignableFrom(clazz);
+    }
+
+    static <T> boolean isCollectionCarrier(ClassCarrier<T> classCarrier) {
+        return classCarrier instanceof CollectionCarrier;
     }
 
     static boolean isValue(Class<?> clazz) {

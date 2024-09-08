@@ -9,6 +9,8 @@ public class AssertTestUtil {
         assertThat(value_2).isNotNull();
         assertThat(value_1).hasNoNullFieldsOrProperties();
         assertThat(value_2).hasNoNullFieldsOrProperties();
+        assertThat(value_1).usingRecursiveAssertion().hasNoNullFields();
+        assertThat(value_2).usingRecursiveAssertion().hasNoNullFields();
         assertThat(value_1).isNotEqualTo(value_2);
     }
 
