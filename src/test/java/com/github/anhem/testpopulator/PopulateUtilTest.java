@@ -9,7 +9,10 @@ import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,20 +28,10 @@ class PopulateUtilTest {
     private static final String SETTER_PREFIX = "set";
 
     @Test
-    void toArgumentTypesReturnsTypeArgumentsAsList() {
-        Type[] typeArguments = getTypeArguments();
-
-        List<Type> argumentTypes = toArgumentTypes(null, typeArguments);
-
-        assertThat(argumentTypes).hasSize(1);
-        assertThat(argumentTypes.get(0)).isEqualTo(typeArguments[0]);
-    }
-
-    @Test
     void toArgumentTypesReturnsParameterArgumentTypes() {
         Parameter parameter = getParameter();
 
-        List<Type> argumentTypes = toArgumentTypes(parameter, null);
+        List<Type> argumentTypes = toArgumentTypes(parameter);
 
         assertThat(argumentTypes).hasSize(1);
         assertThat(argumentTypes.get(0)).isEqualTo(String.class);
@@ -281,16 +274,5 @@ class PopulateUtilTest {
                 .filter(p -> p.getType().equals(Set.class))
                 .findFirst()
                 .orElseThrow();
-    }
-
-    private static Type[] getTypeArguments() {
-        try {
-            Type[] typeArguments = ((ParameterizedType) Pojo.class.getDeclaredField("setOfStrings")
-                    .getGenericType()).getActualTypeArguments();
-            assertThat(typeArguments).hasSize(1);
-            return typeArguments;
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
