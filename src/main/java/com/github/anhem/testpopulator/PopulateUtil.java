@@ -62,6 +62,10 @@ class PopulateUtil {
                 Iterable.class.isAssignableFrom(clazz);
     }
 
+    static <T> boolean isCollectionCarrier(ClassCarrier<T> classCarrier) {
+        return classCarrier instanceof CollectionCarrier;
+    }
+
     static boolean isValue(Class<?> clazz) {
         return clazz.isEnum() || isJavaBaseClass(clazz);
     }
