@@ -2,7 +2,7 @@ package com.github.anhem.testpopulator;
 
 import java.lang.reflect.Type;
 
-public abstract class Carrier {
+abstract class Carrier {
 
     protected final ObjectFactory objectFactory;
 

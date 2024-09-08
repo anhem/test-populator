@@ -3,7 +3,7 @@ package com.github.anhem.testpopulator;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 
-public class ClassCarrier<T> extends Carrier {
+class ClassCarrier<T> extends Carrier {
 
     private final Class<T> clazz;
 

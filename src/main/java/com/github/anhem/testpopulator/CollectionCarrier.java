@@ -7,7 +7,7 @@ import java.util.List;
 
 import static com.github.anhem.testpopulator.PopulateUtil.toArgumentTypes;
 
-public class CollectionCarrier<T> extends ClassCarrier<T> {
+class CollectionCarrier<T> extends ClassCarrier<T> {
 
     private final List<Type> argumentTypes;
 

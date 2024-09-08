@@ -2,7 +2,7 @@ package com.github.anhem.testpopulator;
 
 import java.lang.reflect.Type;
 
-public class TypeCarrier extends Carrier {
+class TypeCarrier extends Carrier {
 
     private final Type type;
 
