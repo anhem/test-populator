@@ -233,7 +233,6 @@ public class PopulateFactory {
 
     private <T> T continuePopulateUsingSetters(Carrier<T> carrier) {
         Class<T> clazz = carrier.getClazz();
-        ObjectFactory objectFactory = carrier.getObjectFactory();
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
@@ -241,7 +240,7 @@ public class PopulateFactory {
             List<Method> methods = getDeclaredMethods(clazz, populateConfig.getBlacklistedMethods()).stream()
                     .filter(method -> isSetterMethod(method, populateConfig.getSetterPrefix()))
                     .collect(Collectors.toList());
-            objectFactory.setter(clazz, methods.size());
+            carrier.getObjectFactory().setter(clazz, methods.size());
             methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, carrier));
             return objectOfClass;
         } catch (Exception e) {
@@ -262,11 +261,10 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingLombokBuilder(Carrier<T> carrier) {
         Class<T> clazz = carrier.getClazz();
-        ObjectFactory objectFactory = carrier.getObjectFactory();
         try {
             Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
             Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(builderObject.getClass(), populateConfig.getBlacklistedMethods());
-            objectFactory.builder(clazz, calculateExpectedChildren(builderObjectMethodsGroupedByInvokeOrder));
+            carrier.getObjectFactory().builder(clazz, calculateExpectedChildren(builderObjectMethodsGroupedByInvokeOrder));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(1)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method, carrier)));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(2)).ifPresent(methods ->
@@ -283,25 +281,22 @@ public class PopulateFactory {
 
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingImmutablesBuilder(Carrier<T> carrier) {
-        Class<T> clazz = carrier.getClazz();
-        ObjectFactory objectFactory = carrier.getObjectFactory();
         try {
-            Class<?> immutablesGeneratedClass = getImmutablesGeneratedClass(clazz);
+            Class<?> immutablesGeneratedClass = getImmutablesGeneratedClass(carrier.getClazz());
             Object builderObject = immutablesGeneratedClass.getDeclaredMethod(BUILDER_METHOD).invoke(null);
             List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(immutablesGeneratedClass, builderObject, populateConfig.getBlacklistedMethods());
-            objectFactory.builder(immutablesGeneratedClass, builderObjectMethods.size());
+            carrier.getObjectFactory().builder(immutablesGeneratedClass, builderObjectMethods.size());
             builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method, carrier));
             Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, IMMUTABLES)), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, carrier.getClazz().getName(), format("%s (%s)", BUILDER, IMMUTABLES)), e);
         }
     }
 
     private <T, V> void continuePopulateForMethod(V objectOfClass, Method method, Carrier<T> carrier) {
-        ObjectFactory objectFactory = carrier.getObjectFactory();
         try {
-            objectFactory.method(method.getName(), method.getParameters().length);
+            carrier.getObjectFactory().method(method.getName(), method.getParameters().length);
             method.invoke(objectOfClass, Stream.of(method.getParameters())
                     .map(parameter -> populateWithOverrides(carrier.toClassTypeCarrier(parameter)))
                     .toArray());
