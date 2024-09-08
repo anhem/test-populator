@@ -29,8 +29,9 @@ public class ClassCarrier<T> extends Carrier {
         return new TypeCarrier(type, objectFactory);
     }
 
-    public CollectionCarrier<?> toCollectionCarrier(Parameter parameter) {
-        Class<?> clazz = parameter.getType();
+    @SuppressWarnings("unchecked")
+    public <V> CollectionCarrier<V> toCollectionCarrier(Parameter parameter) {
+        Class<V> clazz = (Class<V>) parameter.getType();
         return new CollectionCarrier<>(clazz, parameter, objectFactory);
     }
 }

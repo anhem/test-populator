@@ -15,8 +15,9 @@ public class TypeCarrier extends Carrier {
         return type;
     }
 
-    public ClassCarrier<?> toClassCarrier(Type type) {
-        Class<?> clazz = (Class<?>) type;
+    @SuppressWarnings("unchecked")
+    public <T> ClassCarrier<T> toClassCarrier(Type type) {
+        Class<T> clazz = (Class<T>) type;
         return new ClassCarrier<>(clazz, objectFactory);
     }
 }

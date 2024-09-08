@@ -10,7 +10,7 @@ public abstract class Carrier {
         return new ClassCarrier<>(clazz, objectFactory);
     }
 
-    public Carrier(ObjectFactory objectFactory) {
+    protected Carrier(ObjectFactory objectFactory) {
         this.objectFactory = objectFactory;
     }
 
@@ -18,8 +18,9 @@ public abstract class Carrier {
         return objectFactory;
     }
 
-    public CollectionCarrier<?> toCollectionCarrier(Type type, Type[] typeArguments) {
-        Class<?> clazz = (Class<?>) type;
+    @SuppressWarnings("unchecked")
+    public <T> CollectionCarrier<T> toCollectionCarrier(Type type, Type[] typeArguments) {
+        Class<T> clazz = (Class<T>) type;
         return new CollectionCarrier<>(clazz, typeArguments, objectFactory);
     }
 }
