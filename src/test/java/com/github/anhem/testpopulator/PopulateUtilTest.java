@@ -9,7 +9,10 @@ import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,25 +28,10 @@ class PopulateUtilTest {
     private static final String SETTER_PREFIX = "set";
 
     @Test
-    void toArgumentTypesReturnsTypeArgumentsAsList() throws NoSuchFieldException {
-        Type[] typeArguments = ((ParameterizedType) Pojo.class.getDeclaredField("setOfStrings")
-                .getGenericType()).getActualTypeArguments();
-        assertThat(typeArguments).hasSize(1);
-
-        List<Type> argumentTypes = toArgumentTypes(null, typeArguments);
-
-        assertThat(argumentTypes).hasSize(1);
-        assertThat(argumentTypes.get(0)).isEqualTo(typeArguments[0]);
-    }
-
-    @Test
     void toArgumentTypesReturnsParameterArgumentTypes() {
-        Parameter parameter = Arrays.stream(getLargestConstructor(AllArgsConstructor.class, false).getParameters())
-                .filter(p -> p.getType().equals(Set.class))
-                .findFirst()
-                .orElseThrow();
+        Parameter parameter = getParameter();
 
-        List<Type> argumentTypes = toArgumentTypes(parameter, null);
+        List<Type> argumentTypes = toArgumentTypes(parameter);
 
         assertThat(argumentTypes).hasSize(1);
         assertThat(argumentTypes.get(0)).isEqualTo(String.class);
@@ -116,6 +104,21 @@ class PopulateUtilTest {
         assertThat(isCollection(Map.class)).isTrue();
         assertThat(isCollection(ArrayList.class)).isTrue();
     }
+
+    @Test
+    void isCollectionCarrierReturnsFalse() {
+        ClassCarrier<String> classCarrier = Carrier.initialize(String.class, new ObjectFactoryVoid());
+
+        assertThat(isCollectionCarrier(classCarrier)).isFalse();
+    }
+
+    @Test
+    void isCollectionCarrierReturnsTrue() {
+        CollectionCarrier<String> collectionCarrier = new CollectionCarrier<>(String.class, getParameter(), new ObjectFactoryVoid());
+
+        assertThat(isCollectionCarrier(collectionCarrier)).isTrue();
+    }
+
 
     @Test
     void isValueReturnsFalse() {
@@ -266,4 +269,10 @@ class PopulateUtilTest {
         assertThat(isBlackListed(field, DEFAULT_POPULATE_CONFIG.getBlacklistedFields())).isFalse();
     }
 
+    private static Parameter getParameter() {
+        return Arrays.stream(getLargestConstructor(AllArgsConstructor.class, false).getParameters())
+                .filter(p -> p.getType().equals(Set.class))
+                .findFirst()
+                .orElseThrow();
+    }
 }
