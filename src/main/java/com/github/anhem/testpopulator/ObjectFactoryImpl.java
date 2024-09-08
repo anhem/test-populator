@@ -203,7 +203,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     private String getName(Class<?> clazz) {
         int classCounter = classCounters.computeIfAbsent(clazz, k -> 0);
         String string = clazz.getSimpleName();
-        String name = String.format("%s%d", Character.toLowerCase(string.charAt(0)) + string.substring(1), classCounter);
+        String name = String.format("%s_%d", Character.toLowerCase(string.charAt(0)) + string.substring(1), classCounter);
         classCounters.put(clazz, ++classCounter);
         return name;
     }
