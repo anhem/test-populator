@@ -303,9 +303,7 @@ public class PopulateFactory {
         try {
             objectFactory.method(method.getName(), method.getParameters().length);
             method.invoke(objectOfClass, Stream.of(method.getParameters())
-                    .map(parameter -> {
-                        return populateWithOverrides(carrier.toClassTypeCarrier(parameter));
-                    })
+                    .map(parameter -> populateWithOverrides(carrier.toClassTypeCarrier(parameter)))
                     .toArray());
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CALL_METHOD, method.getName(), objectOfClass.getClass().getName()), e);
