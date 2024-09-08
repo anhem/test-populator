@@ -21,8 +21,9 @@ public class ClassCarrier<T> extends Carrier {
         return new ClassCarrier<>(clazz, objectFactory);
     }
 
-    public ClassCarrier<?> toClassCarrier(Parameter parameter) {
-        return new ClassCarrier<>(parameter.getType(), objectFactory);
+    @SuppressWarnings("unchecked")
+    public <V> ClassCarrier<V> toClassCarrier(Parameter parameter) {
+        return (ClassCarrier<V>) new ClassCarrier<>(parameter.getType(), objectFactory);
     }
 
     public TypeCarrier toTypeCarrier(Type type) {
