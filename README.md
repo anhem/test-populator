@@ -1,7 +1,7 @@
 # test-populator
 
 [![CI](https://github.com/anhem/test-populator/workflows/CI/badge.svg)](https://github.com/anhem/test-populator/actions)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.anhem%3Atest-populator&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.anhem%3Atest-populator)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=anhem_test-populator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=anhem_test-populator)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://central.sonatype.com/artifact/com.github.anhem/test-populator/)
 [![OpenJDK](https://img.shields.io/badge/OpenJDK-11-brightgreen)](https://github.com/anhem/test-populator/blob/main/pom.xml#L26)
 
