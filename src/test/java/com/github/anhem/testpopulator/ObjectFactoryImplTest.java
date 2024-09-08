@@ -37,7 +37,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass0 = new MyClass(\"myString\", 1);"));
+        assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass_0 = new MyClass(\"myString\", 1);"));
     }
 
     @Test
@@ -56,10 +56,10 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass0 = new MyClass();",
+                "public static final MyClass myClass_0 = new MyClass();",
                 "static {",
-                "myClass0.setString(\"myString\");",
-                "myClass0.setInteger(1);",
+                "myClass_0.setString(\"myString\");",
+                "myClass_0.setInteger(1);",
                 "}"
         ));
     }
@@ -80,7 +80,7 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass0 = MyClass.builder()",
+                "public static final MyClass myClass_0 = MyClass.builder()",
                 ".string(\"myString\")",
                 ".integer(1)",
                 ".build();"
@@ -103,8 +103,8 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final Set<String> set0 = Set.of(\"myString\");",
-                "public static final MyClass myClass0 = new MyClass(set0);"
+                "public static final Set<String> set_0 = Set.of(\"myString\");",
+                "public static final MyClass myClass_0 = new MyClass(set_0);"
         ));
     }
 
@@ -124,11 +124,11 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final HashSet<String> hashSet0 = new HashSet<>();",
+                "public static final HashSet<String> hashSet_0 = new HashSet<>();",
                 "static {",
-                "hashSet0.add(\"myString\");",
+                "hashSet_0.add(\"myString\");",
                 "}",
-                "public static final MyClass myClass0 = new MyClass(hashSet0);"
+                "public static final MyClass myClass_0 = new MyClass(hashSet_0);"
 
         ));
     }
@@ -150,8 +150,8 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final Map<String, String> map0 = Map.of(\"myKey\", \"myValue\");",
-                "public static final MyClass myClass0 = new MyClass(map0);"
+                "public static final Map<String, String> map_0 = Map.of(\"myKey\", \"myValue\");",
+                "public static final MyClass myClass_0 = new MyClass(map_0);"
         ));
     }
 
@@ -171,11 +171,11 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final HashMap<String, String> hashMap0 = new HashMap<>();",
+                "public static final HashMap<String, String> hashMap_0 = new HashMap<>();",
                 "static {",
-                "hashMap0.put(\"myKey\", \"myValue\");",
+                "hashMap_0.put(\"myKey\", \"myValue\");",
                 "}",
-                "public static final MyClass myClass0 = new MyClass(hashMap0);"
+                "public static final MyClass myClass_0 = new MyClass(hashMap_0);"
 
         ));
     }
@@ -196,8 +196,8 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final List<String> list0 = List.of(\"myString\");",
-                "public static final MyClass myClass0 = new MyClass(list0);"
+                "public static final List<String> list_0 = List.of(\"myString\");",
+                "public static final MyClass myClass_0 = new MyClass(list_0);"
         ));
     }
 
@@ -217,11 +217,11 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final ArrayList<String> arrayList0 = new ArrayList<>();",
+                "public static final ArrayList<String> arrayList_0 = new ArrayList<>();",
                 "static {",
-                "arrayList0.add(\"myString\");",
+                "arrayList_0.add(\"myString\");",
                 "}",
-                "public static final MyClass myClass0 = new MyClass(arrayList0);"
+                "public static final MyClass myClass_0 = new MyClass(arrayList_0);"
         ));
     }
 
@@ -239,8 +239,8 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.ObjectFactoryImplTest.MyClass"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final Boolean[] boolean0 = new Boolean[]{true};",
-                "public static final MyClass myClass0 = new MyClass(boolean0);"
+                "public static final Boolean[] boolean_0 = new Boolean[]{true};",
+                "public static final MyClass myClass_0 = new MyClass(boolean_0);"
         ));
     }
 
@@ -253,7 +253,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEqualTo(Set.of("java.util.UUID"));
         assertThat(objectResult.getStaticImports()).isEmpty();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final UUID uUID0 = UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\");"
+                "public static final UUID uUID_0 = UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\");"
         ));
     }
 
@@ -267,7 +267,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEmpty();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final String string0 = \"myString\";"
+                "public static final String string_0 = \"myString\";"
         ));
     }
 
@@ -304,7 +304,7 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.model.java.ArbitraryEnum.A"
         ));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass0 = new MyClass(" +
+                "public static final MyClass myClass_0 = new MyClass(" +
                         "A, " +
                         "1, " +
                         "2L, " +
