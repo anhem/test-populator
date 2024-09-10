@@ -76,11 +76,14 @@ public class PopulateFactory {
 
     private <T> T populateWithOverrides(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
-        ObjectFactory objectFactory = classCarrier.getObjectFactory();
         if (overridePopulates.containsKey(clazz)) {
             T overridePopulateValue = getOverridePopulateValue(clazz, overridePopulates);
-            objectFactory.overridePopulate(clazz, overridePopulates.get(clazz));
+            classCarrier.getObjectFactory().overridePopulate(clazz, overridePopulates.get(clazz));
             return overridePopulateValue;
+        }
+        if (!isJavaBaseClass(clazz) && !classCarrier.addVisited()) {
+            classCarrier.getObjectFactory().nullValue(clazz);
+            return null;
         }
         if (isCollectionCarrier(classCarrier)) {
             return continuePopulateForCollection((CollectionCarrier<T>) classCarrier);
@@ -90,7 +93,7 @@ public class PopulateFactory {
         }
         if (isValue(clazz)) {
             T value = valueFactory.createValue(clazz);
-            objectFactory.value(value);
+            classCarrier.getObjectFactory().value(value);
             return value;
         }
         return continuePopulateWithStrategies(classCarrier);
@@ -107,58 +110,76 @@ public class PopulateFactory {
         return (T) array;
     }
 
-    @SuppressWarnings("unchecked")
+
     private <T> T continuePopulateForCollection(CollectionCarrier<T> classCarrier) {
-        Class<T> clazz = classCarrier.getClazz();
-        ObjectFactory objectFactory = classCarrier.getObjectFactory();
-        List<Type> argumentTypes = classCarrier.getArgumentTypes();
         try {
-            TypeCarrier typeCarrier = classCarrier.toTypeCarrier(argumentTypes.get(0));
-            if (isMap(clazz)) {
-                if (clazz.getConstructors().length > 0) {
-                    objectFactory.map(clazz);
-                    Object key = continuePopulateWithType(typeCarrier);
-                    Object value = continuePopulateWithType(classCarrier.toTypeCarrier(argumentTypes.get(1)));
-                    Map<Object, Object> map = (Map<Object, Object>) clazz.getConstructor().newInstance();
-                    map.put(key, value);
-                    return (T) map;
-                } else {
-                    objectFactory.mapOf();
-                    Object key = continuePopulateWithType(typeCarrier);
-                    Object value = continuePopulateWithType(classCarrier.toTypeCarrier(argumentTypes.get(1)));
-                    return (T) Map.of(key, value);
-                }
+            if (isMap(classCarrier.getClazz())) {
+                return continuePopulateForMap(classCarrier);
             }
-            if (isSet(clazz)) {
-                if (clazz.getConstructors().length > 0) {
-                    objectFactory.set(clazz);
-                    Object value = continuePopulateWithType(typeCarrier);
-                    Set<Object> set = (Set<Object>) clazz.getConstructor().newInstance();
-                    set.add(value);
-                    return (T) set;
-                } else {
-                    objectFactory.setOf();
-                    Object value = continuePopulateWithType(typeCarrier);
-                    return (T) Set.of(value);
-                }
+            if (isSet(classCarrier.getClazz())) {
+                return continuePopulateForSet(classCarrier);
             }
-            if (isCollection(clazz)) {
-                if (clazz.getConstructors().length > 0) {
-                    objectFactory.list(clazz);
-                    Object value = continuePopulateWithType(typeCarrier);
-                    List<Object> list = (List<Object>) clazz.getConstructor().newInstance();
-                    list.add(value);
-                    return (T) list;
-                } else {
-                    objectFactory.listOf();
-                    Object value = continuePopulateWithType(typeCarrier);
-                    return (T) List.of(value);
-                }
+            if (isCollection(classCarrier.getClazz())) {
+                return continuePopulateForList(classCarrier);
             }
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_COLLECTION, clazz.getTypeName()), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_COLLECTION, classCarrier.getClazz().getTypeName()), e);
         }
-        throw new PopulateException(format(MISSING_COLLECTION_TYPE, clazz.getTypeName()));
+        throw new PopulateException(format(MISSING_COLLECTION_TYPE, classCarrier.getClazz().getTypeName()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateForMap(CollectionCarrier<T> classCarrier) throws Exception {
+        if (hasConstructors(classCarrier)) {
+            classCarrier.getObjectFactory().map(classCarrier.getClazz());
+            Map<Object, Object> map = (Map<Object, Object>) classCarrier.getClazz().getConstructor().newInstance();
+            Optional<Object> key = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0))));
+            Optional<Object> value = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1))));
+            if (key.isPresent() && value.isPresent()) {
+                map.put(key.get(), value.get());
+            }
+            return (T) map;
+        } else {
+            classCarrier.getObjectFactory().mapOf();
+            Optional<Object> key = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0))));
+            Optional<Object> value = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1))));
+            if (key.isPresent() && value.isPresent()) {
+                return (T) Map.of(key.get(), value.get());
+            }
+            return (T) Map.of();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateForSet(CollectionCarrier<T> classCarrier) throws Exception {
+        if (hasConstructors(classCarrier)) {
+            classCarrier.getObjectFactory().set(classCarrier.getClazz());
+            Set<Object> set = (Set<Object>) classCarrier.getClazz().getConstructor().newInstance();
+            Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0))))
+                    .ifPresent(set::add);
+            return (T) set;
+        } else {
+            classCarrier.getObjectFactory().setOf();
+            return Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0))))
+                    .map(value -> (T) Set.of(value))
+                    .orElseGet(() -> (T) Set.of());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateForList(CollectionCarrier<T> classCarrier) throws Exception {
+        if (hasConstructors(classCarrier)) {
+            classCarrier.getObjectFactory().list(classCarrier.getClazz());
+            List<Object> list = (List<Object>) classCarrier.getClazz().getConstructor().newInstance();
+            Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0))))
+                    .ifPresent(list::add);
+            return (T) list;
+        } else {
+            classCarrier.getObjectFactory().listOf();
+            return Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0))))
+                    .map(value -> (T) List.of(value))
+                    .orElseGet(() -> (T) List.of());
+        }
     }
 
     private Object continuePopulateWithType(TypeCarrier typeCarrier) {
@@ -309,8 +330,7 @@ public class PopulateFactory {
                         } else {
                             return populateWithOverrides(classCarrier.toClassCarrier(parameter));
                         }
-                    })
-                    .toArray());
+                    }).toArray());
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CALL_METHOD, method.getName(), objectOfClass.getClass().getName()), e);
         }

@@ -156,6 +156,10 @@ class PopulateUtil {
         }
     }
 
+    static <T> boolean hasConstructors(CollectionCarrier<T> collectionCarrier) {
+        return collectionCarrier.getClazz().getConstructors().length > 0;
+    }
+
     private static boolean hasOnlyNoArgumentConstructor(Class<?> clazz, boolean canAccessNonPublicConstructor) {
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
         if (Arrays.stream(constructors).count() == 1) {

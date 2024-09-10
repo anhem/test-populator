@@ -11,13 +11,13 @@ class CollectionCarrier<T> extends ClassCarrier<T> {
 
     private final List<Type> argumentTypes;
 
-    public CollectionCarrier(Class<T> clazz, Type[] typeArguments, ObjectFactory objectFactory) {
-        super(clazz, objectFactory);
+    public CollectionCarrier(Class<T> clazz, Type[] typeArguments, ObjectFactory objectFactory, List<String> visited) {
+        super(clazz, objectFactory, visited);
         this.argumentTypes = Arrays.asList(typeArguments);
     }
 
-    public CollectionCarrier(Class<T> clazz, Parameter parameter, ObjectFactory objectFactory) {
-        super(clazz, objectFactory);
+    public CollectionCarrier(Class<T> clazz, Parameter parameter, ObjectFactory objectFactory, List<String> visited) {
+        super(clazz, objectFactory, visited);
         this.argumentTypes = toArgumentTypes(parameter);
     }
 

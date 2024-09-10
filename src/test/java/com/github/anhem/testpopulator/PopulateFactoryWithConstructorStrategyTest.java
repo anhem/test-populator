@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -106,5 +107,15 @@ class PopulateFactoryWithConstructorStrategyTest {
         NestedCollections value_1 = populateFactory.populate(NestedCollections.class);
         NestedCollections value_2 = populateFactory.populate(NestedCollections.class);
         assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void circularDependency() {
+        A value_1 = populateFactory.populate(A.class);
+        A value_2 = populateFactory.populate(A.class);
+
+        assertThat(value_1).isNotNull();
+        assertThat(value_2).isNotNull();
+        assertThat(value_1).isNotEqualTo(value_2);
     }
 }

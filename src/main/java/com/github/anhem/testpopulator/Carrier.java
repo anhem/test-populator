@@ -1,17 +1,21 @@
 package com.github.anhem.testpopulator;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 abstract class Carrier {
 
     protected final ObjectFactory objectFactory;
+    protected final List<String> visited;
 
     public static <T> ClassCarrier<T> initialize(Class<T> clazz, ObjectFactory objectFactory) {
-        return new ClassCarrier<>(clazz, objectFactory);
+        return new ClassCarrier<>(clazz, objectFactory, new ArrayList<>());
     }
 
-    protected Carrier(ObjectFactory objectFactory) {
+    protected Carrier(ObjectFactory objectFactory, List<String> visited) {
         this.objectFactory = objectFactory;
+        this.visited = visited;
     }
 
     public ObjectFactory getObjectFactory() {
@@ -20,7 +24,6 @@ abstract class Carrier {
 
     @SuppressWarnings("unchecked")
     public <T> CollectionCarrier<T> toCollectionCarrier(Type type, Type[] typeArguments) {
-        Class<T> clazz = (Class<T>) type;
-        return new CollectionCarrier<>(clazz, typeArguments, objectFactory);
+        return new CollectionCarrier<>((Class<T>) type, typeArguments, objectFactory, visited);
     }
 }

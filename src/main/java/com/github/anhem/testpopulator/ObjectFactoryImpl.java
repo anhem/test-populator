@@ -104,6 +104,13 @@ class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
+    public <T> void nullValue(Class<T> clazz) {
+        setNextObjectBuilder(clazz, VALUE, 0);
+        currentObjectBuilder.setValue("null");
+        setPreviousObjectBuilder();
+    }
+
+    @Override
     public ObjectResult build() {
         ObjectBuilder topObjectBuilder = toTop();
         return topObjectBuilder != null ? topObjectBuilder.build() : ObjectResult.EMPTY_OBJECT_RESULT;
@@ -207,5 +214,4 @@ class ObjectFactoryImpl implements ObjectFactory {
         classCounters.put(clazz, ++classCounter);
         return name;
     }
-
 }
