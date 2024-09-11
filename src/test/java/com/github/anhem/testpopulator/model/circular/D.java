@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.model.java.circular;
+package com.github.anhem.testpopulator.model.circular;
 
 import lombok.*;
 

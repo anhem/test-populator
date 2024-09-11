@@ -1,9 +1,9 @@
 package com.github.anhem.testpopulator.testutil;
 
-import com.github.anhem.testpopulator.model.java.circular.A;
-import com.github.anhem.testpopulator.model.java.circular.B;
-import com.github.anhem.testpopulator.model.java.circular.C;
-import com.github.anhem.testpopulator.model.java.circular.D;
+import com.github.anhem.testpopulator.model.circular.A;
+import com.github.anhem.testpopulator.model.circular.B;
+import com.github.anhem.testpopulator.model.circular.C;
+import com.github.anhem.testpopulator.model.circular.D;
 
 import java.util.List;
 
