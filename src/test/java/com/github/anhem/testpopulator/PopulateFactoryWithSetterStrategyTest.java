@@ -1,7 +1,9 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.model.java.*;
+import com.github.anhem.testpopulator.model.java.circular.A;
+import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
+import com.github.anhem.testpopulator.model.java.setter.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +12,7 @@ import java.util.List;
 import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.Strategy.SETTER;
+import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -118,5 +121,13 @@ class PopulateFactoryWithSetterStrategyTest {
         assertThatThrownBy(() -> populateFactory.populate(PojoPrivateConstructor.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, PojoPrivateConstructor.class.getName(), populateConfig.getStrategyOrder()));
+    }
+
+    @Test
+    void circularDependency() {
+        A value_1 = populateFactory.populate(A.class);
+        A value_2 = populateFactory.populate(A.class);
+
+        assertCircularDependency(value_1, value_2);
     }
 }

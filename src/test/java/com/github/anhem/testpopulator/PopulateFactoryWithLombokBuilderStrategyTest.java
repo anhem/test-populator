@@ -2,7 +2,8 @@ package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.model.java.AllArgsConstructor;
+import com.github.anhem.testpopulator.model.java.circular.A;
+import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableWithSingular;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
+import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -94,6 +96,14 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
 
         assertObjectCanBeRebuilt(value_1);
         assertObjectCanBeRebuilt(value_2);
+    }
+
+    @Test
+    void circularDependency() {
+        A value_1 = populateFactory.populate(A.class);
+        A value_2 = populateFactory.populate(A.class);
+
+        assertCircularDependency(value_1, value_2);
     }
 
     private ObjectAssert<LombokImmutable> assertObjectCanBeRebuilt(LombokImmutable lombokImmutable) {

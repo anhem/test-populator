@@ -1,12 +1,14 @@
-package com.github.anhem.testpopulator.model.java;
+package com.github.anhem.testpopulator.model.java.setter;
 
-import java.time.Instant;
+import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class Pojo {
+public class PojoPrivateConstructor {
 
     private String stringValue;
     private char primitiveCharacterValue;
@@ -19,18 +21,15 @@ public class Pojo {
     private Double doubleValue;
     private LocalDate localDate;
     private LocalDateTime localDateTime;
-    private ZonedDateTime zonedDateTime;
-    private Instant instant;
     private List<String> listOfStrings;
     private Set<String> setOfStrings;
     private Map<Integer, String> mapOfIntegersToStrings;
     private Map<String, Integer> mapOfStringsToIntegers;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
-    private ArrayList<String> arrayList;
-    private HashMap<String, String> hashMap;
-    private HashSet<String> hashSet;
-    private Date date;
+
+    private PojoPrivateConstructor() {
+    }
 
     public String getStringValue() {
         return stringValue;
@@ -120,22 +119,6 @@ public class Pojo {
         this.localDateTime = localDateTime;
     }
 
-    public ZonedDateTime getZonedDateTime() {
-        return zonedDateTime;
-    }
-
-    public void setZonedDateTime(ZonedDateTime zonedDateTime) {
-        this.zonedDateTime = zonedDateTime;
-    }
-
-    public Instant getInstant() {
-        return instant;
-    }
-
-    public void setInstant(Instant instant) {
-        this.instant = instant;
-    }
-
     public List<String> getListOfStrings() {
         return listOfStrings;
     }
@@ -182,37 +165,5 @@ public class Pojo {
 
     public void setArrayOfStrings(String[] arrayOfStrings) {
         this.arrayOfStrings = arrayOfStrings;
-    }
-
-    public ArrayList<String> getArrayList() {
-        return arrayList;
-    }
-
-    public void setArrayList(ArrayList<String> arrayList) {
-        this.arrayList = arrayList;
-    }
-
-    public HashMap<String, String> getHashMap() {
-        return hashMap;
-    }
-
-    public void setHashMap(HashMap<String, String> hashMap) {
-        this.hashMap = hashMap;
-    }
-
-    public HashSet<String> getHashSet() {
-        return hashSet;
-    }
-
-    public void setHashSet(HashSet<String> hashSet) {
-        this.hashSet = hashSet;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 }

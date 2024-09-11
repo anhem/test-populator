@@ -3,7 +3,7 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.immutables.*;
-import com.github.anhem.testpopulator.model.java.AllArgsConstructor;
+import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

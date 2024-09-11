@@ -1,12 +1,14 @@
-package com.github.anhem.testpopulator.model.java;
+package com.github.anhem.testpopulator.model.java.setter;
 
+import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
+
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.ZonedDateTime;
+import java.util.*;
 
-public class PojoWithCustomSetters {
+public class Pojo {
 
     private String stringValue;
     private char primitiveCharacterValue;
@@ -19,18 +21,24 @@ public class PojoWithCustomSetters {
     private Double doubleValue;
     private LocalDate localDate;
     private LocalDateTime localDateTime;
+    private ZonedDateTime zonedDateTime;
+    private Instant instant;
     private List<String> listOfStrings;
     private Set<String> setOfStrings;
     private Map<Integer, String> mapOfIntegersToStrings;
     private Map<String, Integer> mapOfStringsToIntegers;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
+    private ArrayList<String> arrayList;
+    private HashMap<String, String> hashMap;
+    private HashSet<String> hashSet;
+    private Date date;
 
     public String getStringValue() {
         return stringValue;
     }
 
-    public void withStringValue(String stringValue) {
+    public void setStringValue(String stringValue) {
         this.stringValue = stringValue;
     }
 
@@ -38,7 +46,7 @@ public class PojoWithCustomSetters {
         return primitiveCharacterValue;
     }
 
-    public void withPrimitiveCharacterValue(char primitiveCharacterValue) {
+    public void setPrimitiveCharacterValue(char primitiveCharacterValue) {
         this.primitiveCharacterValue = primitiveCharacterValue;
     }
 
@@ -46,7 +54,7 @@ public class PojoWithCustomSetters {
         return characterValue;
     }
 
-    public void withCharacterValue(Character characterValue) {
+    public void setCharacterValue(Character characterValue) {
         this.characterValue = characterValue;
     }
 
@@ -54,7 +62,7 @@ public class PojoWithCustomSetters {
         return primitiveIntegerValue;
     }
 
-    public void withPrimitiveIntegerValue(int primitiveIntegerValue) {
+    public void setPrimitiveIntegerValue(int primitiveIntegerValue) {
         this.primitiveIntegerValue = primitiveIntegerValue;
     }
 
@@ -62,7 +70,7 @@ public class PojoWithCustomSetters {
         return integerValue;
     }
 
-    public void withIntegerValue(Integer integerValue) {
+    public void setIntegerValue(Integer integerValue) {
         this.integerValue = integerValue;
     }
 
@@ -70,7 +78,7 @@ public class PojoWithCustomSetters {
         return primitiveLongValue;
     }
 
-    public void withPrimitiveLongValue(long primitiveLongValue) {
+    public void setPrimitiveLongValue(long primitiveLongValue) {
         this.primitiveLongValue = primitiveLongValue;
     }
 
@@ -78,7 +86,7 @@ public class PojoWithCustomSetters {
         return longValue;
     }
 
-    public void withLongValue(Long longValue) {
+    public void setLongValue(Long longValue) {
         this.longValue = longValue;
     }
 
@@ -86,7 +94,7 @@ public class PojoWithCustomSetters {
         return primitiveDoubleValue;
     }
 
-    public void withPrimitiveDoubleValue(double primitiveDoubleValue) {
+    public void setPrimitiveDoubleValue(double primitiveDoubleValue) {
         this.primitiveDoubleValue = primitiveDoubleValue;
     }
 
@@ -94,7 +102,7 @@ public class PojoWithCustomSetters {
         return doubleValue;
     }
 
-    public void withDoubleValue(Double doubleValue) {
+    public void setDoubleValue(Double doubleValue) {
         this.doubleValue = doubleValue;
     }
 
@@ -102,7 +110,7 @@ public class PojoWithCustomSetters {
         return localDate;
     }
 
-    public void withLocalDate(LocalDate localDate) {
+    public void setLocalDate(LocalDate localDate) {
         this.localDate = localDate;
     }
 
@@ -110,15 +118,31 @@ public class PojoWithCustomSetters {
         return localDateTime;
     }
 
-    public void withLocalDateTime(LocalDateTime localDateTime) {
+    public void setLocalDateTime(LocalDateTime localDateTime) {
         this.localDateTime = localDateTime;
+    }
+
+    public ZonedDateTime getZonedDateTime() {
+        return zonedDateTime;
+    }
+
+    public void setZonedDateTime(ZonedDateTime zonedDateTime) {
+        this.zonedDateTime = zonedDateTime;
+    }
+
+    public Instant getInstant() {
+        return instant;
+    }
+
+    public void setInstant(Instant instant) {
+        this.instant = instant;
     }
 
     public List<String> getListOfStrings() {
         return listOfStrings;
     }
 
-    public void withListOfStrings(List<String> listOfStrings) {
+    public void setListOfStrings(List<String> listOfStrings) {
         this.listOfStrings = listOfStrings;
     }
 
@@ -126,7 +150,7 @@ public class PojoWithCustomSetters {
         return setOfStrings;
     }
 
-    public void withOfStrings(Set<String> setOfStrings) {
+    public void setSetOfStrings(Set<String> setOfStrings) {
         this.setOfStrings = setOfStrings;
     }
 
@@ -134,7 +158,7 @@ public class PojoWithCustomSetters {
         return mapOfIntegersToStrings;
     }
 
-    public void withMapOfIntegersToStrings(Map<Integer, String> mapOfIntegersToStrings) {
+    public void setMapOfIntegersToStrings(Map<Integer, String> mapOfIntegersToStrings) {
         this.mapOfIntegersToStrings = mapOfIntegersToStrings;
     }
 
@@ -142,7 +166,7 @@ public class PojoWithCustomSetters {
         return mapOfStringsToIntegers;
     }
 
-    public void withMapOfStringsToIntegers(Map<String, Integer> mapOfStringsToIntegers) {
+    public void setMapOfStringsToIntegers(Map<String, Integer> mapOfStringsToIntegers) {
         this.mapOfStringsToIntegers = mapOfStringsToIntegers;
     }
 
@@ -150,7 +174,7 @@ public class PojoWithCustomSetters {
         return arbitraryEnum;
     }
 
-    public void withArbitraryEnum(ArbitraryEnum arbitraryEnum) {
+    public void setArbitraryEnum(ArbitraryEnum arbitraryEnum) {
         this.arbitraryEnum = arbitraryEnum;
     }
 
@@ -158,7 +182,39 @@ public class PojoWithCustomSetters {
         return arrayOfStrings;
     }
 
-    public void withArrayOfStrings(String[] arrayOfStrings) {
+    public void setArrayOfStrings(String[] arrayOfStrings) {
         this.arrayOfStrings = arrayOfStrings;
+    }
+
+    public ArrayList<String> getArrayList() {
+        return arrayList;
+    }
+
+    public void setArrayList(ArrayList<String> arrayList) {
+        this.arrayList = arrayList;
+    }
+
+    public HashMap<String, String> getHashMap() {
+        return hashMap;
+    }
+
+    public void setHashMap(HashMap<String, String> hashMap) {
+        this.hashMap = hashMap;
+    }
+
+    public HashSet<String> getHashSet() {
+        return hashSet;
+    }
+
+    public void setHashSet(HashSet<String> hashSet) {
+        this.hashSet = hashSet;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

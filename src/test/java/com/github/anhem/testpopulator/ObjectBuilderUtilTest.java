@@ -1,8 +1,8 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
-import com.github.anhem.testpopulator.model.java.NestedCollections;
-import com.github.anhem.testpopulator.model.java.Pojo;
+import com.github.anhem.testpopulator.model.java.constructor.NestedCollections;
+import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -16,7 +16,7 @@ class ObjectBuilderUtilTest {
 
     @Test
     void getPackageNameReturnsPackageName() {
-        assertThat(getPackageName(Pojo.class)).isEqualTo("com.github.anhem.testpopulator.model.java");
+        assertThat(getPackageName(Pojo.class)).isEqualTo("com.github.anhem.testpopulator.model.java.setter");
     }
 
     @Test
@@ -36,7 +36,7 @@ class ObjectBuilderUtilTest {
 
         addImport(Pojo.class, null, imports, staticImports);
 
-        assertThat(imports).isEqualTo(Set.of("com.github.anhem.testpopulator.model.java.Pojo"));
+        assertThat(imports).isEqualTo(Set.of("com.github.anhem.testpopulator.model.java.setter.Pojo"));
         assertThat(staticImports).isEqualTo(Set.of());
     }
 
@@ -48,7 +48,7 @@ class ObjectBuilderUtilTest {
         addImport(NestedCollections.SimpleClass.class, null, imports, staticImports);
 
         assertThat(imports).isEqualTo(Set.of());
-        assertThat(staticImports).isEqualTo(Set.of("com.github.anhem.testpopulator.model.java.NestedCollections.SimpleClass"));
+        assertThat(staticImports).isEqualTo(Set.of("com.github.anhem.testpopulator.model.java.constructor.NestedCollections.SimpleClass"));
     }
 
     @Test

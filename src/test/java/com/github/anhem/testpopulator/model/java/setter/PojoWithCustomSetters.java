@@ -1,13 +1,14 @@
-package com.github.anhem.testpopulator.model.java;
+package com.github.anhem.testpopulator.model.java.setter;
+
+import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class PojoAbstract {
+public class PojoWithCustomSetters {
 
     private String stringValue;
     private char primitiveCharacterValue;
@@ -26,13 +27,12 @@ public abstract class PojoAbstract {
     private Map<String, Integer> mapOfStringsToIntegers;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
-    private Date date;
 
     public String getStringValue() {
         return stringValue;
     }
 
-    public void setStringValue(String stringValue) {
+    public void withStringValue(String stringValue) {
         this.stringValue = stringValue;
     }
 
@@ -40,7 +40,7 @@ public abstract class PojoAbstract {
         return primitiveCharacterValue;
     }
 
-    public void setPrimitiveCharacterValue(char primitiveCharacterValue) {
+    public void withPrimitiveCharacterValue(char primitiveCharacterValue) {
         this.primitiveCharacterValue = primitiveCharacterValue;
     }
 
@@ -48,7 +48,7 @@ public abstract class PojoAbstract {
         return characterValue;
     }
 
-    public void setCharacterValue(Character characterValue) {
+    public void withCharacterValue(Character characterValue) {
         this.characterValue = characterValue;
     }
 
@@ -56,7 +56,7 @@ public abstract class PojoAbstract {
         return primitiveIntegerValue;
     }
 
-    public void setPrimitiveIntegerValue(int primitiveIntegerValue) {
+    public void withPrimitiveIntegerValue(int primitiveIntegerValue) {
         this.primitiveIntegerValue = primitiveIntegerValue;
     }
 
@@ -64,7 +64,7 @@ public abstract class PojoAbstract {
         return integerValue;
     }
 
-    public void setIntegerValue(Integer integerValue) {
+    public void withIntegerValue(Integer integerValue) {
         this.integerValue = integerValue;
     }
 
@@ -72,7 +72,7 @@ public abstract class PojoAbstract {
         return primitiveLongValue;
     }
 
-    public void setPrimitiveLongValue(long primitiveLongValue) {
+    public void withPrimitiveLongValue(long primitiveLongValue) {
         this.primitiveLongValue = primitiveLongValue;
     }
 
@@ -80,7 +80,7 @@ public abstract class PojoAbstract {
         return longValue;
     }
 
-    public void setLongValue(Long longValue) {
+    public void withLongValue(Long longValue) {
         this.longValue = longValue;
     }
 
@@ -88,7 +88,7 @@ public abstract class PojoAbstract {
         return primitiveDoubleValue;
     }
 
-    public void setPrimitiveDoubleValue(double primitiveDoubleValue) {
+    public void withPrimitiveDoubleValue(double primitiveDoubleValue) {
         this.primitiveDoubleValue = primitiveDoubleValue;
     }
 
@@ -96,7 +96,7 @@ public abstract class PojoAbstract {
         return doubleValue;
     }
 
-    public void setDoubleValue(Double doubleValue) {
+    public void withDoubleValue(Double doubleValue) {
         this.doubleValue = doubleValue;
     }
 
@@ -104,7 +104,7 @@ public abstract class PojoAbstract {
         return localDate;
     }
 
-    public void setLocalDate(LocalDate localDate) {
+    public void withLocalDate(LocalDate localDate) {
         this.localDate = localDate;
     }
 
@@ -112,7 +112,7 @@ public abstract class PojoAbstract {
         return localDateTime;
     }
 
-    public void setLocalDateTime(LocalDateTime localDateTime) {
+    public void withLocalDateTime(LocalDateTime localDateTime) {
         this.localDateTime = localDateTime;
     }
 
@@ -120,7 +120,7 @@ public abstract class PojoAbstract {
         return listOfStrings;
     }
 
-    public void setListOfStrings(List<String> listOfStrings) {
+    public void withListOfStrings(List<String> listOfStrings) {
         this.listOfStrings = listOfStrings;
     }
 
@@ -128,7 +128,7 @@ public abstract class PojoAbstract {
         return setOfStrings;
     }
 
-    public void setSetOfStrings(Set<String> setOfStrings) {
+    public void withOfStrings(Set<String> setOfStrings) {
         this.setOfStrings = setOfStrings;
     }
 
@@ -136,7 +136,7 @@ public abstract class PojoAbstract {
         return mapOfIntegersToStrings;
     }
 
-    public void setMapOfIntegersToStrings(Map<Integer, String> mapOfIntegersToStrings) {
+    public void withMapOfIntegersToStrings(Map<Integer, String> mapOfIntegersToStrings) {
         this.mapOfIntegersToStrings = mapOfIntegersToStrings;
     }
 
@@ -144,7 +144,7 @@ public abstract class PojoAbstract {
         return mapOfStringsToIntegers;
     }
 
-    public void setMapOfStringsToIntegers(Map<String, Integer> mapOfStringsToIntegers) {
+    public void withMapOfStringsToIntegers(Map<String, Integer> mapOfStringsToIntegers) {
         this.mapOfStringsToIntegers = mapOfStringsToIntegers;
     }
 
@@ -152,7 +152,7 @@ public abstract class PojoAbstract {
         return arbitraryEnum;
     }
 
-    public void setArbitraryEnum(ArbitraryEnum arbitraryEnum) {
+    public void withArbitraryEnum(ArbitraryEnum arbitraryEnum) {
         this.arbitraryEnum = arbitraryEnum;
     }
 
@@ -160,15 +160,7 @@ public abstract class PojoAbstract {
         return arrayOfStrings;
     }
 
-    public void setArrayOfStrings(String[] arrayOfStrings) {
+    public void withArrayOfStrings(String[] arrayOfStrings) {
         this.arrayOfStrings = arrayOfStrings;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 }

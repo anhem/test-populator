@@ -3,9 +3,14 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
-import com.github.anhem.testpopulator.model.java.*;
+import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
+import com.github.anhem.testpopulator.model.java.HasBlackListed;
+import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
+import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
+import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorPrivate;
 import com.github.anhem.testpopulator.model.java.override.MyUUID;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
+import com.github.anhem.testpopulator.model.java.setter.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.Test;
 

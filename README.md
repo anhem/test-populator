@@ -96,7 +96,7 @@ argument.
 ##### SETTER
 
 Use a no-arguments/default constructor to instantiate and setter methods to populate fields. Applied to classes that
-only have a no-arguments/default constructor and at least one setter method.
+have a no-arguments/default constructor and at least one setter method.
 
 ##### FIELD
 
@@ -104,7 +104,7 @@ only have a no-arguments/default constructor and at least one setter method.
 other strategies first)
 
 Use a no-arguments/default constructor to instantiate and then use reflection to populate all the fields. Applied to
-classes that only have a no-arguments/default constructor.
+classes that have a no-arguments/default constructor.
 
 ##### BUILDER
 

@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.model.java;
+package com.github.anhem.testpopulator.model.java.setter;
 
 import java.util.List;
 import java.util.Map;

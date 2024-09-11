@@ -1,8 +1,9 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.model.circular.A;
-import com.github.anhem.testpopulator.model.java.*;
+import com.github.anhem.testpopulator.model.java.circular.A;
+import com.github.anhem.testpopulator.model.java.constructor.*;
+import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
+import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,7 +79,7 @@ class PopulateFactoryWithConstructorStrategyTest {
     }
 
     @Test
-    void pojo() {
+    void populatingWithNonMatchingStrategyThrowsException() {
         assertThatThrownBy(() -> populateFactory.populate(Pojo.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, Pojo.class.getName(), populateConfig.getStrategyOrder()));
@@ -114,8 +116,6 @@ class PopulateFactoryWithConstructorStrategyTest {
         A value_1 = populateFactory.populate(A.class);
         A value_2 = populateFactory.populate(A.class);
 
-        assertThat(value_1).isNotNull();
-        assertThat(value_2).isNotNull();
-        assertThat(value_1).isNotEqualTo(value_2);
+        assertCircularDependency(value_1, value_2);
     }
 }

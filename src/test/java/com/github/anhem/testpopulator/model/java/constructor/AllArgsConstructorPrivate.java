@@ -1,4 +1,6 @@
-package com.github.anhem.testpopulator.model.java;
+package com.github.anhem.testpopulator.model.java.constructor;
+
+import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -7,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class AllArgsConstructorAbstract {
+public class AllArgsConstructorPrivate {
 
     private final String stringValue;
     private final char primitiveCharacterValue;
@@ -22,13 +24,13 @@ public abstract class AllArgsConstructorAbstract {
     private final LocalDateTime localDateTime;
     private final List<String> listOfStrings;
     private final Set<String> setOfStrings;
-    private final Map<Integer, String> mapOfIntegerTosStrings;
+    private final Map<Integer, String> mapOfIntegersToStrings;
     private final Map<String, Integer> mapOfStringsToIntegers;
     private final ArbitraryEnum arbitraryEnum;
     private final String[] arrayOfStrings;
     private final Date date;
 
-    public AllArgsConstructorAbstract(
+    private AllArgsConstructorPrivate(
             String stringValue,
             char primitiveCharacterValue,
             Character characterValue,
@@ -42,8 +44,10 @@ public abstract class AllArgsConstructorAbstract {
             LocalDateTime localDateTime,
             List<String> listOfStrings,
             Set<String> setOfStrings,
-            Map<Integer, String> mapOfIntegerTosStrings,
-            Map<String, Integer> mapOfStringsToIntegers,
+            Map<Integer,
+                    String> mapOfIntegersToStrings,
+            Map<String,
+                    Integer> mapOfStringsToIntegers,
             ArbitraryEnum arbitraryEnum,
             String[] arrayOfStrings,
             Date date
@@ -61,7 +65,7 @@ public abstract class AllArgsConstructorAbstract {
         this.localDateTime = localDateTime;
         this.listOfStrings = listOfStrings;
         this.setOfStrings = setOfStrings;
-        this.mapOfIntegerTosStrings = mapOfIntegerTosStrings;
+        this.mapOfIntegersToStrings = mapOfIntegersToStrings;
         this.mapOfStringsToIntegers = mapOfStringsToIntegers;
         this.arbitraryEnum = arbitraryEnum;
         this.arrayOfStrings = arrayOfStrings;
@@ -120,8 +124,8 @@ public abstract class AllArgsConstructorAbstract {
         return setOfStrings;
     }
 
-    public Map<Integer, String> getMapOfIntegerTosStrings() {
-        return mapOfIntegerTosStrings;
+    public Map<Integer, String> getMapOfIntegersToStrings() {
+        return mapOfIntegersToStrings;
     }
 
     public Map<String, Integer> getMapOfStringsToIntegers() {

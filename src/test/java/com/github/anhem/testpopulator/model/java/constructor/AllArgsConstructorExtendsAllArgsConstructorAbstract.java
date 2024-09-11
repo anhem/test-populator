@@ -1,4 +1,6 @@
-package com.github.anhem.testpopulator.model.java;
+package com.github.anhem.testpopulator.model.java.constructor;
+
+import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 
 import java.sql.Date;
 import java.time.LocalDate;
