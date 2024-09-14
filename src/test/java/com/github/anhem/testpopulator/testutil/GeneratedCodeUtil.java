@@ -37,8 +37,8 @@ public class GeneratedCodeUtil {
 
     @SuppressWarnings("unchecked")
     private static <T> Class<T> loadClass(Path path, String packageName, String className) {
-        assertThat(path.toFile().exists()).isTrue();
-        assertThat(new File(path.getParent().toFile(), path.getFileName().toString().replace(JAVA, CLASS)).exists()).isTrue();
+        assertThat(path.toFile()).exists();
+        assertThat(new File(path.getParent().toFile(), path.getFileName().toString().replace(JAVA, CLASS))).exists();
         try (URLClassLoader classLoader = new URLClassLoader(new URL[]{PATH.toFile().toURI().toURL()})) {
             return (Class<T>) Class.forName(String.format("%s.%s", packageName, className), true, classLoader);
         } catch (IOException | ClassNotFoundException e) {
@@ -60,7 +60,7 @@ public class GeneratedCodeUtil {
         File file = new File(path.getParent().toFile(), path.getFileName().toString());
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         int result = compiler.run(null, null, null, file.getPath());
-        assertThat(result).as("compilation failed").isEqualTo(0);
+        assertThat(result).as("compilation failed").isZero();
     }
 
     private static void removeGeneratedFiles(Path path) {

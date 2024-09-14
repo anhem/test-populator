@@ -141,7 +141,7 @@ class PopulateFactoryWithConstructorStrategyTest {
                 .nullOnCircularDependency(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        assertThatThrownBy(() -> populateFactory.populate(A.class));
+        assertThatThrownBy(() -> populateFactory.populate(A.class)).isInstanceOfAny(PopulateException.class, StackOverflowError.class);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

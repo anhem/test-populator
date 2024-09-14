@@ -136,7 +136,7 @@ class PopulateFactoryWithFieldStrategyTest {
 
     @Test
     void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
-        assertThatThrownBy(() -> populateFactory.populate(A.class));
+        assertThatThrownBy(() -> populateFactory.populate(A.class)).isInstanceOfAny(PopulateException.class, StackOverflowError.class);
     }
 
     private A getPopulate() {

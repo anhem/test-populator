@@ -129,7 +129,7 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
                 .nullOnCircularDependency(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        assertThatThrownBy(() -> populateFactory.populate(A.class));
+        assertThatThrownBy(() -> populateFactory.populate(A.class)).isInstanceOfAny(PopulateException.class, StackOverflowError.class);
     }
 
     private void assertObjectCanBeRebuilt(LombokImmutable lombokImmutable) {
