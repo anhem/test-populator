@@ -3,9 +3,14 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
-import com.github.anhem.testpopulator.model.java.*;
+import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
+import com.github.anhem.testpopulator.model.java.HasBlackListed;
+import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
+import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
+import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorPrivate;
 import com.github.anhem.testpopulator.model.java.override.MyUUID;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
+import com.github.anhem.testpopulator.model.java.setter.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.Test;
 
@@ -29,9 +34,7 @@ class PopulateUtilTest {
 
     @Test
     void toArgumentTypesReturnsParameterArgumentTypes() {
-        Parameter parameter = getParameter();
-
-        List<Type> argumentTypes = toArgumentTypes(parameter);
+        List<Type> argumentTypes = toArgumentTypes(getArbitraryParameter());
 
         assertThat(argumentTypes).hasSize(1);
         assertThat(argumentTypes.get(0)).isEqualTo(String.class);
@@ -107,18 +110,13 @@ class PopulateUtilTest {
 
     @Test
     void isCollectionCarrierReturnsFalse() {
-        ClassCarrier<String> classCarrier = Carrier.initialize(String.class, new ObjectFactoryVoid());
-
-        assertThat(isCollectionCarrier(classCarrier)).isFalse();
+        assertThat(isCollectionCarrier(createClassCarrier())).isFalse();
     }
 
     @Test
     void isCollectionCarrierReturnsTrue() {
-        CollectionCarrier<String> collectionCarrier = new CollectionCarrier<>(String.class, getParameter(), new ObjectFactoryVoid());
-
-        assertThat(isCollectionCarrier(collectionCarrier)).isTrue();
+        assertThat(isCollectionCarrier(createCollectionCarrier(String.class))).isTrue();
     }
-
 
     @Test
     void isValueReturnsFalse() {
@@ -143,16 +141,12 @@ class PopulateUtilTest {
 
     @Test
     void hasAtLeastOneParameterReturnsFalse() {
-        Method method = getMethod("getStringValue", Pojo.class);
-
-        assertThat(hasAtLeastOneParameter(method)).isFalse();
+        assertThat(hasAtLeastOneParameter(getArbitraryMethod())).isFalse();
     }
 
     @Test
     void hasAtLeastOneParameterReturnsTrue() {
-        Method method = getMethod("setStringValue", Pojo.class);
-
-        assertThat(hasAtLeastOneParameter(method)).isTrue();
+        assertThat(hasAtLeastOneParameter(getMethod("setStringValue", Pojo.class))).isTrue();
     }
 
     @Test
@@ -250,9 +244,7 @@ class PopulateUtilTest {
 
     @Test
     void isBlackListedMethodReturnsFalse() {
-        Method method = getMethod("getStringValue", Pojo.class);
-
-        assertThat(PopulateUtil.isBlackListed(method, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods())).isFalse();
+        assertThat(PopulateUtil.isBlackListed(getArbitraryMethod(), DEFAULT_POPULATE_CONFIG.getBlacklistedMethods())).isFalse();
     }
 
     @Test
@@ -269,7 +261,29 @@ class PopulateUtilTest {
         assertThat(isBlackListed(field, DEFAULT_POPULATE_CONFIG.getBlacklistedFields())).isFalse();
     }
 
-    private static Parameter getParameter() {
+    @Test
+    void hasConstructorsReturnsTrue() {
+        assertThat(hasConstructors(new CollectionCarrier<>(HashMap.class, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>()))).isTrue();
+    }
+
+    @Test
+    void hasConstructorsReturnsFalse() {
+        assertThat(hasConstructors(new CollectionCarrier<>(Map.class, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>()))).isFalse();
+    }
+
+    private static ClassCarrier<String> createClassCarrier() {
+        return Carrier.initialize(String.class, new ObjectFactoryVoid());
+    }
+
+    private static <T> CollectionCarrier<T> createCollectionCarrier(Class<T> clazz) {
+        return new CollectionCarrier<>(clazz, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>());
+    }
+
+    private static Method getArbitraryMethod() {
+        return getMethod("getStringValue", Pojo.class);
+    }
+
+    private static Parameter getArbitraryParameter() {
         return Arrays.stream(getLargestConstructor(AllArgsConstructor.class, false).getParameters())
                 .filter(p -> p.getType().equals(Set.class))
                 .findFirst()

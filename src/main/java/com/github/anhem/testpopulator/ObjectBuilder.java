@@ -9,6 +9,7 @@ import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 
 class ObjectBuilder {
 
+    static final String NULL = "null";
     static final String PSF = "public static final";
     private static final String NEW_OBJECT_WITH_ARGUMENTS = "%s %s %s = new %s(%s);";
     private static final String NEW_OBJECT = "%s %s %s = new %s();";
@@ -19,6 +20,7 @@ class ObjectBuilder {
     private static final String MAP_OF = "%s %s<%s> %s = Map.of(%s);";
     private static final String NEW_ARRAY = "%s %s[] %s = new %s[]{%s};";
     private static final String NEW_VALUE = "%s %s %s = %s;";
+    private static final String ARGUMENT_DELIMITER = ", ";
     private Class<?> clazz;
     private final String name;
     private final BuildType buildType;
@@ -42,6 +44,10 @@ class ObjectBuilder {
 
     public void addChild(ObjectBuilder child) {
         children.add(child);
+    }
+
+    public List<ObjectBuilder> getChildren() {
+        return children;
     }
 
     public boolean hasAllChildren() {
@@ -157,53 +163,35 @@ class ObjectBuilder {
     }
 
     private List<String> buildSet() {
-        return concatenate(
-                buildChildren(),
-                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                startStaticBlock(),
-                createMethods(),
-                endStaticBlock()
-        ).collect(Collectors.toList());
+        return buildCollection();
     }
 
     private List<String> buildSetOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(SET_OF, PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format(SET_OF, PSF, clazz.getSimpleName(), formatTypes(), name, getNullableArguments(buildArguments()))))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildList() {
-        return concatenate(
-                buildChildren(),
-                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                startStaticBlock(),
-                createMethods(),
-                endStaticBlock()
-        ).collect(Collectors.toList());
+        return buildCollection();
     }
 
     private List<String> buildListOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(LIST_OF, PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format(LIST_OF, PSF, clazz.getSimpleName(), formatTypes(), name, getNullableArguments(buildArguments()))))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildMap() {
-        return concatenate(
-                buildChildren(),
-                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                startStaticBlock(),
-                createMethods(),
-                endStaticBlock()
-        ).collect(Collectors.toList());
+        return buildCollection();
     }
 
     private List<String> buildMapOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(MAP_OF, PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format(MAP_OF, PSF, clazz.getSimpleName(), formatTypes(), name, getNullableArguments(buildArguments()))))
                 .collect(Collectors.toList());
     }
 
@@ -214,8 +202,31 @@ class ObjectBuilder {
                 .collect(Collectors.toList());
     }
 
+    private List<String> buildCollection() {
+        if (collectionHasNullValues(this)) {
+            return concatenate(
+                    buildChildren(),
+                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())))
+                    .collect(Collectors.toList());
+        }
+        return concatenate(
+                buildChildren(),
+                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
+                startStaticBlock(),
+                createMethods(),
+                endStaticBlock()
+        ).collect(Collectors.toList());
+    }
+
     private List<String> buildValue() {
-        return List.of(String.format(NEW_VALUE, PSF, clazz.getSimpleName(), name, this.value));
+        if (isNullValue()) {
+            return List.of();
+        }
+        return List.of(String.format(NEW_VALUE, PSF, clazz.getSimpleName(), name, value));
+    }
+
+    public boolean isNullValue() {
+        return value != null && value.equals(NULL);
     }
 
     private Stream<String> createMethods() {
@@ -225,15 +236,22 @@ class ObjectBuilder {
                         String.format("%s.%s(%s);", name, child.getName(), child.buildArguments()));
     }
 
+    private static String getNullableArguments(String buildArguments) {
+        return Arrays.asList(buildArguments.split(ARGUMENT_DELIMITER)).contains(NULL) ? "" : buildArguments;
+    }
+
     private String buildArguments() {
         return children.stream()
                 .map(child -> {
+                    if (child.isNullValue()) {
+                        return List.of(NULL);
+                    }
                     if (isBasicValue(child)) {
                         return child.buildInlineArgument();
                     }
                     return List.of(child.getName());
                 }).flatMap(Collection::stream)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(ARGUMENT_DELIMITER));
     }
 
     private List<String> buildInlineArgument() {
@@ -251,7 +269,7 @@ class ObjectBuilder {
                     } else {
                         return child.getClazz().getSimpleName();
                     }
-                }).collect(Collectors.joining(", "));
+                }).collect(Collectors.joining(ARGUMENT_DELIMITER));
 
     }
 }

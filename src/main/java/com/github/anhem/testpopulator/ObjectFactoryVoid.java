@@ -71,6 +71,11 @@ class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public <T> void nullValue(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
     public ObjectResult build() {
         return EMPTY_OBJECT_RESULT;
     }

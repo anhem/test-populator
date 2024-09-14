@@ -30,6 +30,8 @@ public interface ObjectFactory {
 
     <T> void value(T value);
 
+    <T> void nullValue(Class<T> clazz);
+
     ObjectResult build();
 
     void writeToFile();
