@@ -113,10 +113,31 @@ class PopulateFactoryWithConstructorStrategyTest {
     }
 
     @Test
-    void circularDependency() {
+    void createsObjectWhenNullOnCircularDependencyIsTrue() {
+        populateConfig = populateConfig.toBuilder()
+                .nullOnCircularDependency(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        AllArgsConstructor value_1 = populateFactory.populate(AllArgsConstructor.class);
+        AllArgsConstructor value_2 = populateFactory.populate(AllArgsConstructor.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void circularDependencyCreatesObjectWhenNullOnCircularDependencyIsTrue() {
+        populateConfig = populateConfig.toBuilder()
+                .nullOnCircularDependency(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
         A value_1 = populateFactory.populate(A.class);
         A value_2 = populateFactory.populate(A.class);
         assertCircularDependency(value_1, value_2);
+    }
+
+    @Test
+    void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
+        assertThatThrownBy(() -> populateFactory.populate(A.class))
+                .isInstanceOf(StackOverflowError.class);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

@@ -92,6 +92,18 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName(), populateConfig.getStrategyOrder()));
     }
 
+    @Test
+    void createsObjectWhenNullOnCircularDependencyIsTrue() {
+        populateConfig = populateConfig.toBuilder()
+                .nullOnCircularDependency(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        ImmutableImmutablesInterface value_1 = populateFactory.populate(ImmutableImmutablesInterface.class);
+        ImmutableImmutablesInterface value_2 = populateFactory.populate(ImmutableImmutablesInterface.class);
+
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER);

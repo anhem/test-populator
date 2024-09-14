@@ -81,7 +81,7 @@ public class PopulateFactory {
             classCarrier.getObjectFactory().overridePopulate(clazz, overridePopulates.get(clazz));
             return overridePopulateValue;
         }
-        if (!isJavaBaseClass(clazz) && !classCarrier.addVisited()) {
+        if (populateConfig.isNullOnCircularDependency() && !isJavaBaseClass(clazz) && !classCarrier.addVisited()) {
             classCarrier.getObjectFactory().nullValue(clazz);
             return null;
         }
@@ -99,7 +99,6 @@ public class PopulateFactory {
         return continuePopulateWithStrategies(classCarrier);
     }
 
-
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateForArray(ClassCarrier<T> classCarrier) {
         Class<?> componentType = classCarrier.getClazz().getComponentType();
@@ -109,7 +108,6 @@ public class PopulateFactory {
         Array.set(array, 0, value);
         return (T) array;
     }
-
 
     private <T> T continuePopulateForCollection(CollectionCarrier<T> classCarrier) {
         try {
@@ -129,7 +127,7 @@ public class PopulateFactory {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T continuePopulateForMap(CollectionCarrier<T> classCarrier) throws Exception {
+    private <T> T continuePopulateForMap(CollectionCarrier<T> classCarrier) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (hasConstructors(classCarrier)) {
             classCarrier.getObjectFactory().map(classCarrier.getClazz());
             Map<Object, Object> map = (Map<Object, Object>) classCarrier.getClazz().getConstructor().newInstance();
@@ -151,7 +149,7 @@ public class PopulateFactory {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T continuePopulateForSet(CollectionCarrier<T> classCarrier) throws Exception {
+    private <T> T continuePopulateForSet(CollectionCarrier<T> classCarrier) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (hasConstructors(classCarrier)) {
             classCarrier.getObjectFactory().set(classCarrier.getClazz());
             Set<Object> set = (Set<Object>) classCarrier.getClazz().getConstructor().newInstance();
@@ -167,7 +165,7 @@ public class PopulateFactory {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T continuePopulateForList(CollectionCarrier<T> classCarrier) throws Exception {
+    private <T> T continuePopulateForList(CollectionCarrier<T> classCarrier) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (hasConstructors(classCarrier)) {
             classCarrier.getObjectFactory().list(classCarrier.getClazz());
             List<Object> list = (List<Object>) classCarrier.getClazz().getConstructor().newInstance();

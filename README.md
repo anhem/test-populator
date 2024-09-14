@@ -82,6 +82,7 @@ MyClass myClass = populateFactory.populate(myClass.class);
 | blacklistedMethods          | List of methods to skip if encountered   | $jacocoInit                     |
 | blacklistedFields           | List of fields to skip if encountered    | \_\_$lineHits$\_\_, $jacocoData |    
 | objectFactoryEnabled        | Experimental! true / false               | false                           |    
+| nullOnCircularDependency    | true / false                             | false                           |    
 
 ### strategyOrder
 
@@ -200,6 +201,13 @@ These files can then be copied into your project and used as any other java clas
 
 This will not work when [FIELD](#Field) or [accessNonPublicConstructors](#accessNonPublicConstructors) is used because
 they use reflection to override how class are accessed.
+
+### nullOnCircularDependency
+
+Enable to solve issues with classes having circular dependencies. In cases where circular dependencies exists you will experience a
+`StackOverflowError`.
+
+By enabling this the circle is broken by setting those values to `null`.
 
 ## ToBuilder
 
