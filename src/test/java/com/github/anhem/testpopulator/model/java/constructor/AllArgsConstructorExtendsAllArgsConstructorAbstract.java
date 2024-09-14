@@ -1,12 +1,18 @@
-package com.github.anhem.testpopulator.model.java;
+package com.github.anhem.testpopulator.model.java.constructor;
 
-import java.sql.Date;
+import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Getter
+@EqualsAndHashCode(callSuper = true)
 public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgsConstructorAbstract {
 
     private final String anotherString;
@@ -16,7 +22,4 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
         this.anotherString = anotherString;
     }
 
-    public String getAnotherString() {
-        return anotherString;
-    }
 }

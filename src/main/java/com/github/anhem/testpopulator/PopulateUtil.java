@@ -79,16 +79,16 @@ class PopulateUtil {
     }
 
     static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz, String setterPrefix, boolean accessNonPublicConstructor) {
-        return strategy.equals(SETTER) && hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor) && getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
+        return strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor) && getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
                 .anyMatch(method -> isSetterMethod(method, setterPrefix));
     }
 
     static boolean isMatchingConstructorStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
-        return strategy.equals(CONSTRUCTOR) && !hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor) && hasConstructorWithArguments(clazz, accessNonPublicConstructor);
+        return strategy.equals(CONSTRUCTOR) && hasConstructorWithArguments(clazz, accessNonPublicConstructor);
     }
 
     static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
-        return strategy.equals(FIELD) && hasOnlyNoArgumentConstructor(clazz, accessNonPublicConstructor);
+        return strategy.equals(FIELD) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor);
     }
 
     static boolean isMatchingBuilderStrategy(Strategy strategy, Class<?> clazz, BuilderPattern builderPattern) {
@@ -156,25 +156,20 @@ class PopulateUtil {
         }
     }
 
-    private static boolean hasOnlyNoArgumentConstructor(Class<?> clazz, boolean canAccessNonPublicConstructor) {
-        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-        if (Arrays.stream(constructors).count() == 1) {
-            Constructor<?> constructor = constructors[0];
-            if (constructor.getParameterCount() == 0) {
-                if (canAccessNonPublicConstructor) {
-                    return true;
-                } else {
-                    return Modifier.isPublic(constructor.getModifiers());
-                }
-            }
-        }
-        return false;
+    static <T> boolean hasConstructors(CollectionCarrier<T> collectionCarrier) {
+        return collectionCarrier.getClazz().getConstructors().length > 0;
+    }
+
+    private static boolean hasConstructorWithoutArguments(Class<?> clazz, boolean canAccessNonPublicConstructor) {
+        return stream(clazz.getDeclaredConstructors())
+                .filter(constructor -> constructor.getParameterCount() == 0)
+                .anyMatch(constructor -> isAccessible(canAccessNonPublicConstructor, constructor));
     }
 
     private static boolean hasConstructorWithArguments(Class<?> clazz, boolean canAccessNonPublicConstructor) {
         return stream(clazz.getDeclaredConstructors())
-                .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
-                .anyMatch(constructor -> constructor.getParameterCount() > 0);
+                .filter(constructor -> constructor.getParameterCount() > 0)
+                .anyMatch(constructor -> isAccessible(canAccessNonPublicConstructor, constructor));
     }
 
     private static List<Field> getAllDeclaredFields(Class<?> clazz, List<Field> declaredFields) {
@@ -194,7 +189,7 @@ class PopulateUtil {
     }
 
     private static String getSetterMethodFormat(String setterPrefix) {
-        return setterPrefix.equals("") ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
+        return setterPrefix.isEmpty() ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
     }
 
     private static List<Field> removeUnwantedFields(List<Field> declaredFields, List<String> blacklistedFields) {
@@ -225,6 +220,14 @@ class PopulateUtil {
             return method.getParameters().length == 0 || (method.getParameters().length == 1 && method.getParameters()[0].getType().equals(long.class));
         }
         return false;
+    }
+
+    private static boolean isAccessible(boolean canAccessNonPublicConstructor, Constructor<?> constructor) {
+        if (canAccessNonPublicConstructor) {
+            return true;
+        } else {
+            return Modifier.isPublic(constructor.getModifiers());
+        }
     }
 
 }

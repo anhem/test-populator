@@ -16,7 +16,7 @@ import static com.github.anhem.testpopulator.ObjectBuilder.PSF;
 import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_END;
 import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_START;
 
-class FileWriterUtil {
+public class FileWriterUtil {
 
     private static final String PATH = "target/generated-test-sources/test-populator/%s/%s_%s.java";
 
@@ -24,7 +24,11 @@ class FileWriterUtil {
     }
 
     public static Path getPath(ObjectResult objectResult, PopulateConfig populateConfig) {
-        return Paths.get(String.format(PATH, objectResult.getPackageName(), objectResult.getClassName(), encode(populateConfig)));
+        return getPath(objectResult.getPackageName(), objectResult.getClassName(), populateConfig);
+    }
+
+    public static Path getPath(String packageName, String className, PopulateConfig populateConfig) {
+        return Paths.get(String.format(PATH, packageName.replace(".", "/"), className, encode(populateConfig)));
     }
 
     public static void createOrOverwriteFile(Path path) {
@@ -85,7 +89,7 @@ class FileWriterUtil {
         }
     }
 
-    private static String encode(PopulateConfig populateConfig) {
+    static String encode(PopulateConfig populateConfig) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             byte[] bytes = messageDigest.digest(populateConfig.toString().getBytes());

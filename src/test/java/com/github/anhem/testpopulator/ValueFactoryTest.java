@@ -1,7 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
-import com.github.anhem.testpopulator.model.java.Pojo;
+import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
