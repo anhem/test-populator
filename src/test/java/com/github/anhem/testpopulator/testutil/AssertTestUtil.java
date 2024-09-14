@@ -59,7 +59,9 @@ public class AssertTestUtil {
         assertThat(cdKey.getCMap()).isEmpty();
         assertThat(cdKey.getCArrayList()).isEmpty();
         assertThat(cdKey.getCHashSet()).isEmpty();
-        assertThat(cdKey.getCHashMap()).isEmpty();
+
+        assertThat(cdKey.getCHashMap()).hasSize(1);
+        assertThat(cdKey.getCHashMap().values().iterator().next()).isNull();
 
         D cdKeyD = cdKey.getD();
         assertThat(cdKeyD.getA()).isNull();

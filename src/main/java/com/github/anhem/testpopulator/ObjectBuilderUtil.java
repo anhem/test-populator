@@ -1,10 +1,13 @@
 package com.github.anhem.testpopulator;
 
 import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.github.anhem.testpopulator.BuildType.*;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
 import static com.github.anhem.testpopulator.PopulateUtil.isJavaBaseClass;
 
@@ -55,6 +58,16 @@ public class ObjectBuilderUtil {
     @SafeVarargs
     static <T> Stream<T> concatenate(Stream<T>... streams) {
         return Stream.of(streams).flatMap(s -> s);
+    }
+
+    public static boolean collectionHasNullValues(ObjectBuilder objectBuilder) {
+        if (List.of(LIST, SET, MAP).contains(objectBuilder.getBuildType())) {
+            return objectBuilder.getChildren().stream()
+                    .map(ObjectBuilder::getChildren)
+                    .flatMap(Collection::stream)
+                    .allMatch(ObjectBuilder::isNullValue);
+        }
+        return false;
     }
 
 }

@@ -7,7 +7,6 @@ import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableWithSingular;
 import com.github.anhem.testpopulator.model.lombok.LombokOddImmutable;
-import org.assertj.core.api.ObjectAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -105,8 +104,8 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        LombokImmutable value_1 = populateFactory.populate(LombokImmutable.class);
-        LombokImmutable value_2 = populateFactory.populate(LombokImmutable.class);
+        LombokImmutable value_1 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
+        LombokImmutable value_2 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
 
         assertRandomlyPopulatedValues(value_1, value_2);
     }
@@ -117,24 +116,28 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        A value_1 = populateFactory.populate(A.class);
-        A value_2 = populateFactory.populate(A.class);
+        A value_1 = populateAndAssertWithGeneratedCode(A.class);
+        A value_2 = populateAndAssertWithGeneratedCode(A.class);
 
         assertCircularDependency(value_1, value_2);
     }
 
     @Test
     void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
-        assertThatThrownBy(() -> populateFactory.populate(A.class))
-                .isInstanceOf(StackOverflowError.class);
+        populateConfig = populateConfig.toBuilder()
+                .objectFactoryEnabled(false)
+                .nullOnCircularDependency(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        assertThatThrownBy(() -> populateFactory.populate(A.class)).isInstanceOf(StackOverflowError.class);
     }
 
-    private ObjectAssert<LombokImmutable> assertObjectCanBeRebuilt(LombokImmutable lombokImmutable) {
-        return assertThat(lombokImmutable.toBuilder().build()).isEqualTo(lombokImmutable);
+    private void assertObjectCanBeRebuilt(LombokImmutable lombokImmutable) {
+        assertThat(lombokImmutable.toBuilder().build()).isEqualTo(lombokImmutable);
     }
 
-    private ObjectAssert<LombokOddImmutable> assertObjectCanBeRebuilt(LombokOddImmutable lombokOddImmutable) {
-        return assertThat(lombokOddImmutable.toBuilder().build()).isEqualTo(lombokOddImmutable);
+    private void assertObjectCanBeRebuilt(LombokOddImmutable lombokOddImmutable) {
+        assertThat(lombokOddImmutable.toBuilder().build()).isEqualTo(lombokOddImmutable);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

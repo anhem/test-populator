@@ -118,8 +118,8 @@ class PopulateFactoryWithConstructorStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        AllArgsConstructor value_1 = populateFactory.populate(AllArgsConstructor.class);
-        AllArgsConstructor value_2 = populateFactory.populate(AllArgsConstructor.class);
+        AllArgsConstructor value_1 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
+        AllArgsConstructor value_2 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
@@ -129,15 +129,19 @@ class PopulateFactoryWithConstructorStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        A value_1 = populateFactory.populate(A.class);
-        A value_2 = populateFactory.populate(A.class);
+        A value_1 = populateAndAssertWithGeneratedCode(A.class);
+        A value_2 = populateAndAssertWithGeneratedCode(A.class);
         assertCircularDependency(value_1, value_2);
     }
 
     @Test
     void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
-        assertThatThrownBy(() -> populateFactory.populate(A.class))
-                .isInstanceOf(StackOverflowError.class);
+        populateConfig = populateConfig.toBuilder()
+                .objectFactoryEnabled(false)
+                .nullOnCircularDependency(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        assertThatThrownBy(() -> populateFactory.populate(A.class)).isInstanceOf(StackOverflowError.class);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

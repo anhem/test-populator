@@ -129,8 +129,8 @@ class PopulateFactoryWithSetterStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        Pojo value_1 = populateFactory.populate(Pojo.class);
-        Pojo value_2 = populateFactory.populate(Pojo.class);
+        Pojo value_1 = populateAndAssertWithGeneratedCode(Pojo.class);
+        Pojo value_2 = populateAndAssertWithGeneratedCode(Pojo.class);
 
         assertRandomlyPopulatedValues(value_1, value_2);
     }
@@ -141,16 +141,20 @@ class PopulateFactoryWithSetterStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        A value_1 = populateFactory.populate(A.class);
-        A value_2 = populateFactory.populate(A.class);
+        A value_1 = populateAndAssertWithGeneratedCode(A.class);
+        A value_2 = populateAndAssertWithGeneratedCode(A.class);
 
         assertCircularDependency(value_1, value_2);
     }
 
     @Test
     void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
-        assertThatThrownBy(() -> populateFactory.populate(A.class))
-                .isInstanceOf(StackOverflowError.class);
+        populateConfig = populateConfig.toBuilder()
+                .objectFactoryEnabled(false)
+                .nullOnCircularDependency(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        assertThatThrownBy(() -> populateFactory.populate(A.class)).isInstanceOf(StackOverflowError.class);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

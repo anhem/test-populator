@@ -5,10 +5,12 @@ import com.github.anhem.testpopulator.model.java.constructor.NestedCollections;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.github.anhem.testpopulator.ObjectBuilder.NULL;
 import static com.github.anhem.testpopulator.ObjectBuilderUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,17 +66,17 @@ class ObjectBuilderUtilTest {
 
     @Test
     void isBasicValueReturnsFalse() {
-        assertThat(isBasicValue(new ObjectBuilder(Pojo.class, "pojo0", BuildType.VALUE, 0))).isFalse();
+        assertThat(isBasicValue(new ObjectBuilder(Pojo.class, "pojo_0", BuildType.VALUE, 0))).isFalse();
     }
 
     @Test
     void isBasicValueReturnsTrueWhenBuildTypeIsValueAndClassIsJavaBaseClass() {
-        assertThat(isBasicValue(new ObjectBuilder(String.class, "string0", BuildType.VALUE, 0))).isTrue();
+        assertThat(isBasicValue(new ObjectBuilder(String.class, "string_0", BuildType.VALUE, 0))).isTrue();
     }
 
     @Test
     void isBasicValueReturnsTrueWhenBuildTypeIsValueAndClassIsEnum() {
-        assertThat(isBasicValue(new ObjectBuilder(ArbitraryEnum.class, "arbitraryEnum0", BuildType.VALUE, 0))).isTrue();
+        assertThat(isBasicValue(new ObjectBuilder(ArbitraryEnum.class, "arbitraryEnum_0", BuildType.VALUE, 0))).isTrue();
     }
 
     @Test
@@ -100,5 +102,36 @@ class ObjectBuilderUtilTest {
                 Stream.of("c"),
                 Stream.of("d"))
         ).hasSize(4).contains("a", "b", "c", "d");
+    }
+
+    @Test
+    void collectionHasNullValuesReturnsTrueWhenObjectBuilderIsListAndWithoutChildren() {
+        ObjectBuilder objectBuilder = new ObjectBuilder(ArrayList.class, "arrayList_0", BuildType.LIST, 1);
+        ObjectBuilder addMethod = new ObjectBuilder(String.class, "add", BuildType.METHOD, 1);
+        ObjectBuilder string = new ObjectBuilder(String.class, "string_0", BuildType.VALUE, 0);
+        string.setValue(NULL);
+        addMethod.addChild(string);
+        objectBuilder.addChild(addMethod);
+
+        assertThat(collectionHasNullValues(objectBuilder)).isTrue();
+    }
+
+    @Test
+    void collectionHasNullValuesReturnsFalseWhenObjectBuilderIsListAndWithChildren() {
+        ObjectBuilder objectBuilder = new ObjectBuilder(ArrayList.class, "arrayList_0", BuildType.LIST, 1);
+        ObjectBuilder addMethod = new ObjectBuilder(String.class, "add", BuildType.METHOD, 1);
+        ObjectBuilder string = new ObjectBuilder(String.class, "string_0", BuildType.VALUE, 0);
+        string.setValue("abc123");
+        addMethod.addChild(string);
+        objectBuilder.addChild(addMethod);
+
+        assertThat(collectionHasNullValues(objectBuilder)).isFalse();
+    }
+
+    @Test
+    void collectionHasNullValuesReturnsFalseWhenObjectBuilderIsNotCollection() {
+        ObjectBuilder string = new ObjectBuilder(String.class, "string_0", BuildType.VALUE, 0);
+
+        assertThat(collectionHasNullValues(string)).isFalse();
     }
 }

@@ -133,9 +133,7 @@ public class PopulateFactory {
             Map<Object, Object> map = (Map<Object, Object>) classCarrier.getClazz().getConstructor().newInstance();
             Optional<Object> key = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0))));
             Optional<Object> value = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1))));
-            if (key.isPresent() && value.isPresent()) {
-                map.put(key.get(), value.get());
-            }
+            key.ifPresent(k -> map.put(k, value.orElse(null)));
             return (T) map;
         } else {
             classCarrier.getObjectFactory().mapOf();

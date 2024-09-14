@@ -46,6 +46,10 @@ class ObjectBuilder {
         children.add(child);
     }
 
+    public List<ObjectBuilder> getChildren() {
+        return children;
+    }
+
     public boolean hasAllChildren() {
         return expectedChildren == children.size();
     }
@@ -159,6 +163,12 @@ class ObjectBuilder {
     }
 
     private List<String> buildSet() {
+        if (collectionHasNullValues(this)) {
+            return concatenate(
+                    buildChildren(),
+                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())))
+                    .collect(Collectors.toList());
+        }
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
@@ -176,6 +186,12 @@ class ObjectBuilder {
     }
 
     private List<String> buildList() {
+        if (collectionHasNullValues(this)) {
+            return concatenate(
+                    buildChildren(),
+                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())))
+                    .collect(Collectors.toList());
+        }
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
@@ -193,6 +209,12 @@ class ObjectBuilder {
     }
 
     private List<String> buildMap() {
+        if (collectionHasNullValues(this)) {
+            return concatenate(
+                    buildChildren(),
+                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName()))
+            ).collect(Collectors.toList());
+        }
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
