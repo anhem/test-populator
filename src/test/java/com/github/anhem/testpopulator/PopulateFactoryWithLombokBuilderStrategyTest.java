@@ -1,6 +1,5 @@
 package com.github.anhem.testpopulator;
 
-import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
@@ -15,9 +14,11 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
+import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
+import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -30,7 +31,7 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(BUILDER))
-                .builderPattern(BuilderPattern.LOMBOK)
+                .builderPattern(LOMBOK)
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -38,15 +39,15 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
 
     @Test
     void string() {
-        String value_1 = populateFactory.populate(String.class);
-        String value_2 = populateFactory.populate(String.class);
+        String value_1 = populateAndAssertWithGeneratedCode(String.class);
+        String value_2 = populateAndAssertWithGeneratedCode(String.class);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     @Test
     void LombokImmutable() {
-        LombokImmutable value_1 = populateFactory.populate(LombokImmutable.class);
-        LombokImmutable value_2 = populateFactory.populate(LombokImmutable.class);
+        LombokImmutable value_1 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
+        LombokImmutable value_2 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
         assertRandomlyPopulatedValues(value_1, value_2);
         assertThat(value_1.getListOfStrings()).hasSize(1);
         assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
@@ -57,8 +58,8 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
 
     @Test
     void LombokImmutableWithSingular() {
-        LombokImmutableWithSingular value_1 = populateFactory.populate(LombokImmutableWithSingular.class);
-        LombokImmutableWithSingular value_2 = populateFactory.populate(LombokImmutableWithSingular.class);
+        LombokImmutableWithSingular value_1 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
+        LombokImmutableWithSingular value_2 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
         assertRandomlyPopulatedValues(value_1, value_2);
         assertThat(value_1.getListOfStrings()).hasSize(1);
         assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
@@ -68,30 +69,30 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
 
     @Test
     void LombokImmutableExtendsLombokAbstractImmutable() {
-        LombokImmutableExtendsLombokAbstractImmutable value_1 = populateFactory.populate(LombokImmutableExtendsLombokAbstractImmutable.class);
-        LombokImmutableExtendsLombokAbstractImmutable value_2 = populateFactory.populate(LombokImmutableExtendsLombokAbstractImmutable.class);
+        LombokImmutableExtendsLombokAbstractImmutable value_1 = populateAndAssertWithGeneratedCode(LombokImmutableExtendsLombokAbstractImmutable.class);
+        LombokImmutableExtendsLombokAbstractImmutable value_2 = populateAndAssertWithGeneratedCode(LombokImmutableExtendsLombokAbstractImmutable.class);
         assertRandomlyPopulatedValues(value_1, value_2);
         assertThat(value_1.getListOfStrings()).hasSize(1);
     }
 
     @Test
     void allArgsConstructor() {
-        assertThatThrownBy(() -> populateFactory.populate(AllArgsConstructor.class))
+        assertThatThrownBy(() -> populateAndAssertWithGeneratedCode(AllArgsConstructor.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructor.class.getName(), populateConfig.getStrategyOrder()));
     }
 
     @Test
     void LombokImmutableBuilder() {
-        assertThatThrownBy(() -> populateFactory.populate(LombokImmutable.LombokImmutableBuilder.class))
+        assertThatThrownBy(() -> populateAndAssertWithGeneratedCode(LombokImmutable.LombokImmutableBuilder.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, LombokImmutable.LombokImmutableBuilder.class.getName(), populateConfig.getStrategyOrder()));
     }
 
     @Test
     void LombokOddImmutable() {
-        LombokOddImmutable value_1 = populateFactory.populate(LombokOddImmutable.class);
-        LombokOddImmutable value_2 = populateFactory.populate(LombokOddImmutable.class);
+        LombokOddImmutable value_1 = populateAndAssertWithGeneratedCode(LombokOddImmutable.class);
+        LombokOddImmutable value_2 = populateAndAssertWithGeneratedCode(LombokOddImmutable.class);
         assertRandomlyPopulatedValues(value_1, value_2);
 
         assertObjectCanBeRebuilt(value_1);
@@ -112,5 +113,17 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
 
     private ObjectAssert<LombokOddImmutable> assertObjectCanBeRebuilt(LombokOddImmutable lombokOddImmutable) {
         return assertThat(lombokOddImmutable.toBuilder().build()).isEqualTo(lombokOddImmutable);
+    }
+
+    private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
+        assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
+        assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER);
+        assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
+        T value = populateFactory.populate(clazz);
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(clazz);
+        assertGeneratedCode(value, populateConfig);
+
+        return value;
     }
 }

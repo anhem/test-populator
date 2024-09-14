@@ -9,6 +9,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
 public class A {
     private String string;
     private B b;

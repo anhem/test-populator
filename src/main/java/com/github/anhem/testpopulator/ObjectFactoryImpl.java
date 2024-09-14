@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.BuildType.*;
 import static com.github.anhem.testpopulator.FileWriterUtil.*;
+import static com.github.anhem.testpopulator.ObjectBuilder.NULL;
 
 class ObjectFactoryImpl implements ObjectFactory {
 
@@ -106,7 +107,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void nullValue(Class<T> clazz) {
         setNextObjectBuilder(clazz, VALUE, 0);
-        currentObjectBuilder.setValue("null");
+        currentObjectBuilder.setValue(NULL);
         setPreviousObjectBuilder();
     }
 
@@ -209,8 +210,8 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     private String getName(Class<?> clazz) {
         int classCounter = classCounters.computeIfAbsent(clazz, k -> 0);
-        String string = clazz.getSimpleName();
-        String name = String.format("%s_%d", Character.toLowerCase(string.charAt(0)) + string.substring(1), classCounter);
+        String simpleName = clazz.getSimpleName();
+        String name = String.format("%s_%d", Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1), classCounter);
         classCounters.put(clazz, ++classCounter);
         return name;
     }

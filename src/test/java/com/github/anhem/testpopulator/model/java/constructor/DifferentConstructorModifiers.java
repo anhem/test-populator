@@ -1,8 +1,13 @@
 package com.github.anhem.testpopulator.model.java.constructor;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
+@Getter
+@EqualsAndHashCode
 public class DifferentConstructorModifiers {
 
-    private String publicConstructorField;
+    private final String publicConstructorField;
     private Integer privateConstructorField;
 
     public DifferentConstructorModifiers(String publicConstructorField) {

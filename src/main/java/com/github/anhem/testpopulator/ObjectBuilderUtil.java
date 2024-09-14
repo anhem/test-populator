@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
 import static com.github.anhem.testpopulator.PopulateUtil.isJavaBaseClass;
 
-class ObjectBuilderUtil {
+public class ObjectBuilderUtil {
 
     static final String STATIC_BLOCK_START = "static {";
     static final String STATIC_BLOCK_END = "}";
@@ -16,11 +16,11 @@ class ObjectBuilderUtil {
     private ObjectBuilderUtil() {
     }
 
-    static String getPackageName(Class<?> clazz) {
+    public static String getPackageName(Class<?> clazz) {
         return clazz.getName().startsWith("java.") ? ObjectBuilder.class.getPackageName() : clazz.getPackageName();
     }
 
-    static String formatClassName(Class<?> clazz) {
+    public static String formatClassName(Class<?> clazz) {
         return String.format("%s_TestData", clazz.getSimpleName());
     }
 

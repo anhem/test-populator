@@ -46,7 +46,7 @@ public class AssertTestUtil {
         C c = b.getC();
         assertThat(c).hasNoNullFieldsOrProperties();
 
-        List<C> cs = c.getCs();
+        List<C> cs = c.getCList();
         assertThat(cs).isEmpty();
 
         D d = c.getD();
@@ -54,7 +54,12 @@ public class AssertTestUtil {
 
         C cdKey = a.getCdMap().keySet().iterator().next();
         assertThat(cdKey).hasNoNullFieldsOrProperties();
-        assertThat(cdKey.getCs()).isEmpty();
+        assertThat(cdKey.getCList()).isEmpty();
+        assertThat(cdKey.getCSet()).isEmpty();
+        assertThat(cdKey.getCMap()).isEmpty();
+        assertThat(cdKey.getCArrayList()).isEmpty();
+        assertThat(cdKey.getCHashSet()).isEmpty();
+        assertThat(cdKey.getCHashMap()).isEmpty();
 
         D cdKeyD = cdKey.getD();
         assertThat(cdKeyD.getA()).isNull();
@@ -72,7 +77,7 @@ public class AssertTestUtil {
 
         C cdValueBC = cdValueB.getC();
         assertThat(cdValueBC.getD()).isNull();
-        assertThat(cdValueBC.getCs()).isEmpty();
+        assertThat(cdValueBC.getCList()).isEmpty();
 
         assertThat(cdValueB.getString()).isNotNull();
     }

@@ -2,14 +2,20 @@ package com.github.anhem.testpopulator.model.circular;
 
 import lombok.*;
 
-import java.util.List;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
 public class C {
     private D d;
-    private List<C> cs;
+    private List<C> cList;
+    private Set<C> cSet;
+    private Map<String, C> cMap;
+    private ArrayList<C> cArrayList;
+    private HashSet<C> cHashSet;
+    private HashMap<String, C> cHashMap;
 }
