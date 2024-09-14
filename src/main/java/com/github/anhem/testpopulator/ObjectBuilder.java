@@ -163,19 +163,7 @@ class ObjectBuilder {
     }
 
     private List<String> buildSet() {
-        if (collectionHasNullValues(this)) {
-            return concatenate(
-                    buildChildren(),
-                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())))
-                    .collect(Collectors.toList());
-        }
-        return concatenate(
-                buildChildren(),
-                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                startStaticBlock(),
-                createMethods(),
-                endStaticBlock()
-        ).collect(Collectors.toList());
+        return buildCollection();
     }
 
     private List<String> buildSetOf() {
@@ -186,19 +174,7 @@ class ObjectBuilder {
     }
 
     private List<String> buildList() {
-        if (collectionHasNullValues(this)) {
-            return concatenate(
-                    buildChildren(),
-                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())))
-                    .collect(Collectors.toList());
-        }
-        return concatenate(
-                buildChildren(),
-                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                startStaticBlock(),
-                createMethods(),
-                endStaticBlock()
-        ).collect(Collectors.toList());
+        return buildCollection();
     }
 
     private List<String> buildListOf() {
@@ -209,19 +185,7 @@ class ObjectBuilder {
     }
 
     private List<String> buildMap() {
-        if (collectionHasNullValues(this)) {
-            return concatenate(
-                    buildChildren(),
-                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName()))
-            ).collect(Collectors.toList());
-        }
-        return concatenate(
-                buildChildren(),
-                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
-                startStaticBlock(),
-                createMethods(),
-                endStaticBlock()
-        ).collect(Collectors.toList());
+        return buildCollection();
     }
 
     private List<String> buildMapOf() {
@@ -236,6 +200,22 @@ class ObjectBuilder {
                 buildChildren(),
                 Stream.of(String.format(NEW_ARRAY, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
                 .collect(Collectors.toList());
+    }
+
+    private List<String> buildCollection() {
+        if (collectionHasNullValues(this)) {
+            return concatenate(
+                    buildChildren(),
+                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())))
+                    .collect(Collectors.toList());
+        }
+        return concatenate(
+                buildChildren(),
+                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
+                startStaticBlock(),
+                createMethods(),
+                endStaticBlock()
+        ).collect(Collectors.toList());
     }
 
     private List<String> buildValue() {
