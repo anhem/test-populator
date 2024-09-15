@@ -20,7 +20,8 @@ import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.STA
 
 public class FileWriterUtil {
 
-    private static final String PATH = "target/generated-test-sources/test-populator/%s/%s_%s.java";
+    static final String TARGET = "target/generated-test-sources/test-populator";
+    private static final String PATH = TARGET + "/%s/%s_%s.java";
 
     private FileWriterUtil() {
     }
@@ -30,7 +31,7 @@ public class FileWriterUtil {
     }
 
     public static Path getPath(String packageName, String className, PopulateConfig populateConfig) {
-        return Paths.get(String.format(PATH, packageName.replace(".", "/"), className, encode(populateConfig)));
+        return Paths.get(String.format(PATH, toPackagePath(packageName), className, encode(populateConfig)));
     }
 
     public static void createOrOverwriteFile(Path path) {
@@ -101,5 +102,9 @@ public class FileWriterUtil {
         } catch (NoSuchAlgorithmException e) {
             throw new ObjectException("Could not encode configuration", e);
         }
+    }
+
+    static String toPackagePath(String packageName) {
+        return packageName.replace(".", "/");
     }
 }
