@@ -1,5 +1,7 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.exception.PopulateException;
+
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.Date;

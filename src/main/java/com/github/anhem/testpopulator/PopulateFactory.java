@@ -3,6 +3,10 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
+import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.object.ObjectFactory;
+import com.github.anhem.testpopulator.object.ObjectFactoryImpl;
+import com.github.anhem.testpopulator.object.ObjectFactoryVoid;
 
 import java.lang.reflect.*;
 import java.util.List;

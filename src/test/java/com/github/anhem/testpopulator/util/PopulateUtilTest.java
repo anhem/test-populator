@@ -3,7 +3,6 @@ package com.github.anhem.testpopulator.util;
 import com.github.anhem.testpopulator.Carrier;
 import com.github.anhem.testpopulator.ClassCarrier;
 import com.github.anhem.testpopulator.CollectionCarrier;
-import com.github.anhem.testpopulator.ObjectFactoryVoid;
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
@@ -16,6 +15,7 @@ import com.github.anhem.testpopulator.model.java.override.MyUUID;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
 import com.github.anhem.testpopulator.model.java.setter.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
+import com.github.anhem.testpopulator.object.ObjectFactoryVoid;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

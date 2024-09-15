@@ -1,7 +1,7 @@
 package com.github.anhem.testpopulator.util;
 
-import com.github.anhem.testpopulator.BuildType;
-import com.github.anhem.testpopulator.ObjectBuilder;
+import com.github.anhem.testpopulator.object.BuildType;
+import com.github.anhem.testpopulator.object.ObjectBuilder;
 
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -10,8 +10,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.BuildType.*;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
+import static com.github.anhem.testpopulator.object.BuildType.*;
 import static com.github.anhem.testpopulator.util.PopulateUtil.isJavaBaseClass;
 
 public class ObjectBuilderUtil {

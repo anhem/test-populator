@@ -1,6 +1,6 @@
 package com.github.anhem.testpopulator.util;
 
-import com.github.anhem.testpopulator.PopulateException;
+import com.github.anhem.testpopulator.exception.PopulateException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

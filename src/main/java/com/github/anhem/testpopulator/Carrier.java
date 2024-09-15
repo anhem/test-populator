@@ -1,5 +1,7 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.object.ObjectFactory;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;

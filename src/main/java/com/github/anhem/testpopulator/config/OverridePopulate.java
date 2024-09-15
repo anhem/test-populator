@@ -1,6 +1,6 @@
 package com.github.anhem.testpopulator.config;
 
-import com.github.anhem.testpopulator.ObjectException;
+import com.github.anhem.testpopulator.exception.ObjectException;
 
 /**
  * For overriding creation/population of classes that cannot be created automatically

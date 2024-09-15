@@ -1,8 +1,8 @@
 package com.github.anhem.testpopulator.util;
 
-import com.github.anhem.testpopulator.ObjectException;
-import com.github.anhem.testpopulator.ObjectResult;
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.exception.ObjectException;
+import com.github.anhem.testpopulator.object.ObjectResult;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.github.anhem.testpopulator.ObjectBuilder.PSF;
+import static com.github.anhem.testpopulator.object.ObjectBuilder.PSF;
 import static com.github.anhem.testpopulator.util.ObjectBuilderUtil.STATIC_BLOCK_END;
 import static com.github.anhem.testpopulator.util.ObjectBuilderUtil.STATIC_BLOCK_START;
 

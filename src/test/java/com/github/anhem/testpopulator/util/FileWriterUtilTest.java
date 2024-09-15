@@ -1,6 +1,6 @@
 package com.github.anhem.testpopulator.util;
 
-import com.github.anhem.testpopulator.ObjectResult;
+import com.github.anhem.testpopulator.object.ObjectResult;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

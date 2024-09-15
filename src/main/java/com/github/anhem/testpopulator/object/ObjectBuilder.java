@@ -1,4 +1,6 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.object;
+
+import com.github.anhem.testpopulator.exception.ObjectException;
 
 import java.util.*;
 import java.util.stream.Collectors;

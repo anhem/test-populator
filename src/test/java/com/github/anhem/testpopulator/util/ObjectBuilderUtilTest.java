@@ -1,10 +1,10 @@
 package com.github.anhem.testpopulator.util;
 
-import com.github.anhem.testpopulator.BuildType;
-import com.github.anhem.testpopulator.ObjectBuilder;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.constructor.NestedCollections;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
+import com.github.anhem.testpopulator.object.BuildType;
+import com.github.anhem.testpopulator.object.ObjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.ObjectBuilder.NULL;
+import static com.github.anhem.testpopulator.object.ObjectBuilder.NULL;
 import static com.github.anhem.testpopulator.util.ObjectBuilderUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,7 +25,7 @@ class ObjectBuilderUtilTest {
 
     @Test
     void getPackageNameReturnsPackageNameOfObjectBuilderWhenClassNameStartsWithJava() {
-        assertThat(getPackageName(String.class)).isEqualTo("com.github.anhem.testpopulator");
+        assertThat(getPackageName(String.class)).isEqualTo("com.github.anhem.testpopulator.object");
     }
 
     @Test
