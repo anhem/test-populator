@@ -1,26 +1,26 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.util;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.PopulateUtil.*;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static java.util.Arrays.stream;
 
-class LombokUtil {
+public class LombokUtil {
     private static final String CLEAR_METHOD_PATTERN = String.format("%s%s", "clear", MATCH_FIRST_CHARACTER_UPPERCASE);
 
     private LombokUtil() {
     }
 
-    static Map<Integer, List<Method>> getMethodsForLombokBuilderGroupedByInvokeOrder(Class<?> clazz, List<String> blacklistedMethods) {
+    public static Map<Integer, List<Method>> getMethodsForLombokBuilderGroupedByInvokeOrder(Class<?> clazz, List<String> blacklistedMethods) {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> !isDeclaringJavaBaseClass(method))
                 .collect(Collectors.groupingBy(LombokUtil::lombokMethodInvokeOrder));
     }
 
-    static int calculateExpectedChildren(Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder) {
+    public static int calculateExpectedChildren(Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder) {
         return builderObjectMethodsGroupedByInvokeOrder.entrySet().stream()
                 .filter(e -> e.getKey() > 0)
                 .map(e -> e.getValue().size())

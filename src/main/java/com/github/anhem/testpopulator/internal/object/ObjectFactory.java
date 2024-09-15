@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.object;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
 

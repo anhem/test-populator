@@ -1,13 +1,15 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.util;
+
+import com.github.anhem.testpopulator.exception.PopulateException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.PopulateUtil.*;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 
-class ImmutablesUtil {
+public class ImmutablesUtil {
 
     static final String ADD_PREFIX = "add";
     static final String ADD_ALL_PREFIX = "addAll";
@@ -24,7 +26,7 @@ class ImmutablesUtil {
     private ImmutablesUtil() {
     }
 
-    static <T> List<Method> getMethodsForImmutablesBuilder(Class<T> clazz, Object builderObject, List<String> blacklistedMethods) {
+    public static <T> List<Method> getMethodsForImmutablesBuilder(Class<T> clazz, Object builderObject, List<String> blacklistedMethods) {
         List<Method> declaredMethods = getDeclaredMethods(builderObject.getClass(), blacklistedMethods);
         return removeMethodsDoingTheSameThing(declaredMethods).stream()
                 .filter(PopulateUtil::hasAtLeastOneParameter)
@@ -33,7 +35,7 @@ class ImmutablesUtil {
                 .collect(Collectors.toList());
     }
 
-    static Class<?> getImmutablesGeneratedClass(Class<?> clazz) {
+    public static Class<?> getImmutablesGeneratedClass(Class<?> clazz) {
         if (clazz.isInterface() || isAbstract(clazz)) {
             try {
                 String packageName = clazz.getName().substring(0, clazz.getName().lastIndexOf(DOT));

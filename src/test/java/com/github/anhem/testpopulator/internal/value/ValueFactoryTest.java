@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.value;
 
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static com.github.anhem.testpopulator.ValueFactory.UNSUPPORTED_TYPE;
+import static com.github.anhem.testpopulator.internal.value.ValueFactory.UNSUPPORTED_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

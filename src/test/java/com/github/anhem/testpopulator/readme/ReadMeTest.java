@@ -1,10 +1,10 @@
 package com.github.anhem.testpopulator.readme;
 
-import com.github.anhem.testpopulator.ObjectException;
-import com.github.anhem.testpopulator.PopulateException;
 import com.github.anhem.testpopulator.PopulateFactory;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.exception.ObjectException;
+import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.readme.model.MyClass;
 import com.github.anhem.testpopulator.readme.model.MyClass2;
 import com.github.anhem.testpopulator.readme.model.MyUUID;

@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.exception;
 
 public class PopulateException extends RuntimeException {
 

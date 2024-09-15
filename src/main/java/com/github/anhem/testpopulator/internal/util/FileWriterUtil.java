@@ -1,6 +1,8 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.exception.ObjectException;
+import com.github.anhem.testpopulator.internal.object.ObjectResult;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,9 +14,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.github.anhem.testpopulator.ObjectBuilder.PSF;
-import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_END;
-import static com.github.anhem.testpopulator.ObjectBuilderUtil.STATIC_BLOCK_START;
+import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.PSF;
+import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.STATIC_BLOCK_END;
+import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.STATIC_BLOCK_START;
 
 public class FileWriterUtil {
 

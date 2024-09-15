@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.constructor.*;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;

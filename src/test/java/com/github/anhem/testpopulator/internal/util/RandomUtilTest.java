@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static com.github.anhem.testpopulator.RandomUtil.*;
+import static com.github.anhem.testpopulator.internal.util.RandomUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RandomUtilTest {

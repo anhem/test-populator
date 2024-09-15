@@ -1,10 +1,10 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.object;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
 
-import static com.github.anhem.testpopulator.ObjectResult.EMPTY_OBJECT_RESULT;
+import static com.github.anhem.testpopulator.internal.object.ObjectResult.EMPTY_OBJECT_RESULT;
 
-class ObjectFactoryVoid implements ObjectFactory {
+public class ObjectFactoryVoid implements ObjectFactory {
     @Override
     public void constructor(Class<?> clazz, int expectedChildren) {
         //ignored

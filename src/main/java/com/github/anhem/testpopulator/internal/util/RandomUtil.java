@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.util;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-class RandomUtil {
+public class RandomUtil {
 
     private static final int RANDOM_INT_MAX_VALUE = 1000000;
     private static final int LEFT_LIMIT = 97; // letter 'a'
