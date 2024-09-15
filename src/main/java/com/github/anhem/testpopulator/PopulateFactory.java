@@ -1,15 +1,16 @@
 package com.github.anhem.testpopulator;
 
-import com.github.anhem.testpopulator.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.carrier.CollectionCarrier;
-import com.github.anhem.testpopulator.carrier.TypeCarrier;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
-import com.github.anhem.testpopulator.object.ObjectFactory;
-import com.github.anhem.testpopulator.object.ObjectFactoryImpl;
-import com.github.anhem.testpopulator.object.ObjectFactoryVoid;
+import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
+import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
+import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
+import com.github.anhem.testpopulator.internal.object.ObjectFactory;
+import com.github.anhem.testpopulator.internal.object.ObjectFactoryImpl;
+import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
+import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import java.lang.reflect.*;
 import java.util.List;
@@ -20,15 +21,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.carrier.CollectionCarrier.initialize;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.*;
-import static com.github.anhem.testpopulator.util.ImmutablesUtil.getImmutablesGeneratedClass;
-import static com.github.anhem.testpopulator.util.ImmutablesUtil.getMethodsForImmutablesBuilder;
-import static com.github.anhem.testpopulator.util.LombokUtil.calculateExpectedChildren;
-import static com.github.anhem.testpopulator.util.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
-import static com.github.anhem.testpopulator.util.PopulateUtil.*;
+import static com.github.anhem.testpopulator.internal.carrier.CollectionCarrier.initialize;
+import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getImmutablesGeneratedClass;
+import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getMethodsForImmutablesBuilder;
+import static com.github.anhem.testpopulator.internal.util.LombokUtil.calculateExpectedChildren;
+import static com.github.anhem.testpopulator.internal.util.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static java.lang.String.format;
 
 /**

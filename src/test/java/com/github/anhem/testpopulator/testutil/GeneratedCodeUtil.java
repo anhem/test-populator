@@ -11,9 +11,9 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.anhem.testpopulator.util.FileWriterUtil.getPath;
-import static com.github.anhem.testpopulator.util.ObjectBuilderUtil.formatClassName;
-import static com.github.anhem.testpopulator.util.ObjectBuilderUtil.getPackageName;
+import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.getPath;
+import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.formatClassName;
+import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.getPackageName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GeneratedCodeUtil {
