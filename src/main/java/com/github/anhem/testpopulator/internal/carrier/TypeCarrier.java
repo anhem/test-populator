@@ -1,10 +1,12 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.carrier;
+
+import com.github.anhem.testpopulator.internal.object.ObjectFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-class TypeCarrier extends Carrier {
+public class TypeCarrier extends Carrier {
 
     private final Type type;
 

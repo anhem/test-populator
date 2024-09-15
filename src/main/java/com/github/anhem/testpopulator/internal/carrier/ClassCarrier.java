@@ -1,11 +1,13 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.carrier;
+
+import com.github.anhem.testpopulator.internal.object.ObjectFactory;
 
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-class ClassCarrier<T> extends Carrier {
+public class ClassCarrier<T> extends Carrier {
 
     private final Class<T> clazz;
 

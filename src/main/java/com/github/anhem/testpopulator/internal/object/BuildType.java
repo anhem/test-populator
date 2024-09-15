@@ -1,6 +1,6 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.internal.object;
 
-enum BuildType {
+public enum BuildType {
     CONSTRUCTOR,
     SETTER,
     BUILDER,

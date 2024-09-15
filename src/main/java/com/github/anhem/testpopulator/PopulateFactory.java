@@ -3,6 +3,14 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
+import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
+import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
+import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
+import com.github.anhem.testpopulator.internal.object.ObjectFactory;
+import com.github.anhem.testpopulator.internal.object.ObjectFactoryImpl;
+import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
+import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import java.lang.reflect.*;
 import java.util.List;
@@ -13,15 +21,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.CollectionCarrier.initialize;
-import static com.github.anhem.testpopulator.ImmutablesUtil.getImmutablesGeneratedClass;
-import static com.github.anhem.testpopulator.ImmutablesUtil.getMethodsForImmutablesBuilder;
-import static com.github.anhem.testpopulator.LombokUtil.calculateExpectedChildren;
-import static com.github.anhem.testpopulator.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
-import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.internal.carrier.CollectionCarrier.initialize;
+import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getImmutablesGeneratedClass;
+import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getMethodsForImmutablesBuilder;
+import static com.github.anhem.testpopulator.internal.util.LombokUtil.calculateExpectedChildren;
+import static com.github.anhem.testpopulator.internal.util.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static java.lang.String.format;
 
 /**
@@ -36,8 +44,8 @@ public class PopulateFactory {
     static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of %s using %s strategy";
     static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection %s";
 
-    static final String BUILD_METHOD = "build";
-    static final String BUILDER_METHOD = "builder";
+    public static final String BUILD_METHOD = "build";
+    public static final String BUILDER_METHOD = "builder";
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
