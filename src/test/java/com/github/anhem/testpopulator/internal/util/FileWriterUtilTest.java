@@ -36,7 +36,7 @@ class FileWriterUtilTest {
     void getPathReturnsPathBuiltFromObjectResultAndPopulateConfig() {
         Path path = FileWriterUtil.getPath(OBJECT_RESULT, DEFAULT_POPULATE_CONFIG);
 
-        assertThat(path).hasToString("target/generated-test-sources/test-populator/com/github/anhem/testpopulator/internal/util/com.github.anhem.testpopulator.internal.util.FileWriterUtilTest_89c4233557e488fd2e99bcfcac1b5dc9.java");
+        assertThat(path).hasToString(String.format("%s/%s/%s_%s.java", TARGET, toPackagePath(this.getClass().getPackageName()), this.getClass().getName(), encode(DEFAULT_POPULATE_CONFIG)));
     }
 
     @Test
@@ -89,7 +89,7 @@ class FileWriterUtilTest {
         writeStartClass(OBJECT_RESULT, path, DEFAULT_POPULATE_CONFIG);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
-                "public class com.github.anhem.testpopulator.internal.util.FileWriterUtilTest_89c4233557e488fd2e99bcfcac1b5dc9 {",
+                String.format("public class %s_%s {", this.getClass().getName(), FileWriterUtil.encode(DEFAULT_POPULATE_CONFIG)),
                 ""
         ));
     }
