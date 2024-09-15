@@ -13,8 +13,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.BuildType.*;
-import static com.github.anhem.testpopulator.FileWriterUtil.*;
 import static com.github.anhem.testpopulator.ObjectBuilder.NULL;
+import static com.github.anhem.testpopulator.util.FileWriterUtil.*;
 
 class ObjectFactoryImpl implements ObjectFactory {
 

@@ -1,5 +1,7 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.util;
 
+import com.github.anhem.testpopulator.BuildType;
+import com.github.anhem.testpopulator.ObjectBuilder;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.constructor.NestedCollections;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
@@ -11,7 +13,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.ObjectBuilder.NULL;
-import static com.github.anhem.testpopulator.ObjectBuilderUtil.*;
+import static com.github.anhem.testpopulator.util.ObjectBuilderUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ObjectBuilderUtilTest {

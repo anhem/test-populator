@@ -5,9 +5,9 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.anhem.testpopulator.PopulateUtil.toArgumentTypes;
+import static com.github.anhem.testpopulator.util.PopulateUtil.toArgumentTypes;
 
-class CollectionCarrier<T> extends ClassCarrier<T> {
+public class CollectionCarrier<T> extends ClassCarrier<T> {
 
     private final List<Type> argumentTypes;
 

@@ -1,4 +1,7 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.util;
+
+import com.github.anhem.testpopulator.BuildType;
+import com.github.anhem.testpopulator.ObjectBuilder;
 
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -9,7 +12,7 @@ import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.BuildType.*;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
-import static com.github.anhem.testpopulator.PopulateUtil.isJavaBaseClass;
+import static com.github.anhem.testpopulator.util.PopulateUtil.isJavaBaseClass;
 
 public class ObjectBuilderUtil {
 
@@ -27,7 +30,7 @@ public class ObjectBuilderUtil {
         return String.format("%s_TestData", clazz.getSimpleName());
     }
 
-    static void addImport(Class<?> clazz, Object value, Set<String> imports, Set<String> staticImports) {
+    public static void addImport(Class<?> clazz, Object value, Set<String> imports, Set<String> staticImports) {
         if (clazz != null && !clazz.getName().startsWith("java.lang.")) {
             if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
                 staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
@@ -39,24 +42,24 @@ public class ObjectBuilderUtil {
         }
     }
 
-    static boolean isBasicValue(ObjectBuilder objectBuilder) {
+    public static boolean isBasicValue(ObjectBuilder objectBuilder) {
         return Objects.requireNonNull(objectBuilder.getBuildType()) == BuildType.VALUE && (isJavaBaseClass(objectBuilder.getClazz()) || objectBuilder.getClazz().isEnum());
     }
 
-    static Stream<String> endBuilder() {
+    public static Stream<String> endBuilder() {
         return Stream.of(String.format(".%s();", BUILD_METHOD));
     }
 
-    static Stream<String> startStaticBlock() {
+    public static Stream<String> startStaticBlock() {
         return Stream.of(STATIC_BLOCK_START);
     }
 
-    static Stream<String> endStaticBlock() {
+    public static Stream<String> endStaticBlock() {
         return Stream.of(STATIC_BLOCK_END);
     }
 
     @SafeVarargs
-    static <T> Stream<T> concatenate(Stream<T>... streams) {
+    public static <T> Stream<T> concatenate(Stream<T>... streams) {
         return Stream.of(streams).flatMap(s -> s);
     }
 

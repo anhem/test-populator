@@ -1,5 +1,6 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.util;
 
+import com.github.anhem.testpopulator.ObjectResult;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -7,8 +8,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.anhem.testpopulator.FileWriterUtil.*;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
+import static com.github.anhem.testpopulator.util.FileWriterUtil.*;
 import static java.io.File.createTempFile;
 import static java.nio.file.Files.readAllLines;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -35,7 +36,7 @@ class FileWriterUtilTest {
     void getPathReturnsPathBuiltFromObjectResultAndPopulateConfig() {
         Path path = FileWriterUtil.getPath(OBJECT_RESULT, DEFAULT_POPULATE_CONFIG);
 
-        assertThat(path).hasToString("target/generated-test-sources/test-populator/com/github/anhem/testpopulator/com.github.anhem.testpopulator.FileWriterUtilTest_89c4233557e488fd2e99bcfcac1b5dc9.java");
+        assertThat(path).hasToString("target/generated-test-sources/test-populator/com/github/anhem/testpopulator/util/com.github.anhem.testpopulator.util.FileWriterUtilTest_89c4233557e488fd2e99bcfcac1b5dc9.java");
     }
 
     @Test
@@ -52,7 +53,7 @@ class FileWriterUtilTest {
         writePackage(OBJECT_RESULT, path);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
-                "package com.github.anhem.testpopulator;",
+                "package com.github.anhem.testpopulator.util;",
                 ""
         ));
     }
@@ -88,7 +89,7 @@ class FileWriterUtilTest {
         writeStartClass(OBJECT_RESULT, path, DEFAULT_POPULATE_CONFIG);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
-                "public class com.github.anhem.testpopulator.FileWriterUtilTest_89c4233557e488fd2e99bcfcac1b5dc9 {",
+                "public class com.github.anhem.testpopulator.util.FileWriterUtilTest_89c4233557e488fd2e99bcfcac1b5dc9 {",
                 ""
         ));
     }

@@ -5,7 +5,7 @@ import java.time.*;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.github.anhem.testpopulator.RandomUtil.*;
+import static com.github.anhem.testpopulator.util.RandomUtil.*;
 
 class ValueFactory {
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";

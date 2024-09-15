@@ -4,13 +4,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.ObjectBuilderUtil.*;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
+import static com.github.anhem.testpopulator.util.ObjectBuilderUtil.*;
 
-class ObjectBuilder {
+public class ObjectBuilder {
 
-    static final String NULL = "null";
-    static final String PSF = "public static final";
+    public static final String NULL = "null";
+    public static final String PSF = "public static final";
     private static final String NEW_OBJECT_WITH_ARGUMENTS = "%s %s %s = new %s(%s);";
     private static final String NEW_OBJECT = "%s %s %s = new %s();";
     private static final String BUILDER = "%s %s %s = %s.%s()";

@@ -5,7 +5,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-class ClassCarrier<T> extends Carrier {
+public class ClassCarrier<T> extends Carrier {
 
     private final Class<T> clazz;
 

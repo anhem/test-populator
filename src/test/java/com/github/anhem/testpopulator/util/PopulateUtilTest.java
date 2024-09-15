@@ -1,5 +1,9 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.util;
 
+import com.github.anhem.testpopulator.Carrier;
+import com.github.anhem.testpopulator.ClassCarrier;
+import com.github.anhem.testpopulator.CollectionCarrier;
+import com.github.anhem.testpopulator.ObjectFactoryVoid;
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
@@ -12,6 +16,7 @@ import com.github.anhem.testpopulator.model.java.override.MyUUID;
 import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
 import com.github.anhem.testpopulator.model.java.setter.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -21,11 +26,11 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.PopulateUtil.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.testutil.FieldTestUtil.getField;
 import static com.github.anhem.testpopulator.testutil.MethodTestUtil.getMethod;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
+import static com.github.anhem.testpopulator.util.PopulateUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateUtilTest {
@@ -239,7 +244,7 @@ class PopulateUtilTest {
     void isBlackListedMethodReturnsTrue() {
         Method method = getMethod("$jacocoInit", HasBlackListed.class);
 
-        assertThat(PopulateUtil.isBlackListed(method, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods())).isTrue();
+        Assertions.assertThat(PopulateUtil.isBlackListed(method, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods())).isTrue();
     }
 
     @Test
