@@ -1,5 +1,8 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.carrier.ClassCarrier;
+import com.github.anhem.testpopulator.carrier.CollectionCarrier;
+import com.github.anhem.testpopulator.carrier.TypeCarrier;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
@@ -17,7 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.CollectionCarrier.initialize;
+import static com.github.anhem.testpopulator.carrier.CollectionCarrier.initialize;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.*;

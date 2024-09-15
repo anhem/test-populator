@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator;
+package com.github.anhem.testpopulator.carrier;
 
 import com.github.anhem.testpopulator.object.ObjectFactory;
 

@@ -1,8 +1,8 @@
 package com.github.anhem.testpopulator.util;
 
-import com.github.anhem.testpopulator.Carrier;
-import com.github.anhem.testpopulator.ClassCarrier;
-import com.github.anhem.testpopulator.CollectionCarrier;
+import com.github.anhem.testpopulator.carrier.Carrier;
+import com.github.anhem.testpopulator.carrier.ClassCarrier;
+import com.github.anhem.testpopulator.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
