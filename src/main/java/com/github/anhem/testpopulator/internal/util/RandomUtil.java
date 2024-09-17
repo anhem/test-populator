@@ -37,7 +37,7 @@ public class RandomUtil {
     }
 
     public static LocalDateTime getRandomLocalDateTime() {
-        return LocalDateTime.now().minusYears(1).plusDays(random.nextInt(730));
+        return LocalDateTime.now().minusYears(1).plusDays(random.nextInt(365));
     }
 
     public static Character getRandomCharacter() {

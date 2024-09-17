@@ -4,8 +4,8 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 
 import java.math.BigDecimal;
 import java.time.*;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Supplier;
 
 import static com.github.anhem.testpopulator.internal.util.RandomUtil.*;
 
@@ -26,9 +26,29 @@ public class ValueFactory {
     private static final BigDecimal BIG_DECIMAL = BigDecimal.ONE;
 
     private final boolean setRandomValues;
+    private final Map<Class<?>, Supplier<?>> types;
 
     public ValueFactory(boolean setRandomValues) {
         this.setRandomValues = setRandomValues;
+        types = new HashMap<>();
+        types.put(Integer.class, this::getInteger);
+        types.put(int.class, this::getInteger);
+        types.put(Long.class, this::getLong);
+        types.put(long.class, this::getLong);
+        types.put(Double.class, this::getDouble);
+        types.put(double.class, this::getDouble);
+        types.put(Boolean.class, this::getBoolean);
+        types.put(boolean.class, this::getBoolean);
+        types.put(BigDecimal.class, this::getBigDecimal);
+        types.put(String.class, this::getString);
+        types.put(LocalDate.class, this::getLocalDate);
+        types.put(LocalDateTime.class, this::getLocalDateTime);
+        types.put(ZonedDateTime.class, this::getZonedDateTime);
+        types.put(Instant.class, this::getInstant);
+        types.put(Date.class, this::getDate);
+        types.put(Character.class, this::getChar);
+        types.put(char.class, this::getChar);
+        types.put(UUID.class, this::getUUID);
     }
 
     @SuppressWarnings("unchecked")
@@ -36,47 +56,10 @@ public class ValueFactory {
         if (clazz.isEnum()) {
             return getEnum(clazz);
         }
-        if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
-            return (T) getInteger();
-        }
-        if (clazz.equals(Long.class) || clazz.equals(long.class)) {
-            return (T) getLong();
-        }
-        if (clazz.equals(Double.class) || clazz.equals(double.class)) {
-            return (T) getDouble();
-        }
-        if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
-            return (T) getBoolean();
-        }
-        if (clazz.equals(BigDecimal.class)) {
-            return (T) getBigDecimal();
-        }
-        if (clazz.equals(String.class)) {
-            return (T) getString();
-        }
-        if (clazz.equals(LocalDate.class)) {
-            return (T) getLocalDate();
-        }
-        if (clazz.equals(LocalDateTime.class)) {
-            return (T) getLocalDateTime();
-        }
-        if (clazz.equals(ZonedDateTime.class)) {
-            return (T) getZonedDateTime();
-        }
-        if (clazz.equals(Instant.class)) {
-            return (T) getInstant();
-        }
-        if (clazz.equals(Date.class)) {
-            return (T) getDate();
-        }
-        if (clazz.equals(Character.class) || clazz.equals(char.class)) {
-            return (T) getChar();
-        }
-        if (clazz.equals(UUID.class)) {
-            return (T) getUUID();
-        }
 
-        throw new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
+        return Optional.ofNullable(types.get(clazz))
+                .map(supplier -> (T) supplier.get())
+                .orElseThrow(() -> new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName())));
     }
 
     private Integer getInteger() {
