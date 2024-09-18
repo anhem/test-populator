@@ -61,6 +61,11 @@ class ValueFactoryTest {
         createAndAssertFixedValues(Date.class);
         createAndAssertFixedValues(Character.class);
         createAndAssertFixedValues(UUID.class);
+        createAndAssertFixedIntValues();
+        createAndAssertFixedLongValues();
+        createAndAssertFixedDoubleValues();
+        createAndAssertFixedBooleanValues();
+        createAndAssertFixedCharValues();
     }
 
     @Test
@@ -131,4 +136,33 @@ class ValueFactoryTest {
         assertThat(value_1).isEqualTo(value_2);
     }
 
+    private void createAndAssertFixedIntValues() {
+        int value_1 = valueFactory.createValue(int.class);
+        int value_2 = valueFactory.createValue(int.class);
+        assertThat(value_1).isEqualTo(value_2);
+    }
+
+    private void createAndAssertFixedLongValues() {
+        long value_1 = valueFactory.createValue(long.class);
+        long value_2 = valueFactory.createValue(long.class);
+        assertThat(value_1).isEqualTo(value_2);
+    }
+
+    private void createAndAssertFixedDoubleValues() {
+        double value_1 = valueFactory.createValue(double.class);
+        double value_2 = valueFactory.createValue(double.class);
+        assertThat(value_1).isEqualTo(value_2);
+    }
+
+    private void createAndAssertFixedBooleanValues() {
+        boolean value_1 = valueFactory.createValue(boolean.class);
+        boolean value_2 = valueFactory.createValue(boolean.class);
+        assertThat(value_1).isEqualTo(value_2);
+    }
+
+    private void createAndAssertFixedCharValues() {
+        char value_1 = valueFactory.createValue(char.class);
+        char value_2 = valueFactory.createValue(char.class);
+        assertThat(value_1).isEqualTo(value_2);
+    }
 }
