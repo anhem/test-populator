@@ -119,7 +119,7 @@ class ValueFactoryTest {
     private Object createSecondNonMatchingValue(Object value) {
         Object secondValue = valueFactory.createValue(value.getClass());
         int retry = 0;
-        while (value.equals(secondValue) && retry < 3) {
+        while (value.equals(secondValue) && retry < 10) {
             secondValue = valueFactory.createValue(value.getClass());
             retry++;
         }
