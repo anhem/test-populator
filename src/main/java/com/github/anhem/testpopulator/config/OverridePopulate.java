@@ -1,10 +1,14 @@
 package com.github.anhem.testpopulator.config;
 
 import com.github.anhem.testpopulator.exception.ObjectException;
+import com.github.anhem.testpopulator.internal.value.TypeSupplier;
 
-import java.util.function.Supplier;
-
-public interface TypeSupplier<T> extends Supplier<T> {
+/**
+ * For overriding creation/population of classes that cannot be created automatically
+ *
+ * @param <T> class to override
+ */
+public interface OverridePopulate<T> extends TypeSupplier<T> {
 
     /**
      * Implementation required _only_ if ObjectFactory is used. ObjectFactory is not enabled by default.
@@ -16,7 +20,7 @@ public interface TypeSupplier<T> extends Supplier<T> {
      * "new MyUUID(java.util.UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\").toString())"
      */
     default String createString() {
-        throw new ObjectException(String.format("createString() is not implemented for class %s", get().getClass().getName()));
+        throw new ObjectException(String.format("createString() is not implemented for class %s", create().getClass().getName()));
     }
 }
 

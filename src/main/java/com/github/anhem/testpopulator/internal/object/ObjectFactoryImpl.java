@@ -158,7 +158,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
         return Optional.ofNullable(stringSuppliers.get(clazz))
                 .map(supplier -> supplier.apply(object))
-                .orElseGet(() -> populateConfig.getTypeSuppliers().getOrDefault(object.getClass(), () -> {
+                .orElseGet(() -> populateConfig.getOverridePopulate().getOrDefault(object.getClass(), () -> {
                     throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
                 }).createString());
     }

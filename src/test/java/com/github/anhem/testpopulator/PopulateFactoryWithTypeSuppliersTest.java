@@ -1,8 +1,8 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.model.java.typesupplier.MyUUID;
-import com.github.anhem.testpopulator.model.java.typesupplier.MyUUIDTypeSupplier;
+import com.github.anhem.testpopulator.model.java.override.MyUUID;
+import com.github.anhem.testpopulator.model.java.override.MyUUIDOverridePopulate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class PopulateFactoryWithTypeSuppliersTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .typeSupplier(MyUUID.class, new MyUUIDTypeSupplier())
+                .overridePopulate(MyUUID.class, new MyUUIDOverridePopulate())
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

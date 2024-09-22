@@ -1,6 +1,6 @@
 package com.github.anhem.testpopulator.internal.value;
 
-import com.github.anhem.testpopulator.config.TypeSupplier;
+import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.exception.PopulateException;
 
 import java.math.BigDecimal;
@@ -28,14 +28,14 @@ public class ValueFactory {
     private final boolean setRandomValues;
     private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
 
-    public ValueFactory(boolean setRandomValues, Map<Class<?>, TypeSupplier<?>> typeSuppliers) {
+    public ValueFactory(boolean setRandomValues, Map<Class<?>, OverridePopulate<?>> overridePopulates) {
         this.setRandomValues = setRandomValues;
         this.typeSuppliers = getDefaultTypeSuppliers();
-        this.typeSuppliers.putAll(typeSuppliers);
+        this.typeSuppliers.putAll(overridePopulates);
     }
 
     private Map<Class<?>, TypeSupplier<?>> getDefaultTypeSuppliers() {
-        final Map<Class<?>, TypeSupplier<?>> typeSuppliers = new HashMap<>();
+        Map<Class<?>, TypeSupplier<?>> typeSuppliers = new HashMap<>();
         typeSuppliers.put(Integer.class, this::getInteger);
         typeSuppliers.put(int.class, this::getInteger);
         typeSuppliers.put(Long.class, this::getLong);
@@ -64,7 +64,7 @@ public class ValueFactory {
         }
 
         return Optional.ofNullable(typeSuppliers.get(clazz))
-                .map(supplier -> (T) supplier.get())
+                .map(supplier -> (T) supplier.create())
                 .orElseThrow(() -> new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName())));
     }
 

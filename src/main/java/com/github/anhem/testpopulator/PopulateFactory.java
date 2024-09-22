@@ -63,7 +63,7 @@ public class PopulateFactory {
      */
     public PopulateFactory(PopulateConfig populateConfig) {
         this.populateConfig = populateConfig;
-        this.valueFactory = new ValueFactory(populateConfig.useRandomValues(), populateConfig.getTypeSuppliers());
+        this.valueFactory = new ValueFactory(populateConfig.useRandomValues(), populateConfig.getOverridePopulate());
     }
 
     /**

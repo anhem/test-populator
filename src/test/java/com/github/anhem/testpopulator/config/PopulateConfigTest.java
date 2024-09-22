@@ -22,8 +22,8 @@ class PopulateConfigTest {
     void buildingPopulateConfigResultsInDefaultValues() {
         assertThat(DEFAULT_POPULATE_CONFIG).isNotNull();
         assertThat(DEFAULT_POPULATE_CONFIG.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER);
-        assertThat(DEFAULT_POPULATE_CONFIG.getTypeSuppliers()).isNotNull();
-        assertThat(DEFAULT_POPULATE_CONFIG.getTypeSuppliers()).isEmpty();
+        assertThat(DEFAULT_POPULATE_CONFIG.getOverridePopulate()).isNotNull();
+        assertThat(DEFAULT_POPULATE_CONFIG.getOverridePopulate()).isEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.useRandomValues()).isTrue();
         assertThat(DEFAULT_POPULATE_CONFIG.canAccessNonPublicConstructors()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.getSetterPrefix()).isEqualTo("set");
@@ -42,7 +42,7 @@ class PopulateConfigTest {
                 .builderPattern(LOMBOK)
                 .strategyOrder(SETTER)
                 .setterPrefix("with")
-                .typeSupplier(Integer.class, () -> 1)
+                .overridePopulate(Integer.class, () -> 1)
                 .randomValues(false)
                 .accessNonPublicConstructors(true)
                 .nullOnCircularDependency(true)
@@ -50,8 +50,8 @@ class PopulateConfigTest {
 
         assertThat(populateConfig.getStrategyOrder()).hasSize(2);
         assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER, SETTER);
-        assertThat(populateConfig.getTypeSuppliers()).hasSize(1);
-        assertThat(populateConfig.getTypeSuppliers()).containsKey(Integer.class);
+        assertThat(populateConfig.getOverridePopulate()).hasSize(1);
+        assertThat(populateConfig.getOverridePopulate()).containsKey(Integer.class);
         assertThat(populateConfig.useRandomValues()).isFalse();
         assertThat(populateConfig.canAccessNonPublicConstructors()).isTrue();
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);

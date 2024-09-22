@@ -1,8 +1,8 @@
 package com.github.anhem.testpopulator.readme;
 
 import com.github.anhem.testpopulator.PopulateFactory;
+import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.config.TypeSupplier;
 import com.github.anhem.testpopulator.exception.ObjectException;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.readme.model.MyClass;
@@ -40,10 +40,10 @@ class ReadMeTest {
 
     @Test
     void exceptionIsThrownWhenObjectFactoryIsEnabledAndTypeSupplierImplementationDoesNotImplementCreateString() {
-        TypeSupplier<MyUUID> myUUIDTypeSupplier = () -> new MyUUID(UUID.randomUUID().toString());
+        OverridePopulate<MyUUID> myUUIDOverridePopulate = () -> new MyUUID(UUID.randomUUID().toString());
         PopulateFactory populateFactory = new PopulateFactory(
                 PopulateConfig.builder()
-                        .typeSupplier(MyUUID.class, myUUIDTypeSupplier)
+                        .overridePopulate(MyUUID.class, myUUIDOverridePopulate)
                         .objectFactoryEnabled(true)
                         .build()
         );

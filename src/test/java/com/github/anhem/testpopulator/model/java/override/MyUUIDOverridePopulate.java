@@ -1,13 +1,13 @@
-package com.github.anhem.testpopulator.model.java.typesupplier;
+package com.github.anhem.testpopulator.model.java.override;
 
-import com.github.anhem.testpopulator.config.TypeSupplier;
+import com.github.anhem.testpopulator.config.OverridePopulate;
 
-public class MyUUIDTypeSupplier implements TypeSupplier<MyUUID> {
+public class MyUUIDOverridePopulate implements OverridePopulate<MyUUID> {
 
     private static final String UUID = "156585fd-4fe5-4ed4-8d59-d8d70d8b96f5";
 
     @Override
-    public MyUUID get() {
+    public MyUUID create() {
         return new MyUUID(UUID);
     }
 
