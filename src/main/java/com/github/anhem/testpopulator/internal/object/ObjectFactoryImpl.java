@@ -21,7 +21,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
 
-    private static final Map<Class<?>, Function<Object, String>> defaultStringSuppliers = new HashMap<>() {{
+    private static final Map<Class<?>, Function<Object, String>> stringSuppliers = new HashMap<>() {{
         put(Integer.class, Object::toString);
         put(Long.class, object -> object + "L");
         put(Double.class, Object::toString);
@@ -154,7 +154,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
             return object.toString();
         }
 
-        return Optional.ofNullable(defaultStringSuppliers.get(clazz))
+        return Optional.ofNullable(stringSuppliers.get(clazz))
                 .map(supplier -> supplier.apply(object))
                 .orElseGet(() -> populateConfig.getTypeSuppliers().getOrDefault(object.getClass(), () -> {
                     throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
