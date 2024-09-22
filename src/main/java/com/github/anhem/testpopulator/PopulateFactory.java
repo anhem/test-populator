@@ -1,6 +1,5 @@
 package com.github.anhem.testpopulator;
 
-import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
@@ -49,7 +48,6 @@ public class PopulateFactory {
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
-    private final Map<Class<?>, OverridePopulate<?>> overridePopulates;
 
     /**
      * Create new instance of PopulateFactory with default configuration
@@ -65,8 +63,7 @@ public class PopulateFactory {
      */
     public PopulateFactory(PopulateConfig populateConfig) {
         this.populateConfig = populateConfig;
-        valueFactory = new ValueFactory(populateConfig.useRandomValues());
-        overridePopulates = populateConfig.createOverridePopulates();
+        this.valueFactory = new ValueFactory(populateConfig.useRandomValues(), populateConfig.getOverridePopulate());
     }
 
     /**
@@ -84,10 +81,10 @@ public class PopulateFactory {
 
     private <T> T populateWithOverrides(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
-        if (overridePopulates.containsKey(clazz)) {
-            T overridePopulateValue = getOverridePopulateValue(clazz, overridePopulates);
-            classCarrier.getObjectFactory().overridePopulate(clazz, overridePopulates.get(clazz));
-            return overridePopulateValue;
+        if (valueFactory.hasType(clazz)) {
+            T value = valueFactory.createValue(clazz);
+            classCarrier.getObjectFactory().value(value);
+            return value;
         }
         if (populateConfig.isNullOnCircularDependency() && !isJavaBaseClass(clazz) && !classCarrier.addVisited()) {
             classCarrier.getObjectFactory().nullValue(clazz);
@@ -98,11 +95,6 @@ public class PopulateFactory {
         }
         if (clazz.isArray()) {
             return continuePopulateForArray(classCarrier);
-        }
-        if (isValue(clazz)) {
-            T value = valueFactory.createValue(clazz);
-            classCarrier.getObjectFactory().value(value);
-            return value;
         }
         return continuePopulateWithStrategies(classCarrier);
     }

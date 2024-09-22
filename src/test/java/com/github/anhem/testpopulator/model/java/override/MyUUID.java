@@ -1,7 +1,12 @@
 package com.github.anhem.testpopulator.model.java.override;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
 import java.util.UUID;
 
+@Getter
+@EqualsAndHashCode
 public class MyUUID {
 
     private final UUID uuid;
@@ -10,7 +15,4 @@ public class MyUUID {
         this.uuid = UUID.fromString(uuid);
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
 }

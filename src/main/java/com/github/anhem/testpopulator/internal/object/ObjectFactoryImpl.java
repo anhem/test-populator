@@ -1,6 +1,5 @@
 package com.github.anhem.testpopulator.internal.object;
 
-import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
 
@@ -11,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
@@ -20,6 +20,24 @@ import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.*;
 public class ObjectFactoryImpl implements ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
+
+    private static final Map<Class<?>, Function<Object, String>> stringSuppliers = new HashMap<>();
+
+    static {
+        stringSuppliers.put(Integer.class, Object::toString);
+        stringSuppliers.put(Long.class, object -> object + "L");
+        stringSuppliers.put(Double.class, Object::toString);
+        stringSuppliers.put(Boolean.class, Object::toString);
+        stringSuppliers.put(BigDecimal.class, object -> String.format("BigDecimal.valueOf(%d)", ((BigDecimal) object).intValue()));
+        stringSuppliers.put(String.class, object -> "\"" + object + "\"");
+        stringSuppliers.put(Character.class, object -> "'" + object + "'");
+        stringSuppliers.put(LocalDate.class, object -> String.format("LocalDate.parse(\"%s\")", object));
+        stringSuppliers.put(LocalDateTime.class, object -> String.format("LocalDateTime.parse(\"%s\")", object));
+        stringSuppliers.put(ZonedDateTime.class, object -> String.format("ZonedDateTime.parse(\"%s\")", object));
+        stringSuppliers.put(Instant.class, object -> String.format("Instant.parse(\"%s\")", object));
+        stringSuppliers.put(Date.class, object -> String.format("new Date(%sL)", ((Date) object).getTime()));
+        stringSuppliers.put(UUID.class, object -> String.format("UUID.fromString(\"%s\")", object));
+    }
 
     private final PopulateConfig populateConfig;
     private final Map<Class<?>, Integer> classCounters;
@@ -92,13 +110,6 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public <T> void overridePopulate(Class<?> clazz, OverridePopulate<T> overridePopulateValue) {
-        setNextObjectBuilder(clazz, OVERRIDE_VALUE, 0);
-        currentObjectBuilder.setValue(overridePopulateValue.createString());
-        setPreviousObjectBuilder();
-    }
-
-    @Override
     public <T> void value(T value) {
         setNextObjectBuilder(value.getClass(), VALUE, 0);
         currentObjectBuilder.setValue(toStringValue(value));
@@ -144,47 +155,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
         if (clazz.isEnum()) {
             return object.toString();
         }
-        if (clazz.equals(Integer.class)) {
-            return object.toString();
-        }
-        if (clazz.equals(Long.class)) {
-            return String.format("%sL", object);
-        }
-        if (clazz.equals(Double.class)) {
-            return object.toString();
-        }
-        if (clazz.equals(Boolean.class)) {
-            return object.toString();
-        }
-        if (clazz.equals(BigDecimal.class)) {
-            return String.format("BigDecimal.valueOf(%d)", ((BigDecimal) object).intValue());
-        }
-        if (clazz.equals(String.class)) {
-            return String.format("\"%s\"", object);
-        }
-        if (clazz.equals(LocalDate.class)) {
-            return String.format("LocalDate.parse(\"%s\")", object);
-        }
-        if (clazz.equals(LocalDateTime.class)) {
-            return String.format("LocalDateTime.parse(\"%s\")", object);
-        }
-        if (clazz.equals(ZonedDateTime.class)) {
-            return String.format("ZonedDateTime.parse(\"%s\")", object);
-        }
-        if (clazz.equals(Instant.class)) {
-            return String.format("Instant.parse(\"%s\")", object);
-        }
-        if (clazz.equals(Date.class)) {
-            return String.format("new Date(%sL)", ((Date) object).getTime());
-        }
-        if (clazz.equals(Character.class)) {
-            return String.format("'%s'", object);
-        }
-        if (clazz.equals(UUID.class)) {
-            return String.format("UUID.fromString(\"%s\")", object);
-        }
 
-        throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
+        return Optional.ofNullable(stringSuppliers.get(clazz))
+                .map(supplier -> supplier.apply(object))
+                .orElseGet(() -> populateConfig.getOverridePopulate().getOrDefault(object.getClass(), () -> {
+                    throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
+                }).createString());
     }
 
     private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {

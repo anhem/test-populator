@@ -5,7 +5,6 @@ import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.readme.model.MyUUID;
 
-import java.util.List;
 import java.util.UUID;
 
 public class TestPopulator {
@@ -14,7 +13,7 @@ public class TestPopulator {
         return populateFactory.populate(clazz);
     }
 
-    private static class MyUUIDOverride implements OverridePopulate<MyUUID> {
+    private static class MyUUIDOverridePopulate implements OverridePopulate<MyUUID> {
 
         @Override
         public MyUUID create() {
@@ -23,7 +22,7 @@ public class TestPopulator {
     }
 
     private static final PopulateConfig populateConfig = PopulateConfig.builder()
-            .overridePopulate(List.of(new MyUUIDOverride()))
+            .overridePopulate(MyUUID.class, new MyUUIDOverridePopulate())
             .build();
 
     private static final PopulateFactory populateFactory = new PopulateFactory(populateConfig);
