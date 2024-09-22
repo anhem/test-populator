@@ -125,7 +125,7 @@ will give the same result.
 
 Random values are not generated entirely at random. They are generated to be random enough. For example date and time of
 various
-types are randomized from between `"now" minus 1 year` and `"now" plus 730 days (2 years)`.
+types are randomized from between `"now" minus 1 year` and `"now" plus 1 year`.
 
 See [RandomUtil.java](src/main/java/com/github/anhem/testpopulator/RandomUtil.java) for more details.
 

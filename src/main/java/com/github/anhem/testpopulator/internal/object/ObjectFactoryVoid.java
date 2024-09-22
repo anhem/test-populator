@@ -1,7 +1,5 @@
 package com.github.anhem.testpopulator.internal.object;
 
-import com.github.anhem.testpopulator.config.OverridePopulate;
-
 import static com.github.anhem.testpopulator.internal.object.ObjectResult.EMPTY_OBJECT_RESULT;
 
 public class ObjectFactoryVoid implements ObjectFactory {
@@ -57,11 +55,6 @@ public class ObjectFactoryVoid implements ObjectFactory {
 
     @Override
     public void array(Class<?> clazz) {
-        //ignored
-    }
-
-    @Override
-    public <T> void overridePopulate(Class<?> clazz, OverridePopulate<T> overridePopulateValue) {
         //ignored
     }
 

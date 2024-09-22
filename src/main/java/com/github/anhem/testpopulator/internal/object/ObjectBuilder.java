@@ -121,7 +121,6 @@ public class ObjectBuilder {
             case ARRAY:
                 return buildArray();
             case VALUE:
-            case OVERRIDE_VALUE:
                 return buildValue();
             default:
                 throw new ObjectException(String.format("Invalid buildType %s", buildType));

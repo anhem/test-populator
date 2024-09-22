@@ -1,7 +1,6 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
-import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
@@ -31,11 +30,6 @@ public class PopulateUtil {
                 .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T getOverridePopulateValue(Class<T> clazz, Map<Class<?>, OverridePopulate<?>> overridePopulate) {
-        return (T) (overridePopulate.get(clazz).create());
-    }
-
     public static List<Field> getDeclaredFields(Class<?> clazz, List<String> blacklistedFields) {
         List<Field> declaredFields = getAllDeclaredFields(clazz, new ArrayList<>());
         return removeUnwantedFields(declaredFields, blacklistedFields);
@@ -62,10 +56,6 @@ public class PopulateUtil {
 
     public static <T> boolean isCollectionCarrier(ClassCarrier<T> classCarrier) {
         return classCarrier instanceof CollectionCarrier;
-    }
-
-    public static boolean isValue(Class<?> clazz) {
-        return clazz.isEnum() || isJavaBaseClass(clazz);
     }
 
     public static boolean isJavaBaseClass(Class<?> clazz) {

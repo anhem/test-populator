@@ -2,7 +2,6 @@ package com.github.anhem.testpopulator.internal.object;
 
 import com.github.anhem.testpopulator.exception.ObjectException;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
-import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -222,19 +221,6 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final Boolean[] boolean_0 = new Boolean[]{true};",
                 "public static final MyClass myClass_0 = new MyClass(boolean_0);"
-        ));
-    }
-
-    @Test
-    void overrideValue() {
-        objectFactoryImpl.overridePopulate(UUID.class, new MyUUIDOverride());
-        ObjectResult objectResult = objectFactoryImpl.build();
-        assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
-        assertThat(objectResult.getClassName()).isEqualTo("UUID_TestData");
-        assertThat(objectResult.getImports()).isEqualTo(Set.of("java.util.UUID"));
-        assertThat(objectResult.getStaticImports()).isEmpty();
-        assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final UUID uUID_0 = UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\");"
         ));
     }
 

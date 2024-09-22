@@ -1,19 +1,15 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
-import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
-import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.HasBlackListed;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorPrivate;
-import com.github.anhem.testpopulator.model.java.override.MyUUID;
-import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
 import com.github.anhem.testpopulator.model.java.setter.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.assertj.core.api.Assertions;
@@ -43,17 +39,6 @@ class PopulateUtilTest {
 
         assertThat(argumentTypes).hasSize(1);
         assertThat(argumentTypes.get(0)).isEqualTo(String.class);
-    }
-
-    @Test
-    void getOverridePopulateValueReturnsValue() {
-        Map<Class<?>, OverridePopulate<?>> overridePopulate = Map.of(MyUUID.class, new MyUUIDOverride());
-
-        MyUUID myUUID = getOverridePopulateValue(MyUUID.class, overridePopulate);
-
-        assertThat(myUUID).isNotNull();
-        assertThat(myUUID.getClass()).isEqualTo(MyUUID.class);
-        assertThat(myUUID.getUuid()).isNotNull();
     }
 
     @Test
@@ -121,17 +106,6 @@ class PopulateUtilTest {
     @Test
     void isCollectionCarrierReturnsTrue() {
         assertThat(isCollectionCarrier(createCollectionCarrier(String.class))).isTrue();
-    }
-
-    @Test
-    void isValueReturnsFalse() {
-        assertThat(isValue(Pojo.class)).isFalse();
-    }
-
-    @Test
-    void isValueReturnsTrue() {
-        assertThat(isValue(String.class)).isTrue();
-        assertThat(isValue(ArbitraryEnum.class)).isTrue();
     }
 
     @Test
