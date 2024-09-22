@@ -1,7 +1,7 @@
 package com.github.anhem.testpopulator.internal.object;
 
-import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.config.TypeSupplier;
 import com.github.anhem.testpopulator.exception.ObjectException;
 
 import java.math.BigDecimal;
@@ -92,13 +92,6 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public <T> void overridePopulate(Class<?> clazz, OverridePopulate<T> overridePopulateValue) {
-        setNextObjectBuilder(clazz, OVERRIDE_VALUE, 0);
-        currentObjectBuilder.setValue(overridePopulateValue.createString());
-        setPreviousObjectBuilder();
-    }
-
-    @Override
     public <T> void value(T value) {
         setNextObjectBuilder(value.getClass(), VALUE, 0);
         currentObjectBuilder.setValue(toStringValue(value));
@@ -184,7 +177,9 @@ public class ObjectFactoryImpl implements ObjectFactory {
             return String.format("UUID.fromString(\"%s\")", object);
         }
 
-        throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
+        return Optional.ofNullable(populateConfig.getTypeSuppliers().get(object.getClass()))
+                .map(TypeSupplier::createString)
+                .orElseThrow(() -> new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName())));
     }
 
     private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {

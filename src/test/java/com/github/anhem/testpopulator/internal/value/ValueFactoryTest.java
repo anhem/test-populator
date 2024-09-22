@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.github.anhem.testpopulator.internal.value.ValueFactory.UNSUPPORTED_TYPE;
@@ -22,7 +23,7 @@ class ValueFactoryTest {
 
     @Test
     void randomValuesAreCreated() {
-        valueFactory = new ValueFactory(true);
+        valueFactory = new ValueFactory(true, Map.of());
         createAndAssertRandomValues(ArbitraryEnum.class);
         createAndAssertRandomValues(Integer.class);
         createAndAssertRandomValues(Long.class);
@@ -46,7 +47,7 @@ class ValueFactoryTest {
 
     @Test
     void fixedValuesAreCreated() {
-        valueFactory = new ValueFactory(false);
+        valueFactory = new ValueFactory(false, Map.of());
         createAndAssertFixedValues(ArbitraryEnum.class);
         createAndAssertFixedValues(Integer.class);
         createAndAssertFixedValues(Long.class);
@@ -70,7 +71,7 @@ class ValueFactoryTest {
 
     @Test
     void attemptingToCreateValueOfUnsupportedTypeThrowsException() {
-        valueFactory = new ValueFactory(true);
+        valueFactory = new ValueFactory(true, Map.of());
         assertThatThrownBy(() -> valueFactory.createValue(Pojo.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(UNSUPPORTED_TYPE, Pojo.class.getTypeName()));

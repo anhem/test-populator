@@ -1,7 +1,5 @@
 package com.github.anhem.testpopulator.config;
 
-import com.github.anhem.testpopulator.model.java.override.MyUUID;
-import com.github.anhem.testpopulator.model.java.override.MyUUIDOverride;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -24,8 +22,8 @@ class PopulateConfigTest {
     void buildingPopulateConfigResultsInDefaultValues() {
         assertThat(DEFAULT_POPULATE_CONFIG).isNotNull();
         assertThat(DEFAULT_POPULATE_CONFIG.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER);
-        assertThat(DEFAULT_POPULATE_CONFIG.createOverridePopulates()).isNotNull();
-        assertThat(DEFAULT_POPULATE_CONFIG.createOverridePopulates()).isEmpty();
+        assertThat(DEFAULT_POPULATE_CONFIG.getTypeSuppliers()).isNotNull();
+        assertThat(DEFAULT_POPULATE_CONFIG.getTypeSuppliers()).isEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.useRandomValues()).isTrue();
         assertThat(DEFAULT_POPULATE_CONFIG.canAccessNonPublicConstructors()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.getSetterPrefix()).isEqualTo("set");
@@ -33,32 +31,32 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedFields()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.isObjectFactoryEnabled()).isFalse();
+        assertThat(DEFAULT_POPULATE_CONFIG.isNullOnCircularDependency()).isFalse();
         assertEqual(DEFAULT_POPULATE_CONFIG.toBuilder().build(), DEFAULT_POPULATE_CONFIG);
     }
 
     @Test
     void buildingCustomPopulateConfig() {
-        MyUUIDOverride overridePopulate = new MyUUIDOverride();
-        Class<? extends MyUUID> overriddenClass = overridePopulate.create().getClass();
-
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .strategyOrder(BUILDER)
                 .builderPattern(LOMBOK)
                 .strategyOrder(SETTER)
                 .setterPrefix("with")
-                .overridePopulate(overridePopulate)
+                .typeSupplier(Integer.class, () -> 1)
                 .randomValues(false)
                 .accessNonPublicConstructors(true)
+                .nullOnCircularDependency(true)
                 .build();
 
         assertThat(populateConfig.getStrategyOrder()).hasSize(2);
         assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER, SETTER);
-        assertThat(populateConfig.createOverridePopulates()).hasSize(1);
-        assertThat(populateConfig.createOverridePopulates()).containsEntry(overriddenClass, overridePopulate);
+        assertThat(populateConfig.getTypeSuppliers()).hasSize(1);
+        assertThat(populateConfig.getTypeSuppliers()).containsKey(Integer.class);
         assertThat(populateConfig.useRandomValues()).isFalse();
         assertThat(populateConfig.canAccessNonPublicConstructors()).isTrue();
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
         assertThat(populateConfig.getSetterPrefix()).isEqualTo("with");
+        assertThat(populateConfig.isNullOnCircularDependency()).isTrue();
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
     }
 

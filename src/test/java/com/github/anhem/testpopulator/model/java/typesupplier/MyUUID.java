@@ -1,7 +1,10 @@
-package com.github.anhem.testpopulator.model.java.override;
+package com.github.anhem.testpopulator.model.java.typesupplier;
+
+import lombok.EqualsAndHashCode;
 
 import java.util.UUID;
 
+@EqualsAndHashCode
 public class MyUUID {
 
     private final UUID uuid;

@@ -12,7 +12,6 @@ public enum BuildType {
     MAP,
     MAP_OF,
     ARRAY,
-    OVERRIDE_VALUE,
     VALUE;
 
     public boolean isParameterizedType() {

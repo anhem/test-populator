@@ -1,8 +1,6 @@
 package com.github.anhem.testpopulator.config;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.lang.String.format;
@@ -14,14 +12,14 @@ public class PopulateConfig {
     public static final String INVALID_CONFIG_MISSING_BUILDER_PATTERN = "%s strategy configured, but no builderPattern specified. Should be one of %s";
     public static final String INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY = "objectFactory can not be enabled while accessNonPublicConstructors is true";
     public static final String INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY = "objectFactory can not be enabled while strategyOrder contains FIELD";
-    private static final List<String> DEFAULT_BLACKLISTED_METHODS = List.of("$jacocoInit");
-    private static final List<String> DEFAULT_BLACKLISTED_FIELDS = List.of("__$lineHits$__", "$jacocoData");
-    private static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER);
-    private static final boolean DEFAULT_RANDOM_VALUES = true;
-    private static final boolean DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS = false;
-    private static final String DEFAULT_SETTER_PREFIX = "set";
-    private static final boolean DEFAULT_OBJECT_FACTORY_ENABLED = false;
-    private static final boolean DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY = false;
+    public static final List<String> DEFAULT_BLACKLISTED_METHODS = List.of("$jacocoInit");
+    public static final List<String> DEFAULT_BLACKLISTED_FIELDS = List.of("__$lineHits$__", "$jacocoData");
+    public static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER);
+    public static final boolean DEFAULT_RANDOM_VALUES = true;
+    public static final boolean DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS = false;
+    public static final String DEFAULT_SETTER_PREFIX = "set";
+    public static final boolean DEFAULT_OBJECT_FACTORY_ENABLED = false;
+    public static final boolean DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY = false;
 
     /**
      * Builder for PopulateConfig
@@ -31,7 +29,7 @@ public class PopulateConfig {
         private List<String> blacklistedMethods = new ArrayList<>();
         private List<String> blacklistedFields = new ArrayList<>();
         private List<Strategy> strategyOrder = new ArrayList<>();
-        private List<OverridePopulate<?>> overridePopulate = new ArrayList<>();
+        private Map<Class<?>, TypeSupplier<?>> typeSuppliers = new HashMap<>();
         private BuilderPattern builderPattern;
         private Boolean randomValues;
         private Boolean accessNonPublicConstructors;
@@ -59,13 +57,13 @@ public class PopulateConfig {
             return this;
         }
 
-        public PopulateConfigBuilder overridePopulate(List<OverridePopulate<?>> overridePopulates) {
-            this.overridePopulate = overridePopulates;
+        public PopulateConfigBuilder typeSuppliers(Map<Class<?>, TypeSupplier<?>> typeSuppliers) {
+            this.typeSuppliers = typeSuppliers;
             return this;
         }
 
-        public PopulateConfigBuilder overridePopulate(OverridePopulate<?> overridePopulate) {
-            this.overridePopulate.add(overridePopulate);
+        public PopulateConfigBuilder typeSupplier(Class<?> clazz, TypeSupplier<?> supplier) {
+            this.typeSuppliers.put(clazz, supplier);
             return this;
         }
 
@@ -104,7 +102,7 @@ public class PopulateConfig {
                     blacklistedMethods,
                     blacklistedFields,
                     strategyOrder,
-                    overridePopulate,
+                    typeSuppliers,
                     builderPattern,
                     randomValues,
                     accessNonPublicConstructors,
@@ -121,11 +119,10 @@ public class PopulateConfig {
         return new PopulateConfigBuilder();
     }
 
-
     private final List<String> blacklistedMethods;
     private final List<String> blacklistedFields;
     private final List<Strategy> strategyOrder;
-    private final List<OverridePopulate<?>> overridePopulate;
+    private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
     private final BuilderPattern builderPattern;
     private final boolean randomValues;
     private final boolean accessNonPublicConstructors;
@@ -133,11 +130,10 @@ public class PopulateConfig {
     private final boolean objectFactoryEnabled;
     private final boolean nullOnCircularDependency;
 
-
     private PopulateConfig(List<String> blacklistedMethods,
                            List<String> blacklistedFields,
                            List<Strategy> strategyOrder,
-                           List<OverridePopulate<?>> overridePopulate,
+                           Map<Class<?>, TypeSupplier<?>> typeSuppliers,
                            BuilderPattern builderPattern,
                            Boolean randomValues,
                            Boolean accessNonPublicConstructors,
@@ -147,7 +143,7 @@ public class PopulateConfig {
         this.blacklistedMethods = blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : blacklistedMethods;
         this.blacklistedFields = blacklistedFields.isEmpty() ? DEFAULT_BLACKLISTED_FIELDS : blacklistedFields;
         this.strategyOrder = strategyOrder.isEmpty() ? DEFAULT_STRATEGY_ORDER : strategyOrder;
-        this.overridePopulate = overridePopulate;
+        this.typeSuppliers = typeSuppliers;
         this.builderPattern = builderPattern;
         this.randomValues = randomValues == null ? DEFAULT_RANDOM_VALUES : randomValues;
         this.accessNonPublicConstructors = accessNonPublicConstructors == null ? DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS : accessNonPublicConstructors;
@@ -168,13 +164,8 @@ public class PopulateConfig {
         return strategyOrder;
     }
 
-    public Map<Class<?>, OverridePopulate<?>> createOverridePopulates() {
-        if (overridePopulate == null || overridePopulate.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        return overridePopulate.stream()
-                .collect(Collectors.toMap(overridePopulate -> overridePopulate.create().getClass(), Function.identity()));
+    public Map<Class<?>, TypeSupplier<?>> getTypeSuppliers() {
+        return typeSuppliers;
     }
 
     public BuilderPattern getBuilderPattern() {
@@ -206,7 +197,7 @@ public class PopulateConfig {
                 .blacklistedMethods(new ArrayList<>(blacklistedMethods))
                 .blacklistedFields(new ArrayList<>(blacklistedFields))
                 .strategyOrder(new ArrayList<>(strategyOrder))
-                .overridePopulate(new ArrayList<>(overridePopulate))
+                .typeSuppliers(new HashMap<>(typeSuppliers))
                 .builderPattern(builderPattern)
                 .randomValues(randomValues)
                 .accessNonPublicConstructors(accessNonPublicConstructors)
@@ -233,7 +224,7 @@ public class PopulateConfig {
                 "blacklistedMethods=" + blacklistedMethods +
                 ", blacklistedFields=" + blacklistedFields +
                 ", strategyOrder=" + strategyOrder +
-                ", overridePopulate=" + overridePopulate +
+                ", typeSuppliers=" + typeSuppliers +
                 ", builderPattern=" + builderPattern +
                 ", randomValues=" + randomValues +
                 ", accessNonPublicConstructors=" + accessNonPublicConstructors +

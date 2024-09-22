@@ -1,8 +1,8 @@
 package com.github.anhem.testpopulator.readme;
 
 import com.github.anhem.testpopulator.PopulateFactory;
-import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.config.TypeSupplier;
 import com.github.anhem.testpopulator.exception.ObjectException;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.readme.model.MyClass;
@@ -39,17 +39,17 @@ class ReadMeTest {
     }
 
     @Test
-    void exceptionIsThrownWhenObjectFactoryIsEnabledAndOverridePopulateImplementationDoesNotImplementCreateString() {
-        OverridePopulate<MyUUID> myUUIDOverridePopulate = () -> new MyUUID(UUID.randomUUID().toString());
+    void exceptionIsThrownWhenObjectFactoryIsEnabledAndTypeSupplierImplementationDoesNotImplementCreateString() {
+        TypeSupplier<MyUUID> myUUIDTypeSupplier = () -> new MyUUID(UUID.randomUUID().toString());
         PopulateFactory populateFactory = new PopulateFactory(
                 PopulateConfig.builder()
-                        .overridePopulate(myUUIDOverridePopulate)
+                        .typeSupplier(MyUUID.class, myUUIDTypeSupplier)
                         .objectFactoryEnabled(true)
                         .build()
         );
 
         Throwable cause = assertThrows(PopulateException.class, () -> populateFactory.populate(MyClass2.class)).getCause();
         assertThat(cause.getClass()).isEqualTo(ObjectException.class);
-        assertThat(cause.getMessage()).isEqualTo(String.format("createString() is not implemented in class %s", myUUIDOverridePopulate.getClass().getName()));
+        assertThat(cause.getMessage()).isEqualTo(String.format("createString() is not implemented for class %s", MyUUID.class.getName()));
     }
 }

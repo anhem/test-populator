@@ -71,18 +71,18 @@ PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 MyClass myClass = populateFactory.populate(myClass.class);
 ```
 
-| config                      | Values                                   | Default                         |
-|-----------------------------|------------------------------------------|---------------------------------|
-| strategyOrder               | CONSTRUCTOR, SETTER, FIELD, BUILDER      | CONSTRUCTOR, SETTER             |
-| builderPattern              | LOMBOK / IMMUTABLES                      | -                               |
-| randomValues                | true / false                             | true                            |
-| setterPrefix                | prefix of setter methods                 | set                             |
-| accessNonPublicConstructors | true / false                             | false                           |
-| overridePopulates           | List of OverridePopulate implementations | -                               |
-| blacklistedMethods          | List of methods to skip if encountered   | $jacocoInit                     |
-| blacklistedFields           | List of fields to skip if encountered    | \_\_$lineHits$\_\_, $jacocoData |    
-| objectFactoryEnabled        | Experimental! true / false               | false                           |    
-| nullOnCircularDependency    | true / false                             | false                           |    
+| config                      | Values                                 | Default                         |
+|-----------------------------|----------------------------------------|---------------------------------|
+| strategyOrder               | CONSTRUCTOR, SETTER, FIELD, BUILDER    | CONSTRUCTOR, SETTER             |
+| builderPattern              | LOMBOK / IMMUTABLES                    | -                               |
+| randomValues                | true / false                           | true                            |
+| setterPrefix                | prefix of setter methods               | set                             |
+| accessNonPublicConstructors | true / false                           | false                           |
+| typeSuppliers               | Map of typeSupplier implementations    | -                               |
+| blacklistedMethods          | List of methods to skip if encountered | $jacocoInit                     |
+| blacklistedFields           | List of fields to skip if encountered  | \_\_$lineHits$\_\_, $jacocoData |    
+| objectFactoryEnabled        | Experimental! true / false             | false                           |    
+| nullOnCircularDependency    | true / false                           | false                           |    
 
 ### strategyOrder
 
@@ -142,7 +142,7 @@ instead)
 
 Controls whether to allow access to private constructors when populating.
 
-### overridePopulates
+### typeSuppliers
 
 This solves a couple of issues that may be encountered:
 
@@ -167,13 +167,13 @@ public class MyUUID {
 ```
 
 It requires a String that can be converted into a UUID which will be impossible to accomplish using random strings. To
-remedy this we can override population of this class by creating our own MyUUID populator class:
+remedy this we can provide our own implementation for creating this class:
 
 ```java
-public class MyUUIDOverride implements OverridePopulate<MyUUID> {
+private static class MyUUIDTypeSupplier implements TypeSupplier<MyUUID> {
 
     @Override
-    public MyUUID create() {
+    public MyUUID get() {
         return new MyUUID(UUID.randomUUID().toString());
     }
 }
@@ -237,16 +237,16 @@ public class TestPopulator {
         return populateFactory.populate(clazz);
     }
 
-    private static class MyUUIDOverride implements OverridePopulate<MyUUID> {
+    private static class MyUUIDTypeSupplier implements TypeSupplier<MyUUID> {
 
         @Override
-        public MyUUID create() {
+        public MyUUID get() {
             return new MyUUID(UUID.randomUUID().toString());
         }
     }
 
     private static final PopulateConfig populateConfig = PopulateConfig.builder()
-            .overridePopulate(List.of(new MyUUIDOverride()))
+            .typeSupplier(MyUUID.class, new MyUUIDTypeSupplier())
             .build();
 
     private static final PopulateFactory populateFactory = new PopulateFactory(populateConfig);

@@ -1,11 +1,11 @@
 package com.github.anhem.testpopulator.internal.value;
 
+import com.github.anhem.testpopulator.config.TypeSupplier;
 import com.github.anhem.testpopulator.exception.PopulateException;
 
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
-import java.util.function.Supplier;
 
 import static com.github.anhem.testpopulator.internal.util.RandomUtil.*;
 
@@ -26,29 +26,32 @@ public class ValueFactory {
     private static final BigDecimal BIG_DECIMAL = BigDecimal.ONE;
 
     private final boolean setRandomValues;
-    private final Map<Class<?>, Supplier<?>> types;
+    private final Set<Class<?>> defaultTypeSuppliers;
+    private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
 
-    public ValueFactory(boolean setRandomValues) {
+    public ValueFactory(boolean setRandomValues, Map<Class<?>, TypeSupplier<?>> typeSuppliers) {
         this.setRandomValues = setRandomValues;
-        types = new HashMap<>();
-        types.put(Integer.class, this::getInteger);
-        types.put(int.class, this::getInteger);
-        types.put(Long.class, this::getLong);
-        types.put(long.class, this::getLong);
-        types.put(Double.class, this::getDouble);
-        types.put(double.class, this::getDouble);
-        types.put(Boolean.class, this::getBoolean);
-        types.put(boolean.class, this::getBoolean);
-        types.put(BigDecimal.class, this::getBigDecimal);
-        types.put(String.class, this::getString);
-        types.put(LocalDate.class, this::getLocalDate);
-        types.put(LocalDateTime.class, this::getLocalDateTime);
-        types.put(ZonedDateTime.class, this::getZonedDateTime);
-        types.put(Instant.class, this::getInstant);
-        types.put(Date.class, this::getDate);
-        types.put(Character.class, this::getChar);
-        types.put(char.class, this::getChar);
-        types.put(UUID.class, this::getUUID);
+        this.typeSuppliers = new HashMap<>();
+        this.typeSuppliers.put(Integer.class, this::getInteger);
+        this.typeSuppliers.put(int.class, this::getInteger);
+        this.typeSuppliers.put(Long.class, this::getLong);
+        this.typeSuppliers.put(long.class, this::getLong);
+        this.typeSuppliers.put(Double.class, this::getDouble);
+        this.typeSuppliers.put(double.class, this::getDouble);
+        this.typeSuppliers.put(Boolean.class, this::getBoolean);
+        this.typeSuppliers.put(boolean.class, this::getBoolean);
+        this.typeSuppliers.put(BigDecimal.class, this::getBigDecimal);
+        this.typeSuppliers.put(String.class, this::getString);
+        this.typeSuppliers.put(LocalDate.class, this::getLocalDate);
+        this.typeSuppliers.put(LocalDateTime.class, this::getLocalDateTime);
+        this.typeSuppliers.put(ZonedDateTime.class, this::getZonedDateTime);
+        this.typeSuppliers.put(Instant.class, this::getInstant);
+        this.typeSuppliers.put(Date.class, this::getDate);
+        this.typeSuppliers.put(Character.class, this::getChar);
+        this.typeSuppliers.put(char.class, this::getChar);
+        this.typeSuppliers.put(UUID.class, this::getUUID);
+        this.defaultTypeSuppliers = this.typeSuppliers.keySet();
+        this.typeSuppliers.putAll(typeSuppliers);
     }
 
     @SuppressWarnings("unchecked")
@@ -57,9 +60,24 @@ public class ValueFactory {
             return getEnum(clazz);
         }
 
-        return Optional.ofNullable(types.get(clazz))
+        return Optional.ofNullable(typeSuppliers.get(clazz))
                 .map(supplier -> (T) supplier.get())
                 .orElseThrow(() -> new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName())));
+    }
+
+    public boolean hasType(Class<?> clazz) {
+        return clazz.isEnum() || typeSuppliers.containsKey(clazz);
+    }
+
+    public boolean isDefaultTypeSupplier(Class<?> clazz) {
+        return defaultTypeSuppliers.contains(clazz);
+    }
+
+    private <T> T getEnum(Class<T> clazz) {
+        if (setRandomValues) {
+            return getRandomEnum(clazz);
+        }
+        return clazz.getEnumConstants()[0];
     }
 
     private Integer getInteger() {
@@ -108,13 +126,6 @@ public class ValueFactory {
 
     private Character getChar() {
         return setRandomValues ? getRandomCharacter() : CHARACTER;
-    }
-
-    private <T> T getEnum(Class<T> clazz) {
-        if (setRandomValues) {
-            return getRandomEnum(clazz);
-        }
-        return clazz.getEnumConstants()[0];
     }
 
     private UUID getUUID() {
