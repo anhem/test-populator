@@ -8,14 +8,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 class PopulateFactoryWithOverridePopulateTest {
-
-    private static final ZonedDateTime NOW = ZonedDateTime.now();
 
     private PopulateFactory populateFactory;
     private PopulateConfig populateConfig;
@@ -24,8 +24,8 @@ class PopulateFactoryWithOverridePopulateTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .overridePopulate(MyUUID.class, new MyUUIDOverridePopulate())
-                .overridePopulate(Integer.class, () -> 1)
-                .overridePopulate(ZonedDateTime.class, () -> NOW)
+                .overridePopulate(Integer.class, () -> -1)
+                .overridePopulate(ZonedDateTime.class, ZonedDateTime::now)
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -45,10 +45,11 @@ class PopulateFactoryWithOverridePopulateTest {
         Pojo value_2 = populateAndAssertWithGeneratedCode(Pojo.class);
 
         assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(value_1.getIntegerValue()).isEqualTo(1);
-        assertThat(value_1.getZonedDateTime()).isEqualTo(NOW);
-        assertThat(value_2.getIntegerValue()).isEqualTo(1);
-        assertThat(value_2.getZonedDateTime()).isEqualTo(NOW);
+        assertThat(value_1.getIntegerValue()).isEqualTo(-1);
+        assertThat(value_1.getZonedDateTime()).isCloseTo(ZonedDateTime.now(), within(1, ChronoUnit.SECONDS));
+        assertThat(value_2.getIntegerValue()).isEqualTo(-1);
+        assertThat(value_2.getZonedDateTime()).isCloseTo(ZonedDateTime.now(), within(1, ChronoUnit.SECONDS));
+        assertThat(value_1.getZonedDateTime()).isNotEqualTo(value_2.getZonedDateTime());
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
