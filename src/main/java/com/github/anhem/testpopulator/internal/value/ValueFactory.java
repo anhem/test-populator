@@ -26,32 +26,35 @@ public class ValueFactory {
     private static final BigDecimal BIG_DECIMAL = BigDecimal.ONE;
 
     private final boolean setRandomValues;
-    private final Set<Class<?>> defaultTypeSuppliers;
     private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
 
     public ValueFactory(boolean setRandomValues, Map<Class<?>, TypeSupplier<?>> typeSuppliers) {
         this.setRandomValues = setRandomValues;
-        this.typeSuppliers = new HashMap<>();
-        this.typeSuppliers.put(Integer.class, this::getInteger);
-        this.typeSuppliers.put(int.class, this::getInteger);
-        this.typeSuppliers.put(Long.class, this::getLong);
-        this.typeSuppliers.put(long.class, this::getLong);
-        this.typeSuppliers.put(Double.class, this::getDouble);
-        this.typeSuppliers.put(double.class, this::getDouble);
-        this.typeSuppliers.put(Boolean.class, this::getBoolean);
-        this.typeSuppliers.put(boolean.class, this::getBoolean);
-        this.typeSuppliers.put(BigDecimal.class, this::getBigDecimal);
-        this.typeSuppliers.put(String.class, this::getString);
-        this.typeSuppliers.put(LocalDate.class, this::getLocalDate);
-        this.typeSuppliers.put(LocalDateTime.class, this::getLocalDateTime);
-        this.typeSuppliers.put(ZonedDateTime.class, this::getZonedDateTime);
-        this.typeSuppliers.put(Instant.class, this::getInstant);
-        this.typeSuppliers.put(Date.class, this::getDate);
-        this.typeSuppliers.put(Character.class, this::getChar);
-        this.typeSuppliers.put(char.class, this::getChar);
-        this.typeSuppliers.put(UUID.class, this::getUUID);
-        this.defaultTypeSuppliers = this.typeSuppliers.keySet();
+        this.typeSuppliers = getDefaultTypeSuppliers();
         this.typeSuppliers.putAll(typeSuppliers);
+    }
+
+    private Map<Class<?>, TypeSupplier<?>> getDefaultTypeSuppliers() {
+        final Map<Class<?>, TypeSupplier<?>> typeSuppliers = new HashMap<>();
+        typeSuppliers.put(Integer.class, this::getInteger);
+        typeSuppliers.put(int.class, this::getInteger);
+        typeSuppliers.put(Long.class, this::getLong);
+        typeSuppliers.put(long.class, this::getLong);
+        typeSuppliers.put(Double.class, this::getDouble);
+        typeSuppliers.put(double.class, this::getDouble);
+        typeSuppliers.put(Boolean.class, this::getBoolean);
+        typeSuppliers.put(boolean.class, this::getBoolean);
+        typeSuppliers.put(BigDecimal.class, this::getBigDecimal);
+        typeSuppliers.put(String.class, this::getString);
+        typeSuppliers.put(LocalDate.class, this::getLocalDate);
+        typeSuppliers.put(LocalDateTime.class, this::getLocalDateTime);
+        typeSuppliers.put(ZonedDateTime.class, this::getZonedDateTime);
+        typeSuppliers.put(Instant.class, this::getInstant);
+        typeSuppliers.put(Date.class, this::getDate);
+        typeSuppliers.put(Character.class, this::getChar);
+        typeSuppliers.put(char.class, this::getChar);
+        typeSuppliers.put(UUID.class, this::getUUID);
+        return typeSuppliers;
     }
 
     @SuppressWarnings("unchecked")
@@ -67,10 +70,6 @@ public class ValueFactory {
 
     public boolean hasType(Class<?> clazz) {
         return clazz.isEnum() || typeSuppliers.containsKey(clazz);
-    }
-
-    public boolean isDefaultTypeSupplier(Class<?> clazz) {
-        return defaultTypeSuppliers.contains(clazz);
     }
 
     private <T> T getEnum(Class<T> clazz) {
