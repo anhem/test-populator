@@ -21,21 +21,23 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
 
-    private static final Map<Class<?>, Function<Object, String>> stringSuppliers = new HashMap<>() {{
-        put(Integer.class, Object::toString);
-        put(Long.class, object -> object + "L");
-        put(Double.class, Object::toString);
-        put(Boolean.class, Object::toString);
-        put(BigDecimal.class, object -> String.format("BigDecimal.valueOf(%d)", ((BigDecimal) object).intValue()));
-        put(String.class, object -> "\"" + object + "\"");
-        put(Character.class, object -> "'" + object + "'");
-        put(LocalDate.class, object -> String.format("LocalDate.parse(\"%s\")", object));
-        put(LocalDateTime.class, object -> String.format("LocalDateTime.parse(\"%s\")", object));
-        put(ZonedDateTime.class, object -> String.format("ZonedDateTime.parse(\"%s\")", object));
-        put(Instant.class, object -> String.format("Instant.parse(\"%s\")", object));
-        put(Date.class, object -> String.format("new Date(%sL)", ((Date) object).getTime()));
-        put(UUID.class, object -> String.format("UUID.fromString(\"%s\")", object));
-    }};
+    private static final Map<Class<?>, Function<Object, String>> stringSuppliers = new HashMap<>();
+
+    static {
+        stringSuppliers.put(Integer.class, Object::toString);
+        stringSuppliers.put(Long.class, object -> object + "L");
+        stringSuppliers.put(Double.class, Object::toString);
+        stringSuppliers.put(Boolean.class, Object::toString);
+        stringSuppliers.put(BigDecimal.class, object -> String.format("BigDecimal.valueOf(%d)", ((BigDecimal) object).intValue()));
+        stringSuppliers.put(String.class, object -> "\"" + object + "\"");
+        stringSuppliers.put(Character.class, object -> "'" + object + "'");
+        stringSuppliers.put(LocalDate.class, object -> String.format("LocalDate.parse(\"%s\")", object));
+        stringSuppliers.put(LocalDateTime.class, object -> String.format("LocalDateTime.parse(\"%s\")", object));
+        stringSuppliers.put(ZonedDateTime.class, object -> String.format("ZonedDateTime.parse(\"%s\")", object));
+        stringSuppliers.put(Instant.class, object -> String.format("Instant.parse(\"%s\")", object));
+        stringSuppliers.put(Date.class, object -> String.format("new Date(%sL)", ((Date) object).getTime()));
+        stringSuppliers.put(UUID.class, object -> String.format("UUID.fromString(\"%s\")", object));
+    }
 
     private final PopulateConfig populateConfig;
     private final Map<Class<?>, Integer> classCounters;
