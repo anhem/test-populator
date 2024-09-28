@@ -12,7 +12,8 @@ import java.util.List;
 
 import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
-import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
+import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
+import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
@@ -143,6 +144,26 @@ class PopulateFactoryWithConstructorStrategyTest {
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(A.class)).isInstanceOfAny(PopulateException.class, StackOverflowError.class);
+    }
+
+    @Test
+    void constructorIsUsedWhenClassOnlySupportsConstructorAndOtherStrategiesAreAvailable() {
+        Class<AllArgsConstructor> clazz = AllArgsConstructor.class;
+        populateConfig = populateConfig.toBuilder()
+                .strategyOrder(List.of(BUILDER, SETTER))
+                .builderPattern(LOMBOK)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
+
+        populateConfig = populateConfig.toBuilder()
+                .strategyOrder(List.of(BUILDER, SETTER, CONSTRUCTOR))
+                .builderPattern(LOMBOK)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        AllArgsConstructor value_1 = populateFactory.populate(clazz);
+        AllArgsConstructor value_2 = populateFactory.populate(clazz);
+        assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

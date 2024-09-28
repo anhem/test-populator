@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.immutables.*;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,7 @@ import java.util.List;
 
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
-import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
+import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,6 +102,25 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
         ImmutableImmutablesInterface value_1 = populateFactory.populate(ImmutableImmutablesInterface.class);
         ImmutableImmutablesInterface value_2 = populateFactory.populate(ImmutableImmutablesInterface.class);
 
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void builderIsUsedWhenClassOnlySupportsBuilderAndOtherStrategiesAreAvailable() {
+        Class<ImmutableImmutablesInterface> clazz = ImmutableImmutablesInterface.class;
+        populateConfig = populateConfig.toBuilder()
+                .strategyOrder(List.of(SETTER, CONSTRUCTOR))
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
+
+        populateConfig = populateConfig.toBuilder()
+                .strategyOrder(List.of(SETTER, CONSTRUCTOR, BUILDER))
+                .builderPattern(IMMUTABLES)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        ImmutableImmutablesInterface value_1 = populateFactory.populate(clazz);
+        ImmutableImmutablesInterface value_2 = populateFactory.populate(clazz);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 

@@ -152,6 +152,10 @@ public class PopulateUtil {
         return collectionCarrier.getClazz().getConstructors().length > 0;
     }
 
+    public static <T> boolean alreadyVisited(ClassCarrier<T> classCarrier, boolean nullOnCircularDependency) {
+        return nullOnCircularDependency && !isJavaBaseClass(classCarrier.getClazz()) && !classCarrier.addVisited();
+    }
+
     private static boolean hasConstructorWithoutArguments(Class<?> clazz, boolean canAccessNonPublicConstructor) {
         return stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> constructor.getParameterCount() == 0)
