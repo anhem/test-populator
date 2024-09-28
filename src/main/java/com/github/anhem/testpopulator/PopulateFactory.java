@@ -82,13 +82,10 @@ public class PopulateFactory {
     private <T> T populateWithOverrides(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
         if (valueFactory.hasType(clazz)) {
-            T value = valueFactory.createValue(clazz);
-            classCarrier.getObjectFactory().value(value);
-            return value;
+            return creatValue(classCarrier);
         }
-        if (populateConfig.isNullOnCircularDependency() && !isJavaBaseClass(clazz) && !classCarrier.addVisited()) {
-            classCarrier.getObjectFactory().nullValue(clazz);
-            return null;
+        if (alreadyVisited(classCarrier, populateConfig.isNullOnCircularDependency())) {
+            return createNullValue(classCarrier);
         }
         if (isCollectionCarrier(classCarrier)) {
             return continuePopulateForCollection((CollectionCarrier<T>) classCarrier);
@@ -97,6 +94,17 @@ public class PopulateFactory {
             return continuePopulateForArray(classCarrier);
         }
         return continuePopulateWithStrategies(classCarrier);
+    }
+
+    private <T> T creatValue(ClassCarrier<T> classCarrier) {
+        T value = valueFactory.createValue(classCarrier.getClazz());
+        classCarrier.getObjectFactory().value(value);
+        return value;
+    }
+
+    private static <T> T createNullValue(ClassCarrier<T> classCarrier) {
+        classCarrier.getObjectFactory().nullValue(classCarrier.getClazz());
+        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -109,21 +117,20 @@ public class PopulateFactory {
         return (T) array;
     }
 
-    private <T> T continuePopulateForCollection(CollectionCarrier<T> classCarrier) {
+    private <T> T continuePopulateForCollection(CollectionCarrier<T> collectionCarrier) {
         try {
-            if (isMap(classCarrier.getClazz())) {
-                return continuePopulateForMap(classCarrier);
-            }
-            if (isSet(classCarrier.getClazz())) {
-                return continuePopulateForSet(classCarrier);
-            }
-            if (isCollection(classCarrier.getClazz())) {
-                return continuePopulateForList(classCarrier);
+            Class<T> clazz = collectionCarrier.getClazz();
+            if (isMap(clazz)) {
+                return continuePopulateForMap(collectionCarrier);
+            } else if (isSet(clazz)) {
+                return continuePopulateForSet(collectionCarrier);
+            } else if (isCollection(clazz)) {
+                return continuePopulateForList(collectionCarrier);
             }
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_COLLECTION, classCarrier.getClazz().getTypeName()), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_COLLECTION, collectionCarrier.getClazz().getTypeName()), e);
         }
-        throw new PopulateException(format(MISSING_COLLECTION_TYPE, classCarrier.getClazz().getTypeName()));
+        throw new PopulateException(format(MISSING_COLLECTION_TYPE, collectionCarrier.getClazz().getTypeName()));
     }
 
     @SuppressWarnings("unchecked")
@@ -271,13 +278,14 @@ public class PopulateFactory {
     }
 
     private <T> T continuePopulateUsingBuilder(ClassCarrier<T> classCarrier) {
-        if (populateConfig.getBuilderPattern().equals(LOMBOK)) {
-            return continuePopulateUsingLombokBuilder(classCarrier);
+        switch (populateConfig.getBuilderPattern()) {
+            case LOMBOK:
+                return continuePopulateUsingLombokBuilder(classCarrier);
+            case IMMUTABLES:
+                return continuePopulateUsingImmutablesBuilder(classCarrier);
+            default:
+                throw new PopulateException("Unsupported builder pattern");
         }
-        if (populateConfig.getBuilderPattern().equals(IMMUTABLES)) {
-            return continuePopulateUsingImmutablesBuilder(classCarrier);
-        }
-        throw new PopulateException("");
     }
 
     @SuppressWarnings("unchecked")

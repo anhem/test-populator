@@ -15,7 +15,7 @@ import java.util.List;
 
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
-import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
+import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
@@ -131,6 +131,25 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(A.class)).isInstanceOfAny(PopulateException.class, StackOverflowError.class);
+    }
+
+    @Test
+    void builderIsUsedWhenClassOnlySupportsBuilderAndOtherStrategiesAreAvailable() {
+        Class<LombokImmutable> clazz = LombokImmutable.class;
+        populateConfig = populateConfig.toBuilder()
+                .strategyOrder(List.of(SETTER, CONSTRUCTOR))
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
+
+        populateConfig = populateConfig.toBuilder()
+                .strategyOrder(List.of(SETTER, CONSTRUCTOR, BUILDER))
+                .builderPattern(LOMBOK)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        LombokImmutable value_1 = populateFactory.populate(clazz);
+        LombokImmutable value_2 = populateFactory.populate(clazz);
+        assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     private void assertObjectCanBeRebuilt(LombokImmutable lombokImmutable) {
