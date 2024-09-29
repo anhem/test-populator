@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PopulateUtilTest {
 
     private static final String SETTER_PREFIX = "set";
+    private static final List<String> SETTER_PREFIXES = List.of(SETTER_PREFIX);
 
     @Test
     void toArgumentTypesReturnsParameterArgumentTypes() {
@@ -131,15 +132,15 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingSetterStrategyReturnsTrue() {
-        assertThat(isMatchingSetterStrategy(SETTER, PojoExtendsPojoAbstract.class, SETTER_PREFIX, false)).isTrue();
-        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIX, true)).isTrue();
+        assertThat(isMatchingSetterStrategy(SETTER, PojoExtendsPojoAbstract.class, SETTER_PREFIXES, false)).isTrue();
+        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIXES, true)).isTrue();
     }
 
     @Test
     void isMatchingSetterStrategyReturnsFalse() {
-        assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIX, false)).isFalse();
-        assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIX, false)).isFalse();
-        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIX, false)).isFalse();
+        assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIXES, false)).isFalse();
+        assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIXES, false)).isFalse();
+        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIXES, false)).isFalse();
     }
 
     @Test
@@ -181,10 +182,8 @@ class PopulateUtilTest {
     }
 
     @Test
-    void isSetterReturnsTrue() {
-        List<Method> setterMethods = getDeclaredMethods(Pojo.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).stream()
-                .filter(method -> isSetterMethod(method, SETTER_PREFIX))
-                .collect(Collectors.toList());
+    void getSetterMethodsReturnsMethodsWhenRegularSetter() {
+        List<Method> setterMethods = getSetterMethods(Pojo.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), SETTER_PREFIXES);
 
         assertThat(setterMethods).isNotEmpty().hasSize(23);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
@@ -192,11 +191,9 @@ class PopulateUtilTest {
     }
 
     @Test
-    void isSetterReturnsTrueForCustomerSetter() {
+    void getSetterMethodsReturnsMethodsWhenCustomSetter() {
         String setterPrefix = "with";
-        List<Method> setterMethods = getDeclaredMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).stream()
-                .filter(method -> isSetterMethod(method, setterPrefix))
-                .collect(Collectors.toList());
+        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), List.of(setterPrefix));
 
         assertThat(setterMethods).isNotEmpty().hasSize(17);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
@@ -204,11 +201,9 @@ class PopulateUtilTest {
     }
 
     @Test
-    void isSetterReturnsTrueForBlankSetter() {
+    void getSetterMethodsReturnsMethodsWhenBlankSetter() {
         String setterPrefix = "";
-        List<Method> setterMethods = getDeclaredMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).stream()
-                .filter(method -> isSetterMethod(method, setterPrefix))
-                .collect(Collectors.toList());
+        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), List.of(setterPrefix));
 
         assertThat(setterMethods).isNotEmpty().hasSize(17);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));

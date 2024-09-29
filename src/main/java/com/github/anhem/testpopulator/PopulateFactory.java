@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -200,7 +199,7 @@ public class PopulateFactory {
             if (isMatchingConstructorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
                 return continuePopulateUsingConstructor(classCarrier);
             }
-            if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefix(), populateConfig.canAccessNonPublicConstructors())) {
+            if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefixes(), populateConfig.canAccessNonPublicConstructors())) {
                 return continuePopulateUsingSetters(classCarrier);
             }
             if (isMatchingFieldStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
@@ -266,9 +265,7 @@ public class PopulateFactory {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
             T objectOfClass = constructor.newInstance();
-            List<Method> methods = getDeclaredMethods(clazz, populateConfig.getBlacklistedMethods()).stream()
-                    .filter(method -> isSetterMethod(method, populateConfig.getSetterPrefix()))
-                    .collect(Collectors.toList());
+            List<Method> methods = getSetterMethods(clazz, populateConfig.getBlacklistedMethods(), populateConfig.getSetterPrefixes());
             classCarrier.getObjectFactory().setter(clazz, methods.size());
             methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));
             return objectOfClass;
@@ -276,6 +273,7 @@ public class PopulateFactory {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), SETTER), e);
         }
     }
+
 
     private <T> T continuePopulateUsingBuilder(ClassCarrier<T> classCarrier) {
         switch (populateConfig.getBuilderPattern()) {
