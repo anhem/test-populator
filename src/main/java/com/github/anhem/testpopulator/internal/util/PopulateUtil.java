@@ -112,7 +112,7 @@ public class PopulateUtil {
     @SuppressWarnings("unchecked")
     public static <T> Constructor<T> getLargestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
         return (Constructor<T>) stream(clazz.getDeclaredConstructors())
-                .filter(c -> canAccessNonPublicConstructor || Modifier.isPublic(c.getModifiers()))
+                .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
                 .max(Comparator.comparingInt(Constructor::getParameterCount))
                 .orElseThrow(() -> new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName())));
     }
