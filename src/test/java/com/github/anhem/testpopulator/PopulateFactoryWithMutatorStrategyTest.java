@@ -200,7 +200,6 @@ class PopulateFactoryWithMutatorStrategyTest {
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
-
     @Test
     void mutatorIsUsedWhenClassOnlyMutatorAndOtherStrategiesAreAvailable() {
         Class<Mutator> clazz = Mutator.class;
@@ -220,7 +219,6 @@ class PopulateFactoryWithMutatorStrategyTest {
         Mutator value_2 = populateFactory.populate(clazz);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
-
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
