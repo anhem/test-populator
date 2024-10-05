@@ -11,6 +11,7 @@ import com.github.anhem.testpopulator.readme.model.MyUUID;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ class ReadMeTest {
 
         assertThat(myClass).hasNoNullFieldsOrProperties();
         assertThat(myClass).extracting("myInnerClass.integer").isNotNull();
-        assertThat(myClass).extracting("myInnerClass.stringToLocalDateMap").is(new Condition<>(m -> ((Map<?, ?>) m).size() > 0, "not empty"));
+        assertThat(myClass).extracting("myInnerClass.stringToLocalDateMap").is(new Condition<>(m -> !((Map<?, ?>) m).isEmpty(), "not empty"));
         System.out.println("myClass = " + myClass);
     }
 
@@ -34,8 +35,10 @@ class ReadMeTest {
         MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 
         assertThat(myClass2).hasNoNullFieldsOrProperties();
+        assertThat(UUID.fromString(myClass2.getStringValue())).isNotNull();
+        assertThat(myClass2.getDate()).isEqualTo(LocalDate.now());
         assertThat(myClass2).extracting("myInnerClass.integer").isNotNull();
-        assertThat(myClass2).extracting("myInnerClass.stringToLocalDateMap").is(new Condition<>(o -> ((Map<?, ?>) o).size() > 0, "not empty"));
+        assertThat(myClass2).extracting("myInnerClass.stringToLocalDateMap").is(new Condition<>(o -> !((Map<?, ?>) o).isEmpty(), "not empty"));
     }
 
     @Test
