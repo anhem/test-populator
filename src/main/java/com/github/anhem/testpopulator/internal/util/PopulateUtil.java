@@ -30,25 +30,32 @@ public class PopulateUtil {
                 .collect(Collectors.toList());
     }
 
-    public static List<Field> getDeclaredFields(Class<?> clazz, List<String> blacklistedFields) {
+    public static <T> List<Field> getDeclaredFields(Class<T> clazz, List<String> blacklistedFields) {
         List<Field> declaredFields = getAllDeclaredFields(clazz, new ArrayList<>());
         return removeUnwantedFields(declaredFields, blacklistedFields);
     }
 
-    public static List<Method> getDeclaredMethods(Class<?> clazz, List<String> blacklistedMethods) {
+    public static <T> List<Method> getDeclaredMethods(Class<T> clazz, List<String> blacklistedMethods) {
         List<Method> declaredMethods = getAllDeclaredMethods(clazz, new ArrayList<>());
         return removeUnwantedMethods(declaredMethods, blacklistedMethods);
     }
 
-    public static boolean isSet(Class<?> clazz) {
+    public static <T> List<Method> getSetterMethods(Class<T> clazz, List<String> blacklistedMethods, List<String> setterPrefixes) {
+        List<String> setterMethodFormats = getSetterMethodFormats(setterPrefixes);
+        return getDeclaredMethods(clazz, blacklistedMethods).stream()
+                .filter(method -> isSetterMethod(method, setterMethodFormats))
+                .collect(Collectors.toList());
+    }
+
+    public static <T> boolean isSet(Class<T> clazz) {
         return Set.class.isAssignableFrom(clazz);
     }
 
-    public static boolean isMap(Class<?> clazz) {
+    public static <T> boolean isMap(Class<T> clazz) {
         return Map.class.isAssignableFrom(clazz);
     }
 
-    public static boolean isCollection(Class<?> clazz) {
+    public static <T> boolean isCollection(Class<T> clazz) {
         return Collection.class.isAssignableFrom(clazz) ||
                 Map.class.isAssignableFrom(clazz) ||
                 Iterable.class.isAssignableFrom(clazz);
@@ -58,7 +65,7 @@ public class PopulateUtil {
         return classCarrier instanceof CollectionCarrier;
     }
 
-    public static boolean isJavaBaseClass(Class<?> clazz) {
+    public static <T> boolean isJavaBaseClass(Class<T> clazz) {
         return clazz.getModule() != null && JAVA_BASE.equals(clazz.getModule().getName());
     }
 
@@ -70,20 +77,23 @@ public class PopulateUtil {
         return method.getParameters().length > 0;
     }
 
-    public static boolean isMatchingSetterStrategy(Strategy strategy, Class<?> clazz, String setterPrefix, boolean accessNonPublicConstructor) {
-        return strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor) && getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
-                .anyMatch(method -> isSetterMethod(method, setterPrefix));
+    public static <T> boolean isMatchingSetterStrategy(Strategy strategy, Class<T> clazz, List<String> setterPrefixes, boolean accessNonPublicConstructor) {
+        if (strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor)) {
+            List<String> setterMethodFormats = getSetterMethodFormats(setterPrefixes);
+            return getAllDeclaredMethods(clazz, new ArrayList<>()).stream().anyMatch(method -> isSetterMethod(method, setterMethodFormats));
+        }
+        return false;
     }
 
-    public static boolean isMatchingConstructorStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
+    public static <T> boolean isMatchingConstructorStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor) {
         return strategy.equals(CONSTRUCTOR) && hasConstructorWithArguments(clazz, accessNonPublicConstructor);
     }
 
-    public static boolean isMatchingFieldStrategy(Strategy strategy, Class<?> clazz, boolean accessNonPublicConstructor) {
+    public static <T> boolean isMatchingFieldStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor) {
         return strategy.equals(FIELD) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor);
     }
 
-    public static boolean isMatchingBuilderStrategy(Strategy strategy, Class<?> clazz, BuilderPattern builderPattern) {
+    public static <T> boolean isMatchingBuilderStrategy(Strategy strategy, Class<T> clazz, BuilderPattern builderPattern) {
         if (strategy.equals(BUILDER)) {
             try {
                 if (builderPattern.equals(IMMUTABLES)) {
@@ -101,11 +111,10 @@ public class PopulateUtil {
 
     @SuppressWarnings("unchecked")
     public static <T> Constructor<T> getLargestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
-        Constructor<?> constructor1 = stream(clazz.getDeclaredConstructors())
+        return (Constructor<T>) stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
                 .max(Comparator.comparingInt(Constructor::getParameterCount))
                 .orElseThrow(() -> new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName())));
-        return (Constructor<T>) constructor1;
     }
 
     static boolean isBlackListed(Method method, List<String> blacklistedMethods) {
@@ -116,14 +125,16 @@ public class PopulateUtil {
         return blacklistedFields.contains(field.getName());
     }
 
-    public static boolean isSetterMethod(Method method, String setterPrefix) {
-        String methodFormat = getSetterMethodFormat(setterPrefix);
-        if (methodFormat.isBlank()) {
-            return method.getReturnType().equals(void.class) && method.getParameters().length == 1;
-        }
-        return method.getName().matches(methodFormat) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+    private static boolean isSetterMethod(Method method, List<String> setterMethodFormats) {
+        return setterMethodFormats.stream().anyMatch(setMethodFormat -> isSetterMethod(method, setMethodFormat));
     }
 
+    private static boolean isSetterMethod(Method method, String setMethodFormat) {
+        if (setMethodFormat.isBlank()) {
+            return method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+        }
+        return method.getName().matches(setMethodFormat) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+    }
 
     static <T> boolean isSameMethodParameterAsClass(Class<T> clazz, Method method) {
         Class<?>[] parameterTypes = method.getParameterTypes();
@@ -156,19 +167,19 @@ public class PopulateUtil {
         return nullOnCircularDependency && !isJavaBaseClass(classCarrier.getClazz()) && !classCarrier.addVisited();
     }
 
-    private static boolean hasConstructorWithoutArguments(Class<?> clazz, boolean canAccessNonPublicConstructor) {
+    private static <T> boolean hasConstructorWithoutArguments(Class<T> clazz, boolean canAccessNonPublicConstructor) {
         return stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> constructor.getParameterCount() == 0)
                 .anyMatch(constructor -> isAccessible(canAccessNonPublicConstructor, constructor));
     }
 
-    private static boolean hasConstructorWithArguments(Class<?> clazz, boolean canAccessNonPublicConstructor) {
+    private static <T> boolean hasConstructorWithArguments(Class<T> clazz, boolean canAccessNonPublicConstructor) {
         return stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> constructor.getParameterCount() > 0)
                 .anyMatch(constructor -> isAccessible(canAccessNonPublicConstructor, constructor));
     }
 
-    private static List<Field> getAllDeclaredFields(Class<?> clazz, List<Field> declaredFields) {
+    private static <T> List<Field> getAllDeclaredFields(Class<T> clazz, List<Field> declaredFields) {
         declaredFields.addAll(Arrays.asList(clazz.getDeclaredFields()));
         if (clazz.getSuperclass() != null) {
             getAllDeclaredFields(clazz.getSuperclass(), declaredFields);
@@ -176,12 +187,18 @@ public class PopulateUtil {
         return declaredFields;
     }
 
-    private static List<Method> getAllDeclaredMethods(Class<?> clazz, List<Method> declaredMethods) {
+    private static <T> List<Method> getAllDeclaredMethods(Class<T> clazz, List<Method> declaredMethods) {
         declaredMethods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
         if (clazz.getSuperclass() != null) {
             getAllDeclaredMethods(clazz.getSuperclass(), declaredMethods);
         }
         return declaredMethods;
+    }
+
+    private static List<String> getSetterMethodFormats(List<String> setterPrefixes) {
+        return setterPrefixes.stream()
+                .map(PopulateUtil::getSetterMethodFormat)
+                .collect(Collectors.toList());
     }
 
     private static String getSetterMethodFormat(String setterPrefix) {
@@ -218,7 +235,7 @@ public class PopulateUtil {
         return false;
     }
 
-    private static boolean isAccessible(boolean canAccessNonPublicConstructor, Constructor<?> constructor) {
+    private static <T> boolean isAccessible(boolean canAccessNonPublicConstructor, Constructor<T> constructor) {
         if (canAccessNonPublicConstructor) {
             return true;
         } else {
