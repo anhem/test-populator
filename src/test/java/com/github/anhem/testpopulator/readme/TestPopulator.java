@@ -35,7 +35,7 @@ public class TestPopulator {
     private static final PopulateConfig populateConfig = PopulateConfig.builder()
             .overridePopulate(MyUUID.class, new MyUUIDOverridePopulate()) //provides own implementation of how to create MyUUID
             .overridePopulate(LocalDate.class, LocalDate::now) //set all LocalDates to "now"
-            .overridePopulate(String.class, () -> UUID.randomUUID().toString()) //sets all string to random UUID's
+            .overridePopulate(String.class, () -> UUID.randomUUID().toString()) //sets all strings to random UUID's
             .build();
 
     //setup PopulateFactory with configuration
