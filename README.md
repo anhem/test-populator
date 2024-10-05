@@ -166,20 +166,10 @@ You can provide your own values by creating your own classes implementing the `O
 or by simply providing your own implementation directly in the configuration:
 
 ```java
-    PopulateConfig.builder()
-    .
-
-overridePopulate(LocalDate .class, LocalDate::now) //set all LocalDates to "now"
-    .
-
-overridePopulate(String .class, () ->UUID.
-
-randomUUID().
-
-toString()) //sets all string to random UUID's
-        .
-
-build();
+    PopulateConfig populateConfig = PopulateConfig.builder()
+        .overridePopulate(LocalDate.class, LocalDate::now) //set all LocalDates to "now"
+        .overridePopulate(String.class, () -> UUID.randomUUID().toString()) //sets all string to random UUID's
+        .build();
 ```
 
 Some classes might be difficult to populate automatically, or you may want to decide what value should be set for a
@@ -214,13 +204,9 @@ public class MyUUIDOverride implements OverridePopulate<MyUUID> {
 This can then be added to our configuration and will be used whenever MyUUID is encountered.
 
 ```java
-    PopulateConfig.builder()
-    .
-
-overridePopulate(MyUUID .class, new MyUUIDOverridePopulate()) //provides own implementation of how to create MyUUID
-        .
-
-build();
+    PopulateConfig populateConfig = PopulateConfig.builder()
+        .overridePopulate(MyUUID.class, new MyUUIDOverridePopulate()) //provides own implementation of how to create MyUUID
+        .build();
 ```
 
 Also see [Setup](#Setup) for a complete example
