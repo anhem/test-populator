@@ -9,10 +9,10 @@ Populate java classes with fixed or random data. Facilitates the creation of obj
 
 **Problem:**
 
-When writing unit tests in particular you may not be interested in what data an object has, you just want to make use of an object of that type.
-Creating a lot of objects manually is time-consuming and gives you more code to maintain.
+When writing tests, you may not be interested in what data an object has. You just want to make use of an object of that type with some or all fields populated.
+Creating a lot of objects manually is time-consuming and gives you additional code to maintain.
 
-The same goes for mocking objects. It works, but can also result in a huge and complicated mocking setup that needs to be maintained.
+The same goes for mocking objects. It works, but can also result in a huge and complicated mocking setup that also needs to be maintained.
 
 **Solution:**
 
