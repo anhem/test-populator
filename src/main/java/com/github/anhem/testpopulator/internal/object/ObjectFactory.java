@@ -4,6 +4,8 @@ public interface ObjectFactory {
 
     void constructor(Class<?> clazz, int expectedChildren);
 
+    void setter(Class<?> clazz, int expectedChildren);
+
     void mutator(Class<?> clazz, int expectedChildren);
 
     void builder(Class<?> clazz, int expectedChildren);
@@ -31,4 +33,5 @@ public interface ObjectFactory {
     ObjectResult build();
 
     void writeToFile();
+
 }

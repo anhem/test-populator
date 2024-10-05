@@ -54,6 +54,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
+    public void setter(Class<?> clazz, int expectedChildren) {
+        setNextObjectBuilder(clazz, SETTER, expectedChildren);
+    }
+
+    @Override
     public void mutator(Class<?> clazz, int expectedChildren) {
         setNextObjectBuilder(clazz, MUTATOR, expectedChildren);
     }
@@ -164,12 +169,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
-        String name = getName(clazz);
         if (currentObjectBuilder == null) {
-            currentObjectBuilder = new ObjectBuilder(clazz, name, buildType, expectedChildren);
+            currentObjectBuilder = new ObjectBuilder(clazz, getName(clazz), buildType, expectedChildren);
+        } else if (buildType == MUTATOR) {
+            setNextObjectBuilder(new ObjectBuilder(clazz, currentObjectBuilder.getName(), buildType, expectedChildren));
         } else {
-            ObjectBuilder child = new ObjectBuilder(clazz, name, buildType, expectedChildren);
-            setNextObjectBuilder(child);
+            setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), buildType, expectedChildren));
         }
     }
 

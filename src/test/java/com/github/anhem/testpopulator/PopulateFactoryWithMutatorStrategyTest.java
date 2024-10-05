@@ -5,6 +5,8 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
+import com.github.anhem.testpopulator.model.java.mutator.MutatorWithConstructor;
+import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
 import com.github.anhem.testpopulator.model.java.setter.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import java.util.List;
 import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
+import static com.github.anhem.testpopulator.config.ConstructorType.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
@@ -218,6 +221,78 @@ class PopulateFactoryWithMutatorStrategyTest {
         Mutator value_1 = populateFactory.populate(clazz);
         Mutator value_2 = populateFactory.populate(clazz);
         assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void MutatorWithConstructorUsingLargestConstructorType() {
+        populateConfig = populateConfig.toBuilder()
+                .constructorType(LARGEST)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        MutatorWithConstructor value_1 = populateAndAssertWithGeneratedCode(MutatorWithConstructor.class);
+        MutatorWithConstructor value_2 = populateAndAssertWithGeneratedCode(MutatorWithConstructor.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void MutatorWithConstructorUsingSmallestConstructorType() {
+        populateConfig = populateConfig.toBuilder()
+                .constructorType(SMALLEST)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        MutatorWithConstructor value_1 = populateAndAssertWithGeneratedCode(MutatorWithConstructor.class);
+        MutatorWithConstructor value_2 = populateAndAssertWithGeneratedCode(MutatorWithConstructor.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void MutatorWithConstructorUsingDefaultConstructorType() {
+        populateConfig = populateConfig.toBuilder()
+                .constructorType(NO_ARGS)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        assertThatThrownBy(() -> populateAndAssertWithGeneratedCode(MutatorWithConstructor.class))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, MutatorWithConstructor.class.getName(), populateConfig.getStrategyOrder()));
+    }
+
+    @Test
+    void MutatorWithMultipleConstructorsUsingLargestConstructorType() {
+        populateConfig = populateConfig.toBuilder()
+                .constructorType(LARGEST)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        MutatorWithMultipleConstructors value_1 = populateAndAssertWithGeneratedCode(MutatorWithMultipleConstructors.class);
+        MutatorWithMultipleConstructors value_2 = populateAndAssertWithGeneratedCode(MutatorWithMultipleConstructors.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void MutatorWithMultipleConstructorsUsingSmallestConstructorType() {
+        populateConfig = populateConfig.toBuilder()
+                .constructorType(SMALLEST)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        MutatorWithMultipleConstructors value_1 = populateAndAssertWithGeneratedCode(MutatorWithMultipleConstructors.class);
+        MutatorWithMultipleConstructors value_2 = populateAndAssertWithGeneratedCode(MutatorWithMultipleConstructors.class);
+        assertRandomlyPopulatedValues(value_1, value_2, "localDate");
+    }
+
+    @Test
+    void MutatorWithMultipleConstructorsUsingNoArgsConstructorType() {
+        populateConfig = populateConfig.toBuilder()
+                .constructorType(NO_ARGS)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        MutatorWithMultipleConstructors value_1 = populateAndAssertWithGeneratedCode(MutatorWithMultipleConstructors.class);
+        MutatorWithMultipleConstructors value_2 = populateAndAssertWithGeneratedCode(MutatorWithMultipleConstructors.class);
+        assertRandomlyPopulatedValues(value_1, value_2, "arbitraryEnum", "localDate");
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

@@ -202,7 +202,7 @@ public class PopulateFactory {
             if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefixes(), populateConfig.canAccessNonPublicConstructors())) {
                 return continuePopulateUsingSetters(classCarrier);
             }
-            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
+            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors(), populateConfig.getConstructorType())) {
                 return continuePopulateUsingMutator(classCarrier);
             }
             if (isMatchingFieldStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
@@ -269,7 +269,7 @@ public class PopulateFactory {
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
             T objectOfClass = constructor.newInstance();
             List<Method> methods = getSetterMethods(clazz, populateConfig.getBlacklistedMethods(), populateConfig.getSetterPrefixes());
-            classCarrier.getObjectFactory().mutator(clazz, methods.size());
+            classCarrier.getObjectFactory().setter(clazz, methods.size());
             methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));
             return objectOfClass;
         } catch (Exception e) {
@@ -280,13 +280,30 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingMutator(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
         try {
-            Constructor<T> constructor = clazz.getDeclaredConstructor();
+            Constructor<T> constructor = getConstructor(clazz, populateConfig.canAccessNonPublicConstructors(), populateConfig.getConstructorType());
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
-            T objectOfClass = constructor.newInstance();
-            List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
-            classCarrier.getObjectFactory().mutator(clazz, methods.size());
-            methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));
-            return objectOfClass;
+            if (constructor.getParameterCount() > 0) {
+                classCarrier.getObjectFactory().constructor(clazz, constructor.getParameterCount());
+                Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
+                    Parameter parameter = constructor.getParameters()[i];
+                    if (isCollection(parameter.getType())) {
+                        return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
+                    } else {
+                        return populateWithOverrides(classCarrier.toClassCarrier(parameter));
+                    }
+                }).toArray();
+                T objectOfClass = constructor.newInstance(arguments);
+                List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
+                classCarrier.getObjectFactory().mutator(clazz, methods.size());
+                methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));
+                return objectOfClass;
+            } else {
+                T objectOfClass = constructor.newInstance();
+                List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
+                classCarrier.getObjectFactory().setter(clazz, methods.size());
+                methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));
+                return objectOfClass;
+            }
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), MUTATOR), e);
         }

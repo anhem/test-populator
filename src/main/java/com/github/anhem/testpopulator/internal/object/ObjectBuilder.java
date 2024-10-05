@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
+import static com.github.anhem.testpopulator.internal.object.BuildType.MUTATOR;
 import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
+import static java.util.Collections.emptyList;
 
 public class ObjectBuilder {
 
@@ -100,8 +102,8 @@ public class ObjectBuilder {
         switch (buildType) {
             case CONSTRUCTOR:
                 return buildConstructor();
-            case MUTATOR:
-                return buildMutator();
+            case SETTER:
+                return buildSetter();
             case BUILDER:
                 return buildBuilder();
             case METHOD:
@@ -122,12 +124,18 @@ public class ObjectBuilder {
                 return buildArray();
             case VALUE:
                 return buildValue();
+            case MUTATOR:
+                return buildMutator();
             default:
                 throw new ObjectException(String.format("Invalid buildType %s", buildType));
         }
     }
 
     private Stream<String> buildChildren() {
+        return buildChildren(children);
+    }
+
+    private Stream<String> buildChildren(List<ObjectBuilder> children) {
         return children.stream()
                 .filter(child -> !isBasicValue(child))
                 .map(ObjectBuilder::buildByBuildType)
@@ -135,15 +143,36 @@ public class ObjectBuilder {
     }
 
     private List<String> buildConstructor() {
-        return concatenate(buildChildren(),
-                Stream.of(String.format(NEW_OBJECT_WITH_ARGUMENTS, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
-                .collect(Collectors.toList());
+        if (children.stream().anyMatch(child -> child.buildType == MUTATOR)) {
+            Map<Boolean, List<ObjectBuilder>> childrenByMutator = children.stream()
+                    .collect(Collectors.groupingBy(child -> child.getBuildType() == MUTATOR));
+            List<ObjectBuilder> mutatorChildren = childrenByMutator.getOrDefault(true, emptyList());
+            List<ObjectBuilder> otherChildren = childrenByMutator.getOrDefault(false, emptyList());
+            return concatenate(
+                    buildChildren(otherChildren),
+                    Stream.of(String.format(NEW_OBJECT_WITH_ARGUMENTS, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments(otherChildren))),
+                    buildChildren(mutatorChildren))
+                    .collect(Collectors.toList());
+        } else {
+            return concatenate(buildChildren(),
+                    Stream.of(String.format(NEW_OBJECT_WITH_ARGUMENTS, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private List<String> buildSetter() {
+        return concatenate(
+                buildChildren(),
+                Stream.of(String.format(NEW_OBJECT, PSF, clazz.getSimpleName(), name, clazz.getSimpleName())),
+                startStaticBlock(),
+                createMethods(),
+                endStaticBlock()
+        ).collect(Collectors.toList());
     }
 
     private List<String> buildMutator() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(NEW_OBJECT, PSF, clazz.getSimpleName(), name, clazz.getSimpleName())),
                 startStaticBlock(),
                 createMethods(),
                 endStaticBlock()
@@ -242,6 +271,10 @@ public class ObjectBuilder {
     }
 
     private String buildArguments() {
+        return buildArguments(children);
+    }
+
+    private String buildArguments(List<ObjectBuilder> children) {
         return children.stream()
                 .map(child -> {
                     if (child.isNullValue()) {

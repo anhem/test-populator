@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator.config;
 
 import java.util.*;
 
+import static com.github.anhem.testpopulator.config.ConstructorType.NO_ARGS;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static java.lang.String.format;
 
@@ -22,6 +23,7 @@ public class PopulateConfig {
     public static final List<String> DEFAULT_SETTER_PREFIXES = List.of("set");
     public static final boolean DEFAULT_OBJECT_FACTORY_ENABLED = false;
     public static final boolean DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY = false;
+    public static final ConstructorType DEFAULT_CONSTRUCTOR_TYPE = NO_ARGS;
 
     public static class PopulateConfigBuilder {
 
@@ -35,6 +37,7 @@ public class PopulateConfig {
         private List<String> setterPrefixes = new ArrayList<>();
         private Boolean objectFactoryEnabled;
         private Boolean nullOnCircularDependency;
+        private ConstructorType constructorType;
 
         /**
          * Set blacklisted methods. I.E methods that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
@@ -207,6 +210,11 @@ public class PopulateConfig {
             return this;
         }
 
+        public PopulateConfigBuilder constructorType(ConstructorType constructorType) {
+            this.constructorType = constructorType;
+            return this;
+        }
+
         public PopulateConfig build() {
             PopulateConfig populateConfig = new PopulateConfig(
                     blacklistedMethods,
@@ -218,7 +226,8 @@ public class PopulateConfig {
                     accessNonPublicConstructors,
                     setterPrefixes,
                     objectFactoryEnabled,
-                    nullOnCircularDependency
+                    nullOnCircularDependency,
+                    constructorType
             );
             populateConfig.validate();
             return populateConfig;
@@ -239,6 +248,7 @@ public class PopulateConfig {
     private final List<String> setterPrefixes;
     private final boolean objectFactoryEnabled;
     private final boolean nullOnCircularDependency;
+    private final ConstructorType constructorType;
 
     private PopulateConfig(List<String> blacklistedMethods,
                            List<String> blacklistedFields,
@@ -249,7 +259,9 @@ public class PopulateConfig {
                            Boolean accessNonPublicConstructors,
                            List<String> setterPrefixes,
                            Boolean objectFactoryEnabled,
-                           Boolean nullOnCircularDependency) {
+                           Boolean nullOnCircularDependency,
+                           ConstructorType constructorType
+    ) {
         this.blacklistedMethods = blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : blacklistedMethods;
         this.blacklistedFields = blacklistedFields.isEmpty() ? DEFAULT_BLACKLISTED_FIELDS : blacklistedFields;
         this.strategyOrder = strategyOrder.isEmpty() ? DEFAULT_STRATEGY_ORDER : strategyOrder;
@@ -260,6 +272,7 @@ public class PopulateConfig {
         this.setterPrefixes = setterPrefixes.isEmpty() ? DEFAULT_SETTER_PREFIXES : setterPrefixes;
         this.objectFactoryEnabled = objectFactoryEnabled == null ? DEFAULT_OBJECT_FACTORY_ENABLED : objectFactoryEnabled;
         this.nullOnCircularDependency = nullOnCircularDependency == null ? DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY : nullOnCircularDependency;
+        this.constructorType = constructorType == null ? DEFAULT_CONSTRUCTOR_TYPE : constructorType;
     }
 
     public List<String> getBlacklistedMethods() {
@@ -302,6 +315,10 @@ public class PopulateConfig {
         return nullOnCircularDependency;
     }
 
+    public ConstructorType getConstructorType() {
+        return constructorType;
+    }
+
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -318,7 +335,8 @@ public class PopulateConfig {
                 .accessNonPublicConstructors(accessNonPublicConstructors)
                 .setterPrefixes(new ArrayList<>(setterPrefixes))
                 .objectFactoryEnabled(objectFactoryEnabled)
-                .nullOnCircularDependency(nullOnCircularDependency);
+                .nullOnCircularDependency(nullOnCircularDependency)
+                .constructorType(constructorType);
     }
 
     private void validate() {
@@ -346,6 +364,7 @@ public class PopulateConfig {
                 ", setterPrefixes=" + setterPrefixes +
                 ", objectFactoryEnabled=" + objectFactoryEnabled +
                 ", nullOnCircularDependency=" + nullOnCircularDependency +
+                ", constructorType=" + constructorType +
                 '}';
     }
 }

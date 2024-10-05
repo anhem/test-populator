@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
+import com.github.anhem.testpopulator.config.ConstructorType;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
@@ -146,13 +147,15 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingMutatorStrategyReturnsTrue() {
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, ConstructorType.NO_ARGS)).isTrue();
     }
 
     @Test
     void isMatchingMutatorStrategyReturnsFalse() {
-        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false)).isFalse();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, AllArgsConstructor.class, false)).isFalse();
+        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, ConstructorType.LARGEST)).isFalse();
+        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, ConstructorType.SMALLEST)).isFalse();
+        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, ConstructorType.NO_ARGS)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, AllArgsConstructor.class, false, ConstructorType.NO_ARGS)).isFalse();
     }
 
     @Test
