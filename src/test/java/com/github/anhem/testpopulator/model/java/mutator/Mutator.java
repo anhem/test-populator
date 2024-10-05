@@ -30,8 +30,8 @@ public class Mutator {
         this.characterValue = character;
     }
 
-    public void withOne(Integer primitiveIntegerValue) {
-        this.primitiveIntegerValue = primitiveIntegerValue;
+    public void withTwo(Integer integer1, Integer integer2) {
+        this.primitiveIntegerValue = integer1 + integer2;
     }
 
     public Mutator setTwoAndReturn(Integer integer, Long aLong) {

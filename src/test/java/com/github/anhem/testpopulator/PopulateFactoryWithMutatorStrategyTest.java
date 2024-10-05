@@ -200,6 +200,28 @@ class PopulateFactoryWithMutatorStrategyTest {
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
+
+    @Test
+    void mutatorIsUsedWhenClassOnlyMutatorAndOtherStrategiesAreAvailable() {
+        Class<Mutator> clazz = Mutator.class;
+        populateConfig = populateConfig.toBuilder()
+                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, SETTER))
+                .builderPattern(LOMBOK)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
+
+        populateConfig = populateConfig.toBuilder()
+                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, SETTER, MUTATOR))
+                .builderPattern(LOMBOK)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        Mutator value_1 = populateFactory.populate(clazz);
+        Mutator value_2 = populateFactory.populate(clazz);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(MUTATOR);
