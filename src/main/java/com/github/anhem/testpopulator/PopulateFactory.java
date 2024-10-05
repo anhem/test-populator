@@ -202,6 +202,9 @@ public class PopulateFactory {
             if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefixes(), populateConfig.canAccessNonPublicConstructors())) {
                 return continuePopulateUsingSetters(classCarrier);
             }
+            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
+                return continuePopulateUsingMutator(classCarrier);
+            }
             if (isMatchingFieldStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
                 return continuePopulateUsingFields(classCarrier);
             }
@@ -266,11 +269,26 @@ public class PopulateFactory {
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
             T objectOfClass = constructor.newInstance();
             List<Method> methods = getSetterMethods(clazz, populateConfig.getBlacklistedMethods(), populateConfig.getSetterPrefixes());
-            classCarrier.getObjectFactory().setter(clazz, methods.size());
+            classCarrier.getObjectFactory().mutator(clazz, methods.size());
             methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));
             return objectOfClass;
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), SETTER), e);
+        }
+    }
+
+    private <T> T continuePopulateUsingMutator(ClassCarrier<T> classCarrier) {
+        Class<T> clazz = classCarrier.getClazz();
+        try {
+            Constructor<T> constructor = clazz.getDeclaredConstructor();
+            setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
+            T objectOfClass = constructor.newInstance();
+            List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
+            classCarrier.getObjectFactory().mutator(clazz, methods.size());
+            methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));
+            return objectOfClass;
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), MUTATOR), e);
         }
     }
 

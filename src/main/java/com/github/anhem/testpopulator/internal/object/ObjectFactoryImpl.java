@@ -54,8 +54,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public void setter(Class<?> clazz, int expectedChildren) {
-        setNextObjectBuilder(clazz, SETTER, expectedChildren);
+    public void mutator(Class<?> clazz, int expectedChildren) {
+        setNextObjectBuilder(clazz, MUTATOR, expectedChildren);
     }
 
     @Override

@@ -100,8 +100,8 @@ public class ObjectBuilder {
         switch (buildType) {
             case CONSTRUCTOR:
                 return buildConstructor();
-            case SETTER:
-                return buildSetter();
+            case MUTATOR:
+                return buildMutator();
             case BUILDER:
                 return buildBuilder();
             case METHOD:
@@ -140,7 +140,7 @@ public class ObjectBuilder {
                 .collect(Collectors.toList());
     }
 
-    private List<String> buildSetter() {
+    private List<String> buildMutator() {
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format(NEW_OBJECT, PSF, clazz.getSimpleName(), name, clazz.getSimpleName())),

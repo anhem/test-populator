@@ -47,6 +47,12 @@ public class PopulateUtil {
                 .collect(Collectors.toList());
     }
 
+    public static <T> List<Method> getMutatorMethods(Class<T> clazz, List<String> blacklistedMethods) {
+        return getDeclaredMethods(clazz, blacklistedMethods).stream()
+                .filter(method -> isMutatorMethod(method, clazz))
+                .collect(Collectors.toList());
+    }
+
     public static <T> boolean isSet(Class<T> clazz) {
         return Set.class.isAssignableFrom(clazz);
     }
@@ -81,6 +87,13 @@ public class PopulateUtil {
         if (strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor)) {
             List<String> setterMethodFormats = getSetterMethodFormats(setterPrefixes);
             return getAllDeclaredMethods(clazz, new ArrayList<>()).stream().anyMatch(method -> isSetterMethod(method, setterMethodFormats));
+        }
+        return false;
+    }
+
+    public static <T> boolean isMatchingMutatorStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor) {
+        if (strategy.equals(MUTATOR) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor)) {
+            return getAllDeclaredMethods(clazz, new ArrayList<>()).stream().anyMatch(method -> isMutatorMethod(method, clazz));
         }
         return false;
     }
@@ -134,6 +147,10 @@ public class PopulateUtil {
             return method.getReturnType().equals(void.class) && method.getParameters().length == 1;
         }
         return method.getName().matches(setMethodFormat) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+    }
+
+    private static <T> boolean isMutatorMethod(Method method, Class<T> clazz) {
+        return (method.getReturnType().equals(void.class) || method.getReturnType().equals(clazz)) && method.getParameters().length > 0;
     }
 
     static <T> boolean isSameMethodParameterAsClass(Class<T> clazz, Method method) {
@@ -230,7 +247,10 @@ public class PopulateUtil {
 
     private static boolean isWaitMethod(Method method) {
         if (Modifier.isFinal(method.getModifiers()) && method.getName().equals("wait")) {
-            return method.getParameters().length == 0 || (method.getParameters().length == 1 && method.getParameters()[0].getType().equals(long.class));
+            return method.getParameters().length == 0 ||
+                    (method.getParameters().length == 1 && method.getParameters()[0].getType().equals(long.class)) ||
+                    (method.getParameters().length == 2 && method.getParameters()[0].getType().equals(long.class) && method.getParameters()[1].getType().equals(int.class))
+                    ;
         }
         return false;
     }

@@ -11,6 +11,7 @@ import com.github.anhem.testpopulator.model.java.HasBlackListed;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorPrivate;
+import com.github.anhem.testpopulator.model.java.mutator.Mutator;
 import com.github.anhem.testpopulator.model.java.setter.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.assertj.core.api.Assertions;
@@ -141,6 +142,17 @@ class PopulateUtilTest {
         assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIXES, false)).isFalse();
         assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIXES, false)).isFalse();
         assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIXES, false)).isFalse();
+    }
+
+    @Test
+    void isMatchingMutatorStrategyReturnsTrue() {
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false)).isTrue();
+    }
+
+    @Test
+    void isMatchingMutatorStrategyReturnsFalse() {
+        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, AllArgsConstructor.class, false)).isFalse();
     }
 
     @Test

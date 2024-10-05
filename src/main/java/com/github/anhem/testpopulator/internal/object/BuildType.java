@@ -2,7 +2,7 @@ package com.github.anhem.testpopulator.internal.object;
 
 public enum BuildType {
     CONSTRUCTOR,
-    SETTER,
+    MUTATOR,
     BUILDER,
     METHOD,
     SET,

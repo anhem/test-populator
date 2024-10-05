@@ -9,7 +9,7 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
-    public void setter(Class<?> clazz, int expectedChildren) {
+    public void mutator(Class<?> clazz, int expectedChildren) {
         //ignored
     }
 
