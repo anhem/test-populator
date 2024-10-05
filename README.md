@@ -122,7 +122,7 @@ Methods are considered setters if they match any of the provided [setterPrefixes
 Use a no-arguments/default constructor to instantiate and mutator methods to populate fields. Applied to classes that
 have a no-arguments/default constructor and at least one mutator method.
 
-This works similarly to [SETTER](#setter) but will take any method that mutates the object instead of those following the classic setter pattern.
+This works similarly to [SETTER](#setter) but will take any method that mutates the object instead of only those following the classic setter pattern.
 
 Methods are considered mutators if they have at least `one argument` and return `void` or the class we attempt to create.
 
