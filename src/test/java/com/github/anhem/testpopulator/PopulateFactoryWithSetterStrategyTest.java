@@ -107,6 +107,31 @@ class PopulateFactoryWithSetterStrategyTest {
     }
 
     @Test
+    void PojoWithMultipleCustomSetters() {
+        populateConfig = populateConfig.toBuilder()
+                .setterPrefix("set")
+                .setterPrefix("with")
+                .setterPrefix("also")
+                .setterPrefix("as")
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        PojoWithMultipleCustomSetters value_1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
+        PojoWithMultipleCustomSetters value_2 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void PojoWithMultipleCustomSettersUsingBlankSetter() {
+        populateConfig = populateConfig.toBuilder()
+                .setterPrefix("")
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        PojoWithMultipleCustomSetters value_1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
+        PojoWithMultipleCustomSetters value_2 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
     void PojoPrivateConstructor() {
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)

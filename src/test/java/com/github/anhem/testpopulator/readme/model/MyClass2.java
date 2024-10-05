@@ -12,12 +12,14 @@ public class MyClass2 {
     private final List<ArbitraryEnum> listWithEnums;
     private final InnerClass myInnerClass;
     private final MyUUID myUUID;
+    private final LocalDate date;
 
-    public MyClass2(String stringValue, List<ArbitraryEnum> listWithEnums, InnerClass myInnerClass, MyUUID myUUID) {
+    public MyClass2(String stringValue, List<ArbitraryEnum> listWithEnums, InnerClass myInnerClass, MyUUID myUUID, LocalDate date) {
         this.stringValue = stringValue;
         this.listWithEnums = listWithEnums;
         this.myInnerClass = myInnerClass;
         this.myUUID = myUUID;
+        this.date = date;
     }
 
     public String getStringValue() {
@@ -34,6 +36,10 @@ public class MyClass2 {
 
     public MyUUID getMyUUID() {
         return myUUID;
+    }
+
+    public LocalDate getDate() {
+        return date;
     }
 
     public static class InnerClass {

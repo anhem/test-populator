@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,8 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.getOverridePopulate()).isEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.useRandomValues()).isTrue();
         assertThat(DEFAULT_POPULATE_CONFIG.canAccessNonPublicConstructors()).isFalse();
-        assertThat(DEFAULT_POPULATE_CONFIG.getSetterPrefix()).isEqualTo("set");
+        assertThat(DEFAULT_POPULATE_CONFIG.getSetterPrefixes()).hasSize(1);
+        assertThat(DEFAULT_POPULATE_CONFIG.getSetterPrefixes().iterator().next()).isEqualTo("set");
         assertThat(DEFAULT_POPULATE_CONFIG.getBuilderPattern()).isNull();
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedFields()).isNotEmpty();
@@ -55,7 +57,8 @@ class PopulateConfigTest {
         assertThat(populateConfig.useRandomValues()).isFalse();
         assertThat(populateConfig.canAccessNonPublicConstructors()).isTrue();
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
-        assertThat(populateConfig.getSetterPrefix()).isEqualTo("with");
+        assertThat(populateConfig.getSetterPrefixes()).hasSize(1);
+        assertThat(populateConfig.getSetterPrefixes().iterator().next()).isEqualTo("with");
         assertThat(populateConfig.isNullOnCircularDependency()).isTrue();
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
     }
@@ -65,7 +68,8 @@ class PopulateConfigTest {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(BUILDER, SETTER))
                 .builderPattern(LOMBOK)
-                .setterPrefix("also")
+                .setterPrefixes(new ArrayList<>(List.of("also", "with")))
+                .setterPrefix("as")
                 .overridePopulate(Map.of(Integer.class, () -> 2, Double.class, () -> 3.0))
                 .randomValues(true)
                 .accessNonPublicConstructors(false)
@@ -80,7 +84,7 @@ class PopulateConfigTest {
         assertThat(populateConfig.useRandomValues()).isTrue();
         assertThat(populateConfig.canAccessNonPublicConstructors()).isFalse();
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
-        assertThat(populateConfig.getSetterPrefix()).isEqualTo("also");
+        assertThat(populateConfig.getSetterPrefixes()).containsExactly("also", "with", "as");
         assertThat(populateConfig.isNullOnCircularDependency()).isFalse();
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
     }

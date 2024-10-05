@@ -19,7 +19,7 @@ public class PopulateConfig {
     public static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER);
     public static final boolean DEFAULT_RANDOM_VALUES = true;
     public static final boolean DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS = false;
-    public static final String DEFAULT_SETTER_PREFIX = "set";
+    public static final List<String> DEFAULT_SETTER_PREFIXES = List.of("set");
     public static final boolean DEFAULT_OBJECT_FACTORY_ENABLED = false;
     public static final boolean DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY = false;
 
@@ -32,7 +32,7 @@ public class PopulateConfig {
         private BuilderPattern builderPattern;
         private Boolean randomValues;
         private Boolean accessNonPublicConstructors;
-        private String setterPrefix;
+        private List<String> setterPrefixes = new ArrayList<>();
         private Boolean objectFactoryEnabled;
         private Boolean nullOnCircularDependency;
 
@@ -151,7 +151,7 @@ public class PopulateConfig {
         }
 
         /**
-         * Controls whether to allow access to private constructors when populating.
+         * Controls whether to allow access to private or protected constructors when populating.
          *
          * @param accessNonPublicConstructor true/false
          * @return PopulateConfigBuilder
@@ -162,13 +162,25 @@ public class PopulateConfig {
         }
 
         /**
+         * Use setters with a different format than set*, overwriting any already existing setters.
+         *
+         * @param setterPrefixes a list of prefixes for methods that work in a similar way as a regular setter method.
+         * Use empty String to match any method that follows the setter pattern without actually being named prefix*
+         */
+        public PopulateConfigBuilder setterPrefixes(List<String> setterPrefixes) {
+            this.setterPrefixes = setterPrefixes;
+            return this;
+        }
+
+        /**
          * Use setters with a different format than set*
          *
-         * @param setterPrefix a prefix for methods that work in a similar way as a regular setter method
+         * @param setterPrefix a prefixe for methods that work in a similar way as a regular setter method.
+         * Use empty String to match any method that follows the setter pattern without actually being named prefix*
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder setterPrefix(String setterPrefix) {
-            this.setterPrefix = setterPrefix;
+            this.setterPrefixes.add(setterPrefix);
             return this;
         }
 
@@ -204,7 +216,7 @@ public class PopulateConfig {
                     builderPattern,
                     randomValues,
                     accessNonPublicConstructors,
-                    setterPrefix,
+                    setterPrefixes,
                     objectFactoryEnabled,
                     nullOnCircularDependency
             );
@@ -224,7 +236,7 @@ public class PopulateConfig {
     private final BuilderPattern builderPattern;
     private final boolean randomValues;
     private final boolean accessNonPublicConstructors;
-    private final String setterPrefix;
+    private final List<String> setterPrefixes;
     private final boolean objectFactoryEnabled;
     private final boolean nullOnCircularDependency;
 
@@ -235,7 +247,7 @@ public class PopulateConfig {
                            BuilderPattern builderPattern,
                            Boolean randomValues,
                            Boolean accessNonPublicConstructors,
-                           String setterPrefix,
+                           List<String> setterPrefixes,
                            Boolean objectFactoryEnabled,
                            Boolean nullOnCircularDependency) {
         this.blacklistedMethods = blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : blacklistedMethods;
@@ -245,7 +257,7 @@ public class PopulateConfig {
         this.builderPattern = builderPattern;
         this.randomValues = randomValues == null ? DEFAULT_RANDOM_VALUES : randomValues;
         this.accessNonPublicConstructors = accessNonPublicConstructors == null ? DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS : accessNonPublicConstructors;
-        this.setterPrefix = setterPrefix == null ? DEFAULT_SETTER_PREFIX : setterPrefix;
+        this.setterPrefixes = setterPrefixes.isEmpty() ? DEFAULT_SETTER_PREFIXES : setterPrefixes;
         this.objectFactoryEnabled = objectFactoryEnabled == null ? DEFAULT_OBJECT_FACTORY_ENABLED : objectFactoryEnabled;
         this.nullOnCircularDependency = nullOnCircularDependency == null ? DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY : nullOnCircularDependency;
     }
@@ -278,8 +290,8 @@ public class PopulateConfig {
         return accessNonPublicConstructors;
     }
 
-    public String getSetterPrefix() {
-        return setterPrefix;
+    public List<String> getSetterPrefixes() {
+        return setterPrefixes;
     }
 
     public boolean isObjectFactoryEnabled() {
@@ -304,7 +316,7 @@ public class PopulateConfig {
                 .builderPattern(builderPattern)
                 .randomValues(randomValues)
                 .accessNonPublicConstructors(accessNonPublicConstructors)
-                .setterPrefix(setterPrefix)
+                .setterPrefixes(new ArrayList<>(setterPrefixes))
                 .objectFactoryEnabled(objectFactoryEnabled)
                 .nullOnCircularDependency(nullOnCircularDependency);
     }
@@ -331,7 +343,7 @@ public class PopulateConfig {
                 ", builderPattern=" + builderPattern +
                 ", randomValues=" + randomValues +
                 ", accessNonPublicConstructors=" + accessNonPublicConstructors +
-                ", setterPrefix='" + setterPrefix + '\'' +
+                ", setterPrefixes=" + setterPrefixes +
                 ", objectFactoryEnabled=" + objectFactoryEnabled +
                 ", nullOnCircularDependency=" + nullOnCircularDependency +
                 '}';
