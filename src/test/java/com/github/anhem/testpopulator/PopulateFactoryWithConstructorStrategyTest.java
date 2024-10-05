@@ -90,13 +90,36 @@ class PopulateFactoryWithConstructorStrategyTest {
 
     @Test
     void allArgsConstructorPrivate() {
+        Class<AllArgsConstructorPrivate> clazz = AllArgsConstructorPrivate.class;
         populateConfig = populateConfig.toBuilder()
-                .accessNonPublicConstructors(true)
+                .accessNonPublicConstructors(false)
                 .objectFactoryEnabled(false)
                 .build();
+        assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
+        populateConfig = populateConfig.toBuilder()
+                .accessNonPublicConstructors(true)
+                .build();
         populateFactory = new PopulateFactory(populateConfig);
-        AllArgsConstructorPrivate value_1 = populateAndAssert(AllArgsConstructorPrivate.class);
-        AllArgsConstructorPrivate value_2 = populateAndAssert(AllArgsConstructorPrivate.class);
+        AllArgsConstructorPrivate value_1 = populateAndAssert(clazz);
+        AllArgsConstructorPrivate value_2 = populateAndAssert(clazz);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void allArgsConstructorProtected() {
+        Class<AllArgsConstructorProtected> clazz = AllArgsConstructorProtected.class;
+        populateConfig = populateConfig.toBuilder()
+                .accessNonPublicConstructors(false)
+                .objectFactoryEnabled(false)
+                .build();
+        assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
+
+        populateConfig = populateConfig.toBuilder()
+                .accessNonPublicConstructors(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        AllArgsConstructorProtected value_1 = populateAndAssert(clazz);
+        AllArgsConstructorProtected value_2 = populateAndAssert(clazz);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 

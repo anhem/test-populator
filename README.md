@@ -7,13 +7,25 @@
 
 Populate java classes with fixed or random data. Facilitates the creation of objects in tests.
 
-Doing this:
+**Problem:**
+
+When writing unit tests in particular you many not be too interested in what data an object has, you just want to make use of an object of that type.
+Creating a lot of objects manually is time-consuming and gives you more code to maintain.
+
+The same goes for mocking objects. It works, but can also result in a huge and complicated mocking setup that needs to be maintained.
+
+**Solution:**
+
+`test-populator` solves the hassle of setting up test data by automatically creating objects for you; in the same way these objects would normally get
+created.
+
+**Doing this:**
 
 ```java
 MyClass myClass = new PopulateFactory().populate(MyClass.class);
 ```
 
-With this:
+**With this:**
 
 ```java
 public class MyClass {
@@ -40,9 +52,10 @@ public class MyClass {
 }
 ```
 
-Results in this:
+**Results in this:**
 
-```
+```java
+//output from toString()
 MyClass{
     stringValue='xksqbhddha', 
     listWithEnums=[B], 
@@ -55,8 +68,9 @@ MyClass{
 
 # Configuration
 
-Use `PopulateConfig` to configure how `test-populator` should run. Calling `populate()` without first providing a
-`PopulateConfig` will result in `test-populator` using default configuration.
+Use `PopulateConfig` to configure how `test-populator` should run.
+
+Calling `populate()` without first providing a `PopulateConfig` will result in `test-populator` using default configuration.
 
 ```java
 //1. Configure
@@ -76,7 +90,7 @@ MyClass myClass = populateFactory.populate(myClass.class);
 | strategyOrder               | CONSTRUCTOR, SETTER, FIELD, BUILDER      | CONSTRUCTOR, SETTER             |
 | builderPattern              | LOMBOK / IMMUTABLES                      | -                               |
 | randomValues                | true / false                             | true                            |
-| setterPrefix                | prefix of setter methods                 | set                             |
+| setterPrefixes              | prefix of setter methods                 | set                             |
 | accessNonPublicConstructors | true / false                             | false                           |
 | overridePopulates           | List of OverridePopulate implementations | -                               |
 | blacklistedMethods          | List of methods to skip if encountered   | $jacocoInit                     |
@@ -99,10 +113,9 @@ argument.
 Use a no-arguments/default constructor to instantiate and setter methods to populate fields. Applied to classes that
 have a no-arguments/default constructor and at least one setter method.
 
-##### FIELD
+Methods are considered setters if they match any of the provided [setterPrefixes](#setterprefixes), with `one argument` and return `void`.
 
-(This is recommended to only be use as a last resort. You should consider changing your Class to conform to any of the
-other strategies first)
+##### FIELD
 
 Use a no-arguments/default constructor to instantiate and then use reflection to populate all the fields. Applied to
 classes that have a no-arguments/default constructor.
@@ -116,7 +129,7 @@ Configured by setting [builderPattern](#builderpattern). Applied to classes with
 
 (Applied when using strategy: [BUILDER](#Builder))
 
-Different builders behave slightly different. The builderPattern tells test-populator which one to use.
+Different builders behave slightly different. The builderPattern tells `test-populator` which one to use.
 
 ### randomValues
 
@@ -129,31 +142,30 @@ types are randomized from between `"now" minus 1 year` and `"now" plus 1 year`.
 
 See [RandomUtil.java](src/main/java/com/github/anhem/testpopulator/RandomUtil.java) for more details.
 
-### setterPrefix
+### setterPrefixes
 
 (Applied when using strategy: [SETTER](#Setter))
 
-Use setters with a different format than set*
+Use setters with a different format than `set*`
+
+An empty string `""` can be used to make use of any void method with one argument
 
 ### accessNonPublicConstructors
 
-(This is recommended to only be use as a last resort. You should consider changing your Class constructor to public
-instead)
-
-Controls whether to allow access to private constructors when populating.
+Controls whether to allow access to private or protected constructors when populating.
 
 ### overridePopulates
 
 This solves a couple of issues that may be encountered:
 
 1. I want to generate my own value for a specific class
-2. test-populator fails to generate a value for a specific class
+2. `test-populator` fails to generate a value for a specific class
 3. I get `Failed to find type to create value for <Class>. Not implemented?`
 
 Some classes might be difficult to populate automatically, or you may want to decide what value should be set for a
 specific class.
 
-This class for example cannot be handled by test-populator alone:
+This class for example cannot be handled by `test-populator` alone:
 
 ```java
 public class MyUUID {

@@ -151,7 +151,7 @@ public class PopulateConfig {
         }
 
         /**
-         * Controls whether to allow access to private constructors when populating.
+         * Controls whether to allow access to private or protected constructors when populating.
          *
          * @param accessNonPublicConstructor true/false
          * @return PopulateConfigBuilder
