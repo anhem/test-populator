@@ -92,7 +92,9 @@ public class PopulateUtil {
     public static <T> boolean isMatchingSetterStrategy(Strategy strategy, Class<T> clazz, List<String> setterPrefixes, boolean accessNonPublicConstructor) {
         if (strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor)) {
             List<String> setterMethodFormats = getSetterMethodFormats(setterPrefixes);
-            return getAllDeclaredMethods(clazz, new ArrayList<>()).stream().anyMatch(method -> isSetterMethod(method, setterMethodFormats));
+            return getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
+                    .filter(method -> !isWaitMethod(method))
+                    .anyMatch(method -> isSetterMethod(method, setterMethodFormats));
         }
         return false;
     }
@@ -291,11 +293,13 @@ public class PopulateUtil {
     }
 
     private static boolean isWaitMethod(Method method) {
-        if (Modifier.isFinal(method.getModifiers()) && method.getName().equals("wait")) {
+        boolean isFinal = Modifier.isFinal(method.getModifiers());
+        boolean isWaitName = method.getName().equals("wait") || (method.getName().equals("wait0") && Modifier.isNative(method.getModifiers()));
+
+        if (isFinal && isWaitName) {
             return method.getParameters().length == 0 ||
                     (method.getParameters().length == 1 && method.getParameters()[0].getType().equals(long.class)) ||
-                    (method.getParameters().length == 2 && method.getParameters()[0].getType().equals(long.class) && method.getParameters()[1].getType().equals(int.class))
-                    ;
+                    (method.getParameters().length == 2 && method.getParameters()[0].getType().equals(long.class) && method.getParameters()[1].getType().equals(int.class));
         }
         return false;
     }
