@@ -12,10 +12,7 @@ import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
 import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import java.lang.reflect.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -35,12 +32,12 @@ import static java.lang.String.format;
  */
 public class PopulateFactory {
 
-    static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection %s";
-    static final String NO_MATCHING_STRATEGY = "Unable to populate %s. No matching strategy found. Tried with %s. Try another strategy or override population for this class";
-    static final String FAILED_TO_SET_FIELD = "Failed to set field %s in object of class %s";
-    static final String FAILED_TO_CALL_METHOD = "Failed to call method %s in object of class %s";
-    static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of %s using %s strategy";
-    static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection %s";
+    static final String MISSING_COLLECTION_TYPE = "Failed to find type for collection '%s'";
+    static final String NO_MATCHING_STRATEGY = "Unable to populate '%s'. No matching strategy found. Tried with %s. Try another strategy or override population for this class";
+    static final String FAILED_TO_SET_FIELD = "Failed to set field '%s' in object of class %s";
+    static final String FAILED_TO_CALL_METHOD = "Failed to call method '%s' in object of class '%s'";
+    static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of '%s' using '%s' strategy";
+    static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection '%s'";
 
     public static final String BUILD_METHOD = "build";
     public static final String BUILDER_METHOD = "builder";
@@ -123,6 +120,8 @@ public class PopulateFactory {
                 return continuePopulateForMap(collectionCarrier);
             } else if (isSet(clazz)) {
                 return continuePopulateForSet(collectionCarrier);
+            } else if (isMapEntry(clazz)) {
+                return continuePopulateForMapEntry(collectionCarrier);
             } else if (isCollection(clazz)) {
                 return continuePopulateForList(collectionCarrier);
             }
@@ -169,6 +168,14 @@ public class PopulateFactory {
     }
 
     @SuppressWarnings("unchecked")
+    private <T> T continuePopulateForMapEntry(CollectionCarrier<T> classCarrier) {
+        classCarrier.getObjectFactory().mapEntry(classCarrier.getClazz());
+        Object key = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)));
+        Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1)));
+        return (T) new AbstractMap.SimpleEntry<>(key, value);
+    }
+
+    @SuppressWarnings("unchecked")
     private <T> T continuePopulateForList(CollectionCarrier<T> classCarrier) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (hasConstructors(classCarrier)) {
             classCarrier.getObjectFactory().list(classCarrier.getClazz());
@@ -202,6 +209,9 @@ public class PopulateFactory {
             if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefixes(), populateConfig.canAccessNonPublicConstructors())) {
                 return continuePopulateUsingSetters(classCarrier);
             }
+            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors(), populateConfig.getConstructorType())) {
+                return continuePopulateUsingMutator(classCarrier);
+            }
             if (isMatchingFieldStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
                 return continuePopulateUsingFields(classCarrier);
             }
@@ -217,19 +227,23 @@ public class PopulateFactory {
         try {
             Constructor<T> constructor = getLargestConstructor(clazz, populateConfig.canAccessNonPublicConstructors());
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
-            classCarrier.getObjectFactory().constructor(clazz, constructor.getParameterCount());
-            Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
-                Parameter parameter = constructor.getParameters()[i];
-                if (isCollection(parameter.getType())) {
-                    return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
-                } else {
-                    return populateWithOverrides(classCarrier.toClassCarrier(parameter));
-                }
-            }).toArray();
-            return constructor.newInstance(arguments);
+            return continuePopulateUsingConstructor(constructor, classCarrier);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), CONSTRUCTOR), e);
         }
+    }
+
+    private <T> T continuePopulateUsingConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), constructor.getParameterCount());
+        Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
+            Parameter parameter = constructor.getParameters()[i];
+            if (isCollection(parameter.getType())) {
+                return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
+            } else {
+                return populateWithOverrides(classCarrier.toClassCarrier(parameter));
+            }
+        }).toArray();
+        return constructor.newInstance(arguments);
     }
 
     private <T> T continuePopulateUsingFields(ClassCarrier<T> classCarrier) {
@@ -244,8 +258,7 @@ public class PopulateFactory {
                         try {
                             setAccessible(field, objectOfClass);
                             if (isCollection(field.getType())) {
-                                Type[] typeArguments = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-                                field.set(objectOfClass, populateWithOverrides(classCarrier.toCollectionCarrier(field.getType(), typeArguments)));
+                                field.set(objectOfClass, populateWithOverrides(classCarrier.toCollectionCarrier(field.getType(), ((ParameterizedType) field.getGenericType()).getActualTypeArguments())));
                             } else {
                                 field.set(objectOfClass, populateWithOverrides(classCarrier.toClassCarrier(field.getType())));
                             }
@@ -274,6 +287,28 @@ public class PopulateFactory {
         }
     }
 
+    private <T> T continuePopulateUsingMutator(ClassCarrier<T> classCarrier) {
+        Class<T> clazz = classCarrier.getClazz();
+        try {
+            Constructor<T> constructor = getConstructor(clazz, populateConfig.canAccessNonPublicConstructors(), populateConfig.getConstructorType());
+            setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
+            if (constructor.getParameterCount() > 0) {
+                T objectOfClass = continuePopulateUsingConstructor(constructor, classCarrier);
+                List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
+                classCarrier.getObjectFactory().mutator(clazz, methods.size());
+                methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));
+                return objectOfClass;
+            } else {
+                T objectOfClass = constructor.newInstance();
+                List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
+                classCarrier.getObjectFactory().setter(clazz, methods.size());
+                methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));
+                return objectOfClass;
+            }
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), MUTATOR), e);
+        }
+    }
 
     private <T> T continuePopulateUsingBuilder(ClassCarrier<T> classCarrier) {
         switch (populateConfig.getBuilderPattern()) {

@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator.internal.object;
 public enum BuildType {
     CONSTRUCTOR,
     SETTER,
+    MUTATOR,
     BUILDER,
     METHOD,
     SET,
@@ -11,6 +12,7 @@ public enum BuildType {
     LIST_OF,
     MAP,
     MAP_OF,
+    MAP_ENTRY,
     ARRAY,
     VALUE;
 

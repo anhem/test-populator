@@ -49,17 +49,22 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public void constructor(Class<?> clazz, int expectedChildren) {
+    public <T> void constructor(Class<T> clazz, int expectedChildren) {
         setNextObjectBuilder(clazz, CONSTRUCTOR, expectedChildren);
     }
 
     @Override
-    public void setter(Class<?> clazz, int expectedChildren) {
+    public <T> void setter(Class<T> clazz, int expectedChildren) {
         setNextObjectBuilder(clazz, SETTER, expectedChildren);
     }
 
     @Override
-    public void builder(Class<?> clazz, int expectedChildren) {
+    public <T> void mutator(Class<T> clazz, int expectedChildren) {
+        setNextObjectBuilder(clazz, MUTATOR, expectedChildren);
+    }
+
+    @Override
+    public <T> void builder(Class<T> clazz, int expectedChildren) {
         setNextObjectBuilder(clazz, BUILDER, expectedChildren);
     }
 
@@ -72,7 +77,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public void set(Class<?> clazz) {
+    public <T> void set(Class<T> clazz) {
         setNextObjectBuilder(clazz, SET, 1);
         method("add", 1);
     }
@@ -83,7 +88,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public void list(Class<?> clazz) {
+    public <T> void list(Class<T> clazz) {
         setNextObjectBuilder(clazz, LIST, 1);
         method("add", 1);
     }
@@ -94,7 +99,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public void map(Class<?> clazz) {
+    public <T> void map(Class<T> clazz) {
         setNextObjectBuilder(clazz, MAP, 1);
         method("put", 2);
     }
@@ -105,7 +110,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public void array(Class<?> clazz) {
+    public <T> void mapEntry(Class<T> clazz) {
+        setNextObjectBuilder(clazz, MAP_ENTRY, 2);
+    }
+
+    @Override
+    public <T> void array(Class<T> clazz) {
         setNextObjectBuilder(clazz, ARRAY, 1);
     }
 
@@ -164,12 +174,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
-        String name = getName(clazz);
         if (currentObjectBuilder == null) {
-            currentObjectBuilder = new ObjectBuilder(clazz, name, buildType, expectedChildren);
+            currentObjectBuilder = new ObjectBuilder(clazz, getName(clazz), buildType, expectedChildren);
+        } else if (buildType == MUTATOR) {
+            setNextObjectBuilder(new ObjectBuilder(clazz, currentObjectBuilder.getName(), buildType, expectedChildren));
         } else {
-            ObjectBuilder child = new ObjectBuilder(clazz, name, buildType, expectedChildren);
-            setNextObjectBuilder(child);
+            setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), buildType, expectedChildren));
         }
     }
 
