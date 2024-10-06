@@ -198,11 +198,6 @@ public class PopulateUtil {
         return (method.getReturnType().equals(void.class) || method.getReturnType().equals(clazz)) && method.getParameters().length > 0;
     }
 
-    static <T> boolean isSameMethodParameterAsClass(Class<T> clazz, Method method) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        return parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(clazz);
-    }
-
     public static <T> void setAccessible(Constructor<T> constructor, boolean canAccessNonPublicConstructor) {
         if (canAccessNonPublicConstructor && !constructor.canAccess(null)) {
             constructor.setAccessible(true);

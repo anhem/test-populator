@@ -13,24 +13,25 @@ import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorPrivate;
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
+import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
 import com.github.anhem.testpopulator.model.java.setter.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.anhem.testpopulator.config.ConstructorType.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.testutil.FieldTestUtil.getField;
 import static com.github.anhem.testpopulator.testutil.MethodTestUtil.getMethod;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateUtilTest {
 
@@ -147,15 +148,15 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingMutatorStrategyReturnsTrue() {
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, ConstructorType.NO_ARGS)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS)).isTrue();
     }
 
     @Test
     void isMatchingMutatorStrategyReturnsFalse() {
         assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, ConstructorType.LARGEST)).isFalse();
         assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, ConstructorType.SMALLEST)).isFalse();
-        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, ConstructorType.NO_ARGS)).isFalse();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, AllArgsConstructor.class, false, ConstructorType.NO_ARGS)).isFalse();
+        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, NO_ARGS)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, AllArgsConstructor.class, false, NO_ARGS)).isFalse();
     }
 
     @Test
@@ -226,6 +227,11 @@ class PopulateUtilTest {
     }
 
     @Test
+    void getMutatorMethodsReturnsMethods() {
+        assertThat(getMutatorMethods(Mutator.class, emptyList())).hasSize(6);
+    }
+
+    @Test
     void isBlackListedMethodReturnsTrue() {
         Method method = getMethod("$jacocoInit", HasBlackListed.class);
 
@@ -292,6 +298,30 @@ class PopulateUtilTest {
         classCarrier = classCarrier.toClassCarrier(String.class);
 
         assertThat(alreadyVisited(classCarrier, true)).isFalse();
+    }
+
+    @Test
+    void MutatorWithMultipleConstructorsReturnsNoArgsConstructor() {
+        assertThat(getConstructor(MutatorWithMultipleConstructors.class, false, NO_ARGS).getParameterCount()).isEqualTo(0);
+        assertThat(getConstructor(Mutator.class, false, NO_ARGS).getParameterCount()).isEqualTo(0);
+        assertThat(getConstructor(PojoPrivateConstructor.class, true, NO_ARGS).getParameterCount()).isEqualTo(0);
+        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, NO_ARGS).getParameterCount());
+    }
+
+    @Test
+    void MutatorWithMultipleConstructorsReturnsLargestConstructor() {
+        assertThat(getConstructor(MutatorWithMultipleConstructors.class, false, LARGEST).getParameterCount()).isEqualTo(11);
+        assertThat(getConstructor(Mutator.class, false, LARGEST).getParameterCount()).isEqualTo(0);
+        assertThat(getConstructor(PojoPrivateConstructor.class, true, LARGEST).getParameterCount()).isEqualTo(0);
+        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, LARGEST).getParameterCount());
+    }
+
+    @Test
+    void MutatorWithMultipleConstructorsReturnsSmallestConstructor() {
+        assertThat(getConstructor(MutatorWithMultipleConstructors.class, false, SMALLEST).getParameterCount()).isEqualTo(1);
+        assertThat(getConstructor(Mutator.class, false, SMALLEST).getParameterCount()).isEqualTo(0);
+        assertThat(getConstructor(PojoPrivateConstructor.class, true, SMALLEST).getParameterCount()).isEqualTo(0);
+        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, SMALLEST).getParameterCount());
     }
 
     private static ClassCarrier<String> createClassCarrier() {

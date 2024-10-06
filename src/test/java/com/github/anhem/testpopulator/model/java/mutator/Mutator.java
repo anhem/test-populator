@@ -23,7 +23,6 @@ public class Mutator {
     private Set<String> setOfStrings;
     private Map<Integer, String> mapOfIntegersToStrings;
 
-
     public void setThree(String s, char c, Character character) {
         this.stringValue = s;
         this.primitiveCharacterValue = c;
