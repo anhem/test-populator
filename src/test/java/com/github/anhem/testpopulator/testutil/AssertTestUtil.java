@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AssertTestUtil {
 
+    private static final String[] EMPTY = {};
+
     public static <T> void assertRandomlyPopulatedValues(T value_1, T value_2) {
         assertThat(value_1).isNotNull();
         assertThat(value_2).isNotNull();
@@ -18,6 +20,17 @@ public class AssertTestUtil {
         assertThat(value_2).hasNoNullFieldsOrProperties();
         assertThat(value_1).usingRecursiveAssertion().hasNoNullFields();
         assertThat(value_2).usingRecursiveAssertion().hasNoNullFields();
+        assertThat(value_1).isNotEqualTo(value_2);
+        assertThat(value_1).usingRecursiveAssertion().isNotEqualTo(value_2);
+    }
+
+    public static <T> void assertRandomlyPopulatedValues(T value_1, T value_2, String... ignoringFields) {
+        assertThat(value_1).isNotNull();
+        assertThat(value_2).isNotNull();
+        assertThat(value_1).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
+        assertThat(value_2).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
+        assertThat(value_1).usingRecursiveAssertion().ignoringFields(ignoringFields).hasNoNullFields();
+        assertThat(value_2).usingRecursiveAssertion().ignoringFields(ignoringFields).hasNoNullFields();
         assertThat(value_1).isNotEqualTo(value_2);
         assertThat(value_1).usingRecursiveAssertion().isNotEqualTo(value_2);
     }

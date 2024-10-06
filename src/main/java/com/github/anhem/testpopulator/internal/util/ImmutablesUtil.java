@@ -63,6 +63,11 @@ public class ImmutablesUtil {
                 .collect(Collectors.toList());
     }
 
+    static <T> boolean isSameMethodParameterAsClass(Class<T> clazz, Method method) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        return parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(clazz);
+    }
+
     private static String getMethodNameWithoutPrefix(Method method) {
         return method.getName()
                 .replace(ADD_ALL_PREFIX, "")

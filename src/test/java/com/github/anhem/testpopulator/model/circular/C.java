@@ -18,4 +18,6 @@ public class C {
     private ArrayList<C> cArrayList;
     private HashSet<C> cHashSet;
     private HashMap<String, C> cHashMap;
+    private Map.Entry<String, C> entry1;
+    private Map.Entry<C, String> entry2;
 }
