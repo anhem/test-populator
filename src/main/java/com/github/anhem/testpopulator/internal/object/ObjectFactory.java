@@ -2,31 +2,31 @@ package com.github.anhem.testpopulator.internal.object;
 
 public interface ObjectFactory {
 
-    void constructor(Class<?> clazz, int expectedChildren);
+    <T> void constructor(Class<T> clazz, int expectedChildren);
 
-    void setter(Class<?> clazz, int expectedChildren);
+    <T> void setter(Class<T> clazz, int expectedChildren);
 
-    void mutator(Class<?> clazz, int expectedChildren);
+    <T> void mutator(Class<T> clazz, int expectedChildren);
 
-    void builder(Class<?> clazz, int expectedChildren);
+    <T> void builder(Class<T> clazz, int expectedChildren);
 
     void method(String methodName, int expectedChildren);
 
-    void set(Class<?> clazz);
+    <T> void set(Class<T> clazz);
 
     void setOf();
 
-    void list(Class<?> clazz);
+    <T> void list(Class<T> clazz);
 
     void listOf();
 
-    void map(Class<?> clazz);
+    <T> void map(Class<T> clazz);
 
     void mapOf();
 
     <T> void mapEntry(Class<T> clazz);
 
-    void array(Class<?> clazz);
+    <T> void array(Class<T> clazz);
 
     <T> void value(T value);
 
