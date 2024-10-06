@@ -59,6 +59,11 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public <T> void mapEntry(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
     public void array(Class<?> clazz) {
         //ignored
     }

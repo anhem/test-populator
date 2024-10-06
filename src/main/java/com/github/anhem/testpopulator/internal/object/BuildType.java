@@ -12,6 +12,7 @@ public enum BuildType {
     LIST_OF,
     MAP,
     MAP_OF,
+    MAP_ENTRY,
     ARRAY,
     VALUE;
 

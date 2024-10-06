@@ -24,6 +24,8 @@ public interface ObjectFactory {
 
     void mapOf();
 
+    <T> void mapEntry(Class<T> clazz);
+
     void array(Class<?> clazz);
 
     <T> void value(T value);

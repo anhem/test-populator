@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isJavaBaseClass;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isMapEntry;
 
 public class ObjectBuilderUtil {
 
@@ -32,6 +33,10 @@ public class ObjectBuilderUtil {
 
     public static void addImport(Class<?> clazz, Object value, Set<String> imports, Set<String> staticImports) {
         if (clazz != null && !clazz.getName().startsWith("java.lang.")) {
+            if (isMapEntry(clazz)) {
+                staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
+                imports.add("java.util.AbstractMap");
+            }
             if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
                 staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
             } else if (value != null && clazz.isEnum()) {

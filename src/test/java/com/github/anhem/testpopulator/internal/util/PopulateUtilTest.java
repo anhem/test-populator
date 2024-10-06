@@ -89,6 +89,16 @@ class PopulateUtilTest {
     }
 
     @Test
+    void isMapEntryReturnsFalse() {
+        assertThat(isMapEntry(String.class)).isFalse();
+    }
+
+    @Test
+    void isMapEntryReturnsTrue() {
+        assertThat(isMapEntry(Map.Entry.class)).isTrue();
+    }
+
+    @Test
     void isCollectionReturnsFalse() {
         assertThat(isCollection(PojoExtendsPojoAbstract.class)).isFalse();
         assertThat(isCollection(String.class)).isFalse();
@@ -101,6 +111,7 @@ class PopulateUtilTest {
         assertThat(isCollection(Collection.class)).isTrue();
         assertThat(isCollection(Map.class)).isTrue();
         assertThat(isCollection(ArrayList.class)).isTrue();
+        assertThat(isCollection(Map.Entry.class)).isTrue();
     }
 
     @Test
@@ -228,7 +239,7 @@ class PopulateUtilTest {
 
     @Test
     void getMutatorMethodsReturnsMethods() {
-        assertThat(getMutatorMethods(Mutator.class, emptyList())).hasSize(6);
+        assertThat(getMutatorMethods(Mutator.class, emptyList())).hasSize(8);
     }
 
     @Test

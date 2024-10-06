@@ -5,6 +5,7 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.setter.*;
+import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

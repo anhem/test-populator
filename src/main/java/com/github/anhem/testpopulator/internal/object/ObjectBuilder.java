@@ -22,6 +22,7 @@ public class ObjectBuilder {
     private static final String SET_OF = "%s %s<%s> %s = Set.of(%s);";
     private static final String LIST_OF = "%s %s<%s> %s = List.of(%s);";
     private static final String MAP_OF = "%s %s<%s> %s = Map.of(%s);";
+    private static final String MAP_ENTRY = "%s %s<%s> %s = new AbstractMap.SimpleEntry<>(%s);";
     private static final String NEW_ARRAY = "%s %s[] %s = new %s[]{%s};";
     private static final String NEW_VALUE = "%s %s %s = %s;";
     private static final String ARGUMENT_DELIMITER = ", ";
@@ -120,6 +121,8 @@ public class ObjectBuilder {
                 return buildMap();
             case MAP_OF:
                 return buildMapOf();
+            case MAP_ENTRY:
+                return buildMapEntry();
             case ARRAY:
                 return buildArray();
             case VALUE:
@@ -222,6 +225,13 @@ public class ObjectBuilder {
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format(MAP_OF, PSF, clazz.getSimpleName(), formatTypes(), name, getNullableArguments(buildArguments()))))
+                .collect(Collectors.toList());
+    }
+
+    private List<String> buildMapEntry() {
+        return concatenate(
+                buildChildren(),
+                Stream.of(String.format(MAP_ENTRY, PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
                 .collect(Collectors.toList());
     }
 

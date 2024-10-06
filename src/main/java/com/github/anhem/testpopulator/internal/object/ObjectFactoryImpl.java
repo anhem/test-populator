@@ -110,6 +110,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
+    public <T> void mapEntry(Class<T> clazz) {
+        setNextObjectBuilder(clazz, MAP_ENTRY, 2);
+    }
+
+    @Override
     public void array(Class<?> clazz) {
         setNextObjectBuilder(clazz, ARRAY, 1);
     }

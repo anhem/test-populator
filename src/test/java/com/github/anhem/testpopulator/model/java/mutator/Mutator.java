@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,8 @@ public class Mutator {
     private List<String> listOfStrings;
     private Set<String> setOfStrings;
     private Map<Integer, String> mapOfIntegersToStrings;
+    private Map.Entry<Integer, String> mapEntry;
+    private AbstractMap.SimpleEntry<Integer, String> simpleEntry;
 
     public void setThree(String s, char c, Character character) {
         this.stringValue = s;
@@ -50,5 +53,13 @@ public class Mutator {
 
     public void somethingRandom(Integer integer, String s) {
         this.mapOfIntegersToStrings = Map.of(integer, s);
+    }
+
+    public void someMapEntry(Map.Entry<Integer, String> mapEntry) {
+        this.mapEntry = mapEntry;
+    }
+
+    public void withSimpleEntry(AbstractMap.SimpleEntry<Integer, String> simpleEntry) {
+        this.simpleEntry = simpleEntry;
     }
 }

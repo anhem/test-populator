@@ -1,13 +1,17 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.ConstructorType;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
+import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesAbstract;
+import com.github.anhem.testpopulator.model.immutables.ImmutablesAbstract;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithConstructor;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
 import com.github.anhem.testpopulator.model.java.setter.*;
+import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -293,6 +297,31 @@ class PopulateFactoryWithMutatorStrategyTest {
         MutatorWithMultipleConstructors value_1 = populateAndAssertWithGeneratedCode(MutatorWithMultipleConstructors.class);
         MutatorWithMultipleConstructors value_2 = populateAndAssertWithGeneratedCode(MutatorWithMultipleConstructors.class);
         assertRandomlyPopulatedValues(value_1, value_2, "arbitraryEnum", "localDate");
+    }
+
+    @Test
+    void LombokImmutableBuilder() {
+        populateConfig = populateConfig.toBuilder()
+                .accessNonPublicConstructors(true)
+                .objectFactoryEnabled(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        LombokImmutable value_1 = populateAndAssert(LombokImmutable.LombokImmutableBuilder.class).build();
+        LombokImmutable value_2 = populateAndAssert(LombokImmutable.LombokImmutableBuilder.class).build();
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void ImmutableImmutablesAbstract() {
+        populateConfig = populateConfig.toBuilder()
+                .accessNonPublicConstructors(true)
+                .objectFactoryEnabled(false)
+                .blacklistedMethods(List.of("from"))
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        ImmutableImmutablesAbstract value_1 = populateAndAssert(ImmutableImmutablesAbstract.Builder.class).build();
+        ImmutableImmutablesAbstract value_2 = populateAndAssert(ImmutableImmutablesAbstract.Builder.class).build();
+        assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
