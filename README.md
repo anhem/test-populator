@@ -321,3 +321,22 @@ public class TestPopulator {
 ```java
 MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 ```
+
+## Full coverage setup
+
+Here is a setup that covers all supported scenarios 
+
+```java
+        PopulateConfig populateConfig = PopulateConfig.builder()
+        .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, FIELD))
+        .builderPattern(LOMBOK)
+        .randomValues(true)
+        .setterPrefix("")
+        .accessNonPublicConstructors(true)
+        .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+        .objectFactoryEnabled(false)
+        .nullOnCircularDependency(true)
+        .constructorType(LARGEST)
+        .build();
+PopulateFactory populateFactory = new PopulateFactory(populateConfig);
+```
