@@ -324,19 +324,27 @@ MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 
 ## Full coverage setup
 
-Here is a setup that covers all supported scenarios 
+Here is a setup that covers all supported scenarios
 
 ```java
-        PopulateConfig populateConfig = PopulateConfig.builder()
-        .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, FIELD))
-        .builderPattern(LOMBOK)
-        .randomValues(true)
-        .setterPrefix("")
-        .accessNonPublicConstructors(true)
-        .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
-        .objectFactoryEnabled(false)
-        .nullOnCircularDependency(true)
-        .constructorType(LARGEST)
-        .build();
-PopulateFactory populateFactory = new PopulateFactory(populateConfig);
+public class TestPopulator {
+
+    public static <T> T populate(Class<T> clazz) {
+        return populateFactory.populate(clazz);
+    }
+
+    private static final PopulateConfig populateConfig = PopulateConfig.builder()
+            .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, FIELD))
+            .builderPattern(LOMBOK)
+            .randomValues(true)
+            .setterPrefix("")
+            .accessNonPublicConstructors(true)
+            .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+            .objectFactoryEnabled(false)
+            .nullOnCircularDependency(true)
+            .constructorType(LARGEST)
+            .build();
+
+    private static final PopulateFactory populateFactory = new PopulateFactory(populateConfig);
+}
 ```
