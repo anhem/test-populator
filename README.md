@@ -97,6 +97,7 @@ MyClass myClass = populateFactory.populate(myClass.class);
 | blacklistedFields           | List of fields to skip if encountered        | \_\_$lineHits$\_\_, $jacocoData |    
 | objectFactoryEnabled        | Experimental! true / false                   | false                           |    
 | nullOnCircularDependency    | true / false                                 | false                           |    
+| constructorType             | NO_ARG, SMALLEST, LARGEST                    | NO_ARG                          |    
 
 ### strategyOrder
 
@@ -119,12 +120,12 @@ Methods are considered setters if they match any of the provided [setterPrefixes
 
 ##### MUTATOR
 
-Use a no-arguments/default constructor to instantiate and mutator methods to populate fields. Applied to classes that
-have a no-arguments/default constructor and at least one mutator method.
+Use a constructor based on [constructorType](#constructortype) to instantiate and mutator methods to populate fields. Applied to classes that
+have at least one mutator method.
 
 This works similarly to [SETTER](#setter) but will take any method that mutates the object instead of only those following the classic setter pattern.
 
-Methods are considered mutators if they have at least `one argument` and return `void` or the class we attempt to create.
+Methods are considered mutators if they have at least `one argument` and return `void` or the class `test-populator` is currently creating.
 
 ##### FIELD
 
@@ -249,6 +250,14 @@ Enable to solve issues with classes having circular dependencies. In cases where
 `StackOverflowError`.
 
 By enabling this the circle is broken by setting those values to `null`.
+
+### constructorType
+
+(Applied when using strategy: [MUTATOR](#Mutator))
+
+Set what constructor is preferred when creating objects. 
+
+SMALLEST will attempt to pick a constructor with at least one parameter and fall back on NO_ARG if none is found.
 
 ## ToBuilder
 

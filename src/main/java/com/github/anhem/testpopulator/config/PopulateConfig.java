@@ -210,6 +210,12 @@ public class PopulateConfig {
             return this;
         }
 
+        /**
+         * Set what constructor is preferred when creating objects using MUTATOR strategy.
+         * SMALLEST will attempt to pick a constructor with at least one parameter and fall back on NO_ARG if none is found.
+         * @param constructorType NO_ARG, SMALLEST, LARGEST
+         * @return PopulateConfigBuilder
+         */
         public PopulateConfigBuilder constructorType(ConstructorType constructorType) {
             this.constructorType = constructorType;
             return this;
