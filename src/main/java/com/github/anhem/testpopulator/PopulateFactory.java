@@ -170,12 +170,9 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateForMapEntry(CollectionCarrier<T> classCarrier) {
         classCarrier.getObjectFactory().mapEntry(classCarrier.getClazz());
-        Optional<Object> key = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0))));
-        Optional<Object> value = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1))));
-        if (key.isPresent() && value.isPresent()) {
-            return (T) new AbstractMap.SimpleEntry<>(key.get(), value.get());
-        }
-        return null;
+        Object key = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)));
+        Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1)));
+        return (T) new AbstractMap.SimpleEntry<>(key, value);
     }
 
     @SuppressWarnings("unchecked")
