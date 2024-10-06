@@ -324,7 +324,7 @@ MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 
 ## Full coverage setup
 
-Here is a setup that covers all supported scenarios
+Here is a setup that covers as much as possible
 
 ```java
 public class TestPopulator {
