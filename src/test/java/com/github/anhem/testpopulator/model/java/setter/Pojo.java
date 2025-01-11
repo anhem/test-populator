@@ -41,5 +41,7 @@ public class Pojo {
     private HashMap<String, String> hashMap;
     private HashSet<String> hashSet;
     private Date date;
+    private Byte byteValue;
+    private byte primitiveByteValue;
 
 }
