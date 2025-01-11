@@ -34,5 +34,7 @@ public class AllArgsConstructor {
     private final ArbitraryEnum arbitraryEnum;
     private final String[] arrayOfStrings;
     private final Date date;
+    private final Byte byteValue;
+    private final byte primitiveByteValue;
 
 }

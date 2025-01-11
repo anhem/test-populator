@@ -98,4 +98,14 @@ class RandomUtilTest {
         assertThat(random_1).isNotEqualTo(random_2);
     }
 
+    @Test
+    void getRandomByteCanBeDifferent() {
+        Byte random_1 = getRandomByte();
+        Byte random_2 = getRandomByte();
+
+        assertThat(random_1).isNotNull();
+        assertThat(random_2).isNotNull();
+        assertThat(random_1).isNotEqualTo(random_2);
+    }
+
 }

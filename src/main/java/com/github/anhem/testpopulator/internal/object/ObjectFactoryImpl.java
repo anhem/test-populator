@@ -37,6 +37,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Instant.class, object -> String.format("Instant.parse(\"%s\")", object));
         stringSuppliers.put(Date.class, object -> String.format("new Date(%sL)", ((Date) object).getTime()));
         stringSuppliers.put(UUID.class, object -> String.format("UUID.fromString(\"%s\")", object));
+        stringSuppliers.put(Byte.class, object -> String.format("Byte.valueOf(\"%s\")", object));
     }
 
     private final PopulateConfig populateConfig;

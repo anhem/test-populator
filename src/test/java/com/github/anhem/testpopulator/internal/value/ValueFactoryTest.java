@@ -38,11 +38,13 @@ class ValueFactoryTest {
         createAndAssertRandomValues(Date.class);
         createAndAssertRandomValues(Character.class);
         createAndAssertRandomValues(UUID.class);
+        createAndAssertRandomValues(Byte.class);
         createAndAssertRandomIntValues();
         createAndAssertRandomLongValues();
         createAndAssertRandomDoubleValues();
         createAndAssertRandomBooleanValues();
         createAndAssertRandomCharValues();
+        createAndAssertRandomByteValues();
     }
 
     @Test
@@ -62,11 +64,13 @@ class ValueFactoryTest {
         createAndAssertFixedValues(Date.class);
         createAndAssertFixedValues(Character.class);
         createAndAssertFixedValues(UUID.class);
+        createAndAssertFixedValues(Byte.class);
         createAndAssertFixedIntValues();
         createAndAssertFixedLongValues();
         createAndAssertFixedDoubleValues();
         createAndAssertFixedBooleanValues();
         createAndAssertFixedCharValues();
+        createAndAssertFixedByteValues();
     }
 
     @Test
@@ -117,6 +121,12 @@ class ValueFactoryTest {
         assertThat(value_1).isNotEqualTo(value_2);
     }
 
+    private void createAndAssertRandomByteValues() {
+        byte value_1 = valueFactory.createValue(byte.class);
+        byte value_2 = (byte) createSecondNonMatchingValue(value_1);
+        assertThat(value_1).isNotEqualTo(value_2);
+    }
+
     private Object createSecondNonMatchingValue(Object value) {
         Object secondValue = valueFactory.createValue(value.getClass());
         int retry = 0;
@@ -164,6 +174,12 @@ class ValueFactoryTest {
     private void createAndAssertFixedCharValues() {
         char value_1 = valueFactory.createValue(char.class);
         char value_2 = valueFactory.createValue(char.class);
+        assertThat(value_1).isEqualTo(value_2);
+    }
+
+    private void createAndAssertFixedByteValues() {
+        byte value_1 = valueFactory.createValue(byte.class);
+        byte value_2 = valueFactory.createValue(byte.class);
         assertThat(value_1).isEqualTo(value_2);
     }
 }

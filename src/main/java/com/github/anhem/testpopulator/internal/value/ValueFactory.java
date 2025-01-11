@@ -24,6 +24,7 @@ public class ValueFactory {
     private static final Character CHARACTER = 'c';
     private static final String UUID_STRING = "43c6e27d-c0c6-43d6-8462-34ac04c1d5f3";
     private static final BigDecimal BIG_DECIMAL = BigDecimal.ONE;
+    private static final byte BYTE = 1;
 
     private final boolean setRandomValues;
     private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
@@ -54,6 +55,8 @@ public class ValueFactory {
         typeSuppliers.put(Character.class, this::getChar);
         typeSuppliers.put(char.class, this::getChar);
         typeSuppliers.put(UUID.class, this::getUUID);
+        typeSuppliers.put(byte.class, this::getByte);
+        typeSuppliers.put(Byte.class, this::getByte);
         return typeSuppliers;
     }
 
@@ -129,5 +132,9 @@ public class ValueFactory {
 
     private UUID getUUID() {
         return setRandomValues ? UUID.randomUUID() : UUID.fromString(UUID_STRING);
+    }
+
+    private Byte getByte() {
+        return setRandomValues ? getRandomByte() : BYTE;
     }
 }

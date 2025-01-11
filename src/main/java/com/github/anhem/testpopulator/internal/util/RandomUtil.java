@@ -48,4 +48,10 @@ public class RandomUtil {
         List<T> enumValues = List.of(clazz.getEnumConstants());
         return enumValues.get(random.nextInt(enumValues.size()));
     }
+
+    public static Byte getRandomByte() {
+        byte[] bytes = new byte[1];
+        random.nextBytes(bytes);
+        return bytes[0];
+    }
 }
