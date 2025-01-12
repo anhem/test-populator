@@ -22,6 +22,26 @@ class RandomUtilTest {
     }
 
     @Test
+    void getRandomShortIsDifferentEachTime() {
+        short random_1 = getRandomShort();
+        short random_2 = getRandomShort();
+
+        assertThat(random_1).isPositive();
+        assertThat(random_2).isPositive();
+        assertThat(random_1).isNotEqualTo(random_2);
+    }
+
+    @Test
+    void getRandomFloatIsDifferentEachTime() {
+        float random_1 = getRandomFloat();
+        float random_2 = getRandomFloat();
+
+        assertThat(random_1).isPositive();
+        assertThat(random_2).isPositive();
+        assertThat(random_1).isNotEqualTo(random_2);
+    }
+
+    @Test
     void getRandomStringIsDifferentEachTime() {
         String random_1 = getRandomString();
         String random_2 = getRandomString();

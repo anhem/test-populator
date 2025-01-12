@@ -36,5 +36,9 @@ public class AllArgsConstructor {
     private final Date date;
     private final Byte byteValue;
     private final byte primitiveByteValue;
+    private final Short shortValue;
+    private final short primitiveShortValue;
+    private final Float floatValue;
+    private final float primitiveFloatValue;
 
 }
