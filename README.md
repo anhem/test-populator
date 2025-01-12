@@ -9,7 +9,9 @@ Populate java classes with fixed or random data. Facilitates the creation of obj
 
 **Problem:**
 
-When writing tests, you may not be interested in what data an object has. You just want to make use of an object of that type with some or all fields populated.
+When writing tests, you may not always be interested in what data an object has. You just want to make use of an object of that type with some or all fields
+populated.
+
 Creating a lot of objects manually is time-consuming and gives you additional code to maintain.
 
 The same goes for mocking objects. It works, but can also result in a huge and complicated mocking setup that also needs to be maintained.
@@ -148,9 +150,8 @@ Different builders behave slightly different. The builderPattern tells `test-pop
 Set to true will randomize everything. When set to false fixed values will be used. I.e. populating the same class twice
 will give the same result.
 
-Random values are not generated entirely at random. They are generated to be random enough. For example date and time of
-various
-types are randomized from between `"now" minus 1 year` and `"now" plus 1 year`.
+**Note!** Random values are not generated entirely at random. They are generated to be random enough. For example date and time of
+various types are randomized from between `"now" minus 1 year` and `"now" plus 1 year`.
 
 See [RandomUtil.java](src/main/java/com/github/anhem/testpopulator/RandomUtil.java) for more details.
 
@@ -180,7 +181,7 @@ or by simply providing your own implementation directly in the configuration:
 ```java
     PopulateConfig populateConfig = PopulateConfig.builder()
         .overridePopulate(LocalDate.class, LocalDate::now) //set all LocalDates to "now"
-        .overridePopulate(String.class, () -> UUID.randomUUID().toString()) //sets all strings to random UUID's
+        .overridePopulate(String.class, () -> UUID.randomUUID().toString()) //set all strings to random UUID's
         .build();
 ```
 
@@ -255,7 +256,7 @@ By enabling this the circle is broken by setting those values to `null`.
 
 (Applied when using strategy: [MUTATOR](#Mutator))
 
-Set what constructor is preferred when creating objects. 
+Set what constructor is preferred when creating objects.
 
 SMALLEST will attempt to pick a constructor with at least one parameter and fall back on NO_ARG if none is found.
 
@@ -334,15 +335,15 @@ public class TestPopulator {
     }
 
     private static final PopulateConfig populateConfig = PopulateConfig.builder()
-            .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, FIELD))
-            .builderPattern(LOMBOK)
-            .randomValues(true)
-            .setterPrefix("")
-            .accessNonPublicConstructors(true)
-            .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
-            .objectFactoryEnabled(false)
-            .nullOnCircularDependency(true)
-            .constructorType(LARGEST)
+            .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, FIELD)) // strategies ordered to make most use of each of them
+            .builderPattern(LOMBOK) // required when using BUILDER strategy to tell test-populator what kind of builder to use 
+            .randomValues(true) // create objects with random values
+            .setterPrefix("") // used by SETTER strategy to know what methods to use. An empty string means calling all void methods with one argument
+            .accessNonPublicConstructors(true) // uses reflection to override access to private constructors by calling constructor.setAccessible(true)
+            .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString())) // if we have our own custom class that test-populator cannot populate without help
+            .objectFactoryEnabled(false) // generates java code for each populated object. Must be false if FIELD strategy or accessNonPublicConstructors = true is used
+            .nullOnCircularDependency(true) // solves issues with circular dependencies by setting values to null when encountered more than once
+            .constructorType(LARGEST) // used by MUTATOR strategy to know what constructor to use
             .build();
 
     private static final PopulateFactory populateFactory = new PopulateFactory(populateConfig);
