@@ -21,6 +21,14 @@ public class RandomUtil {
         return random.nextInt(RANDOM_INT_MAX_VALUE);
     }
 
+    public static short getRandomShort() {
+        return (short) random.nextInt(Short.MAX_VALUE + 1);
+    }
+
+    public static Float getRandomFloat() {
+        return random.nextFloat();
+    }
+
     public static String getRandomString() {
         return random.ints(LEFT_LIMIT, RIGHT_LIMIT + 1)
                 .limit(STRING_LENGTH)
@@ -54,4 +62,5 @@ public class RandomUtil {
         random.nextBytes(bytes);
         return bytes[0];
     }
+
 }

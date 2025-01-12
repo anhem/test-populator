@@ -42,6 +42,8 @@ class ValueFactoryTest {
         createAndAssertRandomIntValues();
         createAndAssertRandomLongValues();
         createAndAssertRandomDoubleValues();
+        createAndAssertRandomShortValues();
+        createAndAssertRandomFloatValues();
         createAndAssertRandomBooleanValues();
         createAndAssertRandomCharValues();
         createAndAssertRandomByteValues();
@@ -68,6 +70,8 @@ class ValueFactoryTest {
         createAndAssertFixedIntValues();
         createAndAssertFixedLongValues();
         createAndAssertFixedDoubleValues();
+        createAndAssertFixedShortValues();
+        createAndAssertFixedFloatValues();
         createAndAssertFixedBooleanValues();
         createAndAssertFixedCharValues();
         createAndAssertFixedByteValues();
@@ -106,6 +110,18 @@ class ValueFactoryTest {
     private void createAndAssertRandomDoubleValues() {
         double value_1 = valueFactory.createValue(double.class);
         double value_2 = (double) createSecondNonMatchingValue(value_1);
+        assertThat(value_1).isNotEqualTo(value_2);
+    }
+
+    private void createAndAssertRandomShortValues() {
+        short value_1 = valueFactory.createValue(short.class);
+        short value_2 = (short) createSecondNonMatchingValue(value_1);
+        assertThat(value_1).isNotEqualTo(value_2);
+    }
+
+    private void createAndAssertRandomFloatValues() {
+        float value_1 = valueFactory.createValue(float.class);
+        float value_2 = (float) createSecondNonMatchingValue(value_1);
         assertThat(value_1).isNotEqualTo(value_2);
     }
 
@@ -162,6 +178,18 @@ class ValueFactoryTest {
     private void createAndAssertFixedDoubleValues() {
         double value_1 = valueFactory.createValue(double.class);
         double value_2 = valueFactory.createValue(double.class);
+        assertThat(value_1).isEqualTo(value_2);
+    }
+
+    private void createAndAssertFixedShortValues() {
+        short value_1 = valueFactory.createValue(short.class);
+        short value_2 = valueFactory.createValue(short.class);
+        assertThat(value_1).isEqualTo(value_2);
+    }
+
+    private void createAndAssertFixedFloatValues() {
+        float value_1 = valueFactory.createValue(float.class);
+        float value_2 = valueFactory.createValue(float.class);
         assertThat(value_1).isEqualTo(value_2);
     }
 

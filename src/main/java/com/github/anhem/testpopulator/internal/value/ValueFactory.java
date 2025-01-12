@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator.internal.value;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.internal.util.RandomUtil;
 
 import java.math.BigDecimal;
 import java.time.*;
@@ -25,6 +26,8 @@ public class ValueFactory {
     private static final String UUID_STRING = "43c6e27d-c0c6-43d6-8462-34ac04c1d5f3";
     private static final BigDecimal BIG_DECIMAL = BigDecimal.ONE;
     private static final byte BYTE = 1;
+    private static final short SHORT = 1;
+    private static final float FLOAT = 1;
 
     private final boolean setRandomValues;
     private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
@@ -43,6 +46,10 @@ public class ValueFactory {
         typeSuppliers.put(long.class, this::getLong);
         typeSuppliers.put(Double.class, this::getDouble);
         typeSuppliers.put(double.class, this::getDouble);
+        typeSuppliers.put(Short.class, this::getShort);
+        typeSuppliers.put(short.class, this::getShort);
+        typeSuppliers.put(Float.class, this::getFloat);
+        typeSuppliers.put(float.class, this::getFloat);
         typeSuppliers.put(Boolean.class, this::getBoolean);
         typeSuppliers.put(boolean.class, this::getBoolean);
         typeSuppliers.put(BigDecimal.class, this::getBigDecimal);
@@ -92,6 +99,14 @@ public class ValueFactory {
 
     private Double getDouble() {
         return setRandomValues ? Double.valueOf(getRandomInt()) : DOUBLE;
+    }
+
+    private Short getShort() {
+        return setRandomValues ? RandomUtil.getRandomShort() : SHORT;
+    }
+
+    private Float getFloat() {
+        return setRandomValues ? RandomUtil.getRandomFloat() : FLOAT;
     }
 
     private Boolean getBoolean() {

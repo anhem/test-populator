@@ -212,7 +212,7 @@ class PopulateUtilTest {
     void getSetterMethodsReturnsMethodsWhenRegularSetter() {
         List<Method> setterMethods = getSetterMethods(Pojo.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), SETTER_PREFIXES);
 
-        assertThat(setterMethods).isNotEmpty().hasSize(25);
+        assertThat(setterMethods).isNotEmpty().hasSize(29);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }

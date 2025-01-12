@@ -43,5 +43,9 @@ public class Pojo {
     private Date date;
     private Byte byteValue;
     private byte primitiveByteValue;
+    private Short shortValue;
+    private short primitiveShortValue;
+    private Float floatValue;
+    private float primitiveFloatValue;
 
 }
