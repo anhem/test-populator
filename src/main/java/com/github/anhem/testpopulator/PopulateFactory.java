@@ -41,6 +41,7 @@ public class PopulateFactory {
 
     public static final String BUILD_METHOD = "build";
     public static final String BUILDER_METHOD = "builder";
+    public static final String KOTLIN_DEFAULT_CONSTRUCTOR_MARKER = "DefaultConstructorMarker";
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
@@ -234,16 +235,26 @@ public class PopulateFactory {
     }
 
     private <T> T continuePopulateUsingConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), constructor.getParameterCount());
-        Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
-            Parameter parameter = constructor.getParameters()[i];
-            if (isCollection(parameter.getType())) {
-                return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
-            } else {
-                return populateWithOverrides(classCarrier.toClassCarrier(parameter));
-            }
-        }).toArray();
-        return constructor.newInstance(arguments);
+        int parameterCount = constructor.getParameterCount();
+        classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), parameterCount);
+        Class<?>[] parameterTypes = constructor.getParameterTypes();
+        if (parameterTypes.length > 0 && parameterTypes[parameterTypes.length - 1].getSimpleName().equals(KOTLIN_DEFAULT_CONSTRUCTOR_MARKER)) {
+            Object[] arguments = IntStream.range(0, parameterCount - 2).mapToObj(i -> continuePopulateUsingConstructor(constructor, classCarrier, i)).toArray();
+            int mask = (1 << (parameterCount - 2)) - 1;
+            return constructor.newInstance(Stream.concat(Arrays.stream(arguments), Stream.of(mask, null)).toArray());
+        } else {
+            Object[] arguments = IntStream.range(0, parameterCount).mapToObj(i -> continuePopulateUsingConstructor(constructor, classCarrier, i)).toArray();
+            return constructor.newInstance(arguments);
+        }
+    }
+
+    private <T> T continuePopulateUsingConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier, int i) {
+        Parameter parameter = constructor.getParameters()[i];
+        if (isCollection(parameter.getType())) {
+            return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
+        } else {
+            return populateWithOverrides(classCarrier.toClassCarrier(parameter));
+        }
     }
 
     private <T> T continuePopulateUsingFields(ClassCarrier<T> classCarrier) {
