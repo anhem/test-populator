@@ -3,7 +3,6 @@ package com.github.anhem.testpopulator.model.java.mutator;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;

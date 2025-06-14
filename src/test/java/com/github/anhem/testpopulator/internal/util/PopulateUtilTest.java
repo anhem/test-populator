@@ -19,7 +19,10 @@ import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
