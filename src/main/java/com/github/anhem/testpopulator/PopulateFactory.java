@@ -41,7 +41,6 @@ public class PopulateFactory {
 
     public static final String BUILD_METHOD = "build";
     public static final String BUILDER_METHOD = "builder";
-    public static final String KOTLIN_DEFAULT_CONSTRUCTOR_MARKER = "DefaultConstructorMarker";
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
@@ -238,7 +237,7 @@ public class PopulateFactory {
         int parameterCount = constructor.getParameterCount();
         classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), parameterCount);
         Class<?>[] parameterTypes = constructor.getParameterTypes();
-        if (parameterTypes.length > 0 && parameterTypes[parameterTypes.length - 1].getSimpleName().equals(KOTLIN_DEFAULT_CONSTRUCTOR_MARKER)) {
+        if (isKotlinConstructor(parameterTypes)) {
             Object[] arguments = IntStream.range(0, parameterCount - 2).mapToObj(i -> continuePopulateUsingConstructor(constructor, classCarrier, i)).toArray();
             int mask = (1 << (parameterCount - 2)) - 1;
             return constructor.newInstance(Stream.concat(Arrays.stream(arguments), Stream.of(mask, null)).toArray());
