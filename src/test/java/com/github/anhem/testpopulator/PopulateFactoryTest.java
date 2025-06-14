@@ -6,6 +6,7 @@ import com.github.anhem.testpopulator.model.java.field.Fields;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoWithMultipleCustomSetters;
+import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
 import com.github.anhem.testpopulator.readme.model.MyClass2;
 import com.github.anhem.testpopulator.readme.model.MyUUID;
@@ -51,6 +52,7 @@ class PopulateFactoryTest {
         assertPopulatedObject(populateFactory.populate(MyClass2.class));
         assertPopulatedObject(populateFactory.populate(PojoPrivateConstructor.class));
         assertPopulatedObject(populateFactory.populate(Fields.class));
+        assertPopulatedObject(populateFactory.populate(KotlinLikeClass.class));
     }
 
     private <T> void assertPopulatedObject(T object) {

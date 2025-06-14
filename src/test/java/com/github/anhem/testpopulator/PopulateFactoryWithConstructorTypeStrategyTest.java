@@ -5,6 +5,7 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.constructor.*;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
+import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -189,6 +190,17 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
+    @Test
+    void kotlinLikeClass() {
+        populateConfig = populateConfig.toBuilder()
+                .objectFactoryEnabled(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        KotlinLikeClass value_1 = populateAndAssert(KotlinLikeClass.class);
+        KotlinLikeClass value_2 = populateAndAssert(KotlinLikeClass.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR);
@@ -206,6 +218,7 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         T value = populateFactory.populate(clazz);
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(clazz);
+        assertThat(value).hasNoNullFieldsOrProperties();
 
         return value;
     }

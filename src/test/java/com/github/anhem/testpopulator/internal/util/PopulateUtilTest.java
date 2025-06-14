@@ -7,6 +7,8 @@ import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
+import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
+import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass.DefaultConstructorMarker;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.HasBlackListed;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
@@ -347,7 +349,7 @@ class PopulateUtilTest {
 
     @Test
     void isKotlinConstructorReturnsTrue() throws NoSuchMethodException {
-        assertThat(isKotlinConstructor(KotlinLikeClass.class.getConstructor(String.class, int.class, DefaultConstructorMarker.class))).isTrue();
+        assertThat(isKotlinConstructor(KotlinLikeClass.class.getConstructor(String.class, int.class, KotlinLikeClass.InnerClass.class, int.class, DefaultConstructorMarker.class))).isTrue();
         assertThat(isKotlinConstructor(KotlinLikeClass.class.getConstructor(DefaultConstructorMarker.class))).isTrue();
     }
 
@@ -378,17 +380,6 @@ class PopulateUtilTest {
         }
 
         public JavaClass(String a, int b) {
-        }
-    }
-
-    private static class DefaultConstructorMarker {
-    }
-
-    private static class KotlinLikeClass {
-        public KotlinLikeClass(String value, int id, DefaultConstructorMarker marker) {
-        }
-
-        public KotlinLikeClass(DefaultConstructorMarker marker) {
         }
     }
 }
