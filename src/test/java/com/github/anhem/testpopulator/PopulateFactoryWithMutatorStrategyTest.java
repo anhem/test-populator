@@ -1,11 +1,9 @@
 package com.github.anhem.testpopulator;
 
-import com.github.anhem.testpopulator.config.ConstructorType;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.immutables.ImmutableImmutablesAbstract;
-import com.github.anhem.testpopulator.model.immutables.ImmutablesAbstract;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithConstructor;
