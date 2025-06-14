@@ -32,7 +32,7 @@ public class ObjectBuilderUtil {
     }
 
     public static void addImport(Class<?> clazz, Object value, Set<String> imports, Set<String> staticImports) {
-        if (clazz != null && !clazz.getName().startsWith("java.lang.")) {
+        if (clazz != null && !clazz.getName().startsWith("java.lang.") && !clazz.getName().equals("java.sql.Date")) {
             if (isMapEntry(clazz)) {
                 staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
                 imports.add("java.util.AbstractMap");

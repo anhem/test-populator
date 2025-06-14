@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,5 +37,14 @@ public abstract class AllArgsConstructorAbstract {
     private final ArbitraryEnum arbitraryEnum;
     private final String[] arrayOfStrings;
     private final Date date;
+    private final LocalTime localTime;
+    private final BigInteger bigInteger;
+    private final OffsetDateTime offsetDateTime;
+    private final OffsetTime offsetTime;
+    private final Duration duration;
+    private final Period period;
+    private final java.sql.Date sqlDate;
+    private final Time sqlTime;
+    private final Timestamp sqlTimestamp;
 
 }

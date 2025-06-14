@@ -262,7 +262,7 @@ public class ObjectBuilder {
         if (isNullValue()) {
             return List.of();
         }
-        return List.of(String.format(NEW_VALUE, PSF, clazz.getSimpleName(), name, value));
+        return List.of(String.format(NEW_VALUE, PSF, clazz == java.sql.Date.class ? clazz.getName() : clazz.getSimpleName(), name, value));
     }
 
     public boolean isNullValue() {

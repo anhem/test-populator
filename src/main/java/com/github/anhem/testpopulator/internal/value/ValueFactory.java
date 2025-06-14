@@ -5,6 +5,9 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.util.RandomUtil;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
 
@@ -16,6 +19,7 @@ public class ValueFactory {
     private static final ZonedDateTime ZONED_DATE_TIME = LOCAL_DATE_TIME.atZone(ZoneId.of("UTC"));
     private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();
     private static final LocalDate LOCAL_DATE = LOCAL_DATE_TIME.toLocalDate();
+    private static final LocalTime LOCAL_TIME = LOCAL_DATE_TIME.toLocalTime();
     private static final Date DATE = Date.from(INSTANT);
     private static final String STRING = "string";
     private static final Boolean BOOLEAN = Boolean.TRUE;
@@ -28,6 +32,15 @@ public class ValueFactory {
     private static final byte BYTE = 1;
     private static final short SHORT = 1;
     private static final float FLOAT = 1;
+    private static final BigInteger BIG_INTEGER = BigInteger.ONE;
+    private static final OffsetDateTime OFFSET_DATE_TIME = ZONED_DATE_TIME.toOffsetDateTime();
+    private static final OffsetTime OFFSET_TIME = ZONED_DATE_TIME.toOffsetDateTime().toOffsetTime();
+    private static final Duration DURATION = Duration.ofDays(1);
+    private static final Period PERIOD = Period.ofDays(1);
+    private static final java.sql.Date SQL_DATE = java.sql.Date.valueOf(LOCAL_DATE);
+    private static final Time SQL_TIME = Time.valueOf(LOCAL_TIME);
+    private static final Timestamp SQL_TIMESTAMP = Timestamp.from(INSTANT);
+
 
     private final boolean setRandomValues;
     private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
@@ -53,12 +66,21 @@ public class ValueFactory {
         typeSuppliers.put(Boolean.class, this::getBoolean);
         typeSuppliers.put(boolean.class, this::getBoolean);
         typeSuppliers.put(BigDecimal.class, this::getBigDecimal);
+        typeSuppliers.put(BigInteger.class, this::getBigInteger);
         typeSuppliers.put(String.class, this::getString);
         typeSuppliers.put(LocalDate.class, this::getLocalDate);
+        typeSuppliers.put(LocalTime.class, this::getLocalTime);
         typeSuppliers.put(LocalDateTime.class, this::getLocalDateTime);
+        typeSuppliers.put(OffsetTime.class, this::getOffsetTime);
+        typeSuppliers.put(OffsetDateTime.class, this::getOffsetDateTime);
         typeSuppliers.put(ZonedDateTime.class, this::getZonedDateTime);
         typeSuppliers.put(Instant.class, this::getInstant);
+        typeSuppliers.put(Duration.class, this::getDuration);
+        typeSuppliers.put(Period.class, this::getPeriod);
         typeSuppliers.put(Date.class, this::getDate);
+        typeSuppliers.put(java.sql.Date.class, this::getSqlDate);
+        typeSuppliers.put(Time.class, this::getSqlTime);
+        typeSuppliers.put(Timestamp.class, this::getSqlTimestamp);
         typeSuppliers.put(Character.class, this::getChar);
         typeSuppliers.put(char.class, this::getChar);
         typeSuppliers.put(UUID.class, this::getUUID);
@@ -151,5 +173,41 @@ public class ValueFactory {
 
     private Byte getByte() {
         return setRandomValues ? getRandomByte() : BYTE;
+    }
+
+    private BigInteger getBigInteger() {
+        return setRandomValues ? BigInteger.valueOf(getLong()) : BIG_INTEGER;
+    }
+
+    private LocalTime getLocalTime() {
+        return setRandomValues ? getRandomLocalDateTime().toLocalTime() : LOCAL_TIME;
+    }
+
+    private OffsetDateTime getOffsetDateTime() {
+        return setRandomValues ? getZonedDateTime().toOffsetDateTime() : OFFSET_DATE_TIME;
+    }
+
+    private OffsetTime getOffsetTime() {
+        return setRandomValues ? getZonedDateTime().toOffsetDateTime().toOffsetTime() : OFFSET_TIME;
+    }
+
+    private Duration getDuration() {
+        return setRandomValues ? Duration.ofSeconds(getLong()) : DURATION;
+    }
+
+    private Period getPeriod() {
+        return setRandomValues ? Period.ofDays(getRandomInt()) : PERIOD;
+    }
+
+    private java.sql.Date getSqlDate() {
+        return setRandomValues ? java.sql.Date.valueOf(getLocalDate()) : SQL_DATE;
+    }
+
+    private Time getSqlTime() {
+        return setRandomValues ? Time.valueOf(getLocalTime()) : SQL_TIME;
+    }
+
+    private Timestamp getSqlTimestamp() {
+        return setRandomValues ? Timestamp.from(getInstant()) : SQL_TIMESTAMP;
     }
 }
