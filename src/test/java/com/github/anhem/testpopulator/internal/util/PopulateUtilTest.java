@@ -338,6 +338,19 @@ class PopulateUtilTest {
         assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, SMALLEST).getParameterCount());
     }
 
+    @Test
+    void isKotlinConstructorReturnsFalse() throws NoSuchMethodException {
+        assertThat(isKotlinConstructor(JavaClass.class.getConstructor())).isFalse();
+        assertThat(isKotlinConstructor(JavaClass.class.getConstructor(String.class))).isFalse();
+        assertThat(isKotlinConstructor(JavaClass.class.getConstructor(String.class, int.class))).isFalse();
+    }
+
+    @Test
+    void isKotlinConstructorReturnsTrue() throws NoSuchMethodException {
+        assertThat(isKotlinConstructor(KotlinLikeClass.class.getConstructor(String.class, int.class, DefaultConstructorMarker.class))).isTrue();
+        assertThat(isKotlinConstructor(KotlinLikeClass.class.getConstructor(DefaultConstructorMarker.class))).isTrue();
+    }
+
     private static ClassCarrier<String> createClassCarrier() {
         return Carrier.initialize(String.class, new ObjectFactoryVoid());
     }
@@ -355,5 +368,27 @@ class PopulateUtilTest {
                 .filter(p -> p.getType().equals(Set.class))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    private static class JavaClass {
+        public JavaClass() {
+        }
+
+        public JavaClass(String a) {
+        }
+
+        public JavaClass(String a, int b) {
+        }
+    }
+
+    private static class DefaultConstructorMarker {
+    }
+
+    private static class KotlinLikeClass {
+        public KotlinLikeClass(String value, int id, DefaultConstructorMarker marker) {
+        }
+
+        public KotlinLikeClass(DefaultConstructorMarker marker) {
+        }
     }
 }
