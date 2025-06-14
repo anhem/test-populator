@@ -4,11 +4,11 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -38,8 +38,17 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Date.class, object -> String.format("new Date(%sL)", ((Date) object).getTime()));
         stringSuppliers.put(UUID.class, object -> String.format("UUID.fromString(\"%s\")", object));
         stringSuppliers.put(Byte.class, object -> String.format("Byte.parseByte(\"%s\")", object));
-        stringSuppliers.put(Short.class, object -> String.format("Short.valueOf(\"%s\")", object));
+        stringSuppliers.put(Short.class, object -> String.format("Short.parseShort(\"%s\")", object));
         stringSuppliers.put(Float.class, object -> object + "f");
+        stringSuppliers.put(LocalTime.class, object -> String.format("LocalTime.parse(\"%s\")", object));
+        stringSuppliers.put(BigInteger.class, object -> String.format("BigInteger.valueOf(%d)", ((BigInteger) object).intValue()));
+        stringSuppliers.put(OffsetDateTime.class, object -> String.format("OffsetDateTime.parse(\"%s\")", object));
+        stringSuppliers.put(OffsetTime.class, object -> String.format("OffsetTime.parse(\"%s\")", object));
+        stringSuppliers.put(Duration.class, object -> String.format("Duration.ofSeconds(%d)", ((Duration) object).getSeconds()));
+        stringSuppliers.put(Period.class, object -> String.format("Period.ofDays(%d)", ((Period) object).getDays()));
+        stringSuppliers.put(java.sql.Date.class, object -> String.format("java.sql.Date.valueOf(\"%s\")", object.toString()));
+        stringSuppliers.put(Time.class, object -> String.format("Time.valueOf(\"%s\")", object.toString()));
+        stringSuppliers.put(Timestamp.class, object -> String.format("Timestamp.valueOf(\"%s\")", object.toString()));
     }
 
     private final PopulateConfig populateConfig;
