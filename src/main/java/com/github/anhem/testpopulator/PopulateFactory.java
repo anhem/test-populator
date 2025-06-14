@@ -238,8 +238,7 @@ public class PopulateFactory {
         classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), parameterCount);
         if (populateConfig.isKotlinSupport() && isKotlinConstructor(constructor)) {
             Object[] arguments = IntStream.range(0, parameterCount - 2).mapToObj(i -> populateConstructorArgument(constructor, classCarrier, i)).toArray();
-            int mask = (1 << (parameterCount - 2)) - 1;
-            return constructor.newInstance(Stream.concat(Arrays.stream(arguments), Stream.of(mask, null)).toArray());
+            return constructor.newInstance(Stream.concat(Arrays.stream(arguments), Stream.of(0, null)).toArray());
         } else {
             Object[] arguments = IntStream.range(0, parameterCount).mapToObj(i -> populateConstructorArgument(constructor, classCarrier, i)).toArray();
             return constructor.newInstance(arguments);
