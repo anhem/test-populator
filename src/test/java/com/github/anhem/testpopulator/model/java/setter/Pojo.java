@@ -6,10 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.*;
 import java.util.*;
 
 @Getter
@@ -47,5 +47,14 @@ public class Pojo {
     private short primitiveShortValue;
     private Float floatValue;
     private float primitiveFloatValue;
+    private LocalTime localTime;
+    private BigInteger bigInteger;
+    private OffsetDateTime offsetDateTime;
+    private OffsetTime offsetTime;
+    private Duration duration;
+    private Period period;
+    private java.sql.Date sqlDate;
+    private Time sqlTime;
+    private Timestamp sqlTimestamp;
 
 }
