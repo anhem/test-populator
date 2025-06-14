@@ -236,8 +236,7 @@ public class PopulateFactory {
     private <T> T createInstanceFromConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         int parameterCount = constructor.getParameterCount();
         classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), parameterCount);
-        Class<?>[] parameterTypes = constructor.getParameterTypes();
-        if (isKotlinConstructor(parameterTypes)) {
+        if (isKotlinConstructor(constructor)) {
             Object[] arguments = IntStream.range(0, parameterCount - 2).mapToObj(i -> populateConstructorArgument(constructor, classCarrier, i)).toArray();
             int mask = (1 << (parameterCount - 2)) - 1;
             return constructor.newInstance(Stream.concat(Arrays.stream(arguments), Stream.of(mask, null)).toArray());

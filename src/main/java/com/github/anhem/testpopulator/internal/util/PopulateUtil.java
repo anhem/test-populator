@@ -313,8 +313,8 @@ public class PopulateUtil {
         }
     }
 
-    public static boolean isKotlinConstructor(Class<?>[] parameterTypes) {
+    public static <T> boolean isKotlinConstructor(Constructor<T> constructor) {
+        Class<?>[] parameterTypes = constructor.getParameterTypes();
         return parameterTypes.length > 0 && parameterTypes[parameterTypes.length - 1].getSimpleName().equals(KOTLIN_DEFAULT_CONSTRUCTOR_MARKER);
     }
-
 }
