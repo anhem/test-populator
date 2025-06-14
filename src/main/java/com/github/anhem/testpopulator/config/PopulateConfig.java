@@ -24,6 +24,7 @@ public class PopulateConfig {
     public static final boolean DEFAULT_OBJECT_FACTORY_ENABLED = false;
     public static final boolean DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY = false;
     public static final ConstructorType DEFAULT_CONSTRUCTOR_TYPE = NO_ARGS;
+    public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
 
     public static class PopulateConfigBuilder {
 
@@ -38,6 +39,7 @@ public class PopulateConfig {
         private Boolean objectFactoryEnabled;
         private Boolean nullOnCircularDependency;
         private ConstructorType constructorType;
+        private Boolean kotlinSupport;
 
         /**
          * Set blacklisted methods. I.E methods that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
@@ -221,6 +223,17 @@ public class PopulateConfig {
             return this;
         }
 
+        /**
+         * Whether to support constructors created using Kotlin
+         *
+         * @param kotlinSupport true/false
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder kotlinSupport(boolean kotlinSupport) {
+            this.kotlinSupport = kotlinSupport;
+            return this;
+        }
+
         public PopulateConfig build() {
             PopulateConfig populateConfig = new PopulateConfig(
                     blacklistedMethods,
@@ -233,7 +246,8 @@ public class PopulateConfig {
                     setterPrefixes,
                     objectFactoryEnabled,
                     nullOnCircularDependency,
-                    constructorType
+                    constructorType,
+                    kotlinSupport
             );
             populateConfig.validate();
             return populateConfig;
@@ -255,6 +269,7 @@ public class PopulateConfig {
     private final boolean objectFactoryEnabled;
     private final boolean nullOnCircularDependency;
     private final ConstructorType constructorType;
+    private final boolean kotlinSupport;
 
     private PopulateConfig(List<String> blacklistedMethods,
                            List<String> blacklistedFields,
@@ -266,7 +281,8 @@ public class PopulateConfig {
                            List<String> setterPrefixes,
                            Boolean objectFactoryEnabled,
                            Boolean nullOnCircularDependency,
-                           ConstructorType constructorType
+                           ConstructorType constructorType,
+                           Boolean kotlinSupport
     ) {
         this.blacklistedMethods = blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : blacklistedMethods;
         this.blacklistedFields = blacklistedFields.isEmpty() ? DEFAULT_BLACKLISTED_FIELDS : blacklistedFields;
@@ -279,6 +295,7 @@ public class PopulateConfig {
         this.objectFactoryEnabled = objectFactoryEnabled == null ? DEFAULT_OBJECT_FACTORY_ENABLED : objectFactoryEnabled;
         this.nullOnCircularDependency = nullOnCircularDependency == null ? DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY : nullOnCircularDependency;
         this.constructorType = constructorType == null ? DEFAULT_CONSTRUCTOR_TYPE : constructorType;
+        this.kotlinSupport = kotlinSupport == null ? DEFAULT_KOTLIN_SUPPORT : kotlinSupport;
     }
 
     public List<String> getBlacklistedMethods() {
@@ -325,6 +342,10 @@ public class PopulateConfig {
         return constructorType;
     }
 
+    public boolean isKotlinSupport() {
+        return kotlinSupport;
+    }
+
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -342,7 +363,8 @@ public class PopulateConfig {
                 .setterPrefixes(new ArrayList<>(setterPrefixes))
                 .objectFactoryEnabled(objectFactoryEnabled)
                 .nullOnCircularDependency(nullOnCircularDependency)
-                .constructorType(constructorType);
+                .constructorType(constructorType)
+                .kotlinSupport(kotlinSupport);
     }
 
     private void validate() {
@@ -371,6 +393,7 @@ public class PopulateConfig {
                 ", objectFactoryEnabled=" + objectFactoryEnabled +
                 ", nullOnCircularDependency=" + nullOnCircularDependency +
                 ", constructorType=" + constructorType +
+                ", kotlinSupport=" + kotlinSupport +
                 '}';
     }
 }

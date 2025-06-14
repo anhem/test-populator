@@ -21,6 +21,7 @@ import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGe
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PopulateFactoryWithConstructorTypeStrategyTest {
 
@@ -194,11 +195,22 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
     void kotlinLikeClass() {
         populateConfig = populateConfig.toBuilder()
                 .objectFactoryEnabled(false)
+                .kotlinSupport(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         KotlinLikeClass value_1 = populateAndAssert(KotlinLikeClass.class);
         KotlinLikeClass value_2 = populateAndAssert(KotlinLikeClass.class);
         assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void kotlinLikeClassThrowsExceptionWhenKotlinSupportIsFalse() {
+        populateConfig = populateConfig.toBuilder()
+                .objectFactoryEnabled(false)
+                .kotlinSupport(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        assertThrows(PopulateException.class, () -> populateFactory.populate(KotlinLikeClass.class));
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

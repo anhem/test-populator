@@ -41,6 +41,7 @@ class PopulateFactoryTest {
                 .objectFactoryEnabled(false)
                 .nullOnCircularDependency(true)
                 .constructorType(LARGEST)
+                .kotlinSupport(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
