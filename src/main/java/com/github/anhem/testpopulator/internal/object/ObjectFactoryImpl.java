@@ -16,11 +16,13 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.NULL;
 import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.*;
+import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.useFullyQualifiedName;
 
 public class ObjectFactoryImpl implements ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
 
+    private static final String NEW_PREFIX = "new ";
     private static final Map<Class<?>, Function<Object, String>> stringSuppliers = new HashMap<>();
 
     static {
@@ -46,18 +48,20 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(OffsetTime.class, object -> String.format("OffsetTime.parse(\"%s\")", object));
         stringSuppliers.put(Duration.class, object -> String.format("Duration.ofSeconds(%d)", ((Duration) object).getSeconds()));
         stringSuppliers.put(Period.class, object -> String.format("Period.ofDays(%d)", ((Period) object).getDays()));
-        stringSuppliers.put(java.sql.Date.class, object -> String.format("java.sql.Date.valueOf(\"%s\")", object.toString()));
+        stringSuppliers.put(java.sql.Date.class, object -> String.format("Date.valueOf(\"%s\")", object.toString()));
         stringSuppliers.put(Time.class, object -> String.format("Time.valueOf(\"%s\")", object.toString()));
         stringSuppliers.put(Timestamp.class, object -> String.format("Timestamp.valueOf(\"%s\")", object.toString()));
     }
 
     private final PopulateConfig populateConfig;
-    private final Map<Class<?>, Integer> classCounters;
+    private final Map<String, Integer> classNameCounters;
+    private final Map<String, Class<?>> classNames;
     private ObjectBuilder currentObjectBuilder;
 
     public ObjectFactoryImpl(PopulateConfig populateConfig) {
         this.populateConfig = populateConfig;
-        this.classCounters = new HashMap<>();
+        this.classNameCounters = new HashMap<>();
+        this.classNames = new HashMap<>();
     }
 
     @Override
@@ -82,7 +86,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public void method(String methodName, int expectedChildren) {
-        setNextObjectBuilder(new ObjectBuilder(methodName, METHOD, expectedChildren));
+        setNextObjectBuilder(new ObjectBuilder(methodName, expectedChildren));
         if (expectedChildren == 0) {
             setPreviousObjectBuilder();
         }
@@ -134,7 +138,16 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void value(T value) {
         setNextObjectBuilder(value.getClass(), VALUE, 0);
-        currentObjectBuilder.setValue(toStringValue(value));
+        String stringValue = toStringValue(value);
+        if (currentObjectBuilder.isUseFullyQualifiedName()) {
+            if (stringValue.startsWith(NEW_PREFIX)) {
+                currentObjectBuilder.setValue(String.format("%s%s.%s", NEW_PREFIX, currentObjectBuilder.getClazz().getPackageName(), stringValue.replace(NEW_PREFIX, "")));
+            } else {
+                currentObjectBuilder.setValue(String.format("%s.%s", currentObjectBuilder.getClazz().getPackageName(), stringValue));
+            }
+        } else {
+            currentObjectBuilder.setValue(stringValue);
+        }
         setPreviousObjectBuilder();
     }
 
@@ -186,12 +199,13 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
+        boolean useFullyQualifiedName = useFullyQualifiedName(clazz, classNames);
         if (currentObjectBuilder == null) {
-            currentObjectBuilder = new ObjectBuilder(clazz, getName(clazz), buildType, expectedChildren);
+            currentObjectBuilder = new ObjectBuilder(clazz, getName(clazz), buildType, useFullyQualifiedName, expectedChildren);
         } else if (buildType == MUTATOR) {
-            setNextObjectBuilder(new ObjectBuilder(clazz, currentObjectBuilder.getName(), buildType, expectedChildren));
+            setNextObjectBuilder(new ObjectBuilder(clazz, currentObjectBuilder.getName(), buildType, useFullyQualifiedName, expectedChildren));
         } else {
-            setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), buildType, expectedChildren));
+            setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), buildType, useFullyQualifiedName, expectedChildren));
         }
     }
 
@@ -208,10 +222,10 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private String getName(Class<?> clazz) {
-        int classCounter = classCounters.computeIfAbsent(clazz, k -> 0);
+        int classCounter = classNameCounters.computeIfAbsent(clazz.getSimpleName(), k -> 0);
         String simpleName = clazz.getSimpleName();
         String name = String.format("%s_%d", Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1), classCounter);
-        classCounters.put(clazz, ++classCounter);
+        classNameCounters.put(clazz.getSimpleName(), ++classCounter);
         return name;
     }
 }

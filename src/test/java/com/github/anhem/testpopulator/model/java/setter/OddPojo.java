@@ -24,5 +24,6 @@ public class OddPojo {
     private Map<String, List<Pojo>> mapOfStringToPojoList;
     private Map<List<String>, List<Pojo>> mapOfStringListToPojoMap;
     private List<List<List<Pojo>>> weirdPojoList;
+    private List<DateAndTimeMix> dateAndTimeMixes;
 
 }
