@@ -100,6 +100,7 @@ MyClass myClass = populateFactory.populate(myClass.class);
 | objectFactoryEnabled        | Experimental! true / false                   | false                           |    
 | nullOnCircularDependency    | true / false                                 | false                           |    
 | constructorType             | NO_ARG, SMALLEST, LARGEST                    | NO_ARG                          |    
+| kotlinSupport               | true / false                                 | false                           |    
 
 ### strategyOrder
 
@@ -258,7 +259,11 @@ By enabling this the circle is broken by setting those values to `null`.
 
 Set what constructor is preferred when creating objects.
 
-SMALLEST will attempt to pick a constructor with at least one parameter and fall back on NO_ARG if none is found.
+`SMALLEST` will attempt to pick a constructor with at least one parameter and fall back on `NO_ARG` if none is found.
+
+### kotlinSupport
+
+Enable for `test-populator` to understand Kotlin constructors with default values.
 
 ## ToBuilder
 

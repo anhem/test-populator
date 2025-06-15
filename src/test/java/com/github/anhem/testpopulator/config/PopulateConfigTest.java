@@ -34,6 +34,7 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedFields()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.isObjectFactoryEnabled()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.isNullOnCircularDependency()).isFalse();
+        assertThat(DEFAULT_POPULATE_CONFIG.isKotlinSupport()).isFalse();
         assertEqual(DEFAULT_POPULATE_CONFIG.toBuilder().build(), DEFAULT_POPULATE_CONFIG);
     }
 
@@ -48,6 +49,7 @@ class PopulateConfigTest {
                 .randomValues(false)
                 .accessNonPublicConstructors(true)
                 .nullOnCircularDependency(true)
+                .kotlinSupport(true)
                 .build();
 
         assertThat(populateConfig.getStrategyOrder()).hasSize(2);
@@ -60,6 +62,7 @@ class PopulateConfigTest {
         assertThat(populateConfig.getSetterPrefixes()).hasSize(1);
         assertThat(populateConfig.getSetterPrefixes().iterator().next()).isEqualTo("with");
         assertThat(populateConfig.isNullOnCircularDependency()).isTrue();
+        assertThat(populateConfig.isKotlinSupport()).isTrue();
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
     }
 
@@ -74,6 +77,7 @@ class PopulateConfigTest {
                 .randomValues(true)
                 .accessNonPublicConstructors(false)
                 .nullOnCircularDependency(false)
+                .kotlinSupport(false)
                 .build();
 
         assertThat(populateConfig.getStrategyOrder()).hasSize(2);
@@ -86,6 +90,7 @@ class PopulateConfigTest {
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
         assertThat(populateConfig.getSetterPrefixes()).containsExactly("also", "with", "as");
         assertThat(populateConfig.isNullOnCircularDependency()).isFalse();
+        assertThat(populateConfig.isKotlinSupport()).isFalse();
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
     }
 
