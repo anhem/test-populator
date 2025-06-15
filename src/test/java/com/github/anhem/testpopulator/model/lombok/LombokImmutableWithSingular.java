@@ -5,8 +5,10 @@ import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -40,4 +42,19 @@ public class LombokImmutableWithSingular {
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
     Date date;
+    Byte byteValue;
+    byte primitiveByteValue;
+    Short shortValue;
+    short primitiveShortValue;
+    Float floatValue;
+    float primitiveFloatValue;
+    LocalTime localTime;
+    BigInteger bigInteger;
+    OffsetDateTime offsetDateTime;
+    OffsetTime offsetTime;
+    Duration duration;
+    Period period;
+    java.sql.Date sqlDate;
+    Time sqlTime;
+    Timestamp sqlTimestamp;
 }

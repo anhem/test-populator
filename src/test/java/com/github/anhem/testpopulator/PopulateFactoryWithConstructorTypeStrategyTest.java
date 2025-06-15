@@ -189,6 +189,13 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
+    @Test
+    void allArgsConstructorDateAndTimeMix() {
+        AllArgsConstructorDateAndTimeMix value_1 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
+        AllArgsConstructorDateAndTimeMix value_2 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR);

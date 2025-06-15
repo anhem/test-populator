@@ -204,6 +204,13 @@ class PopulateFactoryWithSetterStrategyTest {
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
+    @Test
+    void dateAndTimeMix() {
+        DateAndTimeMix value_1 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
+        DateAndTimeMix value_2 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(SETTER);

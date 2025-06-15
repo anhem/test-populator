@@ -4,6 +4,8 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
+import com.github.anhem.testpopulator.model.java.field.Fields;
+import com.github.anhem.testpopulator.model.java.field.FieldsDateAndTimeMix;
 import com.github.anhem.testpopulator.model.java.setter.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.BeforeEach;
@@ -138,6 +140,20 @@ class PopulateFactoryWithFieldStrategyTest {
     @Test
     void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
         assertThatThrownBy(() -> populateFactory.populate(A.class)).isInstanceOfAny(PopulateException.class, StackOverflowError.class);
+    }
+
+    @Test
+    void fields() {
+        Fields value_1 = populateAndAssert(Fields.class);
+        Fields value_2 = populateAndAssert(Fields.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void fieldsDateAndTimeMix() {
+        FieldsDateAndTimeMix value_1 = populateAndAssert(FieldsDateAndTimeMix.class);
+        FieldsDateAndTimeMix value_2 = populateAndAssert(FieldsDateAndTimeMix.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     private A getPopulate() {
