@@ -4,10 +4,7 @@ import com.github.anhem.testpopulator.internal.object.BuildType;
 import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
 
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
@@ -31,8 +28,8 @@ public class ObjectBuilderUtil {
         return String.format("%s_TestData", clazz.getSimpleName());
     }
 
-    public static void addImport(Class<?> clazz, Object value, Set<String> imports, Set<String> staticImports) {
-        if (clazz != null && !clazz.getName().startsWith("java.lang.") && !clazz.getName().equals("java.sql.Date")) {
+    public static void addImport(Class<?> clazz, Object value, boolean useFullyQualifiedName, Set<String> imports, Set<String> staticImports) {
+        if (clazz != null && !useFullyQualifiedName && !clazz.getName().startsWith("java.lang.")) {
             if (isMapEntry(clazz)) {
                 staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
                 imports.add("java.util.AbstractMap");
@@ -76,6 +73,21 @@ public class ObjectBuilderUtil {
                     .allMatch(ObjectBuilder::isNullValue);
         }
         return false;
+    }
+
+    public static boolean useFullyQualifiedName(Class<?> clazz, Map<String, Class<?>> classNames) {
+        if (requiresImport(clazz)) {
+            Class<?> existingClass = classNames.get(clazz.getSimpleName());
+            if (existingClass == null) {
+                classNames.put(clazz.getSimpleName(), clazz);
+                return false;
+            } else return !existingClass.equals(clazz);
+        }
+        return false;
+    }
+
+    private static boolean requiresImport(Class<?> clazz) {
+        return !"java.lang".equals(clazz.getPackageName());
     }
 
 }

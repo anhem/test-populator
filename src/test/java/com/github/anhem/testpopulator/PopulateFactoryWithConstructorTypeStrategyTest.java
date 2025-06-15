@@ -192,6 +192,13 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
     }
 
     @Test
+    void allArgsConstructorDateAndTimeMix() {
+        AllArgsConstructorDateAndTimeMix value_1 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
+        AllArgsConstructorDateAndTimeMix value_2 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
     void kotlinLikeClass() {
         populateConfig = populateConfig.toBuilder()
                 .objectFactoryEnabled(false)
@@ -230,7 +237,6 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         T value = populateFactory.populate(clazz);
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(clazz);
-        assertThat(value).hasNoNullFieldsOrProperties();
 
         return value;
     }

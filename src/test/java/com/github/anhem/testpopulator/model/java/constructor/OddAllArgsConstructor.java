@@ -16,5 +16,6 @@ public class OddAllArgsConstructor {
     private final List<AllArgsConstructor> allArgsConstructorList;
     private final Set<AllArgsConstructor> allArgsConstructorSet;
     private final Map<AllArgsConstructor, AllArgsConstructor> allArgsConstructorMap;
+    private final AllArgsConstructorDateAndTimeMix allArgsConstructorDateAndTimeMix;
 
 }

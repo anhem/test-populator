@@ -4,8 +4,10 @@ import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import lombok.Builder;
 import lombok.Value;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.*;
 import java.util.*;
 
 @Value
@@ -33,4 +35,19 @@ public class LombokImmutable {
     HashMap<String, String> hashMap;
     HashSet<String> hashSet;
     Date date;
+    Byte byteValue;
+    byte primitiveByteValue;
+    Short shortValue;
+    short primitiveShortValue;
+    Float floatValue;
+    float primitiveFloatValue;
+    LocalTime localTime;
+    BigInteger bigInteger;
+    OffsetDateTime offsetDateTime;
+    OffsetTime offsetTime;
+    Duration duration;
+    Period period;
+    java.sql.Date sqlDate;
+    Time sqlTime;
+    Timestamp sqlTimestamp;
 }

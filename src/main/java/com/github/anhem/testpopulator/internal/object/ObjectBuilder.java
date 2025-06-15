@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
+import static com.github.anhem.testpopulator.internal.object.BuildType.METHOD;
 import static com.github.anhem.testpopulator.internal.object.BuildType.MUTATOR;
 import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
 import static java.util.Collections.emptyList;
@@ -29,21 +30,25 @@ public class ObjectBuilder {
     private Class<?> clazz;
     private final String name;
     private final BuildType buildType;
+
+    private final boolean useFullyQualifiedName;
     private final List<ObjectBuilder> children = new ArrayList<>();
     private final int expectedChildren;
     private ObjectBuilder parent;
     private String value;
 
-    public ObjectBuilder(Class<?> clazz, String name, BuildType buildType, int expectedChildren) {
+    public ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
         this.clazz = clazz;
         this.name = name;
         this.buildType = buildType;
+        this.useFullyQualifiedName = useFullyQualifiedName;
         this.expectedChildren = expectedChildren;
     }
 
-    public ObjectBuilder(String name, BuildType buildType, int expectedChildren) {
+    public ObjectBuilder(String name, int expectedChildren) {
         this.name = name;
-        this.buildType = buildType;
+        this.buildType = METHOD;
+        this.useFullyQualifiedName = false;
         this.expectedChildren = expectedChildren;
     }
 
@@ -71,6 +76,10 @@ public class ObjectBuilder {
         return buildType;
     }
 
+    public boolean isUseFullyQualifiedName() {
+        return useFullyQualifiedName;
+    }
+
     public ObjectBuilder getParent() {
         return parent;
     }
@@ -95,7 +104,7 @@ public class ObjectBuilder {
     }
 
     private void getImports(Set<String> imports, Set<String> staticImports) {
-        addImport(clazz, value, imports, staticImports);
+        addImport(clazz, value, useFullyQualifiedName, imports, staticImports);
         children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
     }
 
@@ -153,12 +162,12 @@ public class ObjectBuilder {
             List<ObjectBuilder> otherChildren = childrenByMutator.getOrDefault(false, emptyList());
             return concatenate(
                     buildChildren(otherChildren),
-                    Stream.of(String.format(NEW_OBJECT_WITH_ARGUMENTS, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments(otherChildren))),
+                    Stream.of(String.format(NEW_OBJECT_WITH_ARGUMENTS, PSF, getClassName(), name, getClassName(), buildArguments(otherChildren))),
                     buildChildren(mutatorChildren))
                     .collect(Collectors.toList());
         } else {
             return concatenate(buildChildren(),
-                    Stream.of(String.format(NEW_OBJECT_WITH_ARGUMENTS, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
+                    Stream.of(String.format(NEW_OBJECT_WITH_ARGUMENTS, PSF, getClassName(), name, getClassName(), buildArguments())))
                     .collect(Collectors.toList());
         }
     }
@@ -166,7 +175,7 @@ public class ObjectBuilder {
     private List<String> buildSetter() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(NEW_OBJECT, PSF, clazz.getSimpleName(), name, clazz.getSimpleName())),
+                Stream.of(String.format(NEW_OBJECT, PSF, getClassName(), name, getClassName())),
                 startStaticBlock(),
                 createMethods(),
                 endStaticBlock()
@@ -185,7 +194,7 @@ public class ObjectBuilder {
     private List<String> buildBuilder() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(BUILDER, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), BUILDER_METHOD)),
+                Stream.of(String.format(BUILDER, PSF, getClassName(), name, getClassName(), BUILDER_METHOD)),
                 createMethods(),
                 endBuilder()
         ).collect(Collectors.toList());
@@ -202,7 +211,7 @@ public class ObjectBuilder {
     private List<String> buildSetOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(SET_OF, PSF, clazz.getSimpleName(), formatTypes(), name, getNullableArguments(buildArguments()))))
+                Stream.of(String.format(SET_OF, PSF, getClassName(), formatTypes(), name, getNullableArguments(buildArguments()))))
                 .collect(Collectors.toList());
     }
 
@@ -213,7 +222,7 @@ public class ObjectBuilder {
     private List<String> buildListOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(LIST_OF, PSF, clazz.getSimpleName(), formatTypes(), name, getNullableArguments(buildArguments()))))
+                Stream.of(String.format(LIST_OF, PSF, getClassName(), formatTypes(), name, getNullableArguments(buildArguments()))))
                 .collect(Collectors.toList());
     }
 
@@ -224,21 +233,21 @@ public class ObjectBuilder {
     private List<String> buildMapOf() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(MAP_OF, PSF, clazz.getSimpleName(), formatTypes(), name, getNullableArguments(buildArguments()))))
+                Stream.of(String.format(MAP_OF, PSF, getClassName(), formatTypes(), name, getNullableArguments(buildArguments()))))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildMapEntry() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(MAP_ENTRY, PSF, clazz.getSimpleName(), formatTypes(), name, buildArguments())))
+                Stream.of(String.format(MAP_ENTRY, PSF, getClassName(), formatTypes(), name, buildArguments())))
                 .collect(Collectors.toList());
     }
 
     private List<String> buildArray() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(NEW_ARRAY, PSF, clazz.getSimpleName(), name, clazz.getSimpleName(), buildArguments())))
+                Stream.of(String.format(NEW_ARRAY, PSF, getClassName(), name, getClassName(), buildArguments())))
                 .collect(Collectors.toList());
     }
 
@@ -246,12 +255,12 @@ public class ObjectBuilder {
         if (collectionHasNullValues(this)) {
             return concatenate(
                     buildChildren(),
-                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())))
+                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, getClassName(), formatTypes(), name, getClassName())))
                     .collect(Collectors.toList());
         }
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, clazz.getSimpleName(), formatTypes(), name, clazz.getSimpleName())),
+                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, getClassName(), formatTypes(), name, getClassName())),
                 startStaticBlock(),
                 createMethods(),
                 endStaticBlock()
@@ -262,11 +271,15 @@ public class ObjectBuilder {
         if (isNullValue()) {
             return List.of();
         }
-        return List.of(String.format(NEW_VALUE, PSF, clazz == java.sql.Date.class ? clazz.getName() : clazz.getSimpleName(), name, value));
+        return List.of(String.format(NEW_VALUE, PSF, getClassName(), name, value));
     }
 
     public boolean isNullValue() {
         return value != null && value.equals(NULL);
+    }
+
+    private String getClassName() {
+        return useFullyQualifiedName ? clazz.getCanonicalName() : clazz.getSimpleName();
     }
 
     private Stream<String> createMethods() {
@@ -309,9 +322,9 @@ public class ObjectBuilder {
                         return child.formatTypes();
                     }
                     if (child.getBuildType().isParameterizedType()) {
-                        return String.format("%s<%s>", child.getClazz().getSimpleName(), child.formatTypes());
+                        return String.format("%s<%s>", child.getClassName(), child.formatTypes());
                     } else {
-                        return child.getClazz().getSimpleName();
+                        return child.getClassName();
                     }
                 }).collect(Collectors.joining(ARGUMENT_DELIMITER));
 
