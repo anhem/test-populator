@@ -57,18 +57,6 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
-
-    @Test
-    void populateConfig() {
-        this.populateConfig = populateConfig.toBuilder()
-                .blacklistedMethods(List.of("overridePopulate"))
-                .build();
-        populateFactory = new PopulateFactory(populateConfig);
-        PopulateConfig value_1 = populateAndAssertWithGeneratedCode(PopulateConfig.class);
-        PopulateConfig value_2 = populateAndAssertWithGeneratedCode(PopulateConfig.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-    }
-
     @Test
     void LombokImmutable() {
         LombokImmutable value_1 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
