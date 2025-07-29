@@ -81,7 +81,7 @@ class ObjectBuilderUtilTest {
 
     @Test
     void endBuilderReturnsStreamOfString() {
-        assertThat(endBuilder()).hasSize(1).contains(".build();");
+        assertThat(endBuilder("build")).hasSize(1).contains(".build();");
     }
 
     @Test

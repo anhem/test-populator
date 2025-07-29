@@ -80,8 +80,13 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public <T> void builder(Class<T> clazz, int expectedChildren) {
-        setNextObjectBuilder(clazz, BUILDER, expectedChildren);
+    public <T> void builder(Class<T> clazz, int expectedChildren, String builderMethodName, String buildMethodName) {
+        boolean useFullyQualifiedName = useFullyQualifiedName(clazz, classNames);
+        if (currentObjectBuilder == null) {
+            currentObjectBuilder = new ObjectBuilder(clazz, getName(clazz), useFullyQualifiedName, expectedChildren, builderMethodName, buildMethodName);
+        } else {
+            setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), useFullyQualifiedName, expectedChildren, builderMethodName, buildMethodName));
+        }
     }
 
     @Override

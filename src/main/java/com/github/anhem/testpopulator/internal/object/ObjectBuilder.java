@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 import static com.github.anhem.testpopulator.internal.object.BuildType.METHOD;
 import static com.github.anhem.testpopulator.internal.object.BuildType.MUTATOR;
 import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
@@ -27,13 +26,14 @@ public class ObjectBuilder {
     private static final String NEW_ARRAY = "%s %s[] %s = new %s[]{%s};";
     private static final String NEW_VALUE = "%s %s %s = %s;";
     private static final String ARGUMENT_DELIMITER = ", ";
-    private Class<?> clazz;
+    private final Class<?> clazz;
     private final String name;
     private final BuildType buildType;
-
     private final boolean useFullyQualifiedName;
     private final List<ObjectBuilder> children = new ArrayList<>();
     private final int expectedChildren;
+    private final String builderMethodName;
+    private final String buildMethodName;
     private ObjectBuilder parent;
     private String value;
 
@@ -43,13 +43,29 @@ public class ObjectBuilder {
         this.buildType = buildType;
         this.useFullyQualifiedName = useFullyQualifiedName;
         this.expectedChildren = expectedChildren;
+        this.builderMethodName = null;
+        this.buildMethodName = null;
+    }
+
+    public ObjectBuilder(Class<?> clazz, String name, boolean useFullyQualifiedName, int expectedChildren, String builderMethodName, String buildMethodName) {
+        this.clazz = clazz;
+        this.name = name;
+        this.buildType = BuildType.BUILDER;
+        this.useFullyQualifiedName = useFullyQualifiedName;
+        this.expectedChildren = expectedChildren;
+        this.value = null;
+        this.builderMethodName = builderMethodName;
+        this.buildMethodName = buildMethodName;
     }
 
     public ObjectBuilder(String name, int expectedChildren) {
+        this.clazz = null;
         this.name = name;
         this.buildType = METHOD;
         this.useFullyQualifiedName = false;
         this.expectedChildren = expectedChildren;
+        this.builderMethodName = null;
+        this.buildMethodName = null;
     }
 
     public void addChild(ObjectBuilder child) {
@@ -194,9 +210,9 @@ public class ObjectBuilder {
     private List<String> buildBuilder() {
         return concatenate(
                 buildChildren(),
-                Stream.of(String.format(BUILDER, PSF, getClassName(), name, getClassName(), BUILDER_METHOD)),
+                Stream.of(String.format(BUILDER, PSF, getClassName(), name, getClassName(), builderMethodName)),
                 createMethods(),
-                endBuilder()
+                endBuilder(buildMethodName)
         ).collect(Collectors.toList());
     }
 
