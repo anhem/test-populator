@@ -19,7 +19,7 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
-    public <T> void builder(Class<T> clazz, int expectedChildren) {
+    public <T> void builder(Class<T> clazz, int expectedChildren, String builderMethodName, String buildMethodName) {
         //ignored
     }
 

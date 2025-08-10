@@ -7,7 +7,6 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.PopulateFactory.BUILD_METHOD;
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isJavaBaseClass;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isMapEntry;
@@ -48,8 +47,8 @@ public class ObjectBuilderUtil {
         return Objects.requireNonNull(objectBuilder.getBuildType()) == BuildType.VALUE && (isJavaBaseClass(objectBuilder.getClazz()) || objectBuilder.getClazz().isEnum());
     }
 
-    public static Stream<String> endBuilder() {
-        return Stream.of(String.format(".%s();", BUILD_METHOD));
+    public static Stream<String> endBuilder(String buildMethodName) {
+        return Stream.of(String.format(".%s();", buildMethodName));
     }
 
     public static Stream<String> startStaticBlock() {
