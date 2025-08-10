@@ -62,6 +62,11 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
         LombokImmutable value_1 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
         LombokImmutable value_2 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
         assertRandomlyPopulatedValues(value_1, value_2);
+        assertThat(List.of(value_1, value_2)).allSatisfy(value -> {
+            assertThat(value.getListOfStrings()).hasSize(1);
+            assertThat(value.getMapOfStringsToIntegers()).hasSize(1);
+            assertThat(value.getMapOfStringsToIntegers().values()).hasSize(1);
+        });
     }
 
     @Test
@@ -69,6 +74,13 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
         LombokImmutableWithSingular value_1 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
         LombokImmutableWithSingular value_2 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
         assertRandomlyPopulatedValues(value_1, value_2);
+        assertThat(List.of(value_1, value_2))
+                .allSatisfy(value -> {
+                    assertThat(value.getListOfStrings()).hasSize(2);
+                    assertThat(value.getMapOfStringsToIntegers()).hasSize(2);
+                    assertThat(value.getMapOfStringsToIntegers().values()).hasSize(2);
+                    assertThat(value.getSetOfIntegers()).hasSize(2);
+                });
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
