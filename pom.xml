@@ -4,7 +4,7 @@
 
     <groupId>com.github.anhem</groupId>
     <artifactId>test-populator</artifactId>
-    <version>0.1.19-SNAPSHOT</version>
+    <version>0.1.19</version>
     <packaging>jar</packaging>
 
     <name>test-populator</name>
@@ -32,7 +32,7 @@
         <connection>scm:git:git:github.com/anhem/test-populator.git</connection>
         <developerConnection>scm:git:git@github.com:anhem/test-populator.git</developerConnection>
         <url>https://github.com/anhem/test-populator</url>
-        <tag>develop</tag>
+        <tag>v0.1.19</tag>
     </scm>
 
     <licenses>
