@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.github.anhem.testpopulator.config.BuilderPattern.CUSTOM;
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.PopulateConfig.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -29,7 +29,7 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.canAccessNonPublicConstructors()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.getSetterPrefixes()).hasSize(1);
         assertThat(DEFAULT_POPULATE_CONFIG.getSetterPrefixes().iterator().next()).isEqualTo("set");
-        assertThat(DEFAULT_POPULATE_CONFIG.getBuilderPattern()).isNull();
+        assertThat(DEFAULT_POPULATE_CONFIG.getBuilderPattern()).isEqualTo(CUSTOM);
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedFields()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.isObjectFactoryEnabled()).isFalse();
@@ -87,15 +87,6 @@ class PopulateConfigTest {
         assertThat(populateConfig.getSetterPrefixes()).containsExactly("also", "with", "as");
         assertThat(populateConfig.isNullOnCircularDependency()).isFalse();
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
-    }
-
-    @Test
-    void settingBuilderWithoutBuilderPatternThrowsException() {
-        PopulateConfigBuilder populateConfigBuilder = DEFAULT_POPULATE_CONFIG.toBuilder()
-                .strategyOrder(BUILDER);
-
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, populateConfigBuilder::build);
-        assertThat(illegalArgumentException.getMessage()).isEqualTo(format(INVALID_CONFIG_MISSING_BUILDER_PATTERN, BUILDER, Arrays.toString(BuilderPattern.values())));
     }
 
     @Test

@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
+import static com.github.anhem.testpopulator.config.PopulateConfig.DEFAULT_BUILDER_METHOD;
 import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.getDeclaredMethods;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
@@ -21,7 +21,7 @@ class ImmutablesUtilTest {
 
     @Test
     void getMethodsForImmutablesBuilderReturnsExpectedMethods() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Object builderObject = ImmutableImmutablesInterface.class.getDeclaredMethod(BUILDER_METHOD).invoke(null);
+        Object builderObject = ImmutableImmutablesInterface.class.getDeclaredMethod(DEFAULT_BUILDER_METHOD).invoke(null);
         List<String> allMethodNames = getMethodNames(getDeclaredMethods(builderObject.getClass(), DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()));
         assertThat(allMethodNames.stream().anyMatch(methodName -> methodName.startsWith(ADD_PREFIX))).isTrue();
         assertThat(allMethodNames.stream().anyMatch(methodName -> methodName.startsWith(ADD_ALL_PREFIX))).isTrue();

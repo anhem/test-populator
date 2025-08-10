@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
+import static com.github.anhem.testpopulator.config.PopulateConfig.DEFAULT_BUILDER_METHOD;
+import static com.github.anhem.testpopulator.config.PopulateConfig.DEFAULT_BUILD_METHOD;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,7 +65,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void createObjectUsingBuilder() {
-        objectFactoryImpl.builder(MyClass.class, 2);
+        objectFactoryImpl.builder(MyClass.class, 2, DEFAULT_BUILDER_METHOD, DEFAULT_BUILD_METHOD);
         objectFactoryImpl.method("string", 1);
         objectFactoryImpl.value("myString");
         objectFactoryImpl.method("integer", 1);

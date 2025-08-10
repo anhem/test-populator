@@ -10,7 +10,6 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.PopulateFactory.BUILDER_METHOD;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getImmutablesGeneratedClass;
@@ -51,6 +50,12 @@ public class PopulateUtil {
     public static <T> List<Method> getMutatorMethods(Class<T> clazz, List<String> blacklistedMethods) {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> isMutatorMethod(method, clazz))
+                .collect(Collectors.toList());
+    }
+
+    public static <T> List<Method> getMethodsForCustomBuilder(Class<T> clazz, List<String> blacklistedMethods) {
+        return getDeclaredMethods(clazz, blacklistedMethods).stream()
+                .filter(method -> method.getReturnType().equals(clazz) && method.getParameters().length > 0)
                 .collect(Collectors.toList());
     }
 
@@ -116,13 +121,13 @@ public class PopulateUtil {
         return strategy.equals(FIELD) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor);
     }
 
-    public static <T> boolean isMatchingBuilderStrategy(Strategy strategy, Class<T> clazz, BuilderPattern builderPattern) {
+    public static <T> boolean isMatchingBuilderStrategy(Strategy strategy, Class<T> clazz, BuilderPattern builderPattern, String builderMethod) {
         if (strategy.equals(BUILDER)) {
             try {
                 if (builderPattern.equals(IMMUTABLES)) {
-                    getImmutablesGeneratedClass(clazz).getDeclaredMethod(BUILDER_METHOD);
+                    getImmutablesGeneratedClass(clazz).getDeclaredMethod(builderMethod);
                 } else {
-                    clazz.getDeclaredMethod(BUILDER_METHOD);
+                    clazz.getDeclaredMethod(builderMethod);
                 }
                 return true;
             } catch (NoSuchMethodException e) {

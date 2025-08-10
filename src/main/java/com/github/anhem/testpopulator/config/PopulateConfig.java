@@ -1,10 +1,15 @@
 package com.github.anhem.testpopulator.config;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static com.github.anhem.testpopulator.config.BuilderPattern.*;
 import static com.github.anhem.testpopulator.config.ConstructorType.NO_ARGS;
 import static com.github.anhem.testpopulator.config.Strategy.*;
-import static java.lang.String.format;
 
 /**
  * Configuration for PopulateFactory. Implemented as a builder to allow easy configuration with default values for everything not configured.
@@ -12,7 +17,6 @@ import static java.lang.String.format;
  * Calling toBuilder() on a PopulateConfig object will convert it back to a builder, making it easy to make copies of a configuration with slightly different settings.
  */
 public class PopulateConfig {
-    public static final String INVALID_CONFIG_MISSING_BUILDER_PATTERN = "%s strategy configured, but no builderPattern specified. Should be one of %s";
     public static final String INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY = "objectFactory can not be enabled while accessNonPublicConstructors is true";
     public static final String INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY = "objectFactory can not be enabled while strategyOrder contains FIELD";
     public static final List<String> DEFAULT_BLACKLISTED_METHODS = List.of("$jacocoInit");
@@ -24,9 +28,11 @@ public class PopulateConfig {
     public static final boolean DEFAULT_OBJECT_FACTORY_ENABLED = false;
     public static final boolean DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY = false;
     public static final ConstructorType DEFAULT_CONSTRUCTOR_TYPE = NO_ARGS;
+    public static final BuilderPattern DEFAULT_BUILDER_PATTERN = CUSTOM;
+    public static final String DEFAULT_BUILDER_METHOD = "builder";
+    public static final String DEFAULT_BUILD_METHOD = "build";
 
     public static class PopulateConfigBuilder {
-
         private List<String> blacklistedMethods = new ArrayList<>();
         private List<String> blacklistedFields = new ArrayList<>();
         private List<Strategy> strategyOrder = new ArrayList<>();
@@ -38,6 +44,8 @@ public class PopulateConfig {
         private Boolean objectFactoryEnabled;
         private Boolean nullOnCircularDependency;
         private ConstructorType constructorType;
+        private String builderMethod;
+        private String buildMethod;
 
         /**
          * Set blacklisted methods. I.E methods that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
@@ -79,7 +87,7 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder strategyOrder(Strategy strategy) {
-            strategyOrder.add(strategy);
+            this.strategyOrder = Stream.concat(this.strategyOrder.stream(), Stream.of(strategy)).collect(Collectors.toList());
             return this;
         }
 
@@ -183,7 +191,7 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder setterPrefix(String setterPrefix) {
-            this.setterPrefixes.add(setterPrefix);
+            this.setterPrefixes = Stream.concat(setterPrefixes.stream(), Stream.of(setterPrefix)).collect(Collectors.toList());
             return this;
         }
 
@@ -221,25 +229,43 @@ public class PopulateConfig {
             return this;
         }
 
+        /**
+         *  Set the name of the builder method used when creating objects using BUILDER strategy.
+         *  This option will be ignored for LOMBOK and IMMUTABLES.
+         * @param builderMethod
+         * @return
+         */
+        public PopulateConfigBuilder builderMethod(String builderMethod) {
+            this.builderMethod = builderMethod;
+            return this;
+        }
+
+        /**
+         *  Set the name of the build method used when creating objects using BUILDER strategy.
+         *  This option will be ignored for LOMBOK and IMMUTABLES.
+         * @param buildMethod
+         * @return
+         */
+        public PopulateConfigBuilder buildMethod(String buildMethod) {
+            this.buildMethod = buildMethod;
+            return this;
+        }
+
+        /**
+         * Build and validate a configuration
+         * @return built PopulateConfig
+         */
         public PopulateConfig build() {
-            PopulateConfig populateConfig = new PopulateConfig(
-                    blacklistedMethods,
-                    blacklistedFields,
-                    strategyOrder,
-                    overridePopulate,
-                    builderPattern,
-                    randomValues,
-                    accessNonPublicConstructors,
-                    setterPrefixes,
-                    objectFactoryEnabled,
-                    nullOnCircularDependency,
-                    constructorType
-            );
+            PopulateConfig populateConfig = new PopulateConfig(this);
             populateConfig.validate();
             return populateConfig;
         }
     }
 
+    /**
+     *
+     * @return a configuration object used to create PopulateConfig
+     */
     public static PopulateConfigBuilder builder() {
         return new PopulateConfigBuilder();
     }
@@ -255,30 +281,28 @@ public class PopulateConfig {
     private final boolean objectFactoryEnabled;
     private final boolean nullOnCircularDependency;
     private final ConstructorType constructorType;
+    private final String builderMethod;
+    private final String buildMethod;
 
-    private PopulateConfig(List<String> blacklistedMethods,
-                           List<String> blacklistedFields,
-                           List<Strategy> strategyOrder,
-                           Map<Class<?>, OverridePopulate<?>> overridePopulate,
-                           BuilderPattern builderPattern,
-                           Boolean randomValues,
-                           Boolean accessNonPublicConstructors,
-                           List<String> setterPrefixes,
-                           Boolean objectFactoryEnabled,
-                           Boolean nullOnCircularDependency,
-                           ConstructorType constructorType
-    ) {
-        this.blacklistedMethods = blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : blacklistedMethods;
-        this.blacklistedFields = blacklistedFields.isEmpty() ? DEFAULT_BLACKLISTED_FIELDS : blacklistedFields;
-        this.strategyOrder = strategyOrder.isEmpty() ? DEFAULT_STRATEGY_ORDER : strategyOrder;
-        this.overridePopulate = overridePopulate;
-        this.builderPattern = builderPattern;
-        this.randomValues = randomValues == null ? DEFAULT_RANDOM_VALUES : randomValues;
-        this.accessNonPublicConstructors = accessNonPublicConstructors == null ? DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS : accessNonPublicConstructors;
-        this.setterPrefixes = setterPrefixes.isEmpty() ? DEFAULT_SETTER_PREFIXES : setterPrefixes;
-        this.objectFactoryEnabled = objectFactoryEnabled == null ? DEFAULT_OBJECT_FACTORY_ENABLED : objectFactoryEnabled;
-        this.nullOnCircularDependency = nullOnCircularDependency == null ? DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY : nullOnCircularDependency;
-        this.constructorType = constructorType == null ? DEFAULT_CONSTRUCTOR_TYPE : constructorType;
+    private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
+        this.blacklistedMethods = populateConfigBuilder.blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : populateConfigBuilder.blacklistedMethods;
+        this.blacklistedFields = populateConfigBuilder.blacklistedFields.isEmpty() ? DEFAULT_BLACKLISTED_FIELDS : populateConfigBuilder.blacklistedFields;
+        this.strategyOrder = populateConfigBuilder.strategyOrder.isEmpty() ? DEFAULT_STRATEGY_ORDER : populateConfigBuilder.strategyOrder;
+        this.overridePopulate = populateConfigBuilder.overridePopulate;
+        this.builderPattern = populateConfigBuilder.builderPattern == null ? DEFAULT_BUILDER_PATTERN : populateConfigBuilder.builderPattern;
+        this.randomValues = populateConfigBuilder.randomValues == null ? DEFAULT_RANDOM_VALUES : populateConfigBuilder.randomValues;
+        this.accessNonPublicConstructors = populateConfigBuilder.accessNonPublicConstructors == null ? DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS : populateConfigBuilder.accessNonPublicConstructors;
+        this.setterPrefixes = populateConfigBuilder.setterPrefixes.isEmpty() ? DEFAULT_SETTER_PREFIXES : populateConfigBuilder.setterPrefixes;
+        this.objectFactoryEnabled = populateConfigBuilder.objectFactoryEnabled == null ? DEFAULT_OBJECT_FACTORY_ENABLED : populateConfigBuilder.objectFactoryEnabled;
+        this.nullOnCircularDependency = populateConfigBuilder.nullOnCircularDependency == null ? DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY : populateConfigBuilder.nullOnCircularDependency;
+        this.constructorType = populateConfigBuilder.constructorType == null ? DEFAULT_CONSTRUCTOR_TYPE : populateConfigBuilder.constructorType;
+        if (this.builderPattern == LOMBOK || this.builderPattern == IMMUTABLES) {
+            this.builderMethod = DEFAULT_BUILDER_METHOD;
+            this.buildMethod = DEFAULT_BUILD_METHOD;
+        } else {
+            this.builderMethod = populateConfigBuilder.builderMethod == null ? DEFAULT_BUILDER_METHOD : populateConfigBuilder.builderMethod;
+            this.buildMethod = populateConfigBuilder.buildMethod == null ? DEFAULT_BUILD_METHOD : populateConfigBuilder.buildMethod;
+        }
     }
 
     public List<String> getBlacklistedMethods() {
@@ -325,6 +349,14 @@ public class PopulateConfig {
         return constructorType;
     }
 
+    public String getBuilderMethod() {
+        return builderMethod;
+    }
+
+    public String getBuildMethod() {
+        return buildMethod;
+    }
+
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -342,13 +374,12 @@ public class PopulateConfig {
                 .setterPrefixes(new ArrayList<>(setterPrefixes))
                 .objectFactoryEnabled(objectFactoryEnabled)
                 .nullOnCircularDependency(nullOnCircularDependency)
-                .constructorType(constructorType);
+                .constructorType(constructorType)
+                .builderMethod(builderMethod)
+                .buildMethod(buildMethod);
     }
 
     private void validate() {
-        if (strategyOrder.contains(BUILDER) && builderPattern == null) {
-            throw new IllegalArgumentException(format(INVALID_CONFIG_MISSING_BUILDER_PATTERN, BUILDER, Arrays.toString(BuilderPattern.values())));
-        }
         if (accessNonPublicConstructors && objectFactoryEnabled) {
             throw new IllegalArgumentException(INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY);
         }
@@ -371,6 +402,8 @@ public class PopulateConfig {
                 ", objectFactoryEnabled=" + objectFactoryEnabled +
                 ", nullOnCircularDependency=" + nullOnCircularDependency +
                 ", constructorType=" + constructorType +
+                ", builderMethod='" + builderMethod + '\'' +
+                ", buildMethod='" + buildMethod + '\'' +
                 '}';
     }
 }

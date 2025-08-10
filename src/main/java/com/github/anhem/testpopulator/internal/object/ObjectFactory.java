@@ -8,7 +8,7 @@ public interface ObjectFactory {
 
     <T> void mutator(Class<T> clazz, int expectedChildren);
 
-    <T> void builder(Class<T> clazz, int expectedChildren);
+    <T> void builder(Class<T> clazz, int expectedChildren, String builderMethodName, String buildMethodName);
 
     void method(String methodName, int expectedChildren);
 
