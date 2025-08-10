@@ -16,8 +16,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
-import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
+import static com.github.anhem.testpopulator.config.BuilderPattern.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.internal.carrier.CollectionCarrier.initialize;
 import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getImmutablesGeneratedClass;
@@ -38,9 +37,6 @@ public class PopulateFactory {
     static final String FAILED_TO_CALL_METHOD = "Failed to call method '%s' in object of class '%s'";
     static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of '%s' using '%s' strategy";
     static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection '%s'";
-
-    public static final String BUILD_METHOD = "build";
-    public static final String BUILDER_METHOD = "builder";
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
@@ -215,7 +211,7 @@ public class PopulateFactory {
             if (isMatchingFieldStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
                 return continuePopulateUsingFields(classCarrier);
             }
-            if (isMatchingBuilderStrategy(strategy, clazz, populateConfig.getBuilderPattern())) {
+            if (isMatchingBuilderStrategy(strategy, clazz, populateConfig.getBuilderPattern(), populateConfig.getBuilderMethod())) {
                 return continuePopulateUsingBuilder(classCarrier);
             }
         }
@@ -324,6 +320,8 @@ public class PopulateFactory {
                 return continuePopulateUsingLombokBuilder(classCarrier);
             case IMMUTABLES:
                 return continuePopulateUsingImmutablesBuilder(classCarrier);
+            case CUSTOM:
+                return continuePopulateUsingCustomBuilder(classCarrier);
             default:
                 throw new PopulateException("Unsupported builder pattern");
         }
@@ -333,16 +331,16 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingLombokBuilder(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
         try {
-            Object builderObject = clazz.getDeclaredMethod(BUILDER_METHOD).invoke(null);
+            Object builderObject = clazz.getDeclaredMethod(populateConfig.getBuilderMethod()).invoke(null);
             Map<Integer, List<Method>> builderObjectMethodsGroupedByInvokeOrder = getMethodsForLombokBuilderGroupedByInvokeOrder(builderObject.getClass(), populateConfig.getBlacklistedMethods());
-            classCarrier.getObjectFactory().builder(clazz, calculateExpectedChildren(builderObjectMethodsGroupedByInvokeOrder));
+            classCarrier.getObjectFactory().builder(clazz, calculateExpectedChildren(builderObjectMethodsGroupedByInvokeOrder), populateConfig.getBuilderMethod(), populateConfig.getBuildMethod());
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(1)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method, classCarrier)));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(2)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method, classCarrier)));
             Optional.ofNullable(builderObjectMethodsGroupedByInvokeOrder.get(3)).ifPresent(methods ->
                     methods.forEach(method -> continuePopulateForMethod(builderObject, method, classCarrier)));
-            Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
+            Method buildMethod = builderObject.getClass().getDeclaredMethod(populateConfig.getBuildMethod());
             setAccessible(buildMethod, builderObject);
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
@@ -354,14 +352,29 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingImmutablesBuilder(ClassCarrier<T> classCarrier) {
         try {
             Class<?> immutablesGeneratedClass = getImmutablesGeneratedClass(classCarrier.getClazz());
-            Object builderObject = immutablesGeneratedClass.getDeclaredMethod(BUILDER_METHOD).invoke(null);
+            Object builderObject = immutablesGeneratedClass.getDeclaredMethod(populateConfig.getBuilderMethod()).invoke(null);
             List<Method> builderObjectMethods = getMethodsForImmutablesBuilder(immutablesGeneratedClass, builderObject, populateConfig.getBlacklistedMethods());
-            classCarrier.getObjectFactory().builder(immutablesGeneratedClass, builderObjectMethods.size());
+            classCarrier.getObjectFactory().builder(immutablesGeneratedClass, builderObjectMethods.size(), populateConfig.getBuilderMethod(), populateConfig.getBuildMethod());
             builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method, classCarrier));
-            Method buildMethod = builderObject.getClass().getDeclaredMethod(BUILD_METHOD);
+            Method buildMethod = builderObject.getClass().getDeclaredMethod(populateConfig.getBuildMethod());
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, classCarrier.getClazz().getName(), format("%s (%s)", BUILDER, IMMUTABLES)), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateUsingCustomBuilder(ClassCarrier<T> classCarrier) {
+        Class<T> clazz = classCarrier.getClazz();
+        try {
+            Object builderObject = clazz.getDeclaredMethod(populateConfig.getBuilderMethod()).invoke(null);
+            List<Method> builderObjectMethods = getMethodsForCustomBuilder(builderObject.getClass(), populateConfig.getBlacklistedMethods());
+            classCarrier.getObjectFactory().builder(clazz, builderObjectMethods.size(), populateConfig.getBuilderMethod(), populateConfig.getBuildMethod());
+            builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method, classCarrier));
+            Method buildMethod = builderObject.getClass().getDeclaredMethod(populateConfig.getBuildMethod());
+            return (T) buildMethod.invoke(builderObject);
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, classCarrier.getClazz().getName(), format("%s (%s)", BUILDER, CUSTOM)), e);
         }
     }
 

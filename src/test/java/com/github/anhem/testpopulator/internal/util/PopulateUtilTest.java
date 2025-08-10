@@ -10,6 +10,7 @@ import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
 import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
 import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass.DefaultConstructorMarker;
 import com.github.anhem.testpopulator.model.circular.A;
+import com.github.anhem.testpopulator.model.custombuilder.CustomBuilder;
 import com.github.anhem.testpopulator.model.java.HasBlackListed;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
@@ -29,6 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.ConstructorType.*;
+import static com.github.anhem.testpopulator.config.PopulateConfig.DEFAULT_BUILDER_METHOD;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.testutil.FieldTestUtil.getField;
@@ -204,13 +206,13 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingBuilderStrategyReturnsTrue() {
-        assertThat(isMatchingBuilderStrategy(BUILDER, LombokImmutable.class, BuilderPattern.LOMBOK)).isTrue();
+        assertThat(isMatchingBuilderStrategy(BUILDER, LombokImmutable.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isTrue();
     }
 
     @Test
     void isMatchingBuilderStrategyReturnsFalse() {
-        assertThat(isMatchingBuilderStrategy(Strategy.CONSTRUCTOR, LombokImmutable.class, BuilderPattern.LOMBOK)).isFalse();
-        assertThat(isMatchingBuilderStrategy(BUILDER, PojoExtendsPojoAbstract.class, BuilderPattern.LOMBOK)).isFalse();
+        assertThat(isMatchingBuilderStrategy(Strategy.CONSTRUCTOR, LombokImmutable.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
+        assertThat(isMatchingBuilderStrategy(BUILDER, PojoExtendsPojoAbstract.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
     }
 
     @Test
@@ -245,6 +247,11 @@ class PopulateUtilTest {
     @Test
     void getMutatorMethodsReturnsMethods() {
         assertThat(getMutatorMethods(Mutator.class, emptyList())).hasSize(8);
+    }
+
+    @Test
+    void getMethodsForCustomBuilderReturnsMethods() {
+        assertThat(getMethodsForCustomBuilder(CustomBuilder.CustomBuilderBuilder.class, emptyList())).hasSize(7);
     }
 
     @Test

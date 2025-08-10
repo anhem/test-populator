@@ -49,9 +49,11 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         LombokImmutable value_1 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
         LombokImmutable value_2 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
         assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(value_1.getListOfStrings()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
+        assertThat(List.of(value_1, value_2)).allSatisfy(value -> {
+            assertThat(value.getListOfStrings()).hasSize(1);
+            assertThat(value.getMapOfStringsToIntegers()).hasSize(1);
+            assertThat(value.getMapOfStringsToIntegers().values()).hasSize(1);
+        });
         assertObjectCanBeRebuilt(value_1);
         assertObjectCanBeRebuilt(value_2);
     }
@@ -61,10 +63,13 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         LombokImmutableWithSingular value_1 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
         LombokImmutableWithSingular value_2 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
         assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(value_1.getListOfStrings()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
-        assertThat(value_1.getSetOfIntegers()).hasSize(1);
+        assertThat(List.of(value_1, value_2))
+                .allSatisfy(value -> {
+                    assertThat(value.getListOfStrings()).hasSize(1);
+                    assertThat(value.getMapOfStringsToIntegers()).hasSize(1);
+                    assertThat(value.getMapOfStringsToIntegers().values()).hasSize(1);
+                    assertThat(value.getSetOfIntegers()).hasSize(1);
+                });
     }
 
     @Test

@@ -1,6 +1,8 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.internal.object.BuildType;
+import com.github.anhem.testpopulator.internal.object.BuildTypeObjectBuilder;
+import com.github.anhem.testpopulator.internal.object.MethodObjectBuilder;
 import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.constructor.NestedCollections;
@@ -66,22 +68,22 @@ class ObjectBuilderUtilTest {
 
     @Test
     void isBasicValueReturnsFalse() {
-        assertThat(isBasicValue(new ObjectBuilder(Pojo.class, "pojo_0", BuildType.VALUE, false, 0))).isFalse();
+        assertThat(isBasicValue(new BuildTypeObjectBuilder(Pojo.class, "pojo_0", BuildType.VALUE, false, 0))).isFalse();
     }
 
     @Test
     void isBasicValueReturnsTrueWhenBuildTypeIsValueAndClassIsJavaBaseClass() {
-        assertThat(isBasicValue(new ObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0))).isTrue();
+        assertThat(isBasicValue(new BuildTypeObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0))).isTrue();
     }
 
     @Test
     void isBasicValueReturnsTrueWhenBuildTypeIsValueAndClassIsEnum() {
-        assertThat(isBasicValue(new ObjectBuilder(ArbitraryEnum.class, "arbitraryEnum_0", BuildType.VALUE, false, 0))).isTrue();
+        assertThat(isBasicValue(new BuildTypeObjectBuilder(ArbitraryEnum.class, "arbitraryEnum_0", BuildType.VALUE, false, 0))).isTrue();
     }
 
     @Test
     void endBuilderReturnsStreamOfString() {
-        assertThat(endBuilder()).hasSize(1).contains(".build();");
+        assertThat(endBuilder("build")).hasSize(1).contains(".build();");
     }
 
     @Test
@@ -106,9 +108,9 @@ class ObjectBuilderUtilTest {
 
     @Test
     void collectionHasNullValuesReturnsTrueWhenObjectBuilderIsListAndWithoutChildren() {
-        ObjectBuilder objectBuilder = new ObjectBuilder(ArrayList.class, "arrayList_0", BuildType.LIST, false, 1);
-        ObjectBuilder addMethod = new ObjectBuilder("add", 1);
-        ObjectBuilder string = new ObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0);
+        ObjectBuilder objectBuilder = new BuildTypeObjectBuilder(ArrayList.class, "arrayList_0", BuildType.LIST, false, 1);
+        ObjectBuilder addMethod = new MethodObjectBuilder("add", 1);
+        ObjectBuilder string = new BuildTypeObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0);
         string.setValue(NULL);
         addMethod.addChild(string);
         objectBuilder.addChild(addMethod);
@@ -118,9 +120,9 @@ class ObjectBuilderUtilTest {
 
     @Test
     void collectionHasNullValuesReturnsFalseWhenObjectBuilderIsListAndWithChildren() {
-        ObjectBuilder objectBuilder = new ObjectBuilder(ArrayList.class, "arrayList_0", BuildType.LIST, false, 1);
-        ObjectBuilder addMethod = new ObjectBuilder("add", 1);
-        ObjectBuilder string = new ObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0);
+        ObjectBuilder objectBuilder = new BuildTypeObjectBuilder(ArrayList.class, "arrayList_0", BuildType.LIST, false, 1);
+        ObjectBuilder addMethod = new MethodObjectBuilder("add", 1);
+        ObjectBuilder string = new BuildTypeObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0);
         string.setValue("abc123");
         addMethod.addChild(string);
         objectBuilder.addChild(addMethod);
@@ -130,7 +132,7 @@ class ObjectBuilderUtilTest {
 
     @Test
     void collectionHasNullValuesReturnsFalseWhenObjectBuilderIsNotCollection() {
-        ObjectBuilder string = new ObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0);
+        ObjectBuilder string = new BuildTypeObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0);
 
         assertThat(collectionHasNullValues(string)).isFalse();
     }

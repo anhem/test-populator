@@ -90,7 +90,7 @@ MyClass myClass = populateFactory.populate(myClass.class);
 | config                      | Values                                       | Default                         |
 |-----------------------------|----------------------------------------------|---------------------------------|
 | strategyOrder               | CONSTRUCTOR, SETTER, MUTATOR, FIELD, BUILDER | CONSTRUCTOR, SETTER             |
-| builderPattern              | LOMBOK / IMMUTABLES                          | -                               |
+| builderPattern              | CUSTOM / LOMBOK / IMMUTABLES                 | CUSTOM                          |
 | randomValues                | true / false                                 | true                            |
 | setterPrefixes              | prefix of setter methods                     | set                             |
 | accessNonPublicConstructors | true / false                                 | false                           |
@@ -100,6 +100,8 @@ MyClass myClass = populateFactory.populate(myClass.class);
 | objectFactoryEnabled        | Experimental! true / false                   | false                           |    
 | nullOnCircularDependency    | true / false                                 | false                           |    
 | constructorType             | NO_ARG, SMALLEST, LARGEST                    | NO_ARG                          |    
+| builderMethod               | name of builder method                       | builder                         |    
+| buildMethod                 | name of build method                         | build                           |    
 | kotlinSupport               | true / false                                 | false                           |    
 
 ### strategyOrder
@@ -137,7 +139,8 @@ classes that have a no-arguments/default constructor.
 
 ##### BUILDER
 
-Use builders to populate. Supports [Lombok](https://projectlombok.org/) and [Immutables](https://immutables.github.io/).
+Use builders to populate. Supports [Lombok](https://projectlombok.org/) and [Immutables](https://immutables.github.io/) as well as a lightly
+customizable variant `CUSTOM` where builder and build methods can be defined.
 Configured by setting [builderPattern](#builderpattern). Applied to classes with a builder method.
 
 ### builderPattern
@@ -264,6 +267,18 @@ Set what constructor is preferred when creating objects.
 ### kotlinSupport
 
 Enable for `test-populator` to understand Kotlin constructors with default values.
+
+### builderMethod
+
+(Applied when using [builderPattern](#BuilderPattern): `CUSTOM`)
+
+Set the name of the builder method used when creating objects using BUILDER strategy. This option will be ignored for `LOMBOK` and `IMMUTABLES`.
+
+### buildMethod
+
+(Applied when using [builderPattern](#BuilderPattern): `CUSTOM`)
+
+Set the name of the build method used when creating objects using BUILDER strategy. This option will be ignored for `LOMBOK` and `IMMUTABLES`.
 
 ## ToBuilder
 
