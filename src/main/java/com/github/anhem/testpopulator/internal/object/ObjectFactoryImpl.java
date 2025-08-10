@@ -83,15 +83,15 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public <T> void builder(Class<T> clazz, int expectedChildren, String builderMethodName, String buildMethodName) {
         boolean useFullyQualifiedName = useFullyQualifiedName(clazz, classNames);
         if (currentObjectBuilder == null) {
-            currentObjectBuilder = new ObjectBuilder(clazz, getName(clazz), useFullyQualifiedName, expectedChildren, builderMethodName, buildMethodName);
+            currentObjectBuilder = new BuilderObjectBuilder(clazz, getName(clazz), useFullyQualifiedName, expectedChildren, builderMethodName, buildMethodName);
         } else {
-            setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), useFullyQualifiedName, expectedChildren, builderMethodName, buildMethodName));
+            setNextObjectBuilder(new BuilderObjectBuilder(clazz, getName(clazz), useFullyQualifiedName, expectedChildren, builderMethodName, buildMethodName));
         }
     }
 
     @Override
     public void method(String methodName, int expectedChildren) {
-        setNextObjectBuilder(new ObjectBuilder(methodName, expectedChildren));
+        setNextObjectBuilder(new MethodObjectBuilder(methodName, expectedChildren));
         if (expectedChildren == 0) {
             setPreviousObjectBuilder();
         }
@@ -166,7 +166,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public ObjectResult build() {
         ObjectBuilder topObjectBuilder = toTop();
-        return topObjectBuilder != null ? topObjectBuilder.build() : ObjectResult.EMPTY_OBJECT_RESULT;
+        return topObjectBuilder != null ? topObjectBuilder.buildAll() : ObjectResult.EMPTY_OBJECT_RESULT;
     }
 
     @Override
@@ -206,11 +206,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
     private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
         boolean useFullyQualifiedName = useFullyQualifiedName(clazz, classNames);
         if (currentObjectBuilder == null) {
-            currentObjectBuilder = new ObjectBuilder(clazz, getName(clazz), buildType, useFullyQualifiedName, expectedChildren);
+            currentObjectBuilder = new BuildTypeObjectBuilder(clazz, getName(clazz), buildType, useFullyQualifiedName, expectedChildren);
         } else if (buildType == MUTATOR) {
-            setNextObjectBuilder(new ObjectBuilder(clazz, currentObjectBuilder.getName(), buildType, useFullyQualifiedName, expectedChildren));
+            setNextObjectBuilder(new BuildTypeObjectBuilder(clazz, currentObjectBuilder.getName(), buildType, useFullyQualifiedName, expectedChildren));
         } else {
-            setNextObjectBuilder(new ObjectBuilder(clazz, getName(clazz), buildType, useFullyQualifiedName, expectedChildren));
+            setNextObjectBuilder(new BuildTypeObjectBuilder(clazz, getName(clazz), buildType, useFullyQualifiedName, expectedChildren));
         }
     }
 
