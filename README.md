@@ -79,9 +79,7 @@ Calling `populate()` without first providing a `PopulateConfig` will result in `
 //1. Configure
 PopulateConfig populateConfig = PopulateConfig.builder()
         ...
-                .
-
-build();
+        .build();
 
 //2. Set up
 PopulateFactory populateFactory = new PopulateFactory(populateConfig);
@@ -358,7 +356,7 @@ public class TestPopulator {
     }
 
     private static final PopulateConfig populateConfig = PopulateConfig.builder()
-            .strategyOrder(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD) // strategies ordered to make most use of each of them
+            .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD)) // strategies ordered to make most use of each of them
             .builderPattern(LOMBOK) // required when using BUILDER strategy to tell test-populator what kind of builder to use 
             .randomValues(true) // create objects with random values
             .setterPrefix("") // used by SETTER strategy to know what methods to use. An empty string means calling all void methods with one argument
