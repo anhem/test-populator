@@ -6,6 +6,7 @@ import com.github.anhem.testpopulator.model.java.field.Fields;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoWithMultipleCustomSetters;
+import com.github.anhem.testpopulator.model.java.stc.Users;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
 import com.github.anhem.testpopulator.readme.model.MyClass2;
 import com.github.anhem.testpopulator.readme.model.MyUUID;
@@ -31,7 +32,7 @@ class PopulateFactoryTest {
     @Test
     void fullyConfiguredPopulateFactoryCanPopulateAMixOfClasses() {
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, FIELD))
+                .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, FIELD, STATIC_METHOD))
                 .builderPattern(LOMBOK)
                 .randomValues(true)
                 .setterPrefix("")
@@ -51,6 +52,7 @@ class PopulateFactoryTest {
         assertPopulatedObject(populateFactory.populate(MyClass2.class));
         assertPopulatedObject(populateFactory.populate(PojoPrivateConstructor.class));
         assertPopulatedObject(populateFactory.populate(Fields.class));
+        assertPopulatedObject(populateFactory.populate(Users.class));
     }
 
     private <T> void assertPopulatedObject(T object) {

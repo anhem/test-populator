@@ -12,6 +12,8 @@ public interface ObjectFactory {
 
     void method(String methodName, int expectedChildren);
 
+    <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren);
+
     <T> void set(Class<T> clazz);
 
     void setOf();
@@ -35,5 +37,4 @@ public interface ObjectFactory {
     ObjectResult build();
 
     void writeToFile();
-
 }
