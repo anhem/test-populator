@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryTest {
 
-    public static final List<Class<?>> CLASSES = List.of(
+    private static final List<Class<?>> CLASSES = List.of(
             String.class,
             Instant.class,
             PojoWithMultipleCustomSetters.class, //SETTER
@@ -34,14 +34,13 @@ class PopulateFactoryTest {
             MutatorWithConstructor.class, //MUTATOR
             MyClass2.class, //CONSTRUCTOR
             Fields.class, //FIELD
-            Users.class //STATIC_METHOD
+            Users.class, //STATIC_METHOD
+            MyUUID.class //override populate
     );
 
     @Test
     void canCreatePopulateFactoryWithoutDefaultConfiguration() {
-        PopulateFactory populateFactory = new PopulateFactory();
-
-        assertThat(populateFactory).isNotNull();
+        assertThat(new PopulateFactory()).isNotNull();
     }
 
     @Test
@@ -85,6 +84,4 @@ class PopulateFactoryTest {
         assertThat(object).hasNoNullFieldsOrProperties();
         assertThat(object).usingRecursiveAssertion().hasNoNullFields();
     }
-
-
 }
