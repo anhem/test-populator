@@ -21,7 +21,7 @@ public class MutatorWithConstructor {
     private List<String> listOfStrings;
     private Set<String> setOfStrings;
     private Map<Integer, String> mapOfIntegersToStrings;
-    private ArbitraryEnum arbitraryEnum;
+    private final ArbitraryEnum arbitraryEnum;
 
     public MutatorWithConstructor(ArbitraryEnum arbitraryEnum) {
         this.arbitraryEnum = arbitraryEnum;

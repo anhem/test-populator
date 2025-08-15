@@ -6,5 +6,6 @@ public enum Strategy {
     CONSTRUCTOR,
     FIELD,
     MUTATOR,
-    SETTER
+    SETTER,
+    STATIC_METHOD
 }

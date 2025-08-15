@@ -23,7 +23,7 @@ class PopulateConfigTest {
     @Test
     void buildingPopulateConfigResultsInDefaultValues() {
         assertThat(DEFAULT_POPULATE_CONFIG).isNotNull();
-        assertThat(DEFAULT_POPULATE_CONFIG.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER);
+        assertThat(DEFAULT_POPULATE_CONFIG.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER, STATIC_METHOD);
         assertThat(DEFAULT_POPULATE_CONFIG.getOverridePopulate()).isEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.useRandomValues()).isTrue();
         assertThat(DEFAULT_POPULATE_CONFIG.canAccessNonPublicConstructors()).isFalse();

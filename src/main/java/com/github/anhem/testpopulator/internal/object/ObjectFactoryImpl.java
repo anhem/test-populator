@@ -98,6 +98,15 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
+    public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
+        if (currentObjectBuilder == null) {
+            currentObjectBuilder = new StaticMethodObjectBuilder(clazz, getName(clazz), methodName, expectedChildren);
+        } else {
+            setNextObjectBuilder(new StaticMethodObjectBuilder(clazz, getName(clazz), methodName, expectedChildren));
+        }
+    }
+
+    @Override
     public <T> void set(Class<T> clazz) {
         setNextObjectBuilder(clazz, SET, 1);
         method("add", 1);
