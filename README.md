@@ -59,12 +59,12 @@ public class MyClass {
 
 ```java
 //output from toString()
-MyClass {
-    stringValue = 'xksqbhddha',
-            listWithEnums =[B],
-    myInnerClass = InnerClass {
-        integer = 789707,
-                stringToLocalDateMap = {dsyyjxizvp = 2021 - 02 - 14}
+MyClass{
+    stringValue='xksqbhddha', 
+    listWithEnums=[B], 
+    myInnerClass=InnerClass{
+        integer=789707, 
+        stringToLocalDateMap={dsyyjxizvp=2021-02-14}
     }
 }
 ```
