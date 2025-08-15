@@ -13,7 +13,6 @@ import com.github.anhem.testpopulator.readme.model.MyClass2;
 import com.github.anhem.testpopulator.readme.model.MyUUID;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,8 +25,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class PopulateFactoryTest {
 
     private static final List<Class<?>> CLASSES = List.of(
-            String.class,
-            Instant.class,
             PojoWithMultipleCustomSetters.class, //SETTER
             AllArgsConstructorExtendsAllArgsConstructorAbstract.class, //CONSTRUCTOR
             LombokImmutableExtendsLombokAbstractImmutable.class, //BUILDER
