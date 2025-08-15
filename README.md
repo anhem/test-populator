@@ -9,7 +9,8 @@ Populate java classes with fixed or random data. Facilitates the creation of obj
 
 **Problem:**
 
-When writing tests, you may not always be interested in what data an object has. You just want to make use of an object of that type with some or all fields
+When writing tests, you may not always be interested in what data an object has. You just want to make use of an object of that type with some or all
+fields
 populated.
 
 Creating a lot of objects manually is time-consuming and gives you additional code to maintain.
@@ -58,12 +59,12 @@ public class MyClass {
 
 ```java
 //output from toString()
-MyClass{
-    stringValue='xksqbhddha', 
-    listWithEnums=[B], 
-    myInnerClass=InnerClass{
-        integer=789707, 
-        stringToLocalDateMap={dsyyjxizvp=2021-02-14}
+MyClass {
+    stringValue = 'xksqbhddha',
+            listWithEnums =[B],
+    myInnerClass = InnerClass {
+        integer = 789707,
+                stringToLocalDateMap = {dsyyjxizvp = 2021 - 02 - 14}
     }
 }
 ```
@@ -78,7 +79,9 @@ Calling `populate()` without first providing a `PopulateConfig` will result in `
 //1. Configure
 PopulateConfig populateConfig = PopulateConfig.builder()
         ...
-        .build();
+                .
+
+build();
 
 //2. Set up
 PopulateFactory populateFactory = new PopulateFactory(populateConfig);
@@ -87,21 +90,21 @@ PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 MyClass myClass = populateFactory.populate(myClass.class);
 ```
 
-| config                      | Values                                       | Default                         |
-|-----------------------------|----------------------------------------------|---------------------------------|
-| strategyOrder               | CONSTRUCTOR, SETTER, MUTATOR, FIELD, BUILDER | CONSTRUCTOR, SETTER             |
-| builderPattern              | CUSTOM / LOMBOK / IMMUTABLES                 | CUSTOM                          |
-| randomValues                | true / false                                 | true                            |
-| setterPrefixes              | prefix of setter methods                     | set                             |
-| accessNonPublicConstructors | true / false                                 | false                           |
-| overridePopulates           | List of OverridePopulate implementations     | -                               |
-| blacklistedMethods          | List of methods to skip if encountered       | $jacocoInit                     |
-| blacklistedFields           | List of fields to skip if encountered        | \_\_$lineHits$\_\_, $jacocoData |    
-| objectFactoryEnabled        | Experimental! true / false                   | false                           |    
-| nullOnCircularDependency    | true / false                                 | false                           |    
-| constructorType             | NO_ARG, SMALLEST, LARGEST                    | NO_ARG                          |    
-| builderMethod               | name of builder method                       | builder                         |    
-| buildMethod                 | name of build method                         | build                           |    
+| config                      | Values                                                      | Default                            |
+|-----------------------------|-------------------------------------------------------------|------------------------------------|
+| strategyOrder               | CONSTRUCTOR, SETTER, MUTATOR, FIELD, BUILDER, STATIC_METHOD | CONSTRUCTOR, SETTER, STATIC_METHOD |
+| builderPattern              | CUSTOM / LOMBOK / IMMUTABLES                                | CUSTOM                             |
+| randomValues                | true / false                                                | true                               |
+| setterPrefixes              | prefix of setter methods                                    | set                                |
+| accessNonPublicConstructors | true / false                                                | false                              |
+| overridePopulates           | List of OverridePopulate implementations                    | -                                  |
+| blacklistedMethods          | List of methods to skip if encountered                      | $jacocoInit                        |
+| blacklistedFields           | List of fields to skip if encountered                       | \_\_$lineHits$\_\_, $jacocoData    |    
+| objectFactoryEnabled        | Experimental! true / false                                  | false                              |    
+| nullOnCircularDependency    | true / false                                                | false                              |    
+| constructorType             | NO_ARG, SMALLEST, LARGEST                                   | NO_ARG                             |    
+| builderMethod               | name of builder method                                      | builder                            |    
+| buildMethod                 | name of build method                                        | build                              |    
 
 ### strategyOrder
 
@@ -141,6 +144,11 @@ classes that have a no-arguments/default constructor.
 Use builders to populate. Supports [Lombok](https://projectlombok.org/) and [Immutables](https://immutables.github.io/) as well as a lightly
 customizable variant `CUSTOM` where builder and build methods can be defined.
 Configured by setting [builderPattern](#builderpattern). Applied to classes with a builder method.
+
+##### STATIC_METHOD
+
+Use a public static method that returns an object of the class to populate. The method with most parameters will be used if there are more than one
+method matching this criteria.
 
 ### builderPattern
 
@@ -350,7 +358,7 @@ public class TestPopulator {
     }
 
     private static final PopulateConfig populateConfig = PopulateConfig.builder()
-            .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, FIELD)) // strategies ordered to make most use of each of them
+            .strategyOrder(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD) // strategies ordered to make most use of each of them
             .builderPattern(LOMBOK) // required when using BUILDER strategy to tell test-populator what kind of builder to use 
             .randomValues(true) // create objects with random values
             .setterPrefix("") // used by SETTER strategy to know what methods to use. An empty string means calling all void methods with one argument

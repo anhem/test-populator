@@ -21,7 +21,7 @@ public class PopulateConfig {
     public static final String INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY = "objectFactory can not be enabled while strategyOrder contains FIELD";
     public static final List<String> DEFAULT_BLACKLISTED_METHODS = List.of("$jacocoInit");
     public static final List<String> DEFAULT_BLACKLISTED_FIELDS = List.of("__$lineHits$__", "$jacocoData");
-    public static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER);
+    public static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER, STATIC_METHOD);
     public static final boolean DEFAULT_RANDOM_VALUES = true;
     public static final boolean DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS = false;
     public static final List<String> DEFAULT_SETTER_PREFIXES = List.of("set");
