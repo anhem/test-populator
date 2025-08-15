@@ -13,6 +13,7 @@ import com.github.anhem.testpopulator.readme.model.MyClass2;
 import com.github.anhem.testpopulator.readme.model.MyUUID;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +46,8 @@ class PopulateFactoryTest {
         PopulateConfig populateConfig = createFullyConfiguredPopulateConfig();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
+        assertThat(populateFactory.populate(String.class)).isNotNull();
+        assertThat(populateFactory.populate(Instant.class)).isNotNull();
         CLASSES.forEach(clazz -> assertPopulatedObject(populateFactory.populate(clazz)));
         assertPopulatedObject(populateFactory.populate(PojoPrivateConstructor.class));
     }
@@ -56,6 +59,8 @@ class PopulateFactoryTest {
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
+        assertThat(populateFactory.populate(String.class)).isNotNull();
+        assertThat(populateFactory.populate(Instant.class)).isNotNull();
         CLASSES.forEach(clazz -> assertPopulatedObject(populateFactory.populate(clazz)));
         assertThatThrownBy(() -> populateFactory.populate(PojoPrivateConstructor.class))
                 .isInstanceOf(PopulateException.class)
