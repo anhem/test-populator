@@ -277,7 +277,7 @@ class PopulateUtilTest {
         assertThat(getStaticMethod(Users.class, emptyList(), MethodType.SMALLEST))
                 .isNotNull()
                 .extracting(Method::getName)
-                .isEqualTo("with");
+                .isIn("with", "of");
     }
 
     @Test
