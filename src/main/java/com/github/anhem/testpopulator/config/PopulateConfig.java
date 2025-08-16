@@ -256,7 +256,8 @@ public class PopulateConfig {
         /**
          * Set type of method to find when using STATIC_METHOD strategy.
          * SIMPLEST will attempt to calculate a complexity score for each static method and pick the simplest.
-         * This is to attempt to avoid more complex methods that for example uses Iterator, StreamReader etc. and methods with primitives, Strings, Boolean etc. instead.
+         * This is to attempt to avoid more complex methods that for example uses Iterator, StreamReader etc.
+         * Methods with primitives, Strings, Boolean etc. will be prioritized instead.
          * @param methodType
          * @return
          */
