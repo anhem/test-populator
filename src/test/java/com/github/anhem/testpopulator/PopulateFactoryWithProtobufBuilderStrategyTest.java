@@ -43,21 +43,21 @@ public class PopulateFactoryWithProtobufBuilderStrategyTest {
     }
 
     @Test
-    void UInt32Value() {
+    void uInt32Value() {
         UInt32Value value_1 = populateAndAssertWithGeneratedCode(UInt32Value.class);
         UInt32Value value_2 = populateAndAssertWithGeneratedCode(UInt32Value.class);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     @Test
-    void ByteString() {
+    void byteString() {
         ByteString value_1 = populateAndAssertWithGeneratedCode(ByteString.class);
         ByteString value_2 = populateAndAssertWithGeneratedCode(ByteString.class);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     @Test
-    void BytesValue() {
+    void bytesValue() {
         BytesValue value_1 = populateAndAssertWithGeneratedCode(BytesValue.class);
         BytesValue value_2 = populateAndAssertWithGeneratedCode(BytesValue.class);
         assertRandomlyPopulatedValues(value_1, value_2);
