@@ -140,7 +140,7 @@ classes that have a no-arguments/default constructor.
 
 ##### BUILDER
 
-Use builders to populate. Supports [Lombok](https://projectlombok.org/) [Immutables](https://immutables.github.io/) and [protobuf](https://protobuf.dev/) as well as a lightly
+Use builders to populate. Supports [Lombok](https://projectlombok.org/), [Immutables](https://immutables.github.io/) and [protobuf](https://protobuf.dev/) as well as a lightly
 customizable variant `CUSTOM` where builder and build methods can be defined.
 Configured by setting [builderPattern](#builderpattern). Applied to classes with a builder method.
 

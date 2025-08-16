@@ -5,20 +5,13 @@ package com.github.anhem.testpopulator.model.proto.wrappers;
 import "google/protobuf/wrappers.proto";
 
 message AllWrappers {
-  // Floating-Point Wrappers
   google.protobuf.DoubleValue double_value = 1;
   google.protobuf.FloatValue  float_value = 2;
-
-  // Integer Wrappers
   google.protobuf.Int32Value  int32_value = 3;
   google.protobuf.Int64Value  int64_value = 4;
   google.protobuf.UInt32Value uint32_value = 5;
   google.protobuf.UInt64Value uint64_value = 6;
-
-  // Boolean Wrapper
   google.protobuf.BoolValue bool_value = 7;
-
-  // String and Bytes Wrappers
   google.protobuf.StringValue string_value = 8;
   google.protobuf.BytesValue  bytes_value = 9;
 }

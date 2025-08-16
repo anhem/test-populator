@@ -7,74 +7,43 @@ import "google/protobuf/wrappers.proto";
 option java_package = "com.github.anhem.testpopulator.model.proto.complex";
 option java_multiple_files = true;
 
-// A complex message designed to test reflection-based populators.
 message UserProfile {
-  // --- Test Case 1: Standard scalar types ---
-  // Should generate: setUserId(String), setUsername(String), setIsActive(boolean)
   string user_id = 1;
   string username = 2;
   bool is_active = 3;
 
-  // --- Test Case 2: Nested Message ---
-  // Should generate: setPrimaryAddress(Address)
-  // Your code should ignore setPrimaryAddress(Address.Builder).
   Address primary_address = 4;
 
-  // --- Test Case 3: Repeated scalar field ---
-  // Should generate: addTags(String)
-  // Your code should ignore addAllTags(Iterable<String>).
   repeated string tags = 5;
 
-  // --- Test Case 4: Repeated message field ---
-  // Should generate: addOrderHistory(Order)
   repeated Order order_history = 6;
 
-  // --- Test Case 5: Enum field ---
-  // Should generate: setAccountStatus(AccountStatus)
-  // Your code should ignore setAccountStatusValue(int).
   AccountStatus account_status = 7;
 
-  // --- Test Case 6: Map field ---
-  // Should generate: putMetadata(String, String) with two parameters.
   map<string, string> metadata = 8;
 
-  // --- Test Case 7: 'oneof' block ---
-  // Your code should find both individual setters:
-  // - setContactEmail(String)
-  // - setContactPhone(String)
   oneof contact_info {
     string contact_email = 9;
     string contact_phone = 10;
   }
 
-  // --- Test Case 8: Bytes field ---
-  // Should generate: setProfilePicture(ByteString)
-  // This method will be correctly IGNORED by your utility because its
-  // parameter (com.google.protobuf.ByteString) starts with the filtered package name.
   bytes profile_picture = 11;
 
-  // --- Test Case 9: Google Wrapper Type ---
-  // Should generate: setNickname(StringValue)
-  // This method will also be correctly IGNORED because its parameter
-  // (com.google.protobuf.StringValue) is in the filtered package.
   google.protobuf.StringValue nickname = 12;
 }
 
-// A nested message type.
 message Address {
   string street = 1;
   string city = 2;
   string zip_code = 3;
 }
 
-// Another nested message type for repeated fields.
 message Order {
   string order_id = 1;
   int64 amount_cents = 2;
   int64 timestamp_ms = 3;
 }
 
-// An enum type.
 enum AccountStatus {
   STATUS_UNSPECIFIED = 0;
   PENDING_VERIFICATION = 1;
