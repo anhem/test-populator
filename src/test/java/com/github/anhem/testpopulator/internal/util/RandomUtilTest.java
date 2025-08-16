@@ -105,11 +105,11 @@ class RandomUtilTest {
 
     @Test
     void getRandomEnumCanBeDifferent() {
-        ArbitraryEnum random_1 = getRandomEnum(ArbitraryEnum.class);
-        ArbitraryEnum random_2 = getRandomEnum(ArbitraryEnum.class);
+        ArbitraryEnum random_1 = getRandomEnum(ArbitraryEnum.class, false);
+        ArbitraryEnum random_2 = getRandomEnum(ArbitraryEnum.class, false);
         int retry = 0;
         while (random_1.equals(random_2) && retry < 10) {
-            random_2 = getRandomEnum(ArbitraryEnum.class);
+            random_2 = getRandomEnum(ArbitraryEnum.class, false);
             retry++;
         }
 

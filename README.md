@@ -91,7 +91,7 @@ MyClass myClass = populateFactory.populate(myClass.class);
 | config                      | Values                                                      | Default                            |
 |-----------------------------|-------------------------------------------------------------|------------------------------------|
 | strategyOrder               | CONSTRUCTOR, SETTER, MUTATOR, FIELD, BUILDER, STATIC_METHOD | CONSTRUCTOR, SETTER, STATIC_METHOD |
-| builderPattern              | CUSTOM / LOMBOK / IMMUTABLES                                | CUSTOM                             |
+| builderPattern              | CUSTOM / LOMBOK / IMMUTABLES / PROTOBUF                     | CUSTOM                             |
 | randomValues                | true / false                                                | true                               |
 | setterPrefixes              | prefix of setter methods                                    | set                                |
 | accessNonPublicConstructors | true / false                                                | false                              |
@@ -103,7 +103,7 @@ MyClass myClass = populateFactory.populate(myClass.class);
 | constructorType             | NO_ARG, SMALLEST, LARGEST                                   | NO_ARG                             |    
 | builderMethod               | name of builder method                                      | builder                            |    
 | buildMethod                 | name of build method                                        | build                              |    
-| methodType                  | SMALLEST, LARGEST, SIMPLEST                                 | build                              |    
+| methodType                  | SMALLEST, LARGEST, SIMPLEST                                 | LARGEST                            |    
 
 ### strategyOrder
 
@@ -140,7 +140,7 @@ classes that have a no-arguments/default constructor.
 
 ##### BUILDER
 
-Use builders to populate. Supports [Lombok](https://projectlombok.org/) and [Immutables](https://immutables.github.io/) as well as a lightly
+Use builders to populate. Supports [Lombok](https://projectlombok.org/) [Immutables](https://immutables.github.io/) and [protobuf](https://protobuf.dev/) as well as a lightly
 customizable variant `CUSTOM` where builder and build methods can be defined.
 Configured by setting [builderPattern](#builderpattern). Applied to classes with a builder method.
 
