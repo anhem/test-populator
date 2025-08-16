@@ -37,6 +37,7 @@ public class PopulateFactory {
     static final String FAILED_TO_CALL_METHOD = "Failed to call method '%s' in object of class '%s'";
     static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of '%s' using '%s' strategy";
     static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection '%s'";
+    static final String FAILED_TO_CALL_STATIC_METHOD = "Failed to call static method of class '%s'";
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
@@ -214,6 +215,9 @@ public class PopulateFactory {
             if (isMatchingBuilderStrategy(strategy, clazz, populateConfig.getBuilderPattern(), populateConfig.getBuilderMethod())) {
                 return continuePopulateUsingBuilder(classCarrier);
             }
+            if (isMatchingStaticMethodStrategy(strategy, clazz)) {
+                return continuePopulateUsingStaticMethod(classCarrier);
+            }
         }
         throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName(), populateConfig.getStrategyOrder()));
     }
@@ -374,7 +378,7 @@ public class PopulateFactory {
             Method buildMethod = builderObject.getClass().getDeclaredMethod(populateConfig.getBuildMethod());
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, classCarrier.getClazz().getName(), format("%s (%s)", BUILDER, CUSTOM)), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, CUSTOM)), e);
         }
     }
 
@@ -391,6 +395,25 @@ public class PopulateFactory {
                     }).toArray());
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CALL_METHOD, method.getName(), objectOfClass.getClass().getName()), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateUsingStaticMethod(ClassCarrier<T> classCarrier) {
+        Class<T> clazz = classCarrier.getClazz();
+        try {
+            Method staticMethod = getStaticMethod(clazz, populateConfig.getBlacklistedMethods());
+            classCarrier.getObjectFactory().staticMethod(clazz, staticMethod.getName(), staticMethod.getParameters().length);
+            return (T) staticMethod.invoke(null, Stream.of(staticMethod.getParameters())
+                    .map(parameter -> {
+                        if (isCollection(parameter.getType())) {
+                            return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
+                        } else {
+                            return populateWithOverrides(classCarrier.toClassCarrier(parameter));
+                        }
+                    }).toArray());
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CALL_STATIC_METHOD, clazz.getName()), e);
         }
     }
 }

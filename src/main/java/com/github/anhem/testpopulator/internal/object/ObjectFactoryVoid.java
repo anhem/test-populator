@@ -29,6 +29,11 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
+        //ignored
+    }
+
+    @Override
     public <T> void set(Class<T> clazz) {
         //ignored
     }

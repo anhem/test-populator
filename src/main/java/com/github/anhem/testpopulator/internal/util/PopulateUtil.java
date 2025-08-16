@@ -17,6 +17,7 @@ import static java.util.Arrays.stream;
 
 public class PopulateUtil {
 
+    private static final Comparator<Method> PARAMETER_COUNT_COMPARATOR = Comparator.comparingInt(Method::getParameterCount);
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
     private static final String JAVA_BASE = "java.base";
     private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
@@ -58,6 +59,15 @@ public class PopulateUtil {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> method.getReturnType().equals(clazz) && method.getParameters().length > 0)
                 .collect(Collectors.toList());
+    }
+
+    public static <T> Method getStaticMethod(Class<T> clazz, List<String> blacklistedMethods) {
+        return getDeclaredMethods(clazz, blacklistedMethods).stream()
+                .filter(method -> Modifier.isStatic(method.getModifiers()))
+                .filter(method -> method.getReturnType().equals(clazz))
+                .filter(PopulateUtil::hasAtLeastOneParameter)
+                .max(PARAMETER_COUNT_COMPARATOR)
+                .orElseThrow();
     }
 
     public static <T> boolean isSet(Class<T> clazz) {
@@ -134,6 +144,14 @@ public class PopulateUtil {
             } catch (NoSuchMethodException e) {
                 return false;
             }
+        }
+        return false;
+    }
+
+    public static <T> boolean isMatchingStaticMethodStrategy(Strategy strategy, Class<T> clazz) {
+        if (strategy.equals(STATIC_METHOD)) {
+            return stream(clazz.getDeclaredMethods())
+                    .anyMatch(method -> Modifier.isStatic(method.getModifiers()) && method.getReturnType().equals(clazz) && hasAtLeastOneParameter(method));
         }
         return false;
     }

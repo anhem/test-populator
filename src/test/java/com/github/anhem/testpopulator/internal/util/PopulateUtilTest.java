@@ -2,7 +2,6 @@ package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.ConstructorType;
-import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
@@ -18,6 +17,7 @@ import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorP
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
 import com.github.anhem.testpopulator.model.java.setter.*;
+import com.github.anhem.testpopulator.model.java.stc.User;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -159,8 +159,8 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingSetterStrategyReturnsFalse() {
-        assertThat(isMatchingSetterStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIXES, false)).isFalse();
-        assertThat(isMatchingSetterStrategy(Strategy.SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIXES, false)).isFalse();
+        assertThat(isMatchingSetterStrategy(CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIXES, false)).isFalse();
+        assertThat(isMatchingSetterStrategy(SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIXES, false)).isFalse();
         assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIXES, false)).isFalse();
     }
 
@@ -193,15 +193,15 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingFieldStrategyReturnsTrue() {
-        assertThat(isMatchingFieldStrategy(Strategy.FIELD, PojoExtendsPojoAbstract.class, false)).isTrue();
-        assertThat(isMatchingFieldStrategy(Strategy.FIELD, PojoPrivateConstructor.class, true)).isTrue();
+        assertThat(isMatchingFieldStrategy(FIELD, PojoExtendsPojoAbstract.class, false)).isTrue();
+        assertThat(isMatchingFieldStrategy(FIELD, PojoPrivateConstructor.class, true)).isTrue();
     }
 
     @Test
     void isMatchingFieldStrategyReturnsFalse() {
-        assertThat(isMatchingFieldStrategy(Strategy.CONSTRUCTOR, PojoExtendsPojoAbstract.class, false)).isFalse();
-        assertThat(isMatchingFieldStrategy(Strategy.FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, false)).isFalse();
-        assertThat(isMatchingFieldStrategy(Strategy.FIELD, PojoPrivateConstructor.class, false)).isFalse();
+        assertThat(isMatchingFieldStrategy(CONSTRUCTOR, PojoExtendsPojoAbstract.class, false)).isFalse();
+        assertThat(isMatchingFieldStrategy(FIELD, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, false)).isFalse();
+        assertThat(isMatchingFieldStrategy(FIELD, PojoPrivateConstructor.class, false)).isFalse();
     }
 
     @Test
@@ -211,8 +211,19 @@ class PopulateUtilTest {
 
     @Test
     void isMatchingBuilderStrategyReturnsFalse() {
-        assertThat(isMatchingBuilderStrategy(Strategy.CONSTRUCTOR, LombokImmutable.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
+        assertThat(isMatchingBuilderStrategy(CONSTRUCTOR, LombokImmutable.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
         assertThat(isMatchingBuilderStrategy(BUILDER, PojoExtendsPojoAbstract.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
+    }
+
+    @Test
+    void isMatchingStaticMethodStrategyReturnsTrue() {
+        assertThat(isMatchingStaticMethodStrategy(STATIC_METHOD, User.class)).isTrue();
+    }
+
+    @Test
+    void isMatchingStaticMethodStrategyReturnsFalse() {
+        assertThat(isMatchingStaticMethodStrategy(CONSTRUCTOR, User.class)).isFalse();
+        assertThat(isMatchingStaticMethodStrategy(STATIC_METHOD, AllArgsConstructor.class)).isFalse();
     }
 
     @Test
@@ -252,6 +263,14 @@ class PopulateUtilTest {
     @Test
     void getMethodsForCustomBuilderReturnsMethods() {
         assertThat(getMethodsForCustomBuilder(CustomBuilder.CustomBuilderBuilder.class, emptyList())).hasSize(7);
+    }
+
+    @Test
+    void getStaticMethodReturnsMethod() {
+        assertThat(getStaticMethod(User.class, emptyList()))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("of");
     }
 
     @Test
