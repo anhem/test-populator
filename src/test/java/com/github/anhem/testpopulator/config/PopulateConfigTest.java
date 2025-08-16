@@ -34,6 +34,7 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedFields()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.isObjectFactoryEnabled()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.isNullOnCircularDependency()).isFalse();
+        assertThat(DEFAULT_POPULATE_CONFIG.getMethodType()).isEqualTo(MethodType.LARGEST);
         assertEqual(DEFAULT_POPULATE_CONFIG.toBuilder().build(), DEFAULT_POPULATE_CONFIG);
     }
 
@@ -48,6 +49,7 @@ class PopulateConfigTest {
                 .randomValues(false)
                 .accessNonPublicConstructors(true)
                 .nullOnCircularDependency(true)
+                .methodType(MethodType.SIMPLEST)
                 .build();
 
         assertThat(populateConfig.getStrategyOrder()).hasSize(2);
@@ -60,6 +62,7 @@ class PopulateConfigTest {
         assertThat(populateConfig.getSetterPrefixes()).hasSize(1);
         assertThat(populateConfig.getSetterPrefixes().iterator().next()).isEqualTo("with");
         assertThat(populateConfig.isNullOnCircularDependency()).isTrue();
+        assertThat(populateConfig.getMethodType()).isEqualTo(MethodType.SIMPLEST);
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
     }
 
@@ -86,6 +89,7 @@ class PopulateConfigTest {
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
         assertThat(populateConfig.getSetterPrefixes()).containsExactly("also", "with", "as");
         assertThat(populateConfig.isNullOnCircularDependency()).isFalse();
+        assertThat(DEFAULT_POPULATE_CONFIG.getMethodType()).isEqualTo(MethodType.LARGEST);
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
     }
 

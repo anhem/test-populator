@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
@@ -37,7 +38,7 @@ public class PopulateFactory {
     static final String FAILED_TO_CALL_METHOD = "Failed to call method '%s' in object of class '%s'";
     static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of '%s' using '%s' strategy";
     static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection '%s'";
-    static final String FAILED_TO_CALL_STATIC_METHOD = "Failed to call static method of class '%s'";
+    static final String FAILED_TO_CALL_STATIC_METHOD = "Failed to call static method '%s' of class '%s'";
 
     private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
@@ -393,8 +394,8 @@ public class PopulateFactory {
     @SuppressWarnings("unchecked")
     private <T> T continuePopulateUsingStaticMethod(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
+        Method staticMethod = getStaticMethod(clazz, populateConfig.getBlacklistedMethods(), populateConfig.getMethodType());
         try {
-            Method staticMethod = getStaticMethod(clazz, populateConfig.getBlacklistedMethods());
             classCarrier.getObjectFactory().staticMethod(clazz, staticMethod.getName(), staticMethod.getParameters().length);
             return (T) staticMethod.invoke(null, Stream.of(staticMethod.getParameters())
                     .map(parameter -> {
@@ -405,7 +406,7 @@ public class PopulateFactory {
                         }
                     }).toArray());
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CALL_STATIC_METHOD, clazz.getName()), e);
+            throw new PopulateException(format(FAILED_TO_CALL_STATIC_METHOD, staticMethod.getName(), clazz.getName()), e);
         }
     }
 }

@@ -86,6 +86,7 @@ public class ValueFactory {
         typeSuppliers.put(UUID.class, this::getUUID);
         typeSuppliers.put(byte.class, this::getByte);
         typeSuppliers.put(Byte.class, this::getByte);
+        typeSuppliers.put(Object.class, this::getObject);
         return typeSuppliers;
     }
 
@@ -209,5 +210,9 @@ public class ValueFactory {
 
     private Timestamp getSqlTimestamp() {
         return setRandomValues ? Timestamp.from(getInstant()) : SQL_TIMESTAMP;
+    }
+
+    private Object getObject() {
+        return getString();
     }
 }

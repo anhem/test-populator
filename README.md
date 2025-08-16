@@ -103,6 +103,7 @@ MyClass myClass = populateFactory.populate(myClass.class);
 | constructorType             | NO_ARG, SMALLEST, LARGEST                                   | NO_ARG                             |    
 | builderMethod               | name of builder method                                      | builder                            |    
 | buildMethod                 | name of build method                                        | build                              |    
+| methodType                  | SMALLEST, LARGEST, SIMPLEST                                 | build                              |    
 
 ### strategyOrder
 
@@ -145,8 +146,7 @@ Configured by setting [builderPattern](#builderpattern). Applied to classes with
 
 ##### STATIC_METHOD
 
-Use a public static method that returns an object of the class to populate. The method with most parameters will be used if there are more than one
-method matching this criteria.
+Use a public static method based on [methodType](#methodtype) to create an object of the class.
 
 ### builderPattern
 
@@ -175,6 +175,18 @@ An empty string `""` can be used to make use of any void method with one argumen
 ### accessNonPublicConstructors
 
 Controls whether to allow access to private or protected constructors when populating.
+
+### methodType
+
+(Applied when using strategy: [STATIC_METHOD](#static_method))
+
+Set type of method to find when using STATIC_METHOD strategy.
+
+* LARGEST will take the method with most parameters
+* SMALLEST will take the method with fewest parameters
+* SIMPLEST will attempt to calculate a `complexity score` for each static method and pick the simplest.
+  This is to attempt to avoid more complex methods that for example uses Iterator, StreamReader etc. Methods with primitives, Strings, Boolean etc.
+  will be prioritized instead.
 
 ### overridePopulates
 
