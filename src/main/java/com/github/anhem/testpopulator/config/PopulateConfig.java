@@ -188,7 +188,7 @@ public class PopulateConfig {
         /**
          * Use setters with a different format than set*
          *
-         * @param setterPrefix a prefixe for methods that work in a similar way as a regular setter method.
+         * @param setterPrefix a prefix for methods that work in a similar way as a regular setter method.
          * Use empty String to match any method that follows the setter pattern without actually being named prefix*
          * @return PopulateConfigBuilder
          */
@@ -234,8 +234,8 @@ public class PopulateConfig {
         /**
          *  Set the name of the builder method used when creating objects using BUILDER strategy.
          *  This option will be ignored for LOMBOK and IMMUTABLES.
-         * @param builderMethod
-         * @return
+         * @param builderMethod a string representation of the method name
+         * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder builderMethod(String builderMethod) {
             this.builderMethod = builderMethod;
@@ -245,8 +245,8 @@ public class PopulateConfig {
         /**
          *  Set the name of the build method used when creating objects using BUILDER strategy.
          *  This option will be ignored for LOMBOK and IMMUTABLES.
-         * @param buildMethod
-         * @return
+         * @param buildMethod a string representation of the method name
+         * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder buildMethod(String buildMethod) {
             this.buildMethod = buildMethod;
@@ -258,8 +258,8 @@ public class PopulateConfig {
          * SIMPLEST will attempt to calculate a complexity score for each static method and pick the simplest.
          * This is to attempt to avoid more complex methods that for example uses Iterator, StreamReader etc.
          * Methods with primitives, Strings, Boolean etc. will be prioritized instead.
-         * @param methodType
-         * @return
+         * @param methodType LARGEST, SMALLEST, SIMPLEST
+         * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder methodType(MethodType methodType) {
             this.methodType = methodType;
