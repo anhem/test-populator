@@ -55,7 +55,7 @@ public class MultipleStaticMethods {
     }
 
     public static MultipleStaticMethods fromCsvRecord(String[] record) {
-        return new MultipleStaticMethods(Integer.parseInt(record[0]), record[1], 0.0, LIST, MAP, NOW, UUID);
+        return new MultipleStaticMethods(0, record[0], 0.0, LIST, MAP, NOW, UUID);
     }
 
     public static MultipleStaticMethods fromInputStream(InputStream stream) {

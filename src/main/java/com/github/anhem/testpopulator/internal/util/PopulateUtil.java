@@ -2,8 +2,8 @@ package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.ConstructorType;
-import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.config.MethodType;
+import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 
@@ -70,15 +70,17 @@ public class PopulateUtil {
     }
 
     public static <T> Method getStaticMethod(Class<T> clazz, List<String> blacklistedMethods, MethodType methodType) {
-        Stream<Method> methods = getDeclaredMethods(clazz, blacklistedMethods).stream()
-                .filter(method -> isMatchingStaticMethod(method, clazz));
+        List<Method> methods = getDeclaredMethods(clazz, blacklistedMethods).stream()
+                .filter(method -> isMatchingStaticMethod(method, clazz))
+                .sorted(Comparator.comparing(Method::getName))
+                .collect(Collectors.toList());
         switch (methodType) {
             case LARGEST:
-                return methods.max(PARAMETER_COUNT_COMPARATOR).orElseThrow();
+                return methods.stream().max(PARAMETER_COUNT_COMPARATOR).orElseThrow();
             case SMALLEST:
-                return methods.min(PARAMETER_COUNT_COMPARATOR).orElseThrow();
+                return methods.stream().min(PARAMETER_COUNT_COMPARATOR).orElseThrow();
             case SIMPLEST:
-                return methods.min(SIMPLEST_METHOD_COMPARATOR).orElseThrow();
+                return methods.stream().min(SIMPLEST_METHOD_COMPARATOR).orElseThrow();
             default:
                 throw new IllegalArgumentException("Unsupported MethodType: " + methodType);
         }

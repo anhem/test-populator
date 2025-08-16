@@ -35,21 +35,21 @@ class PopulateFactoryWithStaticStrategyTest {
     }
 
     @Test
-    void UserId() {
+    void userId() {
         UserId value_1 = populateAndAssertWithGeneratedCode(UserId.class);
         UserId value_2 = populateAndAssertWithGeneratedCode(UserId.class);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     @Test
-    void User() {
+    void user() {
         User value_1 = populateAndAssertWithGeneratedCode(User.class);
         User value_2 = populateAndAssertWithGeneratedCode(User.class);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     @Test
-    void Users() {
+    void users() {
         Users value_1 = populateAndAssertWithGeneratedCode(Users.class);
         Users value_2 = populateAndAssertWithGeneratedCode(Users.class);
         assertRandomlyPopulatedValues(value_1, value_2);
@@ -57,7 +57,7 @@ class PopulateFactoryWithStaticStrategyTest {
     }
 
     @Test
-    void UserGroup() {
+    void userGroup() {
         UserGroup value_1 = populateAndAssertWithGeneratedCode(UserGroup.class);
         UserGroup value_2 = populateAndAssertWithGeneratedCode(UserGroup.class);
         assertRandomlyPopulatedValues(value_1, value_2);
@@ -65,14 +65,14 @@ class PopulateFactoryWithStaticStrategyTest {
     }
 
     @Test
-    void MultipleStaticMethods() {
+    void multipleStaticMethods() {
         MultipleStaticMethods value_1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
         MultipleStaticMethods value_2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
         assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     @Test
-    void MultipleStaticMethodsWithSimplestMethodType() {
+    void multipleStaticMethodsWithSimplestMethodType() {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(STATIC_METHOD))
                 .objectFactoryEnabled(true)
@@ -85,7 +85,7 @@ class PopulateFactoryWithStaticStrategyTest {
     }
 
     @Test
-    void MultipleStaticMethodsWithSmallestMethodType() {
+    void multipleStaticMethodsWithSmallestMethodType() {
         populateConfig = PopulateConfig.builder()
                 .strategyOrder(List.of(STATIC_METHOD))
                 .objectFactoryEnabled(true)
