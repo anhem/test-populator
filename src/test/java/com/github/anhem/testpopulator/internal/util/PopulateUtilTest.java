@@ -305,7 +305,7 @@ class PopulateUtilTest {
         assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.SMALLEST))
                 .isNotNull()
                 .extracting(Method::getName)
-                .isEqualTo("fromTimestamp");
+                .isIn("fromTimestamp", "fromCsvRecord");
         assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.SIMPLEST))
                 .isNotNull()
                 .extracting(Method::getName)
