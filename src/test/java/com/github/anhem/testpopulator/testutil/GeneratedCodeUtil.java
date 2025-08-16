@@ -22,13 +22,23 @@ public class GeneratedCodeUtil {
     private static final String CLASS = ".class";
     public static final Path PATH = Path.of("target/generated-test-sources/test-populator/");
 
+    public static <T> void assertGeneratedCode(Class<T> clazz, T object, PopulateConfig populateConfig) {
+        String packageName = getPackageName(object.getClass());
+        Path path = getPath(packageName, formatClassName(clazz), populateConfig);
+        assertGeneratedCode(object, path, packageName, clazz.getSimpleName());
+    }
+
     public static <T> void assertGeneratedCode(T object, PopulateConfig populateConfig) {
         String packageName = getPackageName(object.getClass());
         Path path = getPath(packageName, formatClassName(object.getClass()), populateConfig);
+        assertGeneratedCode(object, path, packageName, object.getClass().getSimpleName());
+    }
+
+    private static <T> void assertGeneratedCode(T object, Path path, String packageName, String simpleName) {
         try {
             compileGeneratedFile(path);
             Class<T> clazz = loadClass(path, packageName, path.getFileName().toString().replace(JAVA, ""));
-            T value = getStaticObjectFromClass(clazz, object.getClass().getSimpleName());
+            T value = getStaticObjectFromClass(clazz, simpleName);
             assertThat(value).usingRecursiveComparison().isEqualTo(object);
         } finally {
             removeGeneratedFiles(path);

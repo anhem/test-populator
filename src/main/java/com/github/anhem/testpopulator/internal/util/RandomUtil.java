@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RandomUtil {
 
@@ -52,8 +54,10 @@ public class RandomUtil {
         return getRandomString().charAt(0);
     }
 
-    public static <T> T getRandomEnum(Class<T> clazz) {
-        List<T> enumValues = List.of(clazz.getEnumConstants());
+    public static <T> T getRandomEnum(Class<T> clazz, boolean removeUnrecognized) {
+        List<T> enumValues = Stream.of(clazz.getEnumConstants())
+                .filter(enumValue -> !removeUnrecognized || !enumValue.toString().equals("UNRECOGNIZED"))
+                .collect(Collectors.toList());
         return enumValues.get(random.nextInt(enumValues.size()));
     }
 

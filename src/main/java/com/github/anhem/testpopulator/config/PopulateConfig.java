@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.config.BuilderPattern.*;
+import static com.github.anhem.testpopulator.config.BuilderPattern.CUSTOM;
+import static com.github.anhem.testpopulator.config.BuilderPattern.PROTOBUF;
 import static com.github.anhem.testpopulator.config.ConstructorType.NO_ARGS;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 
@@ -312,14 +313,24 @@ public class PopulateConfig {
         this.objectFactoryEnabled = populateConfigBuilder.objectFactoryEnabled == null ? DEFAULT_OBJECT_FACTORY_ENABLED : populateConfigBuilder.objectFactoryEnabled;
         this.nullOnCircularDependency = populateConfigBuilder.nullOnCircularDependency == null ? DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY : populateConfigBuilder.nullOnCircularDependency;
         this.constructorType = populateConfigBuilder.constructorType == null ? DEFAULT_CONSTRUCTOR_TYPE : populateConfigBuilder.constructorType;
-        if (this.builderPattern == LOMBOK || this.builderPattern == IMMUTABLES) {
-            this.builderMethod = DEFAULT_BUILDER_METHOD;
-            this.buildMethod = DEFAULT_BUILD_METHOD;
-        } else {
-            this.builderMethod = populateConfigBuilder.builderMethod == null ? DEFAULT_BUILDER_METHOD : populateConfigBuilder.builderMethod;
-            this.buildMethod = populateConfigBuilder.buildMethod == null ? DEFAULT_BUILD_METHOD : populateConfigBuilder.buildMethod;
+        switch (this.builderPattern) {
+            case PROTOBUF:
+                this.builderMethod = "newBuilder";
+                this.buildMethod = DEFAULT_BUILD_METHOD;
+                break;
+            case CUSTOM:
+                this.builderMethod = populateConfigBuilder.builderMethod == null ? DEFAULT_BUILDER_METHOD : populateConfigBuilder.builderMethod;
+                this.buildMethod = populateConfigBuilder.buildMethod == null ? DEFAULT_BUILD_METHOD : populateConfigBuilder.buildMethod;
+                break;
+            default:
+                this.builderMethod = DEFAULT_BUILDER_METHOD;
+                this.buildMethod = DEFAULT_BUILD_METHOD;
         }
-        this.methodType = populateConfigBuilder.methodType == null ? DEFAULT_METHOD_TYPE : populateConfigBuilder.methodType;
+        if (this.builderPattern.equals(PROTOBUF)) {
+            this.methodType = populateConfigBuilder.methodType == null ? MethodType.SIMPLEST : populateConfigBuilder.methodType;
+        } else {
+            this.methodType = populateConfigBuilder.methodType == null ? DEFAULT_METHOD_TYPE : populateConfigBuilder.methodType;
+        }
     }
 
     public List<String> getBlacklistedMethods() {
