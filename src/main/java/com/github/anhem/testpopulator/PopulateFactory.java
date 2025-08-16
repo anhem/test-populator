@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
@@ -394,7 +395,7 @@ public class PopulateFactory {
     private <T> T continuePopulateUsingStaticMethod(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
         try {
-            Method staticMethod = getStaticMethod(clazz, populateConfig.getBlacklistedMethods());
+            Method staticMethod = getStaticMethod(clazz, populateConfig.getBlacklistedMethods(), populateConfig.getMethodType());
             classCarrier.getObjectFactory().staticMethod(clazz, staticMethod.getName(), staticMethod.getParameters().length);
             return (T) staticMethod.invoke(null, Stream.of(staticMethod.getParameters())
                     .map(parameter -> {

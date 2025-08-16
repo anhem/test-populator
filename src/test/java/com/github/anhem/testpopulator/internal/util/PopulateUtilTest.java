@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.ConstructorType;
+import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
@@ -15,7 +16,7 @@ import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorP
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
 import com.github.anhem.testpopulator.model.java.setter.*;
-import com.github.anhem.testpopulator.model.java.stc.User;
+import com.github.anhem.testpopulator.model.java.stc.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -264,8 +265,60 @@ class PopulateUtilTest {
     }
 
     @Test
-    void getStaticMethodReturnsMethod() {
-        assertThat(getStaticMethod(User.class, emptyList()))
+    void getStaticMethodWithMethodTypeLargestReturnsMethod() {
+        assertThat(getStaticMethod(Users.class, emptyList(), MethodType.LARGEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("ofTwo");
+    }
+
+    @Test
+    void getStaticMethodWithMethodTypeSmallestReturnsMethod() {
+        assertThat(getStaticMethod(Users.class, emptyList(), MethodType.SMALLEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("with");
+    }
+
+    @Test
+    void getStaticMethodWithMethodTypeWillNotReturnMethodWithSelfReferencingParameter() {
+        assertThat(getStaticMethod(User.class, emptyList(), MethodType.LARGEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("of");
+        assertThat(getStaticMethod(User.class, emptyList(), MethodType.SMALLEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("of");
+        assertThat(getStaticMethod(User.class, emptyList(), MethodType.SIMPLEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("of");
+    }
+
+    @Test
+    void getStaticMethodWithDifferentMethodTypesWillReturnDifferentMethods() {
+        assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.LARGEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("createFull");
+        assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.SMALLEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("fromTimestamp");
+        assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.SIMPLEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("fromIdAndName");
+        assertThat(getStaticMethod(UserGroup.class, emptyList(), MethodType.SIMPLEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("from");
+        assertThat(getStaticMethod(Users.class, emptyList(), MethodType.SIMPLEST))
+                .isNotNull()
+                .extracting(Method::getName)
+                .isEqualTo("with");
+        assertThat(getStaticMethod(UserId.class, emptyList(), MethodType.SIMPLEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("of");

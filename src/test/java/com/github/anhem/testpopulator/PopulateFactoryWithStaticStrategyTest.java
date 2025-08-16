@@ -1,10 +1,8 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.model.java.stc.User;
-import com.github.anhem.testpopulator.model.java.stc.UserGroup;
-import com.github.anhem.testpopulator.model.java.stc.UserId;
-import com.github.anhem.testpopulator.model.java.stc.Users;
+import com.github.anhem.testpopulator.model.java.stc.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -64,6 +62,39 @@ class PopulateFactoryWithStaticStrategyTest {
         UserGroup value_2 = populateAndAssertWithGeneratedCode(UserGroup.class);
         assertRandomlyPopulatedValues(value_1, value_2);
         assertThat(List.of(value_1, value_2)).allSatisfy(users -> assertThat(users.getUsers()).hasSize(1));
+    }
+
+    @Test
+    void MultipleStaticMethods() {
+        MultipleStaticMethods value_1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        MultipleStaticMethods value_2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void MultipleStaticMethodsWithSimplestMethodType() {
+        populateConfig = PopulateConfig.builder()
+                .strategyOrder(List.of(STATIC_METHOD))
+                .objectFactoryEnabled(true)
+                .methodType(MethodType.SIMPLEST)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        MultipleStaticMethods value_1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        MultipleStaticMethods value_2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void MultipleStaticMethodsWithSmallestMethodType() {
+        populateConfig = PopulateConfig.builder()
+                .strategyOrder(List.of(STATIC_METHOD))
+                .objectFactoryEnabled(true)
+                .methodType(MethodType.SMALLEST)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        MultipleStaticMethods value_1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        MultipleStaticMethods value_2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

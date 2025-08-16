@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
@@ -7,6 +8,7 @@ import com.github.anhem.testpopulator.model.java.field.Fields;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoWithMultipleCustomSetters;
+import com.github.anhem.testpopulator.model.java.stc.MultipleStaticMethods;
 import com.github.anhem.testpopulator.model.java.stc.Users;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
 import com.github.anhem.testpopulator.readme.model.MyClass2;
@@ -33,7 +35,8 @@ class PopulateFactoryTest {
             MyClass2.class, //CONSTRUCTOR
             Fields.class, //FIELD
             Users.class, //STATIC_METHOD
-            MyUUID.class //override populate
+            MyUUID.class, //override populate
+            MultipleStaticMethods.class //STATIC_METHOD
     );
 
     @Test
@@ -78,6 +81,7 @@ class PopulateFactoryTest {
                 .objectFactoryEnabled(false)
                 .nullOnCircularDependency(true)
                 .constructorType(LARGEST)
+                .methodType(MethodType.SIMPLEST)
                 .build();
     }
 

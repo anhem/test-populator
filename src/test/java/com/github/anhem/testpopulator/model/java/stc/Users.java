@@ -15,7 +15,7 @@ public class Users {
         return new Users(List.of());
     }
 
-    public static Users of(User user1, User user2) {
+    public static Users ofTwo(User user1, User user2) {
         return new Users(List.of(user1, user2));
     }
 

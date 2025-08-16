@@ -31,6 +31,7 @@ public class PopulateConfig {
     public static final BuilderPattern DEFAULT_BUILDER_PATTERN = CUSTOM;
     public static final String DEFAULT_BUILDER_METHOD = "builder";
     public static final String DEFAULT_BUILD_METHOD = "build";
+    public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
 
     public static class PopulateConfigBuilder {
         private List<String> blacklistedMethods = new ArrayList<>();
@@ -46,6 +47,7 @@ public class PopulateConfig {
         private ConstructorType constructorType;
         private String builderMethod;
         private String buildMethod;
+        private MethodType methodType;
 
         /**
          * Set blacklisted methods. I.E methods that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
@@ -252,6 +254,18 @@ public class PopulateConfig {
         }
 
         /**
+         * Set type of method to find when using STATIC_METHOD strategy.
+         * SIMPLEST will attempt to calculate a complexity score for each static method and pick the simplest.
+         * This is to attempt to avoid more complex methods that for example uses Iterator, StreamReader etc. and methods with primitives, Strings, Boolean etc. instead.
+         * @param methodType
+         * @return
+         */
+        public PopulateConfigBuilder methodType(MethodType methodType) {
+            this.methodType = methodType;
+            return this;
+        }
+
+        /**
          * Build and validate a configuration
          * @return built PopulateConfig
          */
@@ -283,6 +297,7 @@ public class PopulateConfig {
     private final ConstructorType constructorType;
     private final String builderMethod;
     private final String buildMethod;
+    private final MethodType methodType;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
         this.blacklistedMethods = populateConfigBuilder.blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : populateConfigBuilder.blacklistedMethods;
@@ -303,6 +318,7 @@ public class PopulateConfig {
             this.builderMethod = populateConfigBuilder.builderMethod == null ? DEFAULT_BUILDER_METHOD : populateConfigBuilder.builderMethod;
             this.buildMethod = populateConfigBuilder.buildMethod == null ? DEFAULT_BUILD_METHOD : populateConfigBuilder.buildMethod;
         }
+        this.methodType = populateConfigBuilder.methodType == null ? DEFAULT_METHOD_TYPE : populateConfigBuilder.methodType;
     }
 
     public List<String> getBlacklistedMethods() {
@@ -357,6 +373,10 @@ public class PopulateConfig {
         return buildMethod;
     }
 
+    public MethodType getMethodType() {
+        return methodType;
+    }
+
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -376,7 +396,8 @@ public class PopulateConfig {
                 .nullOnCircularDependency(nullOnCircularDependency)
                 .constructorType(constructorType)
                 .builderMethod(builderMethod)
-                .buildMethod(buildMethod);
+                .buildMethod(buildMethod)
+                .methodType(methodType);
     }
 
     private void validate() {
@@ -404,6 +425,7 @@ public class PopulateConfig {
                 ", constructorType=" + constructorType +
                 ", builderMethod='" + builderMethod + '\'' +
                 ", buildMethod='" + buildMethod + '\'' +
+                ", methodType=" + methodType +
                 '}';
     }
 }

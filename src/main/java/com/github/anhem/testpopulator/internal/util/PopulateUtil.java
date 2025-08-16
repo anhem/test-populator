@@ -3,21 +3,30 @@ package com.github.anhem.testpopulator.internal.util;
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.ConstructorType;
 import com.github.anhem.testpopulator.config.Strategy;
+import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getImmutablesGeneratedClass;
 import static java.util.Arrays.stream;
+import static java.util.Comparator.comparingDouble;
+import static java.util.Comparator.comparingInt;
 
 public class PopulateUtil {
 
-    private static final Comparator<Method> PARAMETER_COUNT_COMPARATOR = Comparator.comparingInt(Method::getParameterCount);
+    private static final Comparator<Method> PARAMETER_COUNT_COMPARATOR = comparingInt(Method::getParameterCount);
+    private static final Comparator<Method> SIMPLEST_METHOD_COMPARATOR = comparingDouble(PopulateUtil::getAverageParameterComplexity)
+            .thenComparingInt(Method::getParameterCount);
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
     private static final String JAVA_BASE = "java.base";
     private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
@@ -60,13 +69,77 @@ public class PopulateUtil {
                 .collect(Collectors.toList());
     }
 
-    public static <T> Method getStaticMethod(Class<T> clazz, List<String> blacklistedMethods) {
-        return getDeclaredMethods(clazz, blacklistedMethods).stream()
-                .filter(method -> Modifier.isStatic(method.getModifiers()))
-                .filter(method -> method.getReturnType().equals(clazz))
-                .filter(PopulateUtil::hasAtLeastOneParameter)
-                .max(PARAMETER_COUNT_COMPARATOR)
-                .orElseThrow();
+    public static <T> Method getStaticMethod(Class<T> clazz, List<String> blacklistedMethods, MethodType methodType) {
+        Stream<Method> methods = getDeclaredMethods(clazz, blacklistedMethods).stream()
+                .filter(method -> isMatchingStaticMethod(method, clazz));
+        switch (methodType) {
+            case LARGEST:
+                return methods.max(PARAMETER_COUNT_COMPARATOR).orElseThrow();
+            case SMALLEST:
+                return methods.min(PARAMETER_COUNT_COMPARATOR).orElseThrow();
+            case SIMPLEST:
+                return methods.min(SIMPLEST_METHOD_COMPARATOR).orElseThrow();
+            default:
+                throw new IllegalArgumentException("Unsupported MethodType: " + methodType);
+        }
+    }
+
+    private static boolean isStatic(Method method) {
+        return Modifier.isStatic(method.getModifiers());
+    }
+
+    private static boolean hasSelfReferencingParameter(Method method, Class<?> clazz) {
+        for (Type paramType : method.getGenericParameterTypes()) {
+            if (isOrContainsType(paramType, clazz)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isOrContainsType(Type type, Class<?> clazz) {
+        if (clazz.equals(type)) {
+            return true;
+        }
+
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            for (Type typeArgument : parameterizedType.getActualTypeArguments()) {
+                if (isOrContainsType(typeArgument, clazz)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static double getAverageParameterComplexity(Method method) {
+        return Arrays.stream(method.getParameterTypes())
+                .mapToInt(PopulateUtil::getParameterTypeScore)
+                .average()
+                .orElse(0);
+    }
+
+    private static int getParameterTypeScore(Class<?> type) {
+        if (Iterator.class.isAssignableFrom(type) ||
+                InputStream.class.isAssignableFrom(type) ||
+                OutputStream.class.isAssignableFrom(type) ||
+                Reader.class.isAssignableFrom(type) ||
+                Stream.class.isAssignableFrom(type)) {
+            return 100;
+        }
+        if (type.isPrimitive() || Number.class.isAssignableFrom(type) ||
+                type.equals(Boolean.class) || type.equals(Character.class) ||
+                type.equals(String.class)) {
+            return 1;
+        }
+        if (type.getPackage() != null && (type.getPackage().getName().startsWith("java.util") || type.getPackage().getName().startsWith("java.time"))) {
+            return 5;
+        }
+        if (type.isArray()) {
+            return 10;
+        }
+        return 20;
     }
 
     public static <T> boolean isSet(Class<T> clazz) {
@@ -149,10 +222,17 @@ public class PopulateUtil {
 
     public static <T> boolean isMatchingStaticMethodStrategy(Strategy strategy, Class<T> clazz) {
         if (strategy.equals(STATIC_METHOD)) {
-            return stream(clazz.getDeclaredMethods())
-                    .anyMatch(method -> Modifier.isStatic(method.getModifiers()) && method.getReturnType().equals(clazz) && hasAtLeastOneParameter(method));
+            return getDeclaredMethods(clazz, new ArrayList<>()).stream()
+                    .anyMatch(method -> isMatchingStaticMethod(method, clazz));
         }
         return false;
+    }
+
+    private static <T> boolean isMatchingStaticMethod(Method method, Class<T> clazz) {
+        return isStatic(method) &&
+                method.getReturnType().equals(clazz) &&
+                hasAtLeastOneParameter(method) &&
+                !hasSelfReferencingParameter(method, clazz);
     }
 
     private static <T> boolean hasAccessibleConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor, ConstructorType constructorType) {
@@ -181,7 +261,7 @@ public class PopulateUtil {
         return (Constructor<T>) stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
                 .filter(constructor -> constructor.getParameterCount() != 0)
-                .min(Comparator.comparingInt(Constructor::getParameterCount))
+                .min(comparingInt(Constructor::getParameterCount))
                 .orElseGet(() -> getNoArgsConstructor(clazz, canAccessNonPublicConstructor));
     }
 
@@ -190,7 +270,7 @@ public class PopulateUtil {
         return (Constructor<T>) stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
                 .filter(constructor -> constructor.getParameterCount() != 0)
-                .max(Comparator.comparingInt(Constructor::getParameterCount))
+                .max(comparingInt(Constructor::getParameterCount))
                 .orElseGet(() -> getNoArgsConstructor(clazz, canAccessNonPublicConstructor));
     }
 
@@ -221,11 +301,11 @@ public class PopulateUtil {
         if (setMethodFormat.isBlank()) {
             return method.getReturnType().equals(void.class) && method.getParameters().length == 1;
         }
-        return method.getName().matches(setMethodFormat) && method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+        return method.getName().matches(setMethodFormat) && method.getReturnType().equals(void.class) && method.getParameters().length == 1 && !isStatic(method);
     }
 
     private static <T> boolean isMutatorMethod(Method method, Class<T> clazz) {
-        return (method.getReturnType().equals(void.class) || method.getReturnType().equals(clazz)) && method.getParameters().length > 0;
+        return (method.getReturnType().equals(void.class) || method.getReturnType().equals(clazz)) && method.getParameters().length > 0 && !isStatic(method);
     }
 
     public static <T> void setAccessible(Constructor<T> constructor, boolean canAccessNonPublicConstructor) {

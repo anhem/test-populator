@@ -11,5 +11,9 @@ public class User {
     UserId userId;
     String firstName;
     String lastName;
+
+    public static User from(User user, UserId userId) {
+        return User.of(userId, user.firstName, user.lastName);
+    }
 }
 
