@@ -59,12 +59,12 @@ public class MyClass {
 
 ```java
 //output from toString()
-MyClass {
-    stringValue = 'xksqbhddha',
-            listWithEnums =[B],
-    myInnerClass = InnerClass {
-        integer = 789707,
-                stringToLocalDateMap = {dsyyjxizvp = 2021 - 02 - 14}
+MyClass{
+    stringValue='xksqbhddha', 
+    listWithEnums=[B], 
+    myInnerClass=InnerClass{
+        integer=789707, 
+        stringToLocalDateMap={dsyyjxizvp=2021-02-14}
     }
 }
 ```
@@ -79,9 +79,7 @@ Calling `populate()` without first providing a `PopulateConfig` will result in `
 //1. Configure
 PopulateConfig populateConfig = PopulateConfig.builder()
         ...
-                .
-
-build();
+        .build();
 
 //2. Set up
 PopulateFactory populateFactory = new PopulateFactory(populateConfig);
