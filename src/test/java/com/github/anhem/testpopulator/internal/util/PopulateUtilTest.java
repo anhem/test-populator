@@ -6,6 +6,8 @@ import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
+import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
+import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass.DefaultConstructorMarker;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.custombuilder.CustomBuilder;
 import com.github.anhem.testpopulator.model.java.HasBlackListed;
@@ -364,6 +366,19 @@ class PopulateUtilTest {
         assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, SMALLEST).getParameterCount());
     }
 
+    @Test
+    void isKotlinConstructorReturnsFalse() throws NoSuchMethodException {
+        assertThat(isKotlinConstructor(JavaClass.class.getConstructor())).isFalse();
+        assertThat(isKotlinConstructor(JavaClass.class.getConstructor(String.class))).isFalse();
+        assertThat(isKotlinConstructor(JavaClass.class.getConstructor(String.class, int.class))).isFalse();
+    }
+
+    @Test
+    void isKotlinConstructorReturnsTrue() throws NoSuchMethodException {
+        assertThat(isKotlinConstructor(KotlinLikeClass.class.getConstructor(String.class, int.class, KotlinLikeClass.InnerClass.class, int.class, DefaultConstructorMarker.class))).isTrue();
+        assertThat(isKotlinConstructor(KotlinLikeClass.class.getConstructor(DefaultConstructorMarker.class))).isTrue();
+    }
+
     private static ClassCarrier<String> createClassCarrier() {
         return Carrier.initialize(String.class, new ObjectFactoryVoid());
     }
@@ -381,5 +396,16 @@ class PopulateUtilTest {
                 .filter(p -> p.getType().equals(Set.class))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    private static class JavaClass {
+        public JavaClass() {
+        }
+
+        public JavaClass(String a) {
+        }
+
+        public JavaClass(String a, int b) {
+        }
     }
 }

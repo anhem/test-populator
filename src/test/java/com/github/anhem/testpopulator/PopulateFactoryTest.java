@@ -8,6 +8,7 @@ import com.github.anhem.testpopulator.model.java.mutator.MutatorWithConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoWithMultipleCustomSetters;
 import com.github.anhem.testpopulator.model.java.stc.Users;
+import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
 import com.github.anhem.testpopulator.readme.model.MyClass2;
 import com.github.anhem.testpopulator.readme.model.MyUUID;
@@ -33,7 +34,8 @@ class PopulateFactoryTest {
             MyClass2.class, //CONSTRUCTOR
             Fields.class, //FIELD
             Users.class, //STATIC_METHOD
-            MyUUID.class //override populate
+            MyUUID.class, //override populate
+            KotlinLikeClass.class //kotlin support
     );
 
     @Test
@@ -78,6 +80,7 @@ class PopulateFactoryTest {
                 .objectFactoryEnabled(false)
                 .nullOnCircularDependency(true)
                 .constructorType(LARGEST)
+                .kotlinSupport(true)
                 .build();
     }
 

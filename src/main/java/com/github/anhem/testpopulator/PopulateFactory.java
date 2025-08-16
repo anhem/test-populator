@@ -227,23 +227,31 @@ public class PopulateFactory {
         try {
             Constructor<T> constructor = getLargestConstructor(clazz, populateConfig.canAccessNonPublicConstructors());
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
-            return continuePopulateUsingConstructor(constructor, classCarrier);
+            return createInstanceFromConstructor(constructor, classCarrier);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), CONSTRUCTOR), e);
         }
     }
 
-    private <T> T continuePopulateUsingConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), constructor.getParameterCount());
-        Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
-            Parameter parameter = constructor.getParameters()[i];
-            if (isCollection(parameter.getType())) {
-                return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
-            } else {
-                return populateWithOverrides(classCarrier.toClassCarrier(parameter));
-            }
-        }).toArray();
-        return constructor.newInstance(arguments);
+    private <T> T createInstanceFromConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        int parameterCount = constructor.getParameterCount();
+        classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), parameterCount);
+        if (populateConfig.isKotlinSupport() && isKotlinConstructor(constructor)) {
+            Object[] arguments = IntStream.range(0, parameterCount - 2).mapToObj(i -> populateConstructorArgument(constructor, classCarrier, i)).toArray();
+            return constructor.newInstance(Stream.concat(Arrays.stream(arguments), Stream.of(0, null)).toArray());
+        } else {
+            Object[] arguments = IntStream.range(0, parameterCount).mapToObj(i -> populateConstructorArgument(constructor, classCarrier, i)).toArray();
+            return constructor.newInstance(arguments);
+        }
+    }
+
+    private <T> T populateConstructorArgument(Constructor<T> constructor, ClassCarrier<T> classCarrier, int i) {
+        Parameter parameter = constructor.getParameters()[i];
+        if (isCollection(parameter.getType())) {
+            return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
+        } else {
+            return populateWithOverrides(classCarrier.toClassCarrier(parameter));
+        }
     }
 
     private <T> T continuePopulateUsingFields(ClassCarrier<T> classCarrier) {
@@ -293,7 +301,7 @@ public class PopulateFactory {
             Constructor<T> constructor = getConstructor(clazz, populateConfig.canAccessNonPublicConstructors(), populateConfig.getConstructorType());
             setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
             if (constructor.getParameterCount() > 0) {
-                T objectOfClass = continuePopulateUsingConstructor(constructor, classCarrier);
+                T objectOfClass = createInstanceFromConstructor(constructor, classCarrier);
                 List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
                 classCarrier.getObjectFactory().mutator(clazz, methods.size());
                 methods.forEach(method -> continuePopulateForMethod(objectOfClass, method, classCarrier));

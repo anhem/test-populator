@@ -5,6 +5,7 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.constructor.*;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
+import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +21,7 @@ import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGe
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PopulateFactoryWithConstructorTypeStrategyTest {
 
@@ -194,6 +196,28 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         AllArgsConstructorDateAndTimeMix value_1 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
         AllArgsConstructorDateAndTimeMix value_2 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
         assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void kotlinLikeClass() {
+        populateConfig = populateConfig.toBuilder()
+                .objectFactoryEnabled(false)
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        KotlinLikeClass value_1 = populateAndAssert(KotlinLikeClass.class);
+        KotlinLikeClass value_2 = populateAndAssert(KotlinLikeClass.class);
+        assertRandomlyPopulatedValues(value_1, value_2);
+    }
+
+    @Test
+    void kotlinLikeClassThrowsExceptionWhenKotlinSupportIsFalse() {
+        populateConfig = populateConfig.toBuilder()
+                .objectFactoryEnabled(false)
+                .kotlinSupport(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        assertThrows(PopulateException.class, () -> populateFactory.populate(KotlinLikeClass.class));
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
