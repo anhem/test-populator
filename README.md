@@ -61,10 +61,14 @@ MyClass{
 ## Key Features
 
 * **Automatic Object Population**: Instantly create fully-populated, complex Java objects with a single line of code.
-* **Multiple Creation Strategies**: Intelligently creates objects using a configurable chain of strategies (constructor, setters, builders, etc.) to handle almost any class design.
-* **Highly Configurable**: Tailor the object creation logic to your exact needs. You can generate random or fixed (deterministic) data, provide custom logic for specific types (like `UUID`), handle circular dependencies, and more.
-* **Builder Support**: Natively supports common builder patterns from libraries like **[Lombok](https://projectlombok.org/)**, **[Immutables](https://immutables.github.io/)**, and **[Protobuf](https://protobuf.dev/)**.
-* **Java Code Generation (Experimental)**: Automatically generate the Java source code for the populated objects, which you can then save and reuse in your tests.
+* **Multiple Creation Strategies**: Intelligently creates objects using a configurable chain of strategies (constructor, setters, builders, etc.) to
+  handle almost any class design.
+* **Highly Configurable**: Tailor the object creation logic to your exact needs. You can generate random or fixed (deterministic) data, provide custom
+  logic for specific types (like `UUID`), handle circular dependencies, and more.
+* **Builder Support**: Natively supports common builder patterns from libraries like **[Lombok](https://projectlombok.org/)**, *
+  *[Immutables](https://immutables.github.io/)**, and **[Protobuf](https://protobuf.dev/)**.
+* **Java Code Generation (Experimental)**: Automatically generate the Java source code for the populated objects, which you can then save and reuse in
+  your tests.
 
 -----
 
@@ -74,18 +78,18 @@ You can customize the library's behavior using a `PopulateConfig` object. If you
 
 The basic setup flow is:
 
-1.  **Configure**: Create a `PopulateConfig` instance with your desired settings.
-2.  **Set up**: Pass the config to a new `PopulateFactory`.
-3.  **Use**: Call `populate()` on the factory instance.
+1. **Configure**: Create a `PopulateConfig` instance with your desired settings.
+2. **Set up**: Pass the config to a new `PopulateFactory`.
+3. **Use**: Call `populate()` on the factory instance.
 
 <!-- end list -->
 
 ```java
 // 1. Configure
 PopulateConfig populateConfig = PopulateConfig.builder()
-        .randomValues(false) // Use fixed values instead of random
-        .nullOnCircularDependency(true) // Prevent stack overflows
-        .build();
+                .randomValues(false) // Use fixed values instead of random
+                .nullOnCircularDependency(true) // Prevent stack overflows
+                .build();
 
 // 2. Set up
 PopulateFactory populateFactory = new PopulateFactory(populateConfig);
@@ -114,13 +118,16 @@ Defines the order of strategies to try when creating an object. If the first str
 Controls whether data is random or fixed.
 
 * **Default**: `true` (random values)
-* **Details**: When set to `false`, populating the same class twice will produce identical objects. Random values are generated within sensible ranges (e.g., dates are +/- 1 year from the current date).
+* **Details**: When set to `false`, populating the same class twice will produce identical objects. Random values are generated within sensible
+  ranges (e.g., dates are +/- 1 year from the current date).
 
 #### `overridePopulates`
 
-Provides **custom logic** for creating instances of specific classes. This is essential when a class requires values with a specific format, or if you want to control the outcome for a specific class.
+Provides **custom logic** for creating instances of specific classes. This is essential when a class requires values with a specific format, or if you
+want to control the outcome for a specific class.
 
-For example, imagine a class `MyUUID` whose constructor takes a `String` but requires it to be a valid UUID. Test-Populator would normally provide a random string like `"fghjklmnpa"`, which would cause the `MyUUID` constructor to fail.
+For example, imagine a class `MyUUID` whose constructor takes a `String` but requires it to be a valid UUID. Test-Populator would normally provide a
+random string like `"fghjklmnpa"`, which would cause the `MyUUID` constructor to fail.
 
 `overridePopulates` lets you "teach" the library how to correctly create these objects.
 
@@ -128,16 +135,16 @@ You can provide a lambda directly in the configuration:
 
 ```java
 PopulateConfig populateConfig = PopulateConfig.builder()
-    // Solves the problem by providing a correctly formatted string for MyUUID
-    .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
-    // Also useful for setting specific values, like the current date
-    .overridePopulate(LocalDate.class, LocalDate::now)
-    // or setting all Strings to a random UUID
-    .overridePopulate(String.class, () -> UUID.randomUUID().toString())
-    .build();
+        // Solves the problem by providing a correctly formatted string for MyUUID
+        .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+        // Also useful for setting specific values, like the current date
+        .overridePopulate(LocalDate.class, LocalDate::now)
+        // or setting all Strings to a random UUID
+        .overridePopulate(String.class, () -> UUID.randomUUID().toString())
+        .build();
 ```
 
-Instead of a lambda, you can also implement the `OverridePopulate` interface for more complex cases. 
+Instead of a lambda, you can also implement the `OverridePopulate` interface for more complex cases.
 
 #### `nullOnCircularDependency`
 
@@ -171,12 +178,16 @@ Allows the library to use private or protected constructors.
 
 * **For `STATIC_METHOD` strategy**:
 
-    * `methodType`: The preferred static factory method to use. Options are `LARGEST` (most parameters), `SMALLEST` (fewest parameters), `SIMPLEST` (prioritizes methods with simple parameter types). Default is `LARGEST`.
+    * `methodType`: The preferred static factory method to use. Options are `LARGEST` (most parameters), `SMALLEST` (fewest parameters), `SIMPLEST` (
+      prioritizes methods with simple parameter types). Default is `LARGEST`.
 
 ### Other Options
 
-* `blacklistedMethods` / `blacklistedFields`: A list of method or field names to skip during population. Useful for avoiding code coverage instrumentation fields like `$jacocoInit`.
-* `objectFactoryEnabled` (Experimental): If `true`, generates Java source code for the populated object in the `target/generated-test-sources/test-populator/` directory. **Note**: This will not work if the `FIELD` strategy or `accessNonPublicConstructors` is enabled.
+* `blacklistedMethods` / `blacklistedFields`: A list of method or field names to skip during population. Useful for avoiding code coverage
+  instrumentation fields like `$jacocoInit`.
+* `objectFactoryEnabled` (Experimental): If `true`, generates Java source code for the populated object in the
+  `target/generated-test-sources/test-populator/` directory. **Note**: This will not work if the `FIELD` strategy or `accessNonPublicConstructors` is
+  enabled.
 
 -----
 
