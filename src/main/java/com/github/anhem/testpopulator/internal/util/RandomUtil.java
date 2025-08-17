@@ -15,8 +15,8 @@ public class RandomUtil {
     private static final int LEFT_LIMIT = 97; // letter 'a'
     private static final int RIGHT_LIMIT = 122; // letter 'z'
     static final int STRING_LENGTH = 10;
-    private static final Random random = new SecureRandom();
     private static final int DAY_IN_SECONDS = 86400;
+    private static final Random random = new SecureRandom();
 
     private RandomUtil() {
     }

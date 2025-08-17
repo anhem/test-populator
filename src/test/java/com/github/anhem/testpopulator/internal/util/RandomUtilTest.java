@@ -130,7 +130,7 @@ class RandomUtilTest {
     }
 
     @Test
-    void getRandomLocalTimegIsDifferentEachTime() {
+    void getRandomLocalTimeIsDifferentEachTime() {
         LocalTime random_1 = getRandomLocalTime();
         LocalTime random_2 = getRandomLocalTime();
 
