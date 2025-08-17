@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.value;
 
+import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.github.anhem.testpopulator.config.BuilderPattern.CUSTOM;
 import static com.github.anhem.testpopulator.internal.value.ValueFactory.UNSUPPORTED_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,7 +25,7 @@ class ValueFactoryTest {
 
     @Test
     void randomValuesAreCreated() {
-        valueFactory = new ValueFactory(true, Map.of());
+        valueFactory = new ValueFactory(true, Map.of(), CUSTOM);
         createAndAssertRandomValues(ArbitraryEnum.class);
         createAndAssertRandomValues(Integer.class);
         createAndAssertRandomValues(Long.class);
@@ -51,7 +53,7 @@ class ValueFactoryTest {
 
     @Test
     void fixedValuesAreCreated() {
-        valueFactory = new ValueFactory(false, Map.of());
+        valueFactory = new ValueFactory(false, Map.of(), CUSTOM);
         createAndAssertFixedValues(ArbitraryEnum.class);
         createAndAssertFixedValues(Integer.class);
         createAndAssertFixedValues(Long.class);
@@ -79,7 +81,7 @@ class ValueFactoryTest {
 
     @Test
     void attemptingToCreateValueOfUnsupportedTypeThrowsException() {
-        valueFactory = new ValueFactory(true, Map.of());
+        valueFactory = new ValueFactory(true, Map.of(), CUSTOM);
         assertThatThrownBy(() -> valueFactory.createValue(Pojo.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(UNSUPPORTED_TYPE, Pojo.class.getTypeName()));
