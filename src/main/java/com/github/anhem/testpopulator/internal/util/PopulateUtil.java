@@ -51,7 +51,7 @@ public class PopulateUtil {
     }
 
     public static <T> List<Method> getSetterMethods(Class<T> clazz, List<String> blacklistedMethods, List<String> setterPrefixes) {
-        List<String> setterMethodFormats = getSetterMethodFormats(setterPrefixes);
+        List<String> setterMethodFormats = getMethodFormats(setterPrefixes);
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> isSetterMethod(method, setterMethodFormats))
                 .collect(Collectors.toList());
@@ -181,7 +181,7 @@ public class PopulateUtil {
 
     public static <T> boolean isMatchingSetterStrategy(Strategy strategy, Class<T> clazz, List<String> setterPrefixes, boolean accessNonPublicConstructor) {
         if (strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor)) {
-            List<String> setterMethodFormats = getSetterMethodFormats(setterPrefixes);
+            List<String> setterMethodFormats = getMethodFormats(setterPrefixes);
             return getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
                     .filter(method -> !isWaitMethod(method))
                     .anyMatch(method -> isSetterMethod(method, setterMethodFormats));
@@ -364,13 +364,13 @@ public class PopulateUtil {
         return declaredMethods;
     }
 
-    private static List<String> getSetterMethodFormats(List<String> setterPrefixes) {
+    private static List<String> getMethodFormats(List<String> setterPrefixes) {
         return setterPrefixes.stream()
-                .map(PopulateUtil::getSetterMethodFormat)
+                .map(PopulateUtil::getMethodFormat)
                 .collect(Collectors.toList());
     }
 
-    private static String getSetterMethodFormat(String setterPrefix) {
+    static String getMethodFormat(String setterPrefix) {
         return setterPrefix.isEmpty() ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
     }
 

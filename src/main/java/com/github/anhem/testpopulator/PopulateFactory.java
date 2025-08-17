@@ -25,6 +25,8 @@ import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getMet
 import static com.github.anhem.testpopulator.internal.util.LombokUtil.calculateExpectedChildren;
 import static com.github.anhem.testpopulator.internal.util.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
+import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.getMethodsForProtobufBuilder;
+import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufByteString;
 import static java.lang.String.format;
 
 /**
@@ -57,7 +59,7 @@ public class PopulateFactory {
      */
     public PopulateFactory(PopulateConfig populateConfig) {
         this.populateConfig = populateConfig;
-        this.valueFactory = new ValueFactory(populateConfig.useRandomValues(), populateConfig.getOverridePopulate());
+        this.valueFactory = new ValueFactory(populateConfig.useRandomValues(), populateConfig.getOverridePopulate(), populateConfig.getBuilderPattern());
     }
 
     /**
@@ -76,7 +78,7 @@ public class PopulateFactory {
     private <T> T populateWithOverrides(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
         if (valueFactory.hasType(clazz)) {
-            return creatValue(classCarrier);
+            return createValue(classCarrier);
         }
         if (alreadyVisited(classCarrier, populateConfig.isNullOnCircularDependency())) {
             return createNullValue(classCarrier);
@@ -90,7 +92,7 @@ public class PopulateFactory {
         return continuePopulateWithStrategies(classCarrier);
     }
 
-    private <T> T creatValue(ClassCarrier<T> classCarrier) {
+    private <T> T createValue(ClassCarrier<T> classCarrier) {
         T value = valueFactory.createValue(classCarrier.getClazz());
         classCarrier.getObjectFactory().value(value);
         return value;
@@ -220,6 +222,9 @@ public class PopulateFactory {
                 return continuePopulateUsingStaticMethod(classCarrier);
             }
         }
+        if (isProtobufByteString(clazz, populateConfig)) {
+            return continuePopulateUsingStaticMethod(classCarrier);
+        }
         throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName(), populateConfig.getStrategyOrder()));
     }
 
@@ -319,6 +324,8 @@ public class PopulateFactory {
                 return continuePopulateUsingImmutablesBuilder(classCarrier);
             case CUSTOM:
                 return continuePopulateUsingCustomBuilder(classCarrier);
+            case PROTOBUF:
+                return continuePopulateUsingProtobufBuilder(classCarrier);
             default:
                 throw new PopulateException("Unsupported builder pattern");
         }
@@ -375,11 +382,29 @@ public class PopulateFactory {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateUsingProtobufBuilder(ClassCarrier<T> classCarrier) {
+        Class<T> clazz = classCarrier.getClazz();
+        try {
+            Object builderObject = clazz.getDeclaredMethod(populateConfig.getBuilderMethod()).invoke(null);
+            List<Method> builderObjectMethods = getMethodsForProtobufBuilder(builderObject.getClass(), populateConfig.getBlacklistedMethods());
+            classCarrier.getObjectFactory().builder(clazz, builderObjectMethods.size(), populateConfig.getBuilderMethod(), populateConfig.getBuildMethod());
+            builderObjectMethods.forEach(method -> continuePopulateForMethod(builderObject, method, classCarrier));
+            Method buildMethod = builderObject.getClass().getDeclaredMethod(populateConfig.getBuildMethod());
+            return (T) buildMethod.invoke(builderObject);
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, classCarrier.getClazz().getName(), format("%s (%s)", BUILDER, PROTOBUF)), e);
+        }
+    }
+
     private <T, V> void continuePopulateForMethod(V objectOfClass, Method method, ClassCarrier<T> classCarrier) {
         try {
             classCarrier.getObjectFactory().method(method.getName(), method.getParameters().length);
             method.invoke(objectOfClass, Stream.of(method.getParameters())
                     .map(parameter -> {
+                        if (isProtobufByteString(parameter, populateConfig)) {
+                            return populateWithOverrides(classCarrier.toClassCarrier(parameter));
+                        }
                         if (isCollection(parameter.getType())) {
                             return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
                         } else {

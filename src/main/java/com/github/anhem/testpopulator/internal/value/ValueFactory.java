@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.value;
 
+import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.util.RandomUtil;
@@ -44,11 +45,13 @@ public class ValueFactory {
 
     private final boolean setRandomValues;
     private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
+    private final BuilderPattern builderPattern;
 
-    public ValueFactory(boolean setRandomValues, Map<Class<?>, OverridePopulate<?>> overridePopulates) {
+    public ValueFactory(boolean setRandomValues, Map<Class<?>, OverridePopulate<?>> overridePopulates, BuilderPattern builderPattern) {
         this.setRandomValues = setRandomValues;
         this.typeSuppliers = getDefaultTypeSuppliers();
         this.typeSuppliers.putAll(overridePopulates);
+        this.builderPattern = builderPattern;
     }
 
     private Map<Class<?>, TypeSupplier<?>> getDefaultTypeSuppliers() {
@@ -107,7 +110,7 @@ public class ValueFactory {
 
     private <T> T getEnum(Class<T> clazz) {
         if (setRandomValues) {
-            return getRandomEnum(clazz);
+            return getRandomEnum(clazz, builderPattern.equals(BuilderPattern.PROTOBUF));
         }
         return clazz.getEnumConstants()[0];
     }

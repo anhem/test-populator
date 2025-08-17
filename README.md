@@ -1,34 +1,28 @@
-# test-populator
+# Test-Populator
 
 [![CI](https://github.com/anhem/test-populator/workflows/CI/badge.svg)](https://github.com/anhem/test-populator/actions)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=anhem_test-populator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=anhem_test-populator)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://central.sonatype.com/artifact/com.github.anhem/test-populator/)
 [![OpenJDK](https://img.shields.io/badge/OpenJDK-11-brightgreen)](https://github.com/anhem/test-populator/blob/main/pom.xml#L26)
 
-Populate java classes with fixed or random data. Facilitates the creation of objects in tests.
+Test-Populator is a Java library that automatically creates and populates objects with fixed or random data, simplifying the creation of test data.
 
-**Problem:**
+-----
 
-When writing tests, you may not always be interested in what data an object has. You just want to make use of an object of that type with some or all
-fields
-populated.
+## Why Use Test-Populator?
 
-Creating a lot of objects manually is time-consuming and gives you additional code to maintain.
+When writing tests, you often need an instance of a class but don't care about all the specific data it contains. Manually creating and populating
+these objects can be time-consuming, adds extra code to maintain, and can lead to complex mocking setups.
 
-The same goes for mocking objects. It works, but can also result in a huge and complicated mocking setup that also needs to be maintained.
+This library solves that problem by automatically creating and populating objects for you.
 
-**Solution:**
-
-`test-populator` solves the hassle of setting up test data by automatically creating objects for you; in the same way these objects would normally get
-created.
-
-**Doing this:**
+For example, instead of manually instantiating `MyClass` and all its nested objects, you can simply do this:
 
 ```java
 MyClass myClass = new PopulateFactory().populate(MyClass.class);
 ```
 
-**With this:**
+Given the following class definition:
 
 ```java
 public class MyClass {
@@ -37,28 +31,21 @@ public class MyClass {
     private final List<ArbitraryEnum> listWithEnums;
     private final InnerClass myInnerClass;
 
-    public MyClass(String stringValue, List<ArbitraryEnum> listWithEnums, InnerClass myInnerClass) {
-        this.stringValue = stringValue;
-        this.listWithEnums = listWithEnums;
-        this.myInnerClass = myInnerClass;
-    }
+    // Constructor...
 
     public static class InnerClass {
         private final int integer;
         private final Map<String, LocalDate> stringToLocalDateMap;
 
-        public InnerClass(int integer, Map<String, LocalDate> stringToLocalDateMap) {
-            this.integer = integer;
-            this.stringToLocalDateMap = stringToLocalDateMap;
-        }
+        // Constructor...
     }
 }
 ```
 
-**Results in this:**
+The library will generate a result like this:
 
-```java
-//output from toString()
+```
+// Console output from myClass.toString()
 MyClass{
     stringValue='xksqbhddha', 
     listWithEnums=[B], 
@@ -69,316 +56,203 @@ MyClass{
 }
 ```
 
-# Configuration
+-----
 
-Use `PopulateConfig` to configure how `test-populator` should run.
+## Key Features
 
-Calling `populate()` without first providing a `PopulateConfig` will result in `test-populator` using default configuration.
+* **Automatic Object Population**: Instantly create fully-populated, complex Java objects with a single line of code.
+* **Multiple Creation Strategies**: Intelligently creates objects using a configurable chain of strategies (constructor, setters, builders, etc.) to
+  handle almost any class design.
+* **Highly Configurable**: Tailor the object creation logic to your exact needs. You can generate random or fixed (deterministic) data, provide custom
+  logic for specific types (like `UUID`), handle circular dependencies, and more.
+* **Builder Support**: Natively supports common builder patterns from libraries like **[Lombok](https://projectlombok.org/)**,
+  **[Immutables](https://immutables.github.io/)**, and **[Protobuf](https://protobuf.dev/)**.
+* **Java Code Generation (Experimental)**: Automatically generate the Java source code for the populated objects, which you can then save and reuse in
+  your tests.
+
+-----
+
+## Configuration
+
+You can customize the library's behavior using a `PopulateConfig` object. If you don't provide one, default settings will be used.
+
+The basic setup flow is:
+
+1. **Configure**: Create a `PopulateConfig` instance with your desired settings.
+2. **Set up**: Pass the config to a new `PopulateFactory`.
+3. **Use**: Call `populate()` on the factory instance.
+
+<!-- end list -->
 
 ```java
-//1. Configure
+// 1. Configure
 PopulateConfig populateConfig = PopulateConfig.builder()
-        ...
-        .build();
+                .randomValues(false) // Use fixed values instead of random
+                .nullOnCircularDependency(true) // Prevent stack overflows
+                .build();
 
-//2. Set up
+// 2. Set up
 PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
-//3. Use
-MyClass myClass = populateFactory.populate(myClass.class);
+// 3. Use
+MyClass myClass = populateFactory.populate(MyClass.class);
 ```
 
-| config                      | Values                                                      | Default                            |
-|-----------------------------|-------------------------------------------------------------|------------------------------------|
-| strategyOrder               | CONSTRUCTOR, SETTER, MUTATOR, FIELD, BUILDER, STATIC_METHOD | CONSTRUCTOR, SETTER, STATIC_METHOD |
-| builderPattern              | CUSTOM / LOMBOK / IMMUTABLES                                | CUSTOM                             |
-| randomValues                | true / false                                                | true                               |
-| setterPrefixes              | prefix of setter methods                                    | set                                |
-| accessNonPublicConstructors | true / false                                                | false                              |
-| overridePopulates           | List of OverridePopulate implementations                    | -                                  |
-| blacklistedMethods          | List of methods to skip if encountered                      | $jacocoInit                        |
-| blacklistedFields           | List of fields to skip if encountered                       | \_\_$lineHits$\_\_, $jacocoData    |    
-| objectFactoryEnabled        | Experimental! true / false                                  | false                              |    
-| nullOnCircularDependency    | true / false                                                | false                              |    
-| constructorType             | NO_ARG, SMALLEST, LARGEST                                   | NO_ARG                             |    
-| builderMethod               | name of builder method                                      | builder                            |    
-| buildMethod                 | name of build method                                        | build                              |    
-| methodType                  | SMALLEST, LARGEST, SIMPLEST                                 | build                              |    
+### Main Configuration Options
 
-### strategyOrder
+#### `strategyOrder`
 
-There are a some different strategies used to populate, and they are being used in the order specified. I.e if the first
-strategy is not suitable for populating, the next will be tried and so on.
+Defines the order of strategies to try when creating an object. If the first strategy fails, it moves to the next.
 
-##### CONSTRUCTOR
+* **Default**: `CONSTRUCTOR`, `SETTER`, `STATIC_METHOD`
+* **Available Strategies**:
+    * `CONSTRUCTOR`: Uses the constructor with the most parameters.
+    * `SETTER`: Uses a no-arg constructor, then calls standard setter methods (e.g., `setName()`).
+    * `MUTATOR`: Uses a constructor, then calls any state-changing methods (including fluent setters like `withName()`).
+    * `FIELD`: Uses a no-arg constructor and populates fields directly using reflection.
+    * `BUILDER`: Uses a builder pattern (e.g., from Lombok or Immutables).
+    * `STATIC_METHOD`: Uses a public static factory method to create an instance.
 
-Use the constructor with most parameters to populate. Applied to classes that have a constructor with at least one
-argument.
+#### `randomValues`
 
-##### SETTER
+Controls whether data is random or fixed.
 
-Use a no-arguments/default constructor to instantiate and setter methods to populate fields. Applied to classes that
-have a no-arguments/default constructor and at least one setter method.
+* **Default**: `true` (random values)
+* **Details**: When set to `false`, populating the same class twice will produce identical objects. Random values are generated within sensible
+  ranges (e.g., dates are +/- 1 year from the current date).
 
-This works similarly to [MUTATOR](#mutator) but will take methods that follow the classic setter pattern.
+#### `overridePopulates`
 
-Methods are considered setters if they match any of the provided [setterPrefixes](#setterprefixes), with `one argument` and return `void`.
+Provides **custom logic** for creating instances of specific classes. This is essential when a class requires values with a specific format, or if you
+want to control the outcome for a specific class.
 
-##### MUTATOR
+For example, imagine a class `MyUUID` whose constructor takes a `String` but requires it to be a valid UUID. Test-Populator would normally provide a
+random string like `"fghjklmnpa"`, which would cause the `MyUUID` constructor to fail.
 
-Use a constructor based on [constructorType](#constructortype) to instantiate and mutator methods to populate fields. Applied to classes that
-have at least one mutator method.
+`overridePopulates` lets you "teach" the library how to correctly create these objects.
 
-This works similarly to [SETTER](#setter) but will take any method that mutates the object instead of only those following the classic setter pattern.
-
-Methods are considered mutators if they have at least `one argument` and return `void` or the class `test-populator` is currently creating.
-
-##### FIELD
-
-Use a no-arguments/default constructor to instantiate and then use reflection to populate all the fields. Applied to
-classes that have a no-arguments/default constructor.
-
-##### BUILDER
-
-Use builders to populate. Supports [Lombok](https://projectlombok.org/) and [Immutables](https://immutables.github.io/) as well as a lightly
-customizable variant `CUSTOM` where builder and build methods can be defined.
-Configured by setting [builderPattern](#builderpattern). Applied to classes with a builder method.
-
-##### STATIC_METHOD
-
-Use a public static method based on [methodType](#methodtype) to create an object of the class.
-
-### builderPattern
-
-(Applied when using strategy: [BUILDER](#Builder))
-
-Different builders behave slightly different. The builderPattern tells `test-populator` which one to use.
-
-### randomValues
-
-Set to true will randomize everything. When set to false fixed values will be used. I.e. populating the same class twice
-will give the same result.
-
-**Note!** Random values are not generated entirely at random. They are generated to be random enough. For example date and time of
-various types are randomized from between `"now" minus 1 year` and `"now" plus 1 year`.
-
-See [RandomUtil.java](src/main/java/com/github/anhem/testpopulator/RandomUtil.java) for more details.
-
-### setterPrefixes
-
-(Applied when using strategy: [SETTER](#Setter))
-
-Use setters with a different format than `set*`
-
-An empty string `""` can be used to make use of any void method with one argument
-
-### accessNonPublicConstructors
-
-Controls whether to allow access to private or protected constructors when populating.
-
-### methodType
-
-(Applied when using strategy: [STATIC_METHOD](#static_method))
-
-Set type of method to find when using STATIC_METHOD strategy.
-
-* LARGEST will take the method with most parameters
-* SMALLEST will take the method with fewest parameters
-* SIMPLEST will attempt to calculate a `complexity score` for each static method and pick the simplest.
-  This is to attempt to avoid more complex methods that for example uses Iterator, StreamReader etc. Methods with primitives, Strings, Boolean etc.
-  will be prioritized instead.
-
-### overridePopulates
-
-This solves a couple of issues that may be encountered:
-
-1. I want to generate my own value for a specific class
-2. `test-populator` fails to generate a value for a specific class
-3. I get `Failed to find type to create value for <Class>. Not implemented?`
-
-You can provide your own values by creating your own classes implementing the `OverridePopulate` interface (see the `MyUUID` example below),
-or by simply providing your own implementation directly in the configuration:
+You can provide a lambda directly in the configuration:
 
 ```java
-    PopulateConfig populateConfig = PopulateConfig.builder()
-        .overridePopulate(LocalDate.class, LocalDate::now) //set all LocalDates to "now"
-        .overridePopulate(String.class, () -> UUID.randomUUID().toString()) //set all strings to random UUID's
+PopulateConfig populateConfig = PopulateConfig.builder()
+        // Solves the problem by providing a correctly formatted string for MyUUID
+        .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+        // Also useful for setting specific values, like the current date
+        .overridePopulate(LocalDate.class, LocalDate::now)
+        // or setting all Strings to a random UUID
+        .overridePopulate(String.class, () -> UUID.randomUUID().toString())
         .build();
 ```
 
-Some classes might be difficult to populate automatically, or you may want to decide what value should be set for a
-specific class.
+Instead of a lambda, you can also implement the `OverridePopulate` interface for more complex cases.
 
-This class for example cannot be handled by `test-populator` alone:
+#### `nullOnCircularDependency`
 
-```java
-public class MyUUID {
+Handles circular dependencies (e.g., `ClassA` has a field of `ClassB`, and `ClassB` has a field of `ClassA`).
 
-    private final UUID uuid;
+* **Default**: `false`
+* **Details**: Enabling this will break the circular reference by setting the recurring object to null, preventing a StackOverflowError. Note that
+  this adds a small performance overhead, as the library must keep track of every class it visits during the population process.
 
-    public MyUUID(String uuid) {
-        this.uuid = UUID.fromString(uuid);
-    }
-}
-```
+#### `accessNonPublicConstructors`
 
-It requires a String that can be converted into a UUID which will be impossible to accomplish using random strings. To
-remedy this we can override population of this class by creating our own MyUUID populator class:
+Allows the library to use private or protected constructors.
 
-```java
-public class MyUUIDOverride implements OverridePopulate<MyUUID> {
+* **Default**: `false`
 
-    @Override
-    public MyUUID create() {
-        return new MyUUID(UUID.randomUUID().toString());
-    }
-}
-```
+### Strategy-Specific Options
 
-This can then be added to our configuration and will be used whenever MyUUID is encountered.
+* **For `SETTER` strategy**:
 
-```java
-    PopulateConfig populateConfig = PopulateConfig.builder()
-        .overridePopulate(MyUUID.class, new MyUUIDOverridePopulate()) //provides own implementation of how to create MyUUID
-        .build();
-```
+    * `setterPrefixes`: A list of prefixes for setter methods. Default is `["set"]`. Use `[""]` to match any void method with one argument.
 
-Also see [Setup](#Setup) for a complete example
+* **For `BUILDER` strategy**:
 
-### blacklistedMethods
+    * `builderPattern`: Specifies which builder library to use. Options are `CUSTOM`, `LOMBOK`, `IMMUTABLES`, `PROTOBUF`. Default is `CUSTOM`.
+    * `builderMethod`: The name of the method that creates the builder instance (e.g., `"builder"`). Used for `CUSTOM` pattern.
+    * `buildMethod`: The name of the method that builds the final object (e.g., `"build"`). Used for `CUSTOM` pattern.
 
-named methods in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
-needed otherwise.
+* **For `MUTATOR` strategy**:
 
-### blacklistedFields
+    * `constructorType`: The preferred constructor to use. Options are `NO_ARG`, `SMALLEST`, `LARGEST`. Default is `NO_ARG`.
 
-named fields in the list will be skipped if encountered. This is mostly a code coverage issue and should rarely be
-needed otherwise.
+* **For `STATIC_METHOD` strategy**:
 
-### objectFactoryEnabled
+    * `methodType`: The preferred static factory method to use. Options are `LARGEST` (most parameters), `SMALLEST` (fewest parameters), `SIMPLEST` (
+      prioritizes methods with simple parameter types). Default is `LARGEST`.
 
-Experimental!
+### Other Options
 
-This will result in populated objects to also be generated as java code
-in `target/generated-test-sources/test-populator/`.
-These files can then be copied into your project and used as any other java class.
+* `blacklistedMethods` / `blacklistedFields`: A list of method or field names to skip during population. Useful for avoiding code coverage
+  instrumentation fields like `$jacocoInit`.
+* `objectFactoryEnabled` (Experimental): If `true`, generates Java source code for the populated object in the
+  `target/generated-test-sources/test-populator/` directory. **Note**: This will not work if the `FIELD` strategy or `accessNonPublicConstructors` is
+  enabled.
 
-This will not work when [FIELD](#Field) or [accessNonPublicConstructors](#accessNonPublicConstructors) is used because
-they use reflection to override how class are accessed.
+-----
 
-### nullOnCircularDependency
+## Usage Examples
 
-Enable to solve issues with classes having circular dependencies. In cases where circular dependencies exists you will experience a
-`StackOverflowError`.
+### Simple Setup
 
-By enabling this the circle is broken by setting those values to `null`.
-
-### constructorType
-
-(Applied when using strategy: [MUTATOR](#Mutator))
-
-Set what constructor is preferred when creating objects.
-
-SMALLEST will attempt to pick a constructor with at least one parameter and fall back on NO_ARG if none is found.
-
-### builderMethod
-
-(Applied when using [builderPattern](#BuilderPattern): `CUSTOM`)
-
-Set the name of the builder method used when creating objects using BUILDER strategy. This option will be ignored for `LOMBOK` and `IMMUTABLES`.
-
-### buildMethod
-
-(Applied when using [builderPattern](#BuilderPattern): `CUSTOM`)
-
-Set the name of the build method used when creating objects using BUILDER strategy. This option will be ignored for `LOMBOK` and `IMMUTABLES`.
-
-## ToBuilder
-
-calling `toBuilder()` on a PopulateConfig object will convert it back to a builder, making it easy to make copies of a
-configuration with slightly different settings.
-
-# Examples
-
-## Simple setup
-
-Simple setup using default configuration.
+For quick use with default settings, you can create a `PopulateFactory` directly.
 
 ```java
+// Uses default configuration (random values, CONSTRUCTOR-first strategy)
 MyClass myClass = new PopulateFactory().populate(MyClass.class);
 ```
 
-## Global setup
+### Global Setup for a Project
 
-Useful if you want to use the same configuration everywhere in your project.
-
-**Setup:**
+It's often useful to create a static helper class with a shared configuration for your entire test suite.
 
 ```java
 public class TestPopulator {
 
-    //static method accessible everywhere in our tests
-    public static <T> T populate(Class<T> clazz) {
-        return populateFactory.populate(clazz);
-    }
-
-    //own implementation of how to create MyUUID objects
-    private static class MyUUIDOverridePopulate implements OverridePopulate<MyUUID> {
-
-        @Override
-        public MyUUID create() {
-            return new MyUUID(UUID.randomUUID().toString());
-        }
-
-        //Only necessary if ObjectFactory is used, can be ignored otherwise. ObjectFactory is not enabled by default.
-        //This provides ObjectFactory with a string used to generate Java code for MyUUID.
-        @Override
-        public String createString() {
-            return "new MyUUID(java.util.UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\").toString())";
-        }
-    }
-
-    //configuration
-    private static final PopulateConfig populateConfig = PopulateConfig.builder()
-            .overridePopulate(MyUUID.class, new MyUUIDOverridePopulate()) //provides own implementation of how to create MyUUID
-            .overridePopulate(LocalDate.class, LocalDate::now) //set all LocalDates to "now"
-            .overridePopulate(String.class, () -> UUID.randomUUID().toString()) //sets all strings to random UUID's
+    // 1. Define the configuration once
+    private static final PopulateConfig POPULATE_CONFIG = PopulateConfig.builder()
+            // Provide custom logic for creating MyUUID objects
+            .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+            // Always set LocalDate to the current date
+            .overridePopulate(LocalDate.class, LocalDate::now)
             .build();
 
-    //setup PopulateFactory with configuration
-    private static final PopulateFactory populateFactory = new PopulateFactory(populateConfig);
+    // 2. Create a single factory instance
+    private static final PopulateFactory POPULATE_FACTORY = new PopulateFactory(POPULATE_CONFIG);
+
+    // 3. Create a static helper method for easy access in tests
+    public static <T> T populate(Class<T> clazz) {
+        return POPULATE_FACTORY.populate(clazz);
+    }
 }
 ```
 
-**Usage:**
+**Usage in a test:**
 
 ```java
+// Now you can easily populate any object with your custom rules
 MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 ```
 
-## Full coverage setup
+### "Full Coverage" Setup
 
-Here is a setup that covers as much as possible
+This example shows a configuration designed to handle a wide variety of class structures by enabling almost all features.
 
 ```java
-public class TestPopulator {
-
-    public static <T> T populate(Class<T> clazz) {
-        return populateFactory.populate(clazz);
-    }
-
-    private static final PopulateConfig populateConfig = PopulateConfig.builder()
-            .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD)) // strategies ordered to make most use of each of them
-            .builderPattern(LOMBOK) // required when using BUILDER strategy to tell test-populator what kind of builder to use 
-            .randomValues(true) // create objects with random values
-            .setterPrefix("") // used by SETTER strategy to know what methods to use. An empty string means calling all void methods with one argument
-            .accessNonPublicConstructors(true) // uses reflection to override access to private constructors by calling constructor.setAccessible(true)
-            .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString())) // if we have our own custom class that test-populator cannot populate without help
-            .objectFactoryEnabled(false) // generates java code for each populated object. Must be false if FIELD strategy or accessNonPublicConstructors = true is used
-            .nullOnCircularDependency(true) // solves issues with circular dependencies by setting values to null when encountered more than once
-            .constructorType(LARGEST) // used by MUTATOR strategy to know what constructor to use
-            .build();
-
-    private static final PopulateFactory populateFactory = new PopulateFactory(populateConfig);
-}
+private static final PopulateConfig FULL_CONFIG = PopulateConfig.builder()
+        // Try all strategies, starting with the most specific (BUILDER)
+        .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD))
+        // Specify the builder pattern to use
+        .builderPattern(LOMBOK)
+        // Use random values for broader test coverage
+        .randomValues(true)
+        // Allow access to private constructors if no public ones are suitable
+        .accessNonPublicConstructors(true)
+        // Prevent infinite loops with circular dependencies
+        .nullOnCircularDependency(true)
+        // For the MUTATOR strategy, prefer the constructor with the most arguments
+        .constructorType(LARGEST)
+        // For the SETTER strategy, consider any void method with one arg a setter
+        .setterPrefix("")
+        .build();
 ```
