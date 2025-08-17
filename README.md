@@ -164,7 +164,7 @@ Allows the library to use private or protected constructors.
 
 * **For `SETTER` strategy**:
 
-    * `setterPrefixes`: A list of prefixes for setter methods. Default is `["set"]`. Use `[""]` to match any void method with one argument.
+    * `setterPrefixes`: A list of prefixes for setter methods. Default is `["set"]` (classic setter pattern). Use `[""]` to match any void method with one argument.
 
 * **For `BUILDER` strategy**:
 
@@ -254,5 +254,7 @@ private static final PopulateConfig FULL_CONFIG = PopulateConfig.builder()
         .constructorType(LARGEST)
         // For the SETTER strategy, consider any void method with one arg a setter
         .setterPrefix("")
+        // For STATIC_METHOD strategy, prioritizes method with simple parameter types  
+        .methodType(MethodType.SIMPLEST)
         .build();
 ```
