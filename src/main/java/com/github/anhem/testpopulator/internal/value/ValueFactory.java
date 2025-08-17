@@ -89,7 +89,6 @@ public class ValueFactory {
         typeSuppliers.put(UUID.class, this::getUUID);
         typeSuppliers.put(byte.class, this::getByte);
         typeSuppliers.put(Byte.class, this::getByte);
-        typeSuppliers.put(Object.class, this::getObject);
         return typeSuppliers;
     }
 
@@ -184,7 +183,7 @@ public class ValueFactory {
     }
 
     private LocalTime getLocalTime() {
-        return setRandomValues ? getRandomLocalDateTime().toLocalTime() : LOCAL_TIME;
+        return setRandomValues ? getRandomLocalTime() : LOCAL_TIME;
     }
 
     private OffsetDateTime getOffsetDateTime() {
@@ -208,14 +207,11 @@ public class ValueFactory {
     }
 
     private Time getSqlTime() {
-        return setRandomValues ? Time.valueOf(getLocalTime()) : SQL_TIME;
+        return setRandomValues ? Time.valueOf(getRandomLocalTime()) : SQL_TIME;
     }
 
     private Timestamp getSqlTimestamp() {
         return setRandomValues ? Timestamp.from(getInstant()) : SQL_TIMESTAMP;
     }
 
-    private Object getObject() {
-        return getString();
-    }
 }
