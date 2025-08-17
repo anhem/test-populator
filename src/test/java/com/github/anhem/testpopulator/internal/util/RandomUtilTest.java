@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import static com.github.anhem.testpopulator.internal.util.RandomUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,7 +120,7 @@ class RandomUtilTest {
     }
 
     @Test
-    void getRandomByteCanBeDifferent() {
+    void getRandomByteIsDifferentEachTime() {
         Byte random_1 = getRandomByte();
         Byte random_2 = getRandomByte();
 
@@ -128,4 +129,13 @@ class RandomUtilTest {
         assertThat(random_1).isNotEqualTo(random_2);
     }
 
+    @Test
+    void getRandomLocalTimegIsDifferentEachTime() {
+        LocalTime random_1 = getRandomLocalTime();
+        LocalTime random_2 = getRandomLocalTime();
+
+        assertThat(random_1).isNotNull();
+        assertThat(random_2).isNotNull();
+        assertThat(random_1).isNotEqualTo(random_2);
+    }
 }

@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator.internal.util;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ public class RandomUtil {
     private static final int RIGHT_LIMIT = 122; // letter 'z'
     static final int STRING_LENGTH = 10;
     private static final Random random = new SecureRandom();
+    private static final int DAY_IN_SECONDS = 86400;
 
     private RandomUtil() {
     }
@@ -43,11 +45,11 @@ public class RandomUtil {
     }
 
     public static LocalDate getRandomLocalDate() {
-        return getRandomLocalDateTime().toLocalDate();
+        return LocalDate.now().minusYears(1).plusDays(random.nextInt(730));
     }
 
     public static LocalDateTime getRandomLocalDateTime() {
-        return LocalDateTime.now().minusYears(1).plusDays(random.nextInt(365));
+        return getRandomLocalDate().atTime(getRandomLocalTime());
     }
 
     public static Character getRandomCharacter() {
@@ -67,4 +69,7 @@ public class RandomUtil {
         return bytes[0];
     }
 
+    public static LocalTime getRandomLocalTime() {
+        return LocalTime.ofSecondOfDay(random.nextInt(DAY_IN_SECONDS));
+    }
 }
