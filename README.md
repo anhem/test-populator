@@ -36,7 +36,7 @@ public class MyClass {
     public static class InnerClass {
         private final int integer;
         private final Map<String, LocalDate> stringToLocalDateMap;
-        
+
         // Constructor...
     }
 }
@@ -65,8 +65,8 @@ MyClass{
   handle almost any class design.
 * **Highly Configurable**: Tailor the object creation logic to your exact needs. You can generate random or fixed (deterministic) data, provide custom
   logic for specific types (like `UUID`), handle circular dependencies, and more.
-* **Builder Support**: Natively supports common builder patterns from libraries like **[Lombok](https://projectlombok.org/)**, *
-  *[Immutables](https://immutables.github.io/)**, and **[Protobuf](https://protobuf.dev/)**.
+* **Builder Support**: Natively supports common builder patterns from libraries like **[Lombok](https://projectlombok.org/)**,
+  **[Immutables](https://immutables.github.io/)**, and **[Protobuf](https://protobuf.dev/)**.
 * **Java Code Generation (Experimental)**: Automatically generate the Java source code for the populated objects, which you can then save and reuse in
   your tests.
 
