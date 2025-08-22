@@ -1,6 +1,5 @@
 package com.github.anhem.testpopulator.internal.util;
 
-import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
@@ -9,9 +8,8 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
-import static com.github.anhem.testpopulator.config.Strategy.*;
-import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getImmutablesGeneratedClass;
+import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
+import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static java.util.Arrays.stream;
 import static java.util.Comparator.comparingInt;
 
@@ -38,12 +36,6 @@ public class PopulateUtil {
     public static <T> List<Method> getDeclaredMethods(Class<T> clazz, List<String> blacklistedMethods) {
         List<Method> declaredMethods = getAllDeclaredMethods(clazz, new ArrayList<>());
         return removeUnwantedMethods(declaredMethods, blacklistedMethods);
-    }
-
-    public static <T> List<Method> getMethodsForCustomBuilder(Class<T> clazz, List<String> blacklistedMethods) {
-        return getDeclaredMethods(clazz, blacklistedMethods).stream()
-                .filter(method -> method.getReturnType().equals(clazz) && method.getParameterCount() > 0)
-                .collect(Collectors.toList());
     }
 
     static boolean isStatic(Method method) {
@@ -91,22 +83,6 @@ public class PopulateUtil {
 
     public static <T> boolean isMatchingFieldStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor) {
         return strategy.equals(FIELD) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor);
-    }
-
-    public static <T> boolean isMatchingBuilderStrategy(Strategy strategy, Class<T> clazz, BuilderPattern builderPattern, String builderMethod) {
-        if (strategy.equals(BUILDER)) {
-            try {
-                if (builderPattern.equals(IMMUTABLES)) {
-                    getImmutablesGeneratedClass(clazz).getDeclaredMethod(builderMethod);
-                } else {
-                    clazz.getDeclaredMethod(builderMethod);
-                }
-                return true;
-            } catch (NoSuchMethodException e) {
-                return false;
-            }
-        }
-        return false;
     }
 
     @SuppressWarnings("unchecked")

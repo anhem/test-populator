@@ -1,12 +1,10 @@
 package com.github.anhem.testpopulator.internal.util;
 
-import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
 import com.github.anhem.testpopulator.model.circular.A;
-import com.github.anhem.testpopulator.model.custombuilder.CustomBuilder;
 import com.github.anhem.testpopulator.model.java.HasBlackListed;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
@@ -15,7 +13,6 @@ import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import com.github.anhem.testpopulator.model.java.setter.PojoExtendsPojoAbstract;
 import com.github.anhem.testpopulator.model.java.setter.PojoExtendsPojoExtendsPojoAbstract;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
-import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,13 +23,12 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.config.PopulateConfig.DEFAULT_BUILDER_METHOD;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
+import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.testutil.FieldTestUtil.getField;
 import static com.github.anhem.testpopulator.testutil.MethodTestUtil.getMethod;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
-import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateUtilTest {
@@ -170,21 +166,6 @@ class PopulateUtilTest {
         assertThat(isMatchingFieldStrategy(FIELD, PojoPrivateConstructor.class, false)).isFalse();
     }
 
-    @Test
-    void isMatchingBuilderStrategyReturnsTrue() {
-        assertThat(isMatchingBuilderStrategy(BUILDER, LombokImmutable.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isTrue();
-    }
-
-    @Test
-    void isMatchingBuilderStrategyReturnsFalse() {
-        assertThat(isMatchingBuilderStrategy(CONSTRUCTOR, LombokImmutable.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
-        assertThat(isMatchingBuilderStrategy(BUILDER, PojoExtendsPojoAbstract.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
-    }
-
-    @Test
-    void getMethodsForCustomBuilderReturnsMethods() {
-        assertThat(getMethodsForCustomBuilder(CustomBuilder.CustomBuilderBuilder.class, emptyList())).hasSize(7);
-    }
 
     @Test
     void isBlackListedMethodReturnsTrue() {

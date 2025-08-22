@@ -19,6 +19,8 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.config.BuilderPattern.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static com.github.anhem.testpopulator.internal.carrier.CollectionCarrier.initialize;
+import static com.github.anhem.testpopulator.internal.util.BuilderUtil.getMethodsForCustomBuilder;
+import static com.github.anhem.testpopulator.internal.util.BuilderUtil.isMatchingBuilderStrategy;
 import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getImmutablesGeneratedClass;
 import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getMethodsForImmutablesBuilder;
 import static com.github.anhem.testpopulator.internal.util.LombokUtil.calculateExpectedChildren;
