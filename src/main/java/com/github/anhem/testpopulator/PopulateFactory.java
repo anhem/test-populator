@@ -23,6 +23,7 @@ import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getImm
 import static com.github.anhem.testpopulator.internal.util.ImmutablesUtil.getMethodsForImmutablesBuilder;
 import static com.github.anhem.testpopulator.internal.util.LombokUtil.calculateExpectedChildren;
 import static com.github.anhem.testpopulator.internal.util.LombokUtil.getMethodsForLombokBuilderGroupedByInvokeOrder;
+import static com.github.anhem.testpopulator.internal.util.MutatorUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.getMethodsForProtobufBuilder;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufByteString;

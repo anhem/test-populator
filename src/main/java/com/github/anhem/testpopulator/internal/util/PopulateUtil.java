@@ -1,7 +1,6 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
-import com.github.anhem.testpopulator.config.ConstructorType;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
@@ -39,13 +38,6 @@ public class PopulateUtil {
     public static <T> List<Method> getDeclaredMethods(Class<T> clazz, List<String> blacklistedMethods) {
         List<Method> declaredMethods = getAllDeclaredMethods(clazz, new ArrayList<>());
         return removeUnwantedMethods(declaredMethods, blacklistedMethods);
-    }
-
-
-    public static <T> List<Method> getMutatorMethods(Class<T> clazz, List<String> blacklistedMethods) {
-        return getDeclaredMethods(clazz, blacklistedMethods).stream()
-                .filter(method -> isMutatorMethod(method, clazz))
-                .collect(Collectors.toList());
     }
 
     public static <T> List<Method> getMethodsForCustomBuilder(Class<T> clazz, List<String> blacklistedMethods) {
@@ -93,16 +85,6 @@ public class PopulateUtil {
         return method.getParameterCount() > 0;
     }
 
-
-    public static <T> boolean isMatchingMutatorStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor, ConstructorType constructorType) {
-        if (strategy.equals(MUTATOR) && hasAccessibleConstructor(clazz, accessNonPublicConstructor, constructorType)) {
-            return getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
-                    .filter(method -> !isWaitMethod(method))
-                    .anyMatch(method -> isMutatorMethod(method, clazz));
-        }
-        return false;
-    }
-
     public static <T> boolean isMatchingConstructorStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor) {
         return strategy.equals(CONSTRUCTOR) && hasConstructorWithArguments(clazz, accessNonPublicConstructor);
     }
@@ -127,37 +109,6 @@ public class PopulateUtil {
         return false;
     }
 
-
-    private static <T> boolean hasAccessibleConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor, ConstructorType constructorType) {
-        try {
-            getConstructor(clazz, canAccessNonPublicConstructor, constructorType);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public static <T> Constructor<T> getConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor, ConstructorType constructorType) {
-        switch (constructorType) {
-            case SMALLEST:
-                return getSmallestConstructor(clazz, canAccessNonPublicConstructor);
-            case LARGEST:
-                return getLargestConstructor(clazz, canAccessNonPublicConstructor);
-            case NO_ARGS:
-            default:
-                return getNoArgsConstructor(clazz, canAccessNonPublicConstructor);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> Constructor<T> getSmallestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
-        return (Constructor<T>) stream(clazz.getDeclaredConstructors())
-                .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
-                .filter(constructor -> constructor.getParameterCount() != 0)
-                .min(comparingInt(Constructor::getParameterCount))
-                .orElseGet(() -> getNoArgsConstructor(clazz, canAccessNonPublicConstructor));
-    }
-
     @SuppressWarnings("unchecked")
     public static <T> Constructor<T> getLargestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
         return (Constructor<T>) stream(clazz.getDeclaredConstructors())
@@ -167,7 +118,7 @@ public class PopulateUtil {
                 .orElseGet(() -> getNoArgsConstructor(clazz, canAccessNonPublicConstructor));
     }
 
-    private static <T> Constructor<T> getNoArgsConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
+    static <T> Constructor<T> getNoArgsConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             if (canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers())) {
@@ -184,10 +135,6 @@ public class PopulateUtil {
 
     static boolean isBlackListed(Field field, List<String> blacklistedFields) {
         return blacklistedFields.contains(field.getName());
-    }
-
-    private static <T> boolean isMutatorMethod(Method method, Class<T> clazz) {
-        return (method.getReturnType().equals(void.class) || method.getReturnType().equals(clazz)) && method.getParameterCount() > 0 && !isStatic(method);
     }
 
     public static <T> void setAccessible(Constructor<T> constructor, boolean canAccessNonPublicConstructor) {
