@@ -65,7 +65,7 @@ public class PopulateUtil {
 
     public static <T> List<Method> getMethodsForCustomBuilder(Class<T> clazz, List<String> blacklistedMethods) {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
-                .filter(method -> method.getReturnType().equals(clazz) && method.getParameters().length > 0)
+                .filter(method -> method.getReturnType().equals(clazz) && method.getParameterCount() > 0)
                 .collect(Collectors.toList());
     }
 
@@ -130,10 +130,15 @@ public class PopulateUtil {
                 Stream.class.isAssignableFrom(type)) {
             return 100;
         }
-        if (type.isPrimitive() || Number.class.isAssignableFrom(type) ||
-                type.equals(Boolean.class) || type.equals(Character.class) ||
-                type.equals(String.class)) {
+        if (type.isPrimitive() ||
+                Number.class.isAssignableFrom(type) ||
+                type.equals(Boolean.class) ||
+                type.equals(Character.class)
+        ) {
             return 1;
+        }
+        if (type.equals(String.class)) {
+            return 2;
         }
         if (type.getPackage() != null && (type.getPackage().getName().startsWith("java.util") || type.getPackage().getName().startsWith("java.time"))) {
             return 5;
@@ -176,7 +181,7 @@ public class PopulateUtil {
     }
 
     static boolean hasAtLeastOneParameter(Method method) {
-        return method.getParameters().length > 0;
+        return method.getParameterCount() > 0;
     }
 
     public static <T> boolean isMatchingSetterStrategy(Strategy strategy, Class<T> clazz, List<String> setterPrefixes, boolean accessNonPublicConstructor) {
@@ -301,13 +306,13 @@ public class PopulateUtil {
 
     private static boolean isSetterMethod(Method method, String setMethodFormat) {
         if (setMethodFormat.isBlank()) {
-            return method.getReturnType().equals(void.class) && method.getParameters().length == 1;
+            return method.getReturnType().equals(void.class) && method.getParameterCount() == 1;
         }
-        return method.getName().matches(setMethodFormat) && method.getReturnType().equals(void.class) && method.getParameters().length == 1 && !isStatic(method);
+        return method.getName().matches(setMethodFormat) && method.getReturnType().equals(void.class) && method.getParameterCount() == 1 && !isStatic(method);
     }
 
     private static <T> boolean isMutatorMethod(Method method, Class<T> clazz) {
-        return (method.getReturnType().equals(void.class) || method.getReturnType().equals(clazz)) && method.getParameters().length > 0 && !isStatic(method);
+        return (method.getReturnType().equals(void.class) || method.getReturnType().equals(clazz)) && method.getParameterCount() > 0 && !isStatic(method);
     }
 
     public static <T> void setAccessible(Constructor<T> constructor, boolean canAccessNonPublicConstructor) {
@@ -402,9 +407,10 @@ public class PopulateUtil {
         boolean isWaitName = method.getName().equals("wait") || (method.getName().equals("wait0") && Modifier.isNative(method.getModifiers()));
 
         if (isFinal && isWaitName) {
-            return method.getParameters().length == 0 ||
-                    (method.getParameters().length == 1 && method.getParameters()[0].getType().equals(long.class)) ||
-                    (method.getParameters().length == 2 && method.getParameters()[0].getType().equals(long.class) && method.getParameters()[1].getType().equals(int.class));
+            int parameterCount = method.getParameterCount();
+            return parameterCount == 0 ||
+                    (parameterCount == 1 && method.getParameters()[0].getType().equals(long.class)) ||
+                    (parameterCount == 2 && method.getParameters()[0].getType().equals(long.class) && method.getParameters()[1].getType().equals(int.class));
         }
         return false;
     }
