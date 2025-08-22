@@ -12,6 +12,9 @@ import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 
 public class SetterUtil {
 
+    private SetterUtil() {
+    }
+
     public static <T> boolean isMatchingSetterStrategy(Strategy strategy, Class<T> clazz, List<String> setterPrefixes, boolean accessNonPublicConstructor) {
         if (strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor)) {
             List<String> setterMethodFormats = getMethodFormats(setterPrefixes);

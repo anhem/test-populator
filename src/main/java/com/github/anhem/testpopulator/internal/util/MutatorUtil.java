@@ -17,6 +17,9 @@ import static java.util.Comparator.comparingInt;
 
 public class MutatorUtil {
 
+    private MutatorUtil() {
+    }
+
     public static <T> boolean isMatchingMutatorStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor, ConstructorType constructorType) {
         if (strategy.equals(MUTATOR) && hasAccessibleConstructor(clazz, accessNonPublicConstructor, constructorType)) {
             return getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
