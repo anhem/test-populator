@@ -27,6 +27,8 @@ import static com.github.anhem.testpopulator.internal.util.LombokUtil.getMethods
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.getMethodsForProtobufBuilder;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufByteString;
+import static com.github.anhem.testpopulator.internal.util.StaticMethodUtil.getStaticMethod;
+import static com.github.anhem.testpopulator.internal.util.StaticMethodUtil.isMatchingStaticMethodStrategy;
 import static java.lang.String.format;
 
 /**
