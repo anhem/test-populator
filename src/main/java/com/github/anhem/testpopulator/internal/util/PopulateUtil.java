@@ -17,7 +17,7 @@ public class PopulateUtil {
 
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
     private static final String JAVA_BASE = "java.base";
-    private static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
+    public static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
 
     private PopulateUtil() {
     }
