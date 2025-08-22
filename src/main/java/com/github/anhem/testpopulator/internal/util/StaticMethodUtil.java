@@ -92,29 +92,45 @@ public class StaticMethodUtil {
     }
 
     private static int getParameterTypeScore(Class<?> type) {
-        if (Iterator.class.isAssignableFrom(type) ||
-                InputStream.class.isAssignableFrom(type) ||
-                OutputStream.class.isAssignableFrom(type) ||
-                Reader.class.isAssignableFrom(type) ||
-                Stream.class.isAssignableFrom(type)) {
+        if (isStreamingType(type)) {
             return 100;
         }
-        if (type.isPrimitive() ||
-                Number.class.isAssignableFrom(type) ||
-                type.equals(Boolean.class) ||
-                type.equals(Character.class)
-        ) {
+        if (isNonNumericPrimitiveOrWrapper(type) || isNumeric(type)) {
             return 1;
         }
         if (type.equals(String.class)) {
             return 2;
         }
-        if (type.getPackage() != null && (type.getPackage().getName().startsWith("java.util") || type.getPackage().getName().startsWith("java.time"))) {
+        if (isStandardUtilityType(type)) {
             return 5;
         }
         if (type.isArray()) {
             return 10;
         }
         return 20;
+    }
+
+    private static boolean isStandardUtilityType(Class<?> type) {
+        return type.getPackage() != null &&
+                (type.getPackage().getName().startsWith("java.util") || type.getPackage().getName().startsWith("java.time"));
+    }
+
+    private static boolean isStreamingType(Class<?> type) {
+        return Iterator.class.isAssignableFrom(type) ||
+                InputStream.class.isAssignableFrom(type) ||
+                OutputStream.class.isAssignableFrom(type) ||
+                Reader.class.isAssignableFrom(type) ||
+                Stream.class.isAssignableFrom(type);
+    }
+
+    private static boolean isNonNumericPrimitiveOrWrapper(Class<?> type) {
+        return type.isPrimitive() ||
+                isNumeric(type) ||
+                type.equals(Boolean.class) ||
+                type.equals(Character.class);
+    }
+
+    private static boolean isNumeric(Class<?> type) {
+        return Number.class.isAssignableFrom(type);
     }
 }
