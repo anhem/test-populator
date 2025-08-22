@@ -76,7 +76,7 @@ public class PopulateUtil {
         return Map.Entry.class.isAssignableFrom(clazz);
     }
 
-    public static <T> boolean isCollection(Class<T> clazz) {
+    public static <T> boolean isCollectionLike(Class<T> clazz) {
         return Collection.class.isAssignableFrom(clazz) ||
                 Map.class.isAssignableFrom(clazz) ||
                 Iterable.class.isAssignableFrom(clazz) ||

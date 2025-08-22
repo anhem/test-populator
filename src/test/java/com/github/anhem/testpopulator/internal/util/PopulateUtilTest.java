@@ -103,28 +103,28 @@ class PopulateUtilTest {
     }
 
     @Test
-    void isCollectionReturnsFalse() {
-        assertThat(isCollection(PojoExtendsPojoAbstract.class)).isFalse();
-        assertThat(isCollection(String.class)).isFalse();
+    void isCollectionLikeReturnsFalse() {
+        assertThat(isCollectionLike(PojoExtendsPojoAbstract.class)).isFalse();
+        assertThat(isCollectionLike(String.class)).isFalse();
     }
 
     @Test
-    void isCollectionReturnsTrue() {
-        assertThat(isCollection(List.class)).isTrue();
-        assertThat(isCollection(Set.class)).isTrue();
-        assertThat(isCollection(Collection.class)).isTrue();
-        assertThat(isCollection(Map.class)).isTrue();
-        assertThat(isCollection(ArrayList.class)).isTrue();
-        assertThat(isCollection(Map.Entry.class)).isTrue();
+    void isCollectionLikeReturnsTrue() {
+        assertThat(isCollectionLike(List.class)).isTrue();
+        assertThat(isCollectionLike(Set.class)).isTrue();
+        assertThat(isCollectionLike(Collection.class)).isTrue();
+        assertThat(isCollectionLike(Map.class)).isTrue();
+        assertThat(isCollectionLike(ArrayList.class)).isTrue();
+        assertThat(isCollectionLike(Map.Entry.class)).isTrue();
     }
 
     @Test
-    void isCollectionCarrierReturnsFalse() {
+    void isCollectionLikeCarrierReturnsFalse() {
         assertThat(isCollectionCarrier(createClassCarrier())).isFalse();
     }
 
     @Test
-    void isCollectionCarrierReturnsTrue() {
+    void isCollectionLikeCarrierReturnsTrue() {
         assertThat(isCollectionCarrier(createCollectionCarrier(String.class))).isTrue();
     }
 

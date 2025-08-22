@@ -3,7 +3,6 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
-import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
@@ -124,7 +123,7 @@ public class PopulateFactory {
                 return continuePopulateForSet(collectionCarrier);
             } else if (isMapEntry(clazz)) {
                 return continuePopulateForMapEntry(collectionCarrier);
-            } else if (isCollection(clazz)) {
+            } else if (isCollectionLike(clazz)) {
                 return continuePopulateForList(collectionCarrier);
             }
         } catch (Exception e) {
@@ -245,7 +244,7 @@ public class PopulateFactory {
         classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), constructor.getParameterCount());
         Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
             Parameter parameter = constructor.getParameters()[i];
-            if (isCollection(parameter.getType())) {
+            if (isCollectionLike(parameter.getType())) {
                 return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
             } else {
                 return populateWithOverrides(classCarrier.toClassCarrier(parameter));
@@ -265,7 +264,7 @@ public class PopulateFactory {
                     .forEach(field -> {
                         try {
                             setAccessible(field, objectOfClass);
-                            if (isCollection(field.getType())) {
+                            if (isCollectionLike(field.getType())) {
                                 field.set(objectOfClass, populateWithOverrides(classCarrier.toCollectionCarrier(field.getType(), ((ParameterizedType) field.getGenericType()).getActualTypeArguments())));
                             } else {
                                 field.set(objectOfClass, populateWithOverrides(classCarrier.toClassCarrier(field.getType())));
@@ -407,7 +406,7 @@ public class PopulateFactory {
                         if (isProtobufByteString(parameter, populateConfig)) {
                             return populateWithOverrides(classCarrier.toClassCarrier(parameter));
                         }
-                        if (isCollection(parameter.getType())) {
+                        if (isCollectionLike(parameter.getType())) {
                             return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
                         } else {
                             return populateWithOverrides(classCarrier.toClassCarrier(parameter));
@@ -426,7 +425,7 @@ public class PopulateFactory {
             classCarrier.getObjectFactory().staticMethod(clazz, staticMethod.getName(), staticMethod.getParameters().length);
             return (T) staticMethod.invoke(null, Stream.of(staticMethod.getParameters())
                     .map(parameter -> {
-                        if (isCollection(parameter.getType())) {
+                        if (isCollectionLike(parameter.getType())) {
                             return populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
                         } else {
                             return populateWithOverrides(classCarrier.toClassCarrier(parameter));
