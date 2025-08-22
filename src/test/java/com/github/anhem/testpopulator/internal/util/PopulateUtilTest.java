@@ -14,7 +14,10 @@ import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorE
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorPrivate;
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
-import com.github.anhem.testpopulator.model.java.setter.*;
+import com.github.anhem.testpopulator.model.java.setter.Pojo;
+import com.github.anhem.testpopulator.model.java.setter.PojoExtendsPojoAbstract;
+import com.github.anhem.testpopulator.model.java.setter.PojoExtendsPojoExtendsPojoAbstract;
+import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,9 +41,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateUtilTest {
-
-    private static final String SETTER_PREFIX = "set";
-    private static final List<String> SETTER_PREFIXES = List.of(SETTER_PREFIX);
 
     @Test
     void toArgumentTypesReturnsParameterArgumentTypes() {
@@ -149,19 +149,6 @@ class PopulateUtilTest {
     }
 
     @Test
-    void isMatchingSetterStrategyReturnsTrue() {
-        assertThat(isMatchingSetterStrategy(SETTER, PojoExtendsPojoAbstract.class, SETTER_PREFIXES, false)).isTrue();
-        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIXES, true)).isTrue();
-    }
-
-    @Test
-    void isMatchingSetterStrategyReturnsFalse() {
-        assertThat(isMatchingSetterStrategy(CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIXES, false)).isFalse();
-        assertThat(isMatchingSetterStrategy(SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIXES, false)).isFalse();
-        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIXES, false)).isFalse();
-    }
-
-    @Test
     void isMatchingMutatorStrategyReturnsTrue() {
         assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS)).isTrue();
     }
@@ -210,35 +197,6 @@ class PopulateUtilTest {
     void isMatchingBuilderStrategyReturnsFalse() {
         assertThat(isMatchingBuilderStrategy(CONSTRUCTOR, LombokImmutable.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
         assertThat(isMatchingBuilderStrategy(BUILDER, PojoExtendsPojoAbstract.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
-    }
-
-    @Test
-    void getSetterMethodsReturnsMethodsWhenRegularSetter() {
-        List<Method> setterMethods = getSetterMethods(Pojo.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), SETTER_PREFIXES);
-
-        assertThat(setterMethods).isNotEmpty().hasSize(38);
-        setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
-        setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
-    }
-
-    @Test
-    void getSetterMethodsReturnsMethodsWhenCustomSetter() {
-        String setterPrefix = "with";
-        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), List.of(setterPrefix));
-
-        assertThat(setterMethods).isNotEmpty().hasSize(17);
-        setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
-        setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
-    }
-
-    @Test
-    void getSetterMethodsReturnsMethodsWhenBlankSetter() {
-        String setterPrefix = "";
-        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), List.of(setterPrefix));
-
-        assertThat(setterMethods).isNotEmpty().hasSize(17);
-        setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
-        setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
 
     @Test

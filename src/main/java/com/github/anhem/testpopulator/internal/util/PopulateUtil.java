@@ -41,12 +41,6 @@ public class PopulateUtil {
         return removeUnwantedMethods(declaredMethods, blacklistedMethods);
     }
 
-    public static <T> List<Method> getSetterMethods(Class<T> clazz, List<String> blacklistedMethods, List<String> setterPrefixes) {
-        List<String> setterMethodFormats = getMethodFormats(setterPrefixes);
-        return getDeclaredMethods(clazz, blacklistedMethods).stream()
-                .filter(method -> isSetterMethod(method, setterMethodFormats))
-                .collect(Collectors.toList());
-    }
 
     public static <T> List<Method> getMutatorMethods(Class<T> clazz, List<String> blacklistedMethods) {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
@@ -99,15 +93,6 @@ public class PopulateUtil {
         return method.getParameterCount() > 0;
     }
 
-    public static <T> boolean isMatchingSetterStrategy(Strategy strategy, Class<T> clazz, List<String> setterPrefixes, boolean accessNonPublicConstructor) {
-        if (strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor)) {
-            List<String> setterMethodFormats = getMethodFormats(setterPrefixes);
-            return getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
-                    .filter(method -> !isWaitMethod(method))
-                    .anyMatch(method -> isSetterMethod(method, setterMethodFormats));
-        }
-        return false;
-    }
 
     public static <T> boolean isMatchingMutatorStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor, ConstructorType constructorType) {
         if (strategy.equals(MUTATOR) && hasAccessibleConstructor(clazz, accessNonPublicConstructor, constructorType)) {
@@ -201,17 +186,6 @@ public class PopulateUtil {
         return blacklistedFields.contains(field.getName());
     }
 
-    private static boolean isSetterMethod(Method method, List<String> setterMethodFormats) {
-        return setterMethodFormats.stream().anyMatch(setMethodFormat -> isSetterMethod(method, setMethodFormat));
-    }
-
-    private static boolean isSetterMethod(Method method, String setMethodFormat) {
-        if (setMethodFormat.isBlank()) {
-            return method.getReturnType().equals(void.class) && method.getParameterCount() == 1;
-        }
-        return method.getName().matches(setMethodFormat) && method.getReturnType().equals(void.class) && method.getParameterCount() == 1 && !isStatic(method);
-    }
-
     private static <T> boolean isMutatorMethod(Method method, Class<T> clazz) {
         return (method.getReturnType().equals(void.class) || method.getReturnType().equals(clazz)) && method.getParameterCount() > 0 && !isStatic(method);
     }
@@ -242,7 +216,7 @@ public class PopulateUtil {
         return nullOnCircularDependency && !isJavaBaseClass(classCarrier.getClazz()) && !classCarrier.addVisited();
     }
 
-    private static <T> boolean hasConstructorWithoutArguments(Class<T> clazz, boolean canAccessNonPublicConstructor) {
+    static <T> boolean hasConstructorWithoutArguments(Class<T> clazz, boolean canAccessNonPublicConstructor) {
         return stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> constructor.getParameterCount() == 0)
                 .anyMatch(constructor -> isAccessible(canAccessNonPublicConstructor, constructor));
@@ -262,18 +236,12 @@ public class PopulateUtil {
         return declaredFields;
     }
 
-    private static <T> List<Method> getAllDeclaredMethods(Class<T> clazz, List<Method> declaredMethods) {
+    static <T> List<Method> getAllDeclaredMethods(Class<T> clazz, List<Method> declaredMethods) {
         declaredMethods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
         if (clazz.getSuperclass() != null) {
             getAllDeclaredMethods(clazz.getSuperclass(), declaredMethods);
         }
         return declaredMethods;
-    }
-
-    private static List<String> getMethodFormats(List<String> setterPrefixes) {
-        return setterPrefixes.stream()
-                .map(PopulateUtil::getMethodFormat)
-                .collect(Collectors.toList());
     }
 
     static String getMethodFormat(String setterPrefix) {
@@ -303,7 +271,7 @@ public class PopulateUtil {
         return Modifier.isNative(method.getModifiers());
     }
 
-    private static boolean isWaitMethod(Method method) {
+    static boolean isWaitMethod(Method method) {
         boolean isFinal = Modifier.isFinal(method.getModifiers());
         boolean isWaitName = method.getName().equals("wait") || (method.getName().equals("wait0") && Modifier.isNative(method.getModifiers()));
 
