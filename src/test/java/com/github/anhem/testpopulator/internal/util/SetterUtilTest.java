@@ -12,12 +12,12 @@ import java.util.List;
 
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.config.Strategy.SETTER;
-import static com.github.anhem.testpopulator.internal.util.SetterMethodUtil.getSetterMethods;
-import static com.github.anhem.testpopulator.internal.util.SetterMethodUtil.isMatchingSetterStrategy;
+import static com.github.anhem.testpopulator.internal.util.SetterUtil.getSetterMethods;
+import static com.github.anhem.testpopulator.internal.util.SetterUtil.isMatchingSetterStrategy;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SetterMethodUtilTest {
+class SetterUtilTest {
 
     private static final String SETTER_PREFIX = "set";
     private static final List<String> SETTER_PREFIXES = List.of(SETTER_PREFIX);

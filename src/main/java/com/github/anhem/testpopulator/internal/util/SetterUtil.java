@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import static com.github.anhem.testpopulator.config.Strategy.SETTER;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 
-public class SetterMethodUtil {
+public class SetterUtil {
 
     public static <T> boolean isMatchingSetterStrategy(Strategy strategy, Class<T> clazz, List<String> setterPrefixes, boolean accessNonPublicConstructor) {
         if (strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor)) {
@@ -25,6 +25,7 @@ public class SetterMethodUtil {
     public static <T> List<Method> getSetterMethods(Class<T> clazz, List<String> blacklistedMethods, List<String> setterPrefixes) {
         List<String> setterMethodFormats = getMethodFormats(setterPrefixes);
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
+                .filter(method -> !isWaitMethod(method))
                 .filter(method -> isSetterMethod(method, setterMethodFormats))
                 .collect(Collectors.toList());
     }
