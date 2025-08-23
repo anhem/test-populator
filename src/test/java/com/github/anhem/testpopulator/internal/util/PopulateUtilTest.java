@@ -1,23 +1,18 @@
 package com.github.anhem.testpopulator.internal.util;
 
-import com.github.anhem.testpopulator.config.BuilderPattern;
-import com.github.anhem.testpopulator.config.ConstructorType;
-import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
 import com.github.anhem.testpopulator.model.circular.A;
-import com.github.anhem.testpopulator.model.custombuilder.CustomBuilder;
 import com.github.anhem.testpopulator.model.java.HasBlackListed;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorPrivate;
-import com.github.anhem.testpopulator.model.java.mutator.Mutator;
-import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
-import com.github.anhem.testpopulator.model.java.setter.*;
-import com.github.anhem.testpopulator.model.java.stc.*;
-import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
+import com.github.anhem.testpopulator.model.java.setter.Pojo;
+import com.github.anhem.testpopulator.model.java.setter.PojoExtendsPojoAbstract;
+import com.github.anhem.testpopulator.model.java.setter.PojoExtendsPojoExtendsPojoAbstract;
+import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,21 +23,15 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.github.anhem.testpopulator.config.ConstructorType.*;
-import static com.github.anhem.testpopulator.config.PopulateConfig.DEFAULT_BUILDER_METHOD;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
+import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.testutil.FieldTestUtil.getField;
 import static com.github.anhem.testpopulator.testutil.MethodTestUtil.getMethod;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
-import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateUtilTest {
-
-    private static final String SETTER_PREFIX = "set";
-    private static final List<String> SETTER_PREFIXES = List.of(SETTER_PREFIX);
 
     @Test
     void toArgumentTypesReturnsParameterArgumentTypes() {
@@ -105,28 +94,28 @@ class PopulateUtilTest {
     }
 
     @Test
-    void isCollectionReturnsFalse() {
-        assertThat(isCollection(PojoExtendsPojoAbstract.class)).isFalse();
-        assertThat(isCollection(String.class)).isFalse();
+    void isCollectionLikeReturnsFalse() {
+        assertThat(isCollectionLike(PojoExtendsPojoAbstract.class)).isFalse();
+        assertThat(isCollectionLike(String.class)).isFalse();
     }
 
     @Test
-    void isCollectionReturnsTrue() {
-        assertThat(isCollection(List.class)).isTrue();
-        assertThat(isCollection(Set.class)).isTrue();
-        assertThat(isCollection(Collection.class)).isTrue();
-        assertThat(isCollection(Map.class)).isTrue();
-        assertThat(isCollection(ArrayList.class)).isTrue();
-        assertThat(isCollection(Map.Entry.class)).isTrue();
+    void isCollectionLikeReturnsTrue() {
+        assertThat(isCollectionLike(List.class)).isTrue();
+        assertThat(isCollectionLike(Set.class)).isTrue();
+        assertThat(isCollectionLike(Collection.class)).isTrue();
+        assertThat(isCollectionLike(Map.class)).isTrue();
+        assertThat(isCollectionLike(ArrayList.class)).isTrue();
+        assertThat(isCollectionLike(Map.Entry.class)).isTrue();
     }
 
     @Test
-    void isCollectionCarrierReturnsFalse() {
+    void isCollectionLikeCarrierReturnsFalse() {
         assertThat(isCollectionCarrier(createClassCarrier())).isFalse();
     }
 
     @Test
-    void isCollectionCarrierReturnsTrue() {
+    void isCollectionLikeCarrierReturnsTrue() {
         assertThat(isCollectionCarrier(createCollectionCarrier(String.class))).isTrue();
     }
 
@@ -148,32 +137,6 @@ class PopulateUtilTest {
     @Test
     void hasAtLeastOneParameterReturnsTrue() {
         assertThat(hasAtLeastOneParameter(getMethod("setStringValue", Pojo.class))).isTrue();
-    }
-
-    @Test
-    void isMatchingSetterStrategyReturnsTrue() {
-        assertThat(isMatchingSetterStrategy(SETTER, PojoExtendsPojoAbstract.class, SETTER_PREFIXES, false)).isTrue();
-        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIXES, true)).isTrue();
-    }
-
-    @Test
-    void isMatchingSetterStrategyReturnsFalse() {
-        assertThat(isMatchingSetterStrategy(CONSTRUCTOR, PojoExtendsPojoAbstract.class, SETTER_PREFIXES, false)).isFalse();
-        assertThat(isMatchingSetterStrategy(SETTER, AllArgsConstructorExtendsAllArgsConstructorAbstract.class, SETTER_PREFIXES, false)).isFalse();
-        assertThat(isMatchingSetterStrategy(SETTER, PojoPrivateConstructor.class, SETTER_PREFIXES, false)).isFalse();
-    }
-
-    @Test
-    void isMatchingMutatorStrategyReturnsTrue() {
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS)).isTrue();
-    }
-
-    @Test
-    void isMatchingMutatorStrategyReturnsFalse() {
-        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, ConstructorType.LARGEST)).isFalse();
-        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, ConstructorType.SMALLEST)).isFalse();
-        assertThat(isMatchingMutatorStrategy(CONSTRUCTOR, AllArgsConstructor.class, false, NO_ARGS)).isFalse();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, AllArgsConstructor.class, false, NO_ARGS)).isFalse();
     }
 
     @Test
@@ -203,126 +166,6 @@ class PopulateUtilTest {
         assertThat(isMatchingFieldStrategy(FIELD, PojoPrivateConstructor.class, false)).isFalse();
     }
 
-    @Test
-    void isMatchingBuilderStrategyReturnsTrue() {
-        assertThat(isMatchingBuilderStrategy(BUILDER, LombokImmutable.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isTrue();
-    }
-
-    @Test
-    void isMatchingBuilderStrategyReturnsFalse() {
-        assertThat(isMatchingBuilderStrategy(CONSTRUCTOR, LombokImmutable.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
-        assertThat(isMatchingBuilderStrategy(BUILDER, PojoExtendsPojoAbstract.class, BuilderPattern.LOMBOK, DEFAULT_BUILDER_METHOD)).isFalse();
-    }
-
-    @Test
-    void isMatchingStaticMethodStrategyReturnsTrue() {
-        assertThat(isMatchingStaticMethodStrategy(STATIC_METHOD, User.class)).isTrue();
-    }
-
-    @Test
-    void isMatchingStaticMethodStrategyReturnsFalse() {
-        assertThat(isMatchingStaticMethodStrategy(CONSTRUCTOR, User.class)).isFalse();
-        assertThat(isMatchingStaticMethodStrategy(STATIC_METHOD, AllArgsConstructor.class)).isFalse();
-    }
-
-    @Test
-    void getSetterMethodsReturnsMethodsWhenRegularSetter() {
-        List<Method> setterMethods = getSetterMethods(Pojo.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), SETTER_PREFIXES);
-
-        assertThat(setterMethods).isNotEmpty().hasSize(38);
-        setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
-        setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
-    }
-
-    @Test
-    void getSetterMethodsReturnsMethodsWhenCustomSetter() {
-        String setterPrefix = "with";
-        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), List.of(setterPrefix));
-
-        assertThat(setterMethods).isNotEmpty().hasSize(17);
-        setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
-        setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
-    }
-
-    @Test
-    void getSetterMethodsReturnsMethodsWhenBlankSetter() {
-        String setterPrefix = "";
-        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), List.of(setterPrefix));
-
-        assertThat(setterMethods).isNotEmpty().hasSize(17);
-        setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
-        setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
-    }
-
-    @Test
-    void getMutatorMethodsReturnsMethods() {
-        assertThat(getMutatorMethods(Mutator.class, emptyList())).hasSize(8);
-    }
-
-    @Test
-    void getMethodsForCustomBuilderReturnsMethods() {
-        assertThat(getMethodsForCustomBuilder(CustomBuilder.CustomBuilderBuilder.class, emptyList())).hasSize(7);
-    }
-
-    @Test
-    void getStaticMethodWithMethodTypeLargestReturnsMethod() {
-        assertThat(getStaticMethod(Users.class, emptyList(), MethodType.LARGEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("ofTwo");
-    }
-
-    @Test
-    void getStaticMethodWithMethodTypeSmallestReturnsMethod() {
-        assertThat(getStaticMethod(Users.class, emptyList(), MethodType.SMALLEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isIn("with", "of");
-    }
-
-    @Test
-    void getStaticMethodWithMethodTypeWillNotReturnMethodWithSelfReferencingParameter() {
-        assertThat(getStaticMethod(User.class, emptyList(), MethodType.LARGEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("of");
-        assertThat(getStaticMethod(User.class, emptyList(), MethodType.SMALLEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("of");
-        assertThat(getStaticMethod(User.class, emptyList(), MethodType.SIMPLEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("of");
-    }
-
-    @Test
-    void getStaticMethodWithDifferentMethodTypesWillReturnDifferentMethods() {
-        assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.LARGEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("createFull");
-        assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.SMALLEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("fromCsvRecord");
-        assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.SIMPLEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("fromIdAndName");
-        assertThat(getStaticMethod(UserGroup.class, emptyList(), MethodType.SIMPLEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("from");
-        assertThat(getStaticMethod(Users.class, emptyList(), MethodType.SIMPLEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("with");
-        assertThat(getStaticMethod(UserId.class, emptyList(), MethodType.SIMPLEST))
-                .isNotNull()
-                .extracting(Method::getName)
-                .isEqualTo("of");
-    }
 
     @Test
     void isBlackListedMethodReturnsTrue() {
@@ -391,30 +234,6 @@ class PopulateUtilTest {
         classCarrier = classCarrier.toClassCarrier(String.class);
 
         assertThat(alreadyVisited(classCarrier, true)).isFalse();
-    }
-
-    @Test
-    void MutatorWithMultipleConstructorsReturnsNoArgsConstructor() {
-        assertThat(getConstructor(MutatorWithMultipleConstructors.class, false, NO_ARGS).getParameterCount()).isEqualTo(0);
-        assertThat(getConstructor(Mutator.class, false, NO_ARGS).getParameterCount()).isEqualTo(0);
-        assertThat(getConstructor(PojoPrivateConstructor.class, true, NO_ARGS).getParameterCount()).isEqualTo(0);
-        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, NO_ARGS).getParameterCount());
-    }
-
-    @Test
-    void MutatorWithMultipleConstructorsReturnsLargestConstructor() {
-        assertThat(getConstructor(MutatorWithMultipleConstructors.class, false, LARGEST).getParameterCount()).isEqualTo(11);
-        assertThat(getConstructor(Mutator.class, false, LARGEST).getParameterCount()).isEqualTo(0);
-        assertThat(getConstructor(PojoPrivateConstructor.class, true, LARGEST).getParameterCount()).isEqualTo(0);
-        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, LARGEST).getParameterCount());
-    }
-
-    @Test
-    void MutatorWithMultipleConstructorsReturnsSmallestConstructor() {
-        assertThat(getConstructor(MutatorWithMultipleConstructors.class, false, SMALLEST).getParameterCount()).isEqualTo(1);
-        assertThat(getConstructor(Mutator.class, false, SMALLEST).getParameterCount()).isEqualTo(0);
-        assertThat(getConstructor(PojoPrivateConstructor.class, true, SMALLEST).getParameterCount()).isEqualTo(0);
-        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, SMALLEST).getParameterCount());
     }
 
     private static ClassCarrier<String> createClassCarrier() {
