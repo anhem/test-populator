@@ -67,6 +67,8 @@ MyClass{
   logic for specific types (like `UUID`), handle circular dependencies, and more.
 * **Builder Support**: Natively supports common builder patterns from libraries like **[Lombok](https://projectlombok.org/)**,
   **[Immutables](https://immutables.github.io/)**, and **[Protobuf](https://protobuf.dev/)**.
+* **Zero Runtime Dependencies:** Written in plain Java, this library is lightweight and has no external runtime dependencies, ensuring it won't
+  introduce transitive dependency conflicts into your project.
 * **Java Code Generation (Experimental)**: Automatically generate the Java source code for the populated objects, which you can then save and reuse in
   your tests.
 

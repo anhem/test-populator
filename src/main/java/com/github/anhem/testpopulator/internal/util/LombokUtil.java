@@ -28,7 +28,7 @@ public class LombokUtil {
     }
 
     private static int lombokMethodInvokeOrder(Method method) {
-        if (stream(method.getParameterTypes()).anyMatch(PopulateUtil::isCollection)) {
+        if (stream(method.getParameterTypes()).anyMatch(PopulateUtil::isCollectionLike)) {
             return 3;
         }
         if (isClearMethod(method)) {

@@ -29,6 +29,9 @@ public class ProtobufUtil {
     private static final String UNKNOWN_FIELD_SET_PARAM = "com.google.protobuf.UnknownFieldSet";
     private static final String BYTE_STRING_NAME = "com.google.protobuf.ByteString";
 
+    private ProtobufUtil() {
+    }
+
     public static boolean isProtobufByteString(Parameter parameter, PopulateConfig populateConfig) {
         return populateConfig.getBuilderPattern().equals(PROTOBUF) && parameter.getType().getName().equals(BYTE_STRING_NAME);
     }
