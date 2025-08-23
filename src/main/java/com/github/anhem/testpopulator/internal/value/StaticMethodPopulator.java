@@ -1,0 +1,43 @@
+package com.github.anhem.testpopulator.internal.value;
+
+import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.internal.PopulatingStrategy;
+import com.github.anhem.testpopulator.internal.Populator;
+import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
+
+import java.lang.reflect.Method;
+import java.util.stream.Stream;
+
+import static com.github.anhem.testpopulator.internal.PopulatorExceptionMessages.FAILED_TO_CALL_STATIC_METHOD;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isCollectionLike;
+import static com.github.anhem.testpopulator.internal.util.StaticMethodUtil.getStaticMethod;
+import static java.lang.String.format;
+
+public class StaticMethodPopulator implements PopulatingStrategy {
+
+    @Override
+    public <T> T populate(ClassCarrier<T> classCarrier, Populator populator) {
+        return continuePopulateUsingStaticMethod(classCarrier, populator);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T continuePopulateUsingStaticMethod(ClassCarrier<T> classCarrier, Populator populator) {
+        Class<T> clazz = classCarrier.getClazz();
+        PopulateConfig populateConfig = classCarrier.getPopulateConfig();
+        Method staticMethod = getStaticMethod(clazz, populateConfig.getBlacklistedMethods(), populateConfig.getMethodType());
+        try {
+            classCarrier.getObjectFactory().staticMethod(clazz, staticMethod.getName(), staticMethod.getParameters().length);
+            return (T) staticMethod.invoke(null, Stream.of(staticMethod.getParameters())
+                    .map(parameter -> {
+                        if (isCollectionLike(parameter.getType())) {
+                            return populator.populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
+                        } else {
+                            return populator.populateWithOverrides(classCarrier.toClassCarrier(parameter));
+                        }
+                    }).toArray());
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_CALL_STATIC_METHOD, staticMethod.getName(), clazz.getName()), e);
+        }
+    }
+}

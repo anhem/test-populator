@@ -27,6 +27,10 @@ public abstract class Carrier {
         return objectFactory;
     }
 
+    public PopulateConfig getPopulateConfig() {
+        return populateConfig;
+    }
+
     @SuppressWarnings("unchecked")
     public <T> CollectionCarrier<T> toCollectionCarrier(Type type, Type[] typeArguments) {
         return new CollectionCarrier<>((Class<T>) type, typeArguments, objectFactory, visited, populateConfig);
