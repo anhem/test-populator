@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal;
+package com.github.anhem.testpopulator.internal.populate;
 
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 

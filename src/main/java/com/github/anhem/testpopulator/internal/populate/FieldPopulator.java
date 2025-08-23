@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal;
+package com.github.anhem.testpopulator.internal.populate;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
@@ -9,8 +9,8 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
-import static com.github.anhem.testpopulator.internal.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
-import static com.github.anhem.testpopulator.internal.PopulatorExceptionMessages.FAILED_TO_SET_FIELD;
+import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
+import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_SET_FIELD;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static java.lang.String.format;
 
@@ -18,10 +18,6 @@ public class FieldPopulator implements PopulatingStrategy {
 
     @Override
     public <T> T populate(ClassCarrier<T> classCarrier, Populator populator) {
-        return continuePopulateUsingFields(classCarrier, populator);
-    }
-
-    private <T> T continuePopulateUsingFields(ClassCarrier<T> classCarrier, Populator populator) {
         Class<T> clazz = classCarrier.getClazz();
         PopulateConfig populateConfig = classCarrier.getPopulateConfig();
         try {

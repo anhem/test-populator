@@ -1,10 +1,10 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.internal.Populator;
 import com.github.anhem.testpopulator.internal.object.ObjectFactory;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryImpl;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
+import com.github.anhem.testpopulator.internal.populate.Populator;
 import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import static com.github.anhem.testpopulator.internal.carrier.CollectionCarrier.initialize;

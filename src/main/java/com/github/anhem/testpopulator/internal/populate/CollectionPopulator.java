@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal;
+package com.github.anhem.testpopulator.internal.populate;
 
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
@@ -10,8 +10,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
-import static com.github.anhem.testpopulator.internal.PopulatorExceptionMessages.FAILED_TO_CREATE_COLLECTION;
-import static com.github.anhem.testpopulator.internal.PopulatorExceptionMessages.MISSING_COLLECTION_TYPE;
+import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_COLLECTION;
+import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.MISSING_COLLECTION_TYPE;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static java.lang.String.format;
 
@@ -19,20 +19,20 @@ public class CollectionPopulator implements PopulatingStrategy {
 
     @Override
     public <T> T populate(ClassCarrier<T> classCarrier, Populator populator) {
-        return continuePopulateForCollection((CollectionCarrier<T>) classCarrier, populator);
+        return doPopulate((CollectionCarrier<T>) classCarrier, populator);
     }
 
-    private <T> T continuePopulateForCollection(CollectionCarrier<T> collectionCarrier, Populator populator) {
+    private <T> T doPopulate(CollectionCarrier<T> collectionCarrier, Populator populator) {
         try {
             Class<T> clazz = collectionCarrier.getClazz();
             if (isMap(clazz)) {
-                return continuePopulateForMap(collectionCarrier, populator);
+                return populateForMap(collectionCarrier, populator);
             } else if (isSet(clazz)) {
-                return continuePopulateForSet(collectionCarrier, populator);
+                return populateForSet(collectionCarrier, populator);
             } else if (isMapEntry(clazz)) {
-                return continuePopulateForMapEntry(collectionCarrier, populator);
+                return populateForMapEntry(collectionCarrier, populator);
             } else if (isCollectionLike(clazz)) {
-                return continuePopulateForList(collectionCarrier, populator);
+                return populateForList(collectionCarrier, populator);
             }
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_COLLECTION, collectionCarrier.getClazz().getTypeName()), e);
@@ -42,7 +42,7 @@ public class CollectionPopulator implements PopulatingStrategy {
 
 
     @SuppressWarnings("unchecked")
-    private <T> T continuePopulateForMap(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private <T> T populateForMap(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (hasConstructors(classCarrier)) {
             classCarrier.getObjectFactory().map(classCarrier.getClazz());
             Map<Object, Object> map = (Map<Object, Object>) classCarrier.getClazz().getConstructor().newInstance();
@@ -62,7 +62,7 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T continuePopulateForSet(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private <T> T populateForSet(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (hasConstructors(classCarrier)) {
             classCarrier.getObjectFactory().set(classCarrier.getClazz());
             Set<Object> set = (Set<Object>) classCarrier.getClazz().getConstructor().newInstance();
@@ -78,7 +78,7 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T continuePopulateForMapEntry(CollectionCarrier<T> classCarrier, Populator populator) {
+    private <T> T populateForMapEntry(CollectionCarrier<T> classCarrier, Populator populator) {
         classCarrier.getObjectFactory().mapEntry(classCarrier.getClazz());
         Object key = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
         Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1)), populator);
@@ -86,7 +86,7 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T continuePopulateForList(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private <T> T populateForList(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (hasConstructors(classCarrier)) {
             classCarrier.getObjectFactory().list(classCarrier.getClazz());
             List<Object> list = (List<Object>) classCarrier.getClazz().getConstructor().newInstance();

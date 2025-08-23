@@ -2,14 +2,14 @@ package com.github.anhem.testpopulator.internal.value;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
-import com.github.anhem.testpopulator.internal.PopulatingStrategy;
-import com.github.anhem.testpopulator.internal.Populator;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
+import com.github.anhem.testpopulator.internal.populate.PopulatingStrategy;
+import com.github.anhem.testpopulator.internal.populate.Populator;
 
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.internal.PopulatorExceptionMessages.FAILED_TO_CALL_STATIC_METHOD;
+import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CALL_STATIC_METHOD;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isCollectionLike;
 import static com.github.anhem.testpopulator.internal.util.StaticMethodUtil.getStaticMethod;
 import static java.lang.String.format;

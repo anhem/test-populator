@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal;
+package com.github.anhem.testpopulator.internal.populate;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
@@ -9,7 +9,7 @@ import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import java.lang.reflect.Array;
 
-import static com.github.anhem.testpopulator.internal.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
+import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.internal.util.BuilderUtil.isMatchingBuilderStrategy;
 import static com.github.anhem.testpopulator.internal.util.MutatorUtil.isMatchingMutatorStrategy;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
