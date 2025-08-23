@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ValueFactoryTest {
 
-    private final List<Class<?>> CLASSES = List.of(
+    private static final List<Class<?>> CLASSES = List.of(
             ArbitraryEnum.class,
             Integer.class,
             Long.class,
