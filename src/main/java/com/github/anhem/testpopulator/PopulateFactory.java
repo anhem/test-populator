@@ -31,7 +31,7 @@ public class PopulateFactory {
      */
     public PopulateFactory(PopulateConfig populateConfig) {
         this.populateConfig = populateConfig;
-        this.populator = new Populator(populateConfig, createValueFactory(populateConfig));
+        this.populator = new Populator(createValueFactory(populateConfig));
     }
 
     /**
@@ -42,7 +42,7 @@ public class PopulateFactory {
      */
     public <T> T populate(Class<T> clazz) {
         ObjectFactory objectFactory = populateConfig.isObjectFactoryEnabled() ? new ObjectFactoryImpl(populateConfig) : new ObjectFactoryVoid();
-        T result = populator.populateWithOverrides(initialize(clazz, objectFactory, populateConfig));
+        T result = populator.populate(initialize(clazz, objectFactory, populateConfig));
         objectFactory.writeToFile();
         return result;
     }

@@ -20,7 +20,6 @@ import static java.lang.String.format;
 
 public class Populator {
 
-    private final PopulateConfig populateConfig;
     private final ValueFactory valueFactory;
     private final ConstructorPopulator constructorPopulator;
     private final FieldPopulator fieldPopulator;
@@ -30,8 +29,7 @@ public class Populator {
     private final BuilderPopulator builderPopulator;
     private final StaticMethodPopulator staticMethodPopulator;
 
-    public Populator(PopulateConfig populateConfig, ValueFactory valueFactory) {
-        this.populateConfig = populateConfig;
+    public Populator(ValueFactory valueFactory) {
         this.valueFactory = valueFactory;
         this.constructorPopulator = new ConstructorPopulator();
         this.fieldPopulator = new FieldPopulator();
@@ -42,21 +40,21 @@ public class Populator {
         this.staticMethodPopulator = new StaticMethodPopulator();
     }
 
-    public <T> T populateWithOverrides(ClassCarrier<T> classCarrier) {
+    public <T> T populate(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
         if (valueFactory.hasType(clazz)) {
             return createValue(classCarrier);
         }
-        if (alreadyVisited(classCarrier, populateConfig.isNullOnCircularDependency())) {
+        if (alreadyVisited(classCarrier, classCarrier.getPopulateConfig().isNullOnCircularDependency())) {
             return createNullValue(classCarrier);
         }
         if (isCollectionCarrier(classCarrier)) {
             return collectionPopulator.populate(classCarrier, this);
         }
         if (clazz.isArray()) {
-            return continuePopulateForArray(classCarrier);
+            return populateForArray(classCarrier);
         }
-        return continuePopulateWithStrategies(classCarrier);
+        return populateWithStrategies(classCarrier);
     }
 
     private <T> T createValue(ClassCarrier<T> classCarrier) {
@@ -71,17 +69,18 @@ public class Populator {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T continuePopulateForArray(ClassCarrier<T> classCarrier) {
+    private <T> T populateForArray(ClassCarrier<T> classCarrier) {
         Class<?> componentType = classCarrier.getClazz().getComponentType();
         classCarrier.getObjectFactory().array(componentType);
-        Object value = populateWithOverrides(classCarrier.toClassCarrier(componentType));
+        Object value = populate(classCarrier.toClassCarrier(componentType));
         Object array = Array.newInstance(componentType, 1);
         Array.set(array, 0, value);
         return (T) array;
     }
 
-    private <T> T continuePopulateWithStrategies(ClassCarrier<T> classCarrier) {
+    private <T> T populateWithStrategies(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
+        PopulateConfig populateConfig = classCarrier.getPopulateConfig();
         for (Strategy strategy : populateConfig.getStrategyOrder()) {
             if (isMatchingConstructorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
                 return constructorPopulator.populate(classCarrier, this);

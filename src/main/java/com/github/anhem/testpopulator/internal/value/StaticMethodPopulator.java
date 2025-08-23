@@ -31,9 +31,9 @@ public class StaticMethodPopulator implements PopulatingStrategy {
             return (T) staticMethod.invoke(null, Stream.of(staticMethod.getParameters())
                     .map(parameter -> {
                         if (isCollectionLike(parameter.getType())) {
-                            return populator.populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
+                            return populator.populate(classCarrier.toCollectionCarrier(parameter));
                         } else {
-                            return populator.populateWithOverrides(classCarrier.toClassCarrier(parameter));
+                            return populator.populate(classCarrier.toClassCarrier(parameter));
                         }
                     }).toArray());
         } catch (Exception e) {

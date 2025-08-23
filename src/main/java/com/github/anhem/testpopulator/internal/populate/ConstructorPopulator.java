@@ -34,9 +34,9 @@ public class ConstructorPopulator implements PopulatingStrategy {
         Object[] arguments = IntStream.range(0, constructor.getParameterCount()).mapToObj(i -> {
             Parameter parameter = constructor.getParameters()[i];
             if (isCollectionLike(parameter.getType())) {
-                return populator.populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
+                return populator.populate(classCarrier.toCollectionCarrier(parameter));
             } else {
-                return populator.populateWithOverrides(classCarrier.toClassCarrier(parameter));
+                return populator.populate(classCarrier.toClassCarrier(parameter));
             }
         }).toArray();
         return constructor.newInstance(arguments);

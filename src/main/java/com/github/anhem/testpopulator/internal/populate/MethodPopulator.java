@@ -19,12 +19,12 @@ public abstract class MethodPopulator {
             method.invoke(objectOfClass, Stream.of(method.getParameters())
                     .map(parameter -> {
                         if (isProtobufByteString(parameter, classCarrier.getPopulateConfig())) {
-                            return populator.populateWithOverrides(classCarrier.toClassCarrier(parameter));
+                            return populator.populate(classCarrier.toClassCarrier(parameter));
                         }
                         if (isCollectionLike(parameter.getType())) {
-                            return populator.populateWithOverrides(classCarrier.toCollectionCarrier(parameter));
+                            return populator.populate(classCarrier.toCollectionCarrier(parameter));
                         } else {
-                            return populator.populateWithOverrides(classCarrier.toClassCarrier(parameter));
+                            return populator.populate(classCarrier.toClassCarrier(parameter));
                         }
                     }).toArray());
         } catch (Exception e) {

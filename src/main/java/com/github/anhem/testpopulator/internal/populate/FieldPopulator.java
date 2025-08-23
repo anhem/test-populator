@@ -30,9 +30,9 @@ public class FieldPopulator implements PopulatingStrategy {
                         try {
                             setAccessible(field, objectOfClass);
                             if (isCollectionLike(field.getType())) {
-                                field.set(objectOfClass, populator.populateWithOverrides(classCarrier.toCollectionCarrier(field.getType(), ((ParameterizedType) field.getGenericType()).getActualTypeArguments())));
+                                field.set(objectOfClass, populator.populate(classCarrier.toCollectionCarrier(field.getType(), ((ParameterizedType) field.getGenericType()).getActualTypeArguments())));
                             } else {
-                                field.set(objectOfClass, populator.populateWithOverrides(classCarrier.toClassCarrier(field.getType())));
+                                field.set(objectOfClass, populator.populate(classCarrier.toClassCarrier(field.getType())));
                             }
                         } catch (Exception e) {
                             throw new PopulateException(format(FAILED_TO_SET_FIELD, field.getName(), objectOfClass.getClass().getName()), e);

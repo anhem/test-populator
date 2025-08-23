@@ -105,8 +105,8 @@ public class CollectionPopulator implements PopulatingStrategy {
         Type type = typeCarrier.getType();
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
-            return populator.populateWithOverrides(typeCarrier.toCollectionCarrier(parameterizedType.getRawType(), parameterizedType.getActualTypeArguments()));
+            return populator.populate(typeCarrier.toCollectionCarrier(parameterizedType.getRawType(), parameterizedType.getActualTypeArguments()));
         }
-        return populator.populateWithOverrides(typeCarrier.toClassCarrier(type));
+        return populator.populate(typeCarrier.toClassCarrier(type));
     }
 }
