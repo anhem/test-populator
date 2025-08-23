@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.carrier;
 
+import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.object.ObjectFactory;
 
 import java.lang.reflect.Parameter;
@@ -13,13 +14,13 @@ public class CollectionCarrier<T> extends ClassCarrier<T> {
 
     private final List<Type> argumentTypes;
 
-    public CollectionCarrier(Class<T> clazz, Type[] typeArguments, ObjectFactory objectFactory, List<String> visited) {
-        super(clazz, objectFactory, visited);
+    public CollectionCarrier(Class<T> clazz, Type[] typeArguments, ObjectFactory objectFactory, List<String> visited, PopulateConfig populateConfig) {
+        super(clazz, objectFactory, visited, populateConfig);
         this.argumentTypes = Arrays.asList(typeArguments);
     }
 
-    public CollectionCarrier(Class<T> clazz, Parameter parameter, ObjectFactory objectFactory, List<String> visited) {
-        super(clazz, objectFactory, visited);
+    public CollectionCarrier(Class<T> clazz, Parameter parameter, ObjectFactory objectFactory, List<String> visited, PopulateConfig populateConfig) {
+        super(clazz, objectFactory, visited, populateConfig);
         this.argumentTypes = toArgumentTypes(parameter);
     }
 

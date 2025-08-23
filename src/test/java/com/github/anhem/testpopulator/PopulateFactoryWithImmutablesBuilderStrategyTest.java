@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
 import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static org.assertj.core.api.Assertions.assertThat;

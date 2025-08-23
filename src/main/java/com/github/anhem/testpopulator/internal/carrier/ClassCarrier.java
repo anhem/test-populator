@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.carrier;
 
+import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.object.ObjectFactory;
 
 import java.lang.reflect.Parameter;
@@ -11,8 +12,8 @@ public class ClassCarrier<T> extends Carrier {
 
     private final Class<T> clazz;
 
-    public ClassCarrier(Class<T> clazz, ObjectFactory objectFactory, List<String> visited) {
-        super(objectFactory, visited);
+    public ClassCarrier(Class<T> clazz, ObjectFactory objectFactory, List<String> visited, PopulateConfig populateConfig) {
+        super(objectFactory, visited, populateConfig);
         this.clazz = clazz;
     }
 
@@ -21,21 +22,21 @@ public class ClassCarrier<T> extends Carrier {
     }
 
     public <V> ClassCarrier<V> toClassCarrier(Class<V> clazz) {
-        return new ClassCarrier<>(clazz, objectFactory, new ArrayList<>(visited));
+        return new ClassCarrier<>(clazz, objectFactory, new ArrayList<>(visited), populateConfig);
     }
 
     @SuppressWarnings("unchecked")
     public <V> ClassCarrier<V> toClassCarrier(Parameter parameter) {
-        return (ClassCarrier<V>) new ClassCarrier<>(parameter.getType(), objectFactory, new ArrayList<>(visited));
+        return (ClassCarrier<V>) new ClassCarrier<>(parameter.getType(), objectFactory, new ArrayList<>(visited), populateConfig);
     }
 
     public TypeCarrier toTypeCarrier(Type type) {
-        return new TypeCarrier(type, objectFactory, visited);
+        return new TypeCarrier(type, objectFactory, visited, populateConfig);
     }
 
     @SuppressWarnings("unchecked")
     public <V> CollectionCarrier<V> toCollectionCarrier(Parameter parameter) {
-        return new CollectionCarrier<>((Class<V>) parameter.getType(), parameter, objectFactory, visited);
+        return new CollectionCarrier<>((Class<V>) parameter.getType(), parameter, objectFactory, visited, populateConfig);
     }
 
     public boolean addVisited() {
