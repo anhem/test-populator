@@ -10,6 +10,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,35 +21,38 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ValueFactoryTest {
 
+    private final List<Class<?>> CLASSES = List.of(
+            ArbitraryEnum.class,
+            Integer.class,
+            Long.class,
+            Double.class,
+            Boolean.class,
+            BigDecimal.class,
+            String.class,
+            LocalDate.class,
+            LocalDateTime.class,
+            ZonedDateTime.class,
+            Instant.class,
+            Date.class,
+            Character.class,
+            UUID.class,
+            Byte.class,
+            BigInteger.class,
+            LocalTime.class,
+            OffsetDateTime.class,
+            OffsetTime.class,
+            Duration.class,
+            Period.class,
+            java.sql.Date.class,
+            Time.class,
+            Timestamp.class
+    );
     private ValueFactory valueFactory;
 
     @Test
     void randomValuesAreCreated() {
         valueFactory = new ValueFactory(true, Map.of(), CUSTOM);
-        createAndAssertRandomValues(ArbitraryEnum.class);
-        createAndAssertRandomValues(Integer.class);
-        createAndAssertRandomValues(Long.class);
-        createAndAssertRandomValues(Double.class);
-        createAndAssertRandomValues(Boolean.class);
-        createAndAssertRandomValues(BigDecimal.class);
-        createAndAssertRandomValues(String.class);
-        createAndAssertRandomValues(LocalDate.class);
-        createAndAssertRandomValues(LocalDateTime.class);
-        createAndAssertRandomValues(ZonedDateTime.class);
-        createAndAssertRandomValues(Instant.class);
-        createAndAssertRandomValues(Date.class);
-        createAndAssertRandomValues(Character.class);
-        createAndAssertRandomValues(UUID.class);
-        createAndAssertRandomValues(Byte.class);
-        createAndAssertRandomValues(BigInteger.class);
-        createAndAssertRandomValues(LocalTime.class);
-        createAndAssertRandomValues(OffsetDateTime.class);
-        createAndAssertRandomValues(OffsetTime.class);
-        createAndAssertRandomValues(Duration.class);
-        createAndAssertRandomValues(Period.class);
-        createAndAssertRandomValues(java.sql.Date.class);
-        createAndAssertRandomValues(Time.class);
-        createAndAssertRandomValues(Timestamp.class);
+        CLASSES.forEach(this::createAndAssertRandomValues);
         createAndAssertRandomIntValues();
         createAndAssertRandomLongValues();
         createAndAssertRandomDoubleValues();
@@ -62,30 +66,7 @@ class ValueFactoryTest {
     @Test
     void fixedValuesAreCreated() {
         valueFactory = new ValueFactory(false, Map.of(), CUSTOM);
-        createAndAssertFixedValues(ArbitraryEnum.class);
-        createAndAssertFixedValues(Integer.class);
-        createAndAssertFixedValues(Long.class);
-        createAndAssertFixedValues(Double.class);
-        createAndAssertFixedValues(Boolean.class);
-        createAndAssertFixedValues(BigDecimal.class);
-        createAndAssertFixedValues(String.class);
-        createAndAssertFixedValues(LocalDate.class);
-        createAndAssertFixedValues(LocalDateTime.class);
-        createAndAssertFixedValues(ZonedDateTime.class);
-        createAndAssertFixedValues(Instant.class);
-        createAndAssertFixedValues(Date.class);
-        createAndAssertFixedValues(Character.class);
-        createAndAssertFixedValues(UUID.class);
-        createAndAssertFixedValues(Byte.class);
-        createAndAssertFixedValues(BigInteger.class);
-        createAndAssertFixedValues(LocalTime.class);
-        createAndAssertFixedValues(OffsetDateTime.class);
-        createAndAssertFixedValues(OffsetTime.class);
-        createAndAssertFixedValues(Duration.class);
-        createAndAssertFixedValues(Period.class);
-        createAndAssertFixedValues(java.sql.Date.class);
-        createAndAssertFixedValues(Time.class);
-        createAndAssertFixedValues(Timestamp.class);
+        CLASSES.forEach(this::createAndAssertFixedValues);
         createAndAssertFixedIntValues();
         createAndAssertFixedLongValues();
         createAndAssertFixedDoubleValues();
