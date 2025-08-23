@@ -33,23 +33,23 @@ class PopulateFactoryWithOverridePopulateTest {
 
     @Test
     void myUUID() {
-        MyUUID value_1 = populateAndAssertWithGeneratedCode(MyUUID.class);
-        MyUUID value_2 = populateAndAssertWithGeneratedCode(MyUUID.class);
+        MyUUID value1 = populateAndAssertWithGeneratedCode(MyUUID.class);
+        MyUUID value2 = populateAndAssertWithGeneratedCode(MyUUID.class);
 
-        assertThat(value_1).usingRecursiveAssertion().isEqualTo(value_2);
+        assertThat(value1).usingRecursiveAssertion().isEqualTo(value2);
     }
 
     @Test
     void PojoWithOverrides() {
-        Pojo value_1 = populateAndAssertWithGeneratedCode(Pojo.class);
-        Pojo value_2 = populateAndAssertWithGeneratedCode(Pojo.class);
+        Pojo value1 = populateAndAssertWithGeneratedCode(Pojo.class);
+        Pojo value2 = populateAndAssertWithGeneratedCode(Pojo.class);
 
-        assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(value_1.getIntegerValue()).isEqualTo(-1);
-        assertThat(value_1.getZonedDateTime()).isCloseTo(ZonedDateTime.now(), within(1, ChronoUnit.SECONDS));
-        assertThat(value_2.getIntegerValue()).isEqualTo(-1);
-        assertThat(value_2.getZonedDateTime()).isCloseTo(ZonedDateTime.now(), within(1, ChronoUnit.SECONDS));
-        assertThat(value_1.getZonedDateTime()).isNotEqualTo(value_2.getZonedDateTime());
+        assertRandomlyPopulatedValues(value1, value2);
+        assertThat(value1.getIntegerValue()).isEqualTo(-1);
+        assertThat(value1.getZonedDateTime()).isCloseTo(ZonedDateTime.now(), within(1, ChronoUnit.SECONDS));
+        assertThat(value2.getIntegerValue()).isEqualTo(-1);
+        assertThat(value2.getZonedDateTime()).isCloseTo(ZonedDateTime.now(), within(1, ChronoUnit.SECONDS));
+        assertThat(value1.getZonedDateTime()).isNotEqualTo(value2.getZonedDateTime());
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

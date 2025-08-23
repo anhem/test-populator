@@ -37,37 +37,37 @@ class PopulateFactoryWithFieldStrategyTest {
 
     @Test
     void string() {
-        String value_1 = populateAndAssert(String.class);
-        String value_2 = populateAndAssert(String.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        String value1 = populateAndAssert(String.class);
+        String value2 = populateAndAssert(String.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void pojo() {
-        Pojo value_1 = populateAndAssert(Pojo.class);
-        Pojo value_2 = populateAndAssert(Pojo.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        Pojo value1 = populateAndAssert(Pojo.class);
+        Pojo value2 = populateAndAssert(Pojo.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void pojoExtendsPojoAbstract() {
-        PojoExtendsPojoAbstract value_1 = populateAndAssert(PojoExtendsPojoAbstract.class);
-        PojoExtendsPojoAbstract value_2 = populateAndAssert(PojoExtendsPojoAbstract.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoExtendsPojoAbstract value1 = populateAndAssert(PojoExtendsPojoAbstract.class);
+        PojoExtendsPojoAbstract value2 = populateAndAssert(PojoExtendsPojoAbstract.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void PojoExtendsPojoExtendsPojoAbstract() {
-        PojoExtendsPojoExtendsPojoAbstract value_1 = populateAndAssert(PojoExtendsPojoExtendsPojoAbstract.class);
-        PojoExtendsPojoExtendsPojoAbstract value_2 = populateAndAssert(PojoExtendsPojoExtendsPojoAbstract.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoExtendsPojoExtendsPojoAbstract value1 = populateAndAssert(PojoExtendsPojoExtendsPojoAbstract.class);
+        PojoExtendsPojoExtendsPojoAbstract value2 = populateAndAssert(PojoExtendsPojoExtendsPojoAbstract.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void oddPojo() {
-        OddPojo value_1 = populateAndAssert(OddPojo.class);
-        OddPojo value_2 = populateAndAssert(OddPojo.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        OddPojo value1 = populateAndAssert(OddPojo.class);
+        OddPojo value2 = populateAndAssert(OddPojo.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -90,9 +90,9 @@ class PopulateFactoryWithFieldStrategyTest {
                 .accessNonPublicConstructors(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        PojoPrivateConstructor value_1 = populateAndAssert(PojoPrivateConstructor.class);
-        PojoPrivateConstructor value_2 = populateAndAssert(PojoPrivateConstructor.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoPrivateConstructor value1 = populateAndAssert(PojoPrivateConstructor.class);
+        PojoPrivateConstructor value2 = populateAndAssert(PojoPrivateConstructor.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -108,9 +108,9 @@ class PopulateFactoryWithFieldStrategyTest {
                 .accessNonPublicConstructors(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        LombokImmutable value_1 = populateAndAssert(LombokImmutable.LombokImmutableBuilder.class).build();
-        LombokImmutable value_2 = populateAndAssert(LombokImmutable.LombokImmutableBuilder.class).build();
-        assertRandomlyPopulatedValues(value_1, value_2);
+        LombokImmutable value1 = populateAndAssert(LombokImmutable.LombokImmutableBuilder.class).build();
+        LombokImmutable value2 = populateAndAssert(LombokImmutable.LombokImmutableBuilder.class).build();
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -119,10 +119,10 @@ class PopulateFactoryWithFieldStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        Pojo value_1 = populateFactory.populate(Pojo.class);
-        Pojo value_2 = populateFactory.populate(Pojo.class);
+        Pojo value1 = populateFactory.populate(Pojo.class);
+        Pojo value2 = populateFactory.populate(Pojo.class);
 
-        assertRandomlyPopulatedValues(value_1, value_2);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -131,10 +131,10 @@ class PopulateFactoryWithFieldStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        A value_1 = getPopulate();
-        A value_2 = getPopulate();
+        A value1 = getPopulate();
+        A value2 = getPopulate();
 
-        assertCircularDependency(value_1, value_2);
+        assertCircularDependency(value1, value2);
     }
 
     @Test
@@ -144,16 +144,16 @@ class PopulateFactoryWithFieldStrategyTest {
 
     @Test
     void fields() {
-        Fields value_1 = populateAndAssert(Fields.class);
-        Fields value_2 = populateAndAssert(Fields.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        Fields value1 = populateAndAssert(Fields.class);
+        Fields value2 = populateAndAssert(Fields.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void fieldsDateAndTimeMix() {
-        FieldsDateAndTimeMix value_1 = populateAndAssert(FieldsDateAndTimeMix.class);
-        FieldsDateAndTimeMix value_2 = populateAndAssert(FieldsDateAndTimeMix.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        FieldsDateAndTimeMix value1 = populateAndAssert(FieldsDateAndTimeMix.class);
+        FieldsDateAndTimeMix value2 = populateAndAssert(FieldsDateAndTimeMix.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     private A getPopulate() {

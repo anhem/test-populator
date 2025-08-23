@@ -1,6 +1,5 @@
 package com.github.anhem.testpopulator.internal.value;
 
-import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.Test;
@@ -106,61 +105,61 @@ class ValueFactoryTest {
     }
 
     private void createAndAssertRandomValues(Class<?> clazz) {
-        Object value_1 = valueFactory.createValue(clazz);
-        Object value_2 = createSecondNonMatchingValue(value_1);
-        assertThat(value_1).isNotNull();
-        assertThat(value_2).isNotNull();
-        assertThat(value_1.getClass()).isEqualTo(clazz);
-        assertThat(value_2.getClass()).isEqualTo(clazz);
-        assertThat(value_1).isNotEqualTo(value_2);
+        Object value1 = valueFactory.createValue(clazz);
+        Object value2 = createSecondNonMatchingValue(value1);
+        assertThat(value1).isNotNull();
+        assertThat(value2).isNotNull();
+        assertThat(value1.getClass()).isEqualTo(clazz);
+        assertThat(value2.getClass()).isEqualTo(clazz);
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomIntValues() {
-        int value_1 = valueFactory.createValue(int.class);
-        int value_2 = (int) createSecondNonMatchingValue(value_1);
-        assertThat(value_1).isNotEqualTo(value_2);
+        int value1 = valueFactory.createValue(int.class);
+        int value2 = (int) createSecondNonMatchingValue(value1);
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomLongValues() {
-        long value_1 = valueFactory.createValue(long.class);
-        long value_2 = (long) createSecondNonMatchingValue(value_1);
-        assertThat(value_1).isNotEqualTo(value_2);
+        long value1 = valueFactory.createValue(long.class);
+        long value2 = (long) createSecondNonMatchingValue(value1);
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomDoubleValues() {
-        double value_1 = valueFactory.createValue(double.class);
-        double value_2 = (double) createSecondNonMatchingValue(value_1);
-        assertThat(value_1).isNotEqualTo(value_2);
+        double value1 = valueFactory.createValue(double.class);
+        double value2 = (double) createSecondNonMatchingValue(value1);
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomShortValues() {
-        short value_1 = valueFactory.createValue(short.class);
-        short value_2 = (short) createSecondNonMatchingValue(value_1);
-        assertThat(value_1).isNotEqualTo(value_2);
+        short value1 = valueFactory.createValue(short.class);
+        short value2 = (short) createSecondNonMatchingValue(value1);
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomFloatValues() {
-        float value_1 = valueFactory.createValue(float.class);
-        float value_2 = (float) createSecondNonMatchingValue(value_1);
-        assertThat(value_1).isNotEqualTo(value_2);
+        float value1 = valueFactory.createValue(float.class);
+        float value2 = (float) createSecondNonMatchingValue(value1);
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomBooleanValues() {
-        boolean value_1 = valueFactory.createValue(boolean.class);
-        boolean value_2 = (boolean) createSecondNonMatchingValue(value_1);
-        assertThat(value_1).isNotEqualTo(value_2);
+        boolean value1 = valueFactory.createValue(boolean.class);
+        boolean value2 = (boolean) createSecondNonMatchingValue(value1);
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomCharValues() {
-        char value_1 = valueFactory.createValue(char.class);
-        char value_2 = (char) createSecondNonMatchingValue(value_1);
-        assertThat(value_1).isNotEqualTo(value_2);
+        char value1 = valueFactory.createValue(char.class);
+        char value2 = (char) createSecondNonMatchingValue(value1);
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomByteValues() {
-        byte value_1 = valueFactory.createValue(byte.class);
-        byte value_2 = (byte) createSecondNonMatchingValue(value_1);
-        assertThat(value_1).isNotEqualTo(value_2);
+        byte value1 = valueFactory.createValue(byte.class);
+        byte value2 = (byte) createSecondNonMatchingValue(value1);
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     private Object createSecondNonMatchingValue(Object value) {
@@ -174,60 +173,60 @@ class ValueFactoryTest {
     }
 
     private void createAndAssertFixedValues(Class<?> clazz) {
-        Object value_1 = valueFactory.createValue(clazz);
-        Object value_2 = valueFactory.createValue(clazz);
-        assertThat(value_1).isNotNull();
-        assertThat(value_2).isNotNull();
-        assertThat(value_1.getClass()).isEqualTo(clazz);
-        assertThat(value_2.getClass()).isEqualTo(clazz);
-        assertThat(value_1).isEqualTo(value_2);
+        Object value1 = valueFactory.createValue(clazz);
+        Object value2 = valueFactory.createValue(clazz);
+        assertThat(value1).isNotNull();
+        assertThat(value2).isNotNull();
+        assertThat(value1.getClass()).isEqualTo(clazz);
+        assertThat(value2.getClass()).isEqualTo(clazz);
+        assertThat(value1).isEqualTo(value2);
     }
 
     private void createAndAssertFixedIntValues() {
-        int value_1 = valueFactory.createValue(int.class);
-        int value_2 = valueFactory.createValue(int.class);
-        assertThat(value_1).isEqualTo(value_2);
+        int value1 = valueFactory.createValue(int.class);
+        int value2 = valueFactory.createValue(int.class);
+        assertThat(value1).isEqualTo(value2);
     }
 
     private void createAndAssertFixedLongValues() {
-        long value_1 = valueFactory.createValue(long.class);
-        long value_2 = valueFactory.createValue(long.class);
-        assertThat(value_1).isEqualTo(value_2);
+        long value1 = valueFactory.createValue(long.class);
+        long value2 = valueFactory.createValue(long.class);
+        assertThat(value1).isEqualTo(value2);
     }
 
     private void createAndAssertFixedDoubleValues() {
-        double value_1 = valueFactory.createValue(double.class);
-        double value_2 = valueFactory.createValue(double.class);
-        assertThat(value_1).isEqualTo(value_2);
+        double value1 = valueFactory.createValue(double.class);
+        double value2 = valueFactory.createValue(double.class);
+        assertThat(value1).isEqualTo(value2);
     }
 
     private void createAndAssertFixedShortValues() {
-        short value_1 = valueFactory.createValue(short.class);
-        short value_2 = valueFactory.createValue(short.class);
-        assertThat(value_1).isEqualTo(value_2);
+        short value1 = valueFactory.createValue(short.class);
+        short value2 = valueFactory.createValue(short.class);
+        assertThat(value1).isEqualTo(value2);
     }
 
     private void createAndAssertFixedFloatValues() {
-        float value_1 = valueFactory.createValue(float.class);
-        float value_2 = valueFactory.createValue(float.class);
-        assertThat(value_1).isEqualTo(value_2);
+        float value1 = valueFactory.createValue(float.class);
+        float value2 = valueFactory.createValue(float.class);
+        assertThat(value1).isEqualTo(value2);
     }
 
     private void createAndAssertFixedBooleanValues() {
-        boolean value_1 = valueFactory.createValue(boolean.class);
-        boolean value_2 = valueFactory.createValue(boolean.class);
-        assertThat(value_1).isEqualTo(value_2);
+        boolean value1 = valueFactory.createValue(boolean.class);
+        boolean value2 = valueFactory.createValue(boolean.class);
+        assertThat(value1).isEqualTo(value2);
     }
 
     private void createAndAssertFixedCharValues() {
-        char value_1 = valueFactory.createValue(char.class);
-        char value_2 = valueFactory.createValue(char.class);
-        assertThat(value_1).isEqualTo(value_2);
+        char value1 = valueFactory.createValue(char.class);
+        char value2 = valueFactory.createValue(char.class);
+        assertThat(value1).isEqualTo(value2);
     }
 
     private void createAndAssertFixedByteValues() {
-        byte value_1 = valueFactory.createValue(byte.class);
-        byte value_2 = valueFactory.createValue(byte.class);
-        assertThat(value_1).isEqualTo(value_2);
+        byte value1 = valueFactory.createValue(byte.class);
+        byte value2 = valueFactory.createValue(byte.class);
+        assertThat(value1).isEqualTo(value2);
     }
 }

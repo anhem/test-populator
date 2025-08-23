@@ -37,37 +37,37 @@ class PopulateFactoryWithSetterStrategyTest {
 
     @Test
     void string() {
-        String value_1 = populateAndAssertWithGeneratedCode(String.class);
-        String value_2 = populateAndAssertWithGeneratedCode(String.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        String value1 = populateAndAssertWithGeneratedCode(String.class);
+        String value2 = populateAndAssertWithGeneratedCode(String.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void pojo() {
-        Pojo value_1 = populateAndAssertWithGeneratedCode(Pojo.class);
-        Pojo value_2 = populateAndAssertWithGeneratedCode(Pojo.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        Pojo value1 = populateAndAssertWithGeneratedCode(Pojo.class);
+        Pojo value2 = populateAndAssertWithGeneratedCode(Pojo.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void pojoExtendsPojoAbstract() {
-        PojoExtendsPojoAbstract value_1 = populateAndAssertWithGeneratedCode(PojoExtendsPojoAbstract.class);
-        PojoExtendsPojoAbstract value_2 = populateAndAssertWithGeneratedCode(PojoExtendsPojoAbstract.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoExtendsPojoAbstract value1 = populateAndAssertWithGeneratedCode(PojoExtendsPojoAbstract.class);
+        PojoExtendsPojoAbstract value2 = populateAndAssertWithGeneratedCode(PojoExtendsPojoAbstract.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void PojoExtendsPojoExtendsPojoAbstract() {
-        PojoExtendsPojoExtendsPojoAbstract value_1 = populateAndAssertWithGeneratedCode(PojoExtendsPojoExtendsPojoAbstract.class);
-        PojoExtendsPojoExtendsPojoAbstract value_2 = populateAndAssertWithGeneratedCode(PojoExtendsPojoExtendsPojoAbstract.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoExtendsPojoExtendsPojoAbstract value1 = populateAndAssertWithGeneratedCode(PojoExtendsPojoExtendsPojoAbstract.class);
+        PojoExtendsPojoExtendsPojoAbstract value2 = populateAndAssertWithGeneratedCode(PojoExtendsPojoExtendsPojoAbstract.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void oddPojo() {
-        OddPojo value_1 = populateAndAssertWithGeneratedCode(OddPojo.class);
-        OddPojo value_2 = populateAndAssertWithGeneratedCode(OddPojo.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        OddPojo value1 = populateAndAssertWithGeneratedCode(OddPojo.class);
+        OddPojo value2 = populateAndAssertWithGeneratedCode(OddPojo.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -90,9 +90,9 @@ class PopulateFactoryWithSetterStrategyTest {
                 .setterPrefix("with")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        PojoWithCustomSetters value_1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
-        PojoWithCustomSetters value_2 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
+        PojoWithCustomSetters value2 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -101,9 +101,9 @@ class PopulateFactoryWithSetterStrategyTest {
                 .setterPrefix("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        PojoWithCustomSetters value_1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
-        PojoWithCustomSetters value_2 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
+        PojoWithCustomSetters value2 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -115,9 +115,9 @@ class PopulateFactoryWithSetterStrategyTest {
                 .setterPrefix("as")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        PojoWithMultipleCustomSetters value_1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
-        PojoWithMultipleCustomSetters value_2 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
+        PojoWithMultipleCustomSetters value2 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -126,9 +126,9 @@ class PopulateFactoryWithSetterStrategyTest {
                 .setterPrefix("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        PojoWithMultipleCustomSetters value_1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
-        PojoWithMultipleCustomSetters value_2 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
+        PojoWithMultipleCustomSetters value2 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -138,9 +138,9 @@ class PopulateFactoryWithSetterStrategyTest {
                 .objectFactoryEnabled(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        PojoPrivateConstructor value_1 = populateAndAssert(PojoPrivateConstructor.class);
-        PojoPrivateConstructor value_2 = populateAndAssert(PojoPrivateConstructor.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        PojoPrivateConstructor value1 = populateAndAssert(PojoPrivateConstructor.class);
+        PojoPrivateConstructor value2 = populateAndAssert(PojoPrivateConstructor.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -156,10 +156,10 @@ class PopulateFactoryWithSetterStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        Pojo value_1 = populateAndAssertWithGeneratedCode(Pojo.class);
-        Pojo value_2 = populateAndAssertWithGeneratedCode(Pojo.class);
+        Pojo value1 = populateAndAssertWithGeneratedCode(Pojo.class);
+        Pojo value2 = populateAndAssertWithGeneratedCode(Pojo.class);
 
-        assertRandomlyPopulatedValues(value_1, value_2);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -168,10 +168,10 @@ class PopulateFactoryWithSetterStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        A value_1 = populateAndAssertWithGeneratedCode(A.class);
-        A value_2 = populateAndAssertWithGeneratedCode(A.class);
+        A value1 = populateAndAssertWithGeneratedCode(A.class);
+        A value2 = populateAndAssertWithGeneratedCode(A.class);
 
-        assertCircularDependency(value_1, value_2);
+        assertCircularDependency(value1, value2);
     }
 
     @Test
@@ -199,16 +199,16 @@ class PopulateFactoryWithSetterStrategyTest {
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        Pojo value_1 = populateFactory.populate(clazz);
-        Pojo value_2 = populateFactory.populate(clazz);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        Pojo value1 = populateFactory.populate(clazz);
+        Pojo value2 = populateFactory.populate(clazz);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void dateAndTimeMix() {
-        DateAndTimeMix value_1 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
-        DateAndTimeMix value_2 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        DateAndTimeMix value1 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
+        DateAndTimeMix value2 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
