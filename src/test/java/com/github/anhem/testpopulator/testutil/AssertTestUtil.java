@@ -39,13 +39,13 @@ public class AssertTestUtil {
         assertThat(value1).isNotEqualTo(value2);
     }
 
-    public static void assertCircularDependency(A a_1, A a_2) {
-        assertThat(a_1).isNotNull();
-        assertThat(a_2).isNotNull();
-        assertThat(a_1).isNotEqualTo(a_2);
-        assertThat(a_1).usingRecursiveAssertion().isNotEqualTo(a_2);
-        assertCircularDependency(a_1);
-        assertCircularDependency(a_2);
+    public static void assertCircularDependency(A a1, A a2) {
+        assertThat(a1).isNotNull();
+        assertThat(a2).isNotNull();
+        assertThat(a1).isNotEqualTo(a2);
+        assertThat(a1).usingRecursiveAssertion().isNotEqualTo(a2);
+        assertCircularDependency(a1);
+        assertCircularDependency(a2);
     }
 
     private static void assertCircularDependency(A a) {
