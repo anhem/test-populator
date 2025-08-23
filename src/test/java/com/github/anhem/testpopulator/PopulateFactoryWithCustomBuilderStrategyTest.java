@@ -33,16 +33,16 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
 
     @Test
     void string() {
-        String value_1 = populateAndAssertWithGeneratedCode(String.class);
-        String value_2 = populateAndAssertWithGeneratedCode(String.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        String value1 = populateAndAssertWithGeneratedCode(String.class);
+        String value2 = populateAndAssertWithGeneratedCode(String.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void CustomBuilder() {
-        CustomBuilder value_1 = populateAndAssertWithGeneratedCode(CustomBuilder.class);
-        CustomBuilder value_2 = populateAndAssertWithGeneratedCode(CustomBuilder.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        CustomBuilder value1 = populateAndAssertWithGeneratedCode(CustomBuilder.class);
+        CustomBuilder value2 = populateAndAssertWithGeneratedCode(CustomBuilder.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -52,17 +52,17 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
                 .buildMethod("done")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        CustomBuilderCustomName value_1 = populateAndAssertWithGeneratedCode(CustomBuilderCustomName.class);
-        CustomBuilderCustomName value_2 = populateAndAssertWithGeneratedCode(CustomBuilderCustomName.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        CustomBuilderCustomName value1 = populateAndAssertWithGeneratedCode(CustomBuilderCustomName.class);
+        CustomBuilderCustomName value2 = populateAndAssertWithGeneratedCode(CustomBuilderCustomName.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void LombokImmutable() {
-        LombokImmutable value_1 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
-        LombokImmutable value_2 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(List.of(value_1, value_2)).allSatisfy(value -> {
+        LombokImmutable value1 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
+        LombokImmutable value2 = populateAndAssertWithGeneratedCode(LombokImmutable.class);
+        assertRandomlyPopulatedValues(value1, value2);
+        assertThat(List.of(value1, value2)).allSatisfy(value -> {
             assertThat(value.getListOfStrings()).hasSize(1);
             assertThat(value.getMapOfStringsToIntegers()).hasSize(1);
             assertThat(value.getMapOfStringsToIntegers().values()).hasSize(1);
@@ -71,10 +71,10 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
 
     @Test
     void LombokImmutableWithSingular() {
-        LombokImmutableWithSingular value_1 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
-        LombokImmutableWithSingular value_2 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(List.of(value_1, value_2))
+        LombokImmutableWithSingular value1 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
+        LombokImmutableWithSingular value2 = populateAndAssertWithGeneratedCode(LombokImmutableWithSingular.class);
+        assertRandomlyPopulatedValues(value1, value2);
+        assertThat(List.of(value1, value2))
                 .allSatisfy(value -> {
                     assertThat(value.getListOfStrings()).hasSize(2);
                     assertThat(value.getMapOfStringsToIntegers()).hasSize(2);

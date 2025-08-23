@@ -34,56 +34,56 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
 
     @Test
     void string() {
-        String value_1 = populateAndAssertWithGeneratedCode(String.class);
-        String value_2 = populateAndAssertWithGeneratedCode(String.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        String value1 = populateAndAssertWithGeneratedCode(String.class);
+        String value2 = populateAndAssertWithGeneratedCode(String.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void immutablesInterfaceImplementation() {
-        ImmutableImmutablesInterface value_1 = populateAndAssertWithGeneratedCode(ImmutableImmutablesInterface.class);
-        ImmutableImmutablesInterface value_2 = populateAndAssertWithGeneratedCode(ImmutableImmutablesInterface.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(value_1.getListOfStrings()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
+        ImmutableImmutablesInterface value1 = populateAndAssertWithGeneratedCode(ImmutableImmutablesInterface.class);
+        ImmutableImmutablesInterface value2 = populateAndAssertWithGeneratedCode(ImmutableImmutablesInterface.class);
+        assertRandomlyPopulatedValues(value1, value2);
+        assertThat(value1.getListOfStrings()).hasSize(1);
+        assertThat(value1.getMapOfStringsToIntegers()).hasSize(1);
+        assertThat(value1.getMapOfStringsToIntegers().values()).hasSize(1);
     }
 
     @Test
     void immutablesInterface() {
-        ImmutablesInterface value_1 = populateAndAssertWithGeneratedCode(ImmutablesInterface.class);
-        ImmutablesInterface value_2 = populateAndAssertWithGeneratedCode(ImmutablesInterface.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(value_1.getListOfStrings()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
+        ImmutablesInterface value1 = populateAndAssertWithGeneratedCode(ImmutablesInterface.class);
+        ImmutablesInterface value2 = populateAndAssertWithGeneratedCode(ImmutablesInterface.class);
+        assertRandomlyPopulatedValues(value1, value2);
+        assertThat(value1.getListOfStrings()).hasSize(1);
+        assertThat(value1.getMapOfStringsToIntegers()).hasSize(1);
+        assertThat(value1.getMapOfStringsToIntegers().values()).hasSize(1);
     }
 
     @Test
     void immutablesAbstractImplementation() {
-        ImmutableImmutablesAbstract value_1 = populateAndAssertWithGeneratedCode(ImmutableImmutablesAbstract.class);
-        ImmutableImmutablesAbstract value_2 = populateAndAssertWithGeneratedCode(ImmutableImmutablesAbstract.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(value_1.getListOfStrings()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
+        ImmutableImmutablesAbstract value1 = populateAndAssertWithGeneratedCode(ImmutableImmutablesAbstract.class);
+        ImmutableImmutablesAbstract value2 = populateAndAssertWithGeneratedCode(ImmutableImmutablesAbstract.class);
+        assertRandomlyPopulatedValues(value1, value2);
+        assertThat(value1.getListOfStrings()).hasSize(1);
+        assertThat(value1.getMapOfStringsToIntegers()).hasSize(1);
+        assertThat(value1.getMapOfStringsToIntegers().values()).hasSize(1);
     }
 
     @Test
     void immutablesAbstract() {
-        ImmutablesAbstract value_1 = populateAndAssertWithGeneratedCode(ImmutablesAbstract.class);
-        ImmutablesAbstract value_2 = populateAndAssertWithGeneratedCode(ImmutablesAbstract.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(value_1.getListOfStrings()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers()).hasSize(1);
-        assertThat(value_1.getMapOfStringsToIntegers().values()).hasSize(1);
+        ImmutablesAbstract value1 = populateAndAssertWithGeneratedCode(ImmutablesAbstract.class);
+        ImmutablesAbstract value2 = populateAndAssertWithGeneratedCode(ImmutablesAbstract.class);
+        assertRandomlyPopulatedValues(value1, value2);
+        assertThat(value1.getListOfStrings()).hasSize(1);
+        assertThat(value1.getMapOfStringsToIntegers()).hasSize(1);
+        assertThat(value1.getMapOfStringsToIntegers().values()).hasSize(1);
     }
 
     @Test
     void immutablesOddInterface() {
-        ImmutablesOddInterface value_1 = populateAndAssertWithGeneratedCode(ImmutablesOddInterface.class);
-        ImmutablesOddInterface value_2 = populateAndAssertWithGeneratedCode(ImmutablesOddInterface.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        ImmutablesOddInterface value1 = populateAndAssertWithGeneratedCode(ImmutablesOddInterface.class);
+        ImmutablesOddInterface value2 = populateAndAssertWithGeneratedCode(ImmutablesOddInterface.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -99,10 +99,10 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        ImmutableImmutablesInterface value_1 = populateFactory.populate(ImmutableImmutablesInterface.class);
-        ImmutableImmutablesInterface value_2 = populateFactory.populate(ImmutableImmutablesInterface.class);
+        ImmutableImmutablesInterface value1 = populateFactory.populate(ImmutableImmutablesInterface.class);
+        ImmutableImmutablesInterface value2 = populateFactory.populate(ImmutableImmutablesInterface.class);
 
-        assertRandomlyPopulatedValues(value_1, value_2);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -119,9 +119,9 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
                 .builderPattern(IMMUTABLES)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        ImmutableImmutablesInterface value_1 = populateFactory.populate(clazz);
-        ImmutableImmutablesInterface value_2 = populateFactory.populate(clazz);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        ImmutableImmutablesInterface value1 = populateFactory.populate(clazz);
+        ImmutableImmutablesInterface value2 = populateFactory.populate(clazz);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

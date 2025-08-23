@@ -37,52 +37,52 @@ public class PopulateFactoryWithProtobufBuilderStrategyTest {
 
     @Test
     void int32Value() {
-        Int32Value value_1 = populateAndAssertWithGeneratedCode(Int32Value.class);
-        Int32Value value_2 = populateAndAssertWithGeneratedCode(Int32Value.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        Int32Value value1 = populateAndAssertWithGeneratedCode(Int32Value.class);
+        Int32Value value2 = populateAndAssertWithGeneratedCode(Int32Value.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void uInt32Value() {
-        UInt32Value value_1 = populateAndAssertWithGeneratedCode(UInt32Value.class);
-        UInt32Value value_2 = populateAndAssertWithGeneratedCode(UInt32Value.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        UInt32Value value1 = populateAndAssertWithGeneratedCode(UInt32Value.class);
+        UInt32Value value2 = populateAndAssertWithGeneratedCode(UInt32Value.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void byteString() {
-        ByteString value_1 = populateAndAssertWithGeneratedCode(ByteString.class);
-        ByteString value_2 = populateAndAssertWithGeneratedCode(ByteString.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        ByteString value1 = populateAndAssertWithGeneratedCode(ByteString.class);
+        ByteString value2 = populateAndAssertWithGeneratedCode(ByteString.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void bytesValue() {
-        BytesValue value_1 = populateAndAssertWithGeneratedCode(BytesValue.class);
-        BytesValue value_2 = populateAndAssertWithGeneratedCode(BytesValue.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        BytesValue value1 = populateAndAssertWithGeneratedCode(BytesValue.class);
+        BytesValue value2 = populateAndAssertWithGeneratedCode(BytesValue.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void simple() {
-        Person value_1 = populateAndAssertWithGeneratedCode(Person.class);
-        Person value_2 = populateAndAssertWithGeneratedCode(Person.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        Person value1 = populateAndAssertWithGeneratedCode(Person.class);
+        Person value2 = populateAndAssertWithGeneratedCode(Person.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void wrappers() {
         Wrappers.AllWrappers.newBuilder().setInt32Value(Int32Value.newBuilder().setValue(42).build());
-        Wrappers.AllWrappers value_1 = populateAndAssertWithGeneratedCode(Wrappers.AllWrappers.class);
-        Wrappers.AllWrappers value_2 = populateAndAssertWithGeneratedCode(Wrappers.AllWrappers.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        Wrappers.AllWrappers value1 = populateAndAssertWithGeneratedCode(Wrappers.AllWrappers.class);
+        Wrappers.AllWrappers value2 = populateAndAssertWithGeneratedCode(Wrappers.AllWrappers.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void complex() {
-        UserProfile value_1 = populateAndAssertWithGeneratedCode(UserProfile.class);
-        UserProfile value_2 = populateAndAssertWithGeneratedCode(UserProfile.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        UserProfile value1 = populateAndAssertWithGeneratedCode(UserProfile.class);
+        UserProfile value2 = populateAndAssertWithGeneratedCode(UserProfile.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
@@ -97,12 +97,12 @@ public class PopulateFactoryWithProtobufBuilderStrategyTest {
         return value;
     }
 
-    public static <T> void assertRandomlyPopulatedValues(T value_1, T value_2) {
-        assertThat(value_1).isNotNull();
-        assertThat(value_2).isNotNull();
-        assertThat(value_1).hasNoNullFieldsOrProperties();
-        assertThat(value_2).hasNoNullFieldsOrProperties();
-        assertThat(value_1).isNotEqualTo(value_2);
-        assertThat(value_1).usingRecursiveAssertion().isNotEqualTo(value_2);
+    public static <T> void assertRandomlyPopulatedValues(T value1, T value2) {
+        assertThat(value1).isNotNull();
+        assertThat(value2).isNotNull();
+        assertThat(value1).hasNoNullFieldsOrProperties();
+        assertThat(value2).hasNoNullFieldsOrProperties();
+        assertThat(value1).isNotEqualTo(value2);
+        assertThat(value1).usingRecursiveAssertion().isNotEqualTo(value2);
     }
 }

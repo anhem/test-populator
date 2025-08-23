@@ -29,46 +29,46 @@ class PopulateFactoryWithStaticStrategyTest {
 
     @Test
     void string() {
-        String value_1 = populateAndAssertWithGeneratedCode(String.class);
-        String value_2 = populateAndAssertWithGeneratedCode(String.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        String value1 = populateAndAssertWithGeneratedCode(String.class);
+        String value2 = populateAndAssertWithGeneratedCode(String.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void userId() {
-        UserId value_1 = populateAndAssertWithGeneratedCode(UserId.class);
-        UserId value_2 = populateAndAssertWithGeneratedCode(UserId.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        UserId value1 = populateAndAssertWithGeneratedCode(UserId.class);
+        UserId value2 = populateAndAssertWithGeneratedCode(UserId.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void user() {
-        User value_1 = populateAndAssertWithGeneratedCode(User.class);
-        User value_2 = populateAndAssertWithGeneratedCode(User.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        User value1 = populateAndAssertWithGeneratedCode(User.class);
+        User value2 = populateAndAssertWithGeneratedCode(User.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void users() {
-        Users value_1 = populateAndAssertWithGeneratedCode(Users.class);
-        Users value_2 = populateAndAssertWithGeneratedCode(Users.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(List.of(value_1, value_2)).allSatisfy(users -> assertThat(users.getUsers()).hasSize(2));
+        Users value1 = populateAndAssertWithGeneratedCode(Users.class);
+        Users value2 = populateAndAssertWithGeneratedCode(Users.class);
+        assertRandomlyPopulatedValues(value1, value2);
+        assertThat(List.of(value1, value2)).allSatisfy(users -> assertThat(users.getUsers()).hasSize(2));
     }
 
     @Test
     void userGroup() {
-        UserGroup value_1 = populateAndAssertWithGeneratedCode(UserGroup.class);
-        UserGroup value_2 = populateAndAssertWithGeneratedCode(UserGroup.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
-        assertThat(List.of(value_1, value_2)).allSatisfy(users -> assertThat(users.getUsers()).hasSize(1));
+        UserGroup value1 = populateAndAssertWithGeneratedCode(UserGroup.class);
+        UserGroup value2 = populateAndAssertWithGeneratedCode(UserGroup.class);
+        assertRandomlyPopulatedValues(value1, value2);
+        assertThat(List.of(value1, value2)).allSatisfy(users -> assertThat(users.getUsers()).hasSize(1));
     }
 
     @Test
     void multipleStaticMethods() {
-        MultipleStaticMethods value_1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
-        MultipleStaticMethods value_2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        MultipleStaticMethods value1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        MultipleStaticMethods value2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -79,9 +79,9 @@ class PopulateFactoryWithStaticStrategyTest {
                 .methodType(MethodType.SIMPLEST)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        MultipleStaticMethods value_1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
-        MultipleStaticMethods value_2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        MultipleStaticMethods value1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        MultipleStaticMethods value2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -92,9 +92,9 @@ class PopulateFactoryWithStaticStrategyTest {
                 .methodType(MethodType.SMALLEST)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        MultipleStaticMethods value_1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
-        MultipleStaticMethods value_2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        MultipleStaticMethods value1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        MultipleStaticMethods value2 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

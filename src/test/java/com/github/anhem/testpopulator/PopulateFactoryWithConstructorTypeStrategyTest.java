@@ -37,41 +37,41 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
 
     @Test
     void string() {
-        String value_1 = populateAndAssertWithGeneratedCode(String.class);
-        String value_2 = populateAndAssertWithGeneratedCode(String.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        String value1 = populateAndAssertWithGeneratedCode(String.class);
+        String value2 = populateAndAssertWithGeneratedCode(String.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void allArgsConstructor() {
-        AllArgsConstructor value_1 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
-        AllArgsConstructor value_2 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        AllArgsConstructor value1 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
+        AllArgsConstructor value2 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void allArgsConstructorExtendsAllArgsConstructorAbstract() {
-        AllArgsConstructorExtendsAllArgsConstructorAbstract value_1 = populateAndAssertWithGeneratedCode(AllArgsConstructorExtendsAllArgsConstructorAbstract.class);
-        AllArgsConstructorExtendsAllArgsConstructorAbstract value_2 = populateAndAssertWithGeneratedCode(AllArgsConstructorExtendsAllArgsConstructorAbstract.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        AllArgsConstructorExtendsAllArgsConstructorAbstract value1 = populateAndAssertWithGeneratedCode(AllArgsConstructorExtendsAllArgsConstructorAbstract.class);
+        AllArgsConstructorExtendsAllArgsConstructorAbstract value2 = populateAndAssertWithGeneratedCode(AllArgsConstructorExtendsAllArgsConstructorAbstract.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void oddAllArgsConstructor() {
-        OddAllArgsConstructor value_1 = populateAndAssertWithGeneratedCode(OddAllArgsConstructor.class);
-        OddAllArgsConstructor value_2 = populateAndAssertWithGeneratedCode(OddAllArgsConstructor.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        OddAllArgsConstructor value1 = populateAndAssertWithGeneratedCode(OddAllArgsConstructor.class);
+        OddAllArgsConstructor value2 = populateAndAssertWithGeneratedCode(OddAllArgsConstructor.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void populatedWithPublicConstructor() {
-        DifferentConstructorModifiers value_1 = populateAndAssertWithGeneratedCode(DifferentConstructorModifiers.class);
-        DifferentConstructorModifiers value_2 = populateAndAssertWithGeneratedCode(DifferentConstructorModifiers.class);
-        assertThat(value_1).isNotNull();
-        assertThat(value_2).isNotNull();
-        assertThat(value_1).hasNoNullFieldsOrPropertiesExcept("privateConstructorField");
-        assertThat(value_2).hasNoNullFieldsOrPropertiesExcept("privateConstructorField");
-        assertThat(value_1).isNotEqualTo(value_2);
+        DifferentConstructorModifiers value1 = populateAndAssertWithGeneratedCode(DifferentConstructorModifiers.class);
+        DifferentConstructorModifiers value2 = populateAndAssertWithGeneratedCode(DifferentConstructorModifiers.class);
+        assertThat(value1).isNotNull();
+        assertThat(value2).isNotNull();
+        assertThat(value1).hasNoNullFieldsOrPropertiesExcept("privateConstructorField");
+        assertThat(value2).hasNoNullFieldsOrPropertiesExcept("privateConstructorField");
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     @Test
@@ -100,9 +100,9 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
                 .accessNonPublicConstructors(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        AllArgsConstructorPrivate value_1 = populateAndAssert(clazz);
-        AllArgsConstructorPrivate value_2 = populateAndAssert(clazz);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        AllArgsConstructorPrivate value1 = populateAndAssert(clazz);
+        AllArgsConstructorPrivate value2 = populateAndAssert(clazz);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -118,9 +118,9 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
                 .accessNonPublicConstructors(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        AllArgsConstructorProtected value_1 = populateAndAssert(clazz);
-        AllArgsConstructorProtected value_2 = populateAndAssert(clazz);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        AllArgsConstructorProtected value1 = populateAndAssert(clazz);
+        AllArgsConstructorProtected value2 = populateAndAssert(clazz);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -132,9 +132,9 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
 
     @Test
     void nestedCollections() {
-        NestedCollections value_1 = populateAndAssertWithGeneratedCode(NestedCollections.class);
-        NestedCollections value_2 = populateAndAssertWithGeneratedCode(NestedCollections.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        NestedCollections value1 = populateAndAssertWithGeneratedCode(NestedCollections.class);
+        NestedCollections value2 = populateAndAssertWithGeneratedCode(NestedCollections.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -143,9 +143,9 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        AllArgsConstructor value_1 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
-        AllArgsConstructor value_2 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        AllArgsConstructor value1 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
+        AllArgsConstructor value2 = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
@@ -154,9 +154,9 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
                 .nullOnCircularDependency(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        A value_1 = populateAndAssertWithGeneratedCode(A.class);
-        A value_2 = populateAndAssertWithGeneratedCode(A.class);
-        assertCircularDependency(value_1, value_2);
+        A value1 = populateAndAssertWithGeneratedCode(A.class);
+        A value2 = populateAndAssertWithGeneratedCode(A.class);
+        assertCircularDependency(value1, value2);
     }
 
     @Test
@@ -184,16 +184,16 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        AllArgsConstructor value_1 = populateFactory.populate(clazz);
-        AllArgsConstructor value_2 = populateFactory.populate(clazz);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        AllArgsConstructor value1 = populateFactory.populate(clazz);
+        AllArgsConstructor value2 = populateFactory.populate(clazz);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test
     void allArgsConstructorDateAndTimeMix() {
-        AllArgsConstructorDateAndTimeMix value_1 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
-        AllArgsConstructorDateAndTimeMix value_2 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
-        assertRandomlyPopulatedValues(value_1, value_2);
+        AllArgsConstructorDateAndTimeMix value1 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
+        AllArgsConstructorDateAndTimeMix value2 = populateAndAssertWithGeneratedCode(AllArgsConstructorDateAndTimeMix.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

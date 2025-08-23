@@ -11,32 +11,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AssertTestUtil {
 
-    public static <T> void assertRandomlyPopulatedValues(T value_1, T value_2) {
-        assertThat(value_1).isNotNull();
-        assertThat(value_2).isNotNull();
-        assertThat(value_1).hasNoNullFieldsOrProperties();
-        assertThat(value_2).hasNoNullFieldsOrProperties();
-        assertThat(value_1).usingRecursiveAssertion().hasNoNullFields();
-        assertThat(value_2).usingRecursiveAssertion().hasNoNullFields();
-        assertThat(value_1).isNotEqualTo(value_2);
-        assertThat(value_1).usingRecursiveAssertion().isNotEqualTo(value_2);
+    public static <T> void assertRandomlyPopulatedValues(T value1, T value2) {
+        assertThat(value1).isNotNull();
+        assertThat(value2).isNotNull();
+        assertThat(value1).hasNoNullFieldsOrProperties();
+        assertThat(value2).hasNoNullFieldsOrProperties();
+        assertThat(value1).usingRecursiveAssertion().hasNoNullFields();
+        assertThat(value2).usingRecursiveAssertion().hasNoNullFields();
+        assertThat(value1).isNotEqualTo(value2);
+        assertThat(value1).usingRecursiveAssertion().isNotEqualTo(value2);
     }
 
-    public static <T> void assertRandomlyPopulatedValues(T value_1, T value_2, String... ignoringFields) {
-        assertThat(value_1).isNotNull();
-        assertThat(value_2).isNotNull();
-        assertThat(value_1).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
-        assertThat(value_2).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
-        assertThat(value_1).usingRecursiveAssertion().ignoringFields(ignoringFields).hasNoNullFields();
-        assertThat(value_2).usingRecursiveAssertion().ignoringFields(ignoringFields).hasNoNullFields();
-        assertThat(value_1).isNotEqualTo(value_2);
-        assertThat(value_1).usingRecursiveAssertion().isNotEqualTo(value_2);
+    public static <T> void assertRandomlyPopulatedValues(T value1, T value2, String... ignoringFields) {
+        assertThat(value1).isNotNull();
+        assertThat(value2).isNotNull();
+        assertThat(value1).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
+        assertThat(value2).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
+        assertThat(value1).usingRecursiveAssertion().ignoringFields(ignoringFields).hasNoNullFields();
+        assertThat(value2).usingRecursiveAssertion().ignoringFields(ignoringFields).hasNoNullFields();
+        assertThat(value1).isNotEqualTo(value2);
+        assertThat(value1).usingRecursiveAssertion().isNotEqualTo(value2);
     }
 
-    public static void assertRandomlyPopulatedValues(String value_1, String value_2) {
-        assertThat(value_1).isNotNull();
-        assertThat(value_2).isNotNull();
-        assertThat(value_1).isNotEqualTo(value_2);
+    public static void assertRandomlyPopulatedValues(String value1, String value2) {
+        assertThat(value1).isNotNull();
+        assertThat(value2).isNotNull();
+        assertThat(value1).isNotEqualTo(value2);
     }
 
     public static void assertCircularDependency(A a_1, A a_2) {
