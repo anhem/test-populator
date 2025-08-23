@@ -195,17 +195,17 @@ class PopulateUtilTest {
 
     @Test
     void hasConstructorsReturnsTrue() {
-        assertThat(hasConstructors(new CollectionCarrier<>(HashMap.class, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>()))).isTrue();
+        assertThat(hasConstructors(new CollectionCarrier<>(HashMap.class, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>(), null))).isTrue();
     }
 
     @Test
     void hasConstructorsReturnsFalse() {
-        assertThat(hasConstructors(new CollectionCarrier<>(Map.class, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>()))).isFalse();
+        assertThat(hasConstructors(new CollectionCarrier<>(Map.class, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>(), null))).isFalse();
     }
 
     @Test
     void alreadyVisitedReturnsTrueWhenClassHasBeenVisited() {
-        ClassCarrier<A> classCarrier = ClassCarrier.initialize(A.class, new ObjectFactoryVoid());
+        ClassCarrier<A> classCarrier = ClassCarrier.initialize(A.class, new ObjectFactoryVoid(), null);
 
         assertThat(alreadyVisited(classCarrier, true)).isFalse();
 
@@ -216,7 +216,7 @@ class PopulateUtilTest {
 
     @Test
     void alreadyVisitedReturnsFalseWhenNullOnCircularDependencyIsFalse() {
-        ClassCarrier<A> classCarrier = ClassCarrier.initialize(A.class, new ObjectFactoryVoid());
+        ClassCarrier<A> classCarrier = ClassCarrier.initialize(A.class, new ObjectFactoryVoid(), null);
 
         assertThat(alreadyVisited(classCarrier, true)).isFalse();
 
@@ -227,7 +227,7 @@ class PopulateUtilTest {
 
     @Test
     void alreadyVisitedReturnsFalseWhenBaseJavaClass() {
-        ClassCarrier<String> classCarrier = ClassCarrier.initialize(String.class, new ObjectFactoryVoid());
+        ClassCarrier<String> classCarrier = ClassCarrier.initialize(String.class, new ObjectFactoryVoid(), null);
 
         assertThat(alreadyVisited(classCarrier, true)).isFalse();
 
@@ -237,11 +237,11 @@ class PopulateUtilTest {
     }
 
     private static ClassCarrier<String> createClassCarrier() {
-        return Carrier.initialize(String.class, new ObjectFactoryVoid());
+        return Carrier.initialize(String.class, new ObjectFactoryVoid(), null);
     }
 
     private static <T> CollectionCarrier<T> createCollectionCarrier(Class<T> clazz) {
-        return new CollectionCarrier<>(clazz, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>());
+        return new CollectionCarrier<>(clazz, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>(), null);
     }
 
     private static Method getArbitraryMethod() {

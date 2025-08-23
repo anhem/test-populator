@@ -42,7 +42,7 @@ public class PopulateFactory {
      */
     public <T> T populate(Class<T> clazz) {
         ObjectFactory objectFactory = populateConfig.isObjectFactoryEnabled() ? new ObjectFactoryImpl(populateConfig) : new ObjectFactoryVoid();
-        T result = populator.populateWithOverrides(initialize(clazz, objectFactory));
+        T result = populator.populateWithOverrides(initialize(clazz, objectFactory, populateConfig));
         objectFactory.writeToFile();
         return result;
     }
