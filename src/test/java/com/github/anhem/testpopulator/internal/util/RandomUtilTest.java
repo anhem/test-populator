@@ -14,128 +14,128 @@ class RandomUtilTest {
 
     @Test
     void getRandomIntIsDifferentEachTime() {
-        int random_1 = getRandomInt();
-        int random_2 = getRandomInt();
+        int random1 = getRandomInt();
+        int random2 = getRandomInt();
 
-        assertThat(random_1).isPositive();
-        assertThat(random_2).isPositive();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isPositive();
+        assertThat(random2).isPositive();
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomShortIsDifferentEachTime() {
-        short random_1 = getRandomShort();
-        short random_2 = getRandomShort();
+        short random1 = getRandomShort();
+        short random2 = getRandomShort();
 
-        assertThat(random_1).isPositive();
-        assertThat(random_2).isPositive();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isPositive();
+        assertThat(random2).isPositive();
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomFloatIsDifferentEachTime() {
-        float random_1 = getRandomFloat();
-        float random_2 = getRandomFloat();
+        float random1 = getRandomFloat();
+        float random2 = getRandomFloat();
 
-        assertThat(random_1).isPositive();
-        assertThat(random_2).isPositive();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isPositive();
+        assertThat(random2).isPositive();
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomStringIsDifferentEachTime() {
-        String random_1 = getRandomString();
-        String random_2 = getRandomString();
+        String random1 = getRandomString();
+        String random2 = getRandomString();
 
-        assertThat(random_1).isNotNull();
-        assertThat(random_2).isNotNull();
-        assertThat(random_1).hasSize(STRING_LENGTH);
-        assertThat(random_2).hasSize(STRING_LENGTH);
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isNotNull();
+        assertThat(random2).isNotNull();
+        assertThat(random1).hasSize(STRING_LENGTH);
+        assertThat(random2).hasSize(STRING_LENGTH);
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomBooleanCanBeDifferent() {
-        Boolean random_1 = getRandomBoolean();
-        Boolean random_2 = getRandomBoolean();
+        Boolean random1 = getRandomBoolean();
+        Boolean random2 = getRandomBoolean();
         int retry = 0;
-        while (random_1.equals(random_2) && retry < 10) {
-            random_2 = getRandomBoolean();
+        while (random1.equals(random2) && retry < 10) {
+            random2 = getRandomBoolean();
             retry++;
         }
 
-        assertThat(random_1).isNotNull();
-        assertThat(random_2).isNotNull();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isNotNull();
+        assertThat(random2).isNotNull();
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomLocalDateIsDifferentEachTime() {
-        LocalDate random_1 = getRandomLocalDate();
-        LocalDate random_2 = getRandomLocalDate();
+        LocalDate random1 = getRandomLocalDate();
+        LocalDate random2 = getRandomLocalDate();
 
-        assertThat(random_1).isNotNull();
-        assertThat(random_2).isNotNull();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isNotNull();
+        assertThat(random2).isNotNull();
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomLocalDateTimeIsDifferentEachTime() {
-        LocalDateTime random_1 = getRandomLocalDateTime();
-        LocalDateTime random_2 = getRandomLocalDateTime();
+        LocalDateTime random1 = getRandomLocalDateTime();
+        LocalDateTime random2 = getRandomLocalDateTime();
 
-        assertThat(random_1).isNotNull();
-        assertThat(random_2).isNotNull();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isNotNull();
+        assertThat(random2).isNotNull();
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomCharacterCanBeDifferent() {
-        Character random_1 = getRandomCharacter();
-        Character random_2 = getRandomCharacter();
+        Character random1 = getRandomCharacter();
+        Character random2 = getRandomCharacter();
         int retry = 0;
-        while (random_1.equals(random_2) && retry < 10) {
-            random_2 = getRandomCharacter();
+        while (random1.equals(random2) && retry < 10) {
+            random2 = getRandomCharacter();
             retry++;
         }
 
-        assertThat(random_1).isNotNull();
-        assertThat(random_2).isNotNull();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isNotNull();
+        assertThat(random2).isNotNull();
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomEnumCanBeDifferent() {
-        ArbitraryEnum random_1 = getRandomEnum(ArbitraryEnum.class, false);
-        ArbitraryEnum random_2 = getRandomEnum(ArbitraryEnum.class, false);
+        ArbitraryEnum random1 = getRandomEnum(ArbitraryEnum.class, false);
+        ArbitraryEnum random2 = getRandomEnum(ArbitraryEnum.class, false);
         int retry = 0;
-        while (random_1.equals(random_2) && retry < 10) {
-            random_2 = getRandomEnum(ArbitraryEnum.class, false);
+        while (random1.equals(random2) && retry < 10) {
+            random2 = getRandomEnum(ArbitraryEnum.class, false);
             retry++;
         }
 
-        assertThat(random_1).isNotNull();
-        assertThat(random_2).isNotNull();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isNotNull();
+        assertThat(random2).isNotNull();
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomByteIsDifferentEachTime() {
-        Byte random_1 = getRandomByte();
-        Byte random_2 = getRandomByte();
+        Byte random1 = getRandomByte();
+        Byte random2 = getRandomByte();
 
-        assertThat(random_1).isNotNull();
-        assertThat(random_2).isNotNull();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isNotNull();
+        assertThat(random2).isNotNull();
+        assertThat(random1).isNotEqualTo(random2);
     }
 
     @Test
     void getRandomLocalTimeIsDifferentEachTime() {
-        LocalTime random_1 = getRandomLocalTime();
-        LocalTime random_2 = getRandomLocalTime();
+        LocalTime random1 = getRandomLocalTime();
+        LocalTime random2 = getRandomLocalTime();
 
-        assertThat(random_1).isNotNull();
-        assertThat(random_2).isNotNull();
-        assertThat(random_1).isNotEqualTo(random_2);
+        assertThat(random1).isNotNull();
+        assertThat(random2).isNotNull();
+        assertThat(random1).isNotEqualTo(random2);
     }
 }
