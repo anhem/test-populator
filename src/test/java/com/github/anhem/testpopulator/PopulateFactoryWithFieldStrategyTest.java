@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.github.anhem.testpopulator.PopulateFactory.FAILED_TO_CREATE_OBJECT;
-import static com.github.anhem.testpopulator.PopulateFactory.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
+import static com.github.anhem.testpopulator.internal.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
+import static com.github.anhem.testpopulator.internal.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static java.lang.String.format;
