@@ -21,23 +21,16 @@ import static java.lang.String.format;
 public class Populator {
 
     private final ValueFactory valueFactory;
-    private final ConstructorPopulator constructorPopulator;
-    private final FieldPopulator fieldPopulator;
-    private final CollectionPopulator collectionPopulator;
-    private final SetterPopulator setterPopulator;
-    private final MutatorPopulator mutatorPopulator;
-    private final BuilderPopulator builderPopulator;
-    private final StaticMethodPopulator staticMethodPopulator;
+    private final ConstructorPopulator constructorPopulator = new ConstructorPopulator();
+    private final FieldPopulator fieldPopulator = new FieldPopulator();
+    private final CollectionPopulator collectionPopulator = new CollectionPopulator();
+    private final SetterPopulator setterPopulator = new SetterPopulator();
+    private final MutatorPopulator mutatorPopulator = new MutatorPopulator(constructorPopulator);
+    private final BuilderPopulator builderPopulator = new BuilderPopulator();
+    private final StaticMethodPopulator staticMethodPopulator = new StaticMethodPopulator();
 
     public Populator(ValueFactory valueFactory) {
         this.valueFactory = valueFactory;
-        this.constructorPopulator = new ConstructorPopulator();
-        this.fieldPopulator = new FieldPopulator();
-        this.collectionPopulator = new CollectionPopulator();
-        this.setterPopulator = new SetterPopulator();
-        this.mutatorPopulator = new MutatorPopulator(this.constructorPopulator);
-        this.builderPopulator = new BuilderPopulator();
-        this.staticMethodPopulator = new StaticMethodPopulator();
     }
 
     public <T> T populate(ClassCarrier<T> classCarrier) {
