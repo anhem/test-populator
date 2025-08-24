@@ -62,6 +62,17 @@ public class PopulateConfig {
         }
 
         /**
+         * Add blacklisted method. I.E a method that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         *
+         * @param blacklistedMethod name of methods to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedMethod(String blacklistedMethod) {
+            this.blacklistedMethods = concat(this.blacklistedMethods, blacklistedMethod);
+            return this;
+        }
+
+        /**
          * Set blacklist fields. I.E fields that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
          *
          * @param blacklistedFields name of fields to ignore
@@ -69,6 +80,17 @@ public class PopulateConfig {
          */
         public PopulateConfigBuilder blacklistedFields(List<String> blacklistedFields) {
             this.blacklistedFields = blacklistedFields;
+            return this;
+        }
+
+        /**
+         * Add blacklist field. I.E a field that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         *
+         * @param blacklistedField name of fields to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedField(String blacklistedField) {
+            this.blacklistedFields = concat(this.blacklistedFields, blacklistedField);
             return this;
         }
 
@@ -89,8 +111,20 @@ public class PopulateConfig {
          * @param strategy declares what strategy to use when populating
          * @return PopulateConfigBuilder
          */
+        @Deprecated // use addStrategyOrder()
         public PopulateConfigBuilder strategyOrder(Strategy strategy) {
-            this.strategyOrder = Stream.concat(this.strategyOrder.stream(), Stream.of(strategy)).collect(Collectors.toList());
+            this.strategyOrder = concat(this.strategyOrder, strategy);
+            return this;
+        }
+
+        /**
+         * Add strategy order at the end of existing list
+         *
+         * @param strategy declares what strategy to use when populating
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addStrategyOrder(Strategy strategy) {
+            this.strategyOrder = concat(this.strategyOrder, strategy);
             return this;
         }
 
@@ -167,8 +201,21 @@ public class PopulateConfig {
          * Use empty String to match any method that follows the setter pattern without actually being named prefix*
          * @return PopulateConfigBuilder
          */
+        @Deprecated //use addSetterPrefix()
         public PopulateConfigBuilder setterPrefix(String setterPrefix) {
-            this.setterPrefixes = Stream.concat(setterPrefixes.stream(), Stream.of(setterPrefix)).collect(Collectors.toList());
+            this.setterPrefixes = concat(setterPrefixes, setterPrefix);
+            return this;
+        }
+
+        /**
+         * add a setter prefix
+         *
+         * @param setterPrefix a prefix for methods that work in a similar way as a regular setter method.
+         * Use empty String to match any method that follows the setter pattern without actually being named prefix*
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addSetterPrefix(String setterPrefix) {
+            this.setterPrefixes = concat(setterPrefixes, setterPrefix);
             return this;
         }
 
@@ -250,6 +297,11 @@ public class PopulateConfig {
             populateConfig.validate();
             return populateConfig;
         }
+
+        private <T> List<T> concat(List<T> list, T value) {
+            return Stream.concat(list.stream(), Stream.of(value)).collect(Collectors.toList());
+        }
+
     }
 
     /**

@@ -75,7 +75,7 @@ class PopulateFactoryTest {
                 .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD))
                 .builderPattern(LOMBOK)
                 .randomValues(true)
-                .setterPrefix("")
+                .addSetterPrefix("")
                 .accessNonPublicConstructors(true)
                 .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
                 .objectFactoryEnabled(false)
