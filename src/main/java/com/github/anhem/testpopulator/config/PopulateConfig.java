@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.CUSTOM;
-import static com.github.anhem.testpopulator.config.BuilderPattern.PROTOBUF;
 import static com.github.anhem.testpopulator.config.ConstructorType.NO_ARGS;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 
@@ -31,6 +30,7 @@ public class PopulateConfig {
     public static final ConstructorType DEFAULT_CONSTRUCTOR_TYPE = NO_ARGS;
     public static final BuilderPattern DEFAULT_BUILDER_PATTERN = CUSTOM;
     public static final String DEFAULT_BUILDER_METHOD = "builder";
+    public static final String PROTOBUF_BUILDER_METHOD = "newBuilder";
     public static final String DEFAULT_BUILD_METHOD = "build";
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
 
@@ -91,32 +91,6 @@ public class PopulateConfig {
          */
         public PopulateConfigBuilder strategyOrder(Strategy strategy) {
             this.strategyOrder = Stream.concat(this.strategyOrder.stream(), Stream.of(strategy)).collect(Collectors.toList());
-            return this;
-        }
-
-        /**
-         * Provide your own implementations of how objects should be created when those classes are encountered during population.
-         * This overwrites any existing overridePopulates.
-         *
-         * @param overridePopulates implementations from this list will be used whenever a class they can produce is encountered.
-         * @return PopulateConfigBuilder
-         */
-        @Deprecated //use overridePopulate(Map<Class<?>, OverridePopulate<?>> overridePopulates)
-        public PopulateConfigBuilder overridePopulate(List<OverridePopulate<?>> overridePopulates) {
-            this.overridePopulate = new HashMap<>();
-            overridePopulates.forEach(this::overridePopulate);
-            return this;
-        }
-
-        /**
-         * Add your own implementation of how an object should be created when that class is encountered during population.
-         *
-         * @param overridePopulate this implementation will be used whenever a class it can produce is encountered.
-         * @return PopulateConfigBuilder
-         */
-        @Deprecated //use overridePopulate(Class<?> clazz, OverridePopulate<?> overridePopulate)
-        public PopulateConfigBuilder overridePopulate(OverridePopulate<?> overridePopulate) {
-            this.overridePopulate.put(overridePopulate.create().getClass(), overridePopulate);
             return this;
         }
 
@@ -315,7 +289,7 @@ public class PopulateConfig {
         this.constructorType = populateConfigBuilder.constructorType == null ? DEFAULT_CONSTRUCTOR_TYPE : populateConfigBuilder.constructorType;
         switch (this.builderPattern) {
             case PROTOBUF:
-                this.builderMethod = "newBuilder";
+                this.builderMethod = PROTOBUF_BUILDER_METHOD;
                 this.buildMethod = DEFAULT_BUILD_METHOD;
                 break;
             case CUSTOM:
@@ -395,7 +369,7 @@ public class PopulateConfig {
                 .blacklistedMethods(new ArrayList<>(blacklistedMethods))
                 .blacklistedFields(new ArrayList<>(blacklistedFields))
                 .strategyOrder(new ArrayList<>(strategyOrder))
-                .overridePopulate(new ArrayList<>(overridePopulate.values()))
+                .overridePopulate(new HashMap<>(overridePopulate))
                 .builderPattern(builderPattern)
                 .randomValues(randomValues)
                 .accessNonPublicConstructors(accessNonPublicConstructors)
