@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.populate;
 
+import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
@@ -95,7 +96,7 @@ public class Populator {
             }
         }
         if (isProtobufByteString(clazz, populateConfig)) {
-            return staticMethodPopulator.populate(classCarrier, this);
+            return staticMethodPopulator.populate(classCarrier, this, MethodType.SIMPLEST);
         }
         throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName(), populateConfig.getStrategyOrder()));
     }

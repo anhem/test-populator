@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.value;
 
+import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
@@ -18,14 +19,14 @@ public class StaticMethodPopulator implements PopulatingStrategy {
 
     @Override
     public <T> T populate(ClassCarrier<T> classCarrier, Populator populator) {
-        return continuePopulateUsingStaticMethod(classCarrier, populator);
+        return populate(classCarrier, populator, classCarrier.getPopulateConfig().getMethodType());
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T continuePopulateUsingStaticMethod(ClassCarrier<T> classCarrier, Populator populator) {
+    public <T> T populate(ClassCarrier<T> classCarrier, Populator populator, MethodType methodType) {
         Class<T> clazz = classCarrier.getClazz();
         PopulateConfig populateConfig = classCarrier.getPopulateConfig();
-        Method staticMethod = getStaticMethod(clazz, populateConfig.getBlacklistedMethods(), populateConfig.getMethodType());
+        Method staticMethod = getStaticMethod(clazz, populateConfig.getBlacklistedMethods(), methodType);
         try {
             classCarrier.getObjectFactory().staticMethod(clazz, staticMethod.getName(), staticMethod.getParameters().length);
             return (T) staticMethod.invoke(null, Stream.of(staticMethod.getParameters())

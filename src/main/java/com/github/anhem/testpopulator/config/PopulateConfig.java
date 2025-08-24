@@ -326,11 +326,7 @@ public class PopulateConfig {
                 this.builderMethod = DEFAULT_BUILDER_METHOD;
                 this.buildMethod = DEFAULT_BUILD_METHOD;
         }
-        if (this.builderPattern.equals(PROTOBUF)) {
-            this.methodType = populateConfigBuilder.methodType == null ? MethodType.SIMPLEST : populateConfigBuilder.methodType;
-        } else {
-            this.methodType = populateConfigBuilder.methodType == null ? DEFAULT_METHOD_TYPE : populateConfigBuilder.methodType;
-        }
+        this.methodType = populateConfigBuilder.methodType == null ? DEFAULT_METHOD_TYPE : populateConfigBuilder.methodType;
     }
 
     public List<String> getBlacklistedMethods() {
