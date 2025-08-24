@@ -87,7 +87,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .setterPrefix("with")
+                .addSetterPrefix("with")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -98,7 +98,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithBlankSetters() {
         populateConfig = populateConfig.toBuilder()
-                .setterPrefix("")
+                .addSetterPrefix("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -109,10 +109,10 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .setterPrefix("set")
-                .setterPrefix("with")
-                .setterPrefix("also")
-                .setterPrefix("as")
+                .addSetterPrefix("set")
+                .addSetterPrefix("with")
+                .addSetterPrefix("also")
+                .addSetterPrefix("as")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -123,7 +123,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSettersUsingBlankSetter() {
         populateConfig = populateConfig.toBuilder()
-                .setterPrefix("")
+                .addSetterPrefix("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
