@@ -437,31 +437,31 @@ public class PopulateConfig {
     private final MethodType methodType;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
-        this.blacklistedMethods = populateConfigBuilder.blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : populateConfigBuilder.blacklistedMethods;
-        this.blacklistedFields = populateConfigBuilder.blacklistedFields.isEmpty() ? DEFAULT_BLACKLISTED_FIELDS : populateConfigBuilder.blacklistedFields;
-        this.strategyOrder = populateConfigBuilder.strategyOrder.isEmpty() ? DEFAULT_STRATEGY_ORDER : populateConfigBuilder.strategyOrder;
+        this.blacklistedMethods = collectionOrDefault(populateConfigBuilder.blacklistedMethods, DEFAULT_BLACKLISTED_METHODS);
+        this.blacklistedFields = collectionOrDefault(populateConfigBuilder.blacklistedFields, DEFAULT_BLACKLISTED_FIELDS);
+        this.strategyOrder = collectionOrDefault(populateConfigBuilder.strategyOrder, DEFAULT_STRATEGY_ORDER);
         this.overridePopulate = populateConfigBuilder.overridePopulate;
-        this.builderPattern = populateConfigBuilder.builderPattern == null ? DEFAULT_BUILDER_PATTERN : populateConfigBuilder.builderPattern;
-        this.randomValues = populateConfigBuilder.randomValues == null ? DEFAULT_RANDOM_VALUES : populateConfigBuilder.randomValues;
-        this.accessNonPublicConstructors = populateConfigBuilder.accessNonPublicConstructors == null ? DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS : populateConfigBuilder.accessNonPublicConstructors;
-        this.setterPrefixes = populateConfigBuilder.setterPrefixes.isEmpty() ? DEFAULT_SETTER_PREFIXES : populateConfigBuilder.setterPrefixes;
-        this.objectFactoryEnabled = populateConfigBuilder.objectFactoryEnabled == null ? DEFAULT_OBJECT_FACTORY_ENABLED : populateConfigBuilder.objectFactoryEnabled;
-        this.nullOnCircularDependency = populateConfigBuilder.nullOnCircularDependency == null ? DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY : populateConfigBuilder.nullOnCircularDependency;
-        this.constructorType = populateConfigBuilder.constructorType == null ? DEFAULT_CONSTRUCTOR_TYPE : populateConfigBuilder.constructorType;
+        this.builderPattern = valueOrDefault(populateConfigBuilder.builderPattern, DEFAULT_BUILDER_PATTERN);
+        this.randomValues = valueOrDefault(populateConfigBuilder.randomValues, DEFAULT_RANDOM_VALUES);
+        this.accessNonPublicConstructors = valueOrDefault(populateConfigBuilder.accessNonPublicConstructors, DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS);
+        this.setterPrefixes = collectionOrDefault(populateConfigBuilder.setterPrefixes, DEFAULT_SETTER_PREFIXES);
+        this.objectFactoryEnabled = valueOrDefault(populateConfigBuilder.objectFactoryEnabled, DEFAULT_OBJECT_FACTORY_ENABLED);
+        this.nullOnCircularDependency = valueOrDefault(populateConfigBuilder.nullOnCircularDependency, DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY);
+        this.constructorType = valueOrDefault(populateConfigBuilder.constructorType, DEFAULT_CONSTRUCTOR_TYPE);
         switch (this.builderPattern) {
             case PROTOBUF:
                 this.builderMethod = PROTOBUF_BUILDER_METHOD;
                 this.buildMethod = DEFAULT_BUILD_METHOD;
                 break;
             case CUSTOM:
-                this.builderMethod = populateConfigBuilder.builderMethod == null ? DEFAULT_BUILDER_METHOD : populateConfigBuilder.builderMethod;
-                this.buildMethod = populateConfigBuilder.buildMethod == null ? DEFAULT_BUILD_METHOD : populateConfigBuilder.buildMethod;
+                this.builderMethod = valueOrDefault(populateConfigBuilder.builderMethod, DEFAULT_BUILDER_METHOD);
+                this.buildMethod = valueOrDefault(populateConfigBuilder.buildMethod, DEFAULT_BUILD_METHOD);
                 break;
             default:
                 this.builderMethod = DEFAULT_BUILDER_METHOD;
                 this.buildMethod = DEFAULT_BUILD_METHOD;
         }
-        this.methodType = populateConfigBuilder.methodType == null ? DEFAULT_METHOD_TYPE : populateConfigBuilder.methodType;
+        this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
     }
 
     public List<String> getBlacklistedMethods() {
@@ -551,6 +551,14 @@ public class PopulateConfig {
         if (strategyOrder.contains(FIELD) && objectFactoryEnabled) {
             throw new IllegalArgumentException(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
         }
+    }
+
+    private static <T> T valueOrDefault(T value, T defaultValue) {
+        return value == null ? defaultValue : value;
+    }
+
+    private static <T extends Collection<?>> T collectionOrDefault(T collection, T defaultCollection) {
+        return collection == null || collection.isEmpty() ? defaultCollection : collection;
     }
 
     @Override
