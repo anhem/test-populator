@@ -5,6 +5,7 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
@@ -26,7 +27,7 @@ public class ImmutablesUtil {
     private ImmutablesUtil() {
     }
 
-    public static <T> List<Method> getMethodsForImmutablesBuilder(Class<T> clazz, Object builderObject, List<String> blacklistedMethods) {
+    public static <T> List<Method> getMethodsForImmutablesBuilder(Class<T> clazz, Object builderObject, Set<String> blacklistedMethods) {
         List<Method> declaredMethods = getDeclaredMethods(builderObject.getClass(), blacklistedMethods);
         return removeMethodsDoingTheSameThing(declaredMethods).stream()
                 .filter(PopulateUtil::hasAtLeastOneParameter)

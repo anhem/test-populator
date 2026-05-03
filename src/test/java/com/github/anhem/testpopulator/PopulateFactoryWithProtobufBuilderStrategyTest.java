@@ -12,8 +12,6 @@ import com.google.protobuf.UInt32Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static com.github.anhem.testpopulator.config.BuilderPattern.PROTOBUF;
 import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
@@ -27,8 +25,9 @@ public class PopulateFactoryWithProtobufBuilderStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(BUILDER))
-                .builderPattern(PROTOBUF)
+                .builderStrategy()
+                .pattern(PROTOBUF)
+                .and()
                 .objectFactoryEnabled(true)
                 .methodType(MethodType.SIMPLEST)
                 .build();

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
@@ -30,8 +30,9 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(BUILDER))
-                .builderPattern(LOMBOK)
+                .builderStrategy()
+                .pattern(LOMBOK)
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -142,14 +143,24 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     void builderIsUsedWhenClassOnlySupportsBuilderAndOtherStrategiesAreAvailable() {
         Class<LombokImmutable> clazz = LombokImmutable.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(SETTER, CONSTRUCTOR))
+                .clearStrategies()
+                .setterStrategy()
+                .and()
+                .constructorStrategy()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(SETTER, CONSTRUCTOR, BUILDER))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .setterStrategy()
+                .and()
+                .constructorStrategy()
+                .and()
+                .builderStrategy()
+                .pattern(LOMBOK)
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         LombokImmutable value1 = populateFactory.populate(clazz);

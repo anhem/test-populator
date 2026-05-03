@@ -1,9 +1,6 @@
 package com.github.anhem.testpopulator.config;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,12 +16,12 @@ import static com.github.anhem.testpopulator.config.Strategy.*;
 public class PopulateConfig {
     public static final String INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY = "objectFactory can not be enabled while accessNonPublicConstructors is true";
     public static final String INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY = "objectFactory can not be enabled while strategyOrder contains FIELD";
-    public static final List<String> DEFAULT_BLACKLISTED_METHODS = List.of("$jacocoInit");
-    public static final List<String> DEFAULT_BLACKLISTED_FIELDS = List.of("__$lineHits$__", "$jacocoData");
+    public static final Set<String> DEFAULT_BLACKLISTED_METHODS = Set.of("$jacocoInit");
+    public static final Set<String> DEFAULT_BLACKLISTED_FIELDS = Set.of("__$lineHits$__", "$jacocoData");
     public static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER, STATIC_METHOD);
     public static final boolean DEFAULT_RANDOM_VALUES = true;
     public static final boolean DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS = false;
-    public static final List<String> DEFAULT_SETTER_PREFIXES = List.of("set");
+    public static final Set<String> DEFAULT_SETTER_PREFIXES = Set.of("set");
     public static final boolean DEFAULT_OBJECT_FACTORY_ENABLED = false;
     public static final boolean DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY = false;
     public static final ConstructorType DEFAULT_CONSTRUCTOR_TYPE = NO_ARGS;
@@ -35,14 +32,14 @@ public class PopulateConfig {
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
 
     public static class PopulateConfigBuilder {
-        private List<String> blacklistedMethods = new ArrayList<>();
-        private List<String> blacklistedFields = new ArrayList<>();
+        private Set<String> blacklistedMethods = new HashSet<>();
+        private Set<String> blacklistedFields = new HashSet<>();
         private List<Strategy> strategyOrder = new ArrayList<>();
         private Map<Class<?>, OverridePopulate<?>> overridePopulate = new HashMap<>();
         private BuilderPattern builderPattern;
         private Boolean randomValues;
         private Boolean accessNonPublicConstructors;
-        private List<String> setterPrefixes = new ArrayList<>();
+        private Set<String> setterPrefixes = new HashSet<>();
         private Boolean objectFactoryEnabled;
         private Boolean nullOnCircularDependency;
         private ConstructorType constructorType;
@@ -51,101 +48,143 @@ public class PopulateConfig {
         private MethodType methodType;
 
         /**
-         * Set blacklisted methods. I.E methods that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         * Set blacklisted methods, replacing existing ones.
          *
          * @param blacklistedMethods name of methods to ignore
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder blacklistedMethods(List<String> blacklistedMethods) {
-            this.blacklistedMethods = blacklistedMethods;
+        public PopulateConfigBuilder setBlacklistedMethods(Collection<String> blacklistedMethods) {
+            this.blacklistedMethods = new HashSet<>(blacklistedMethods);
             return this;
         }
 
         /**
-         * Add blacklisted method. I.E a method that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         * Set blacklisted methods, replacing existing ones.
          *
-         * @param blacklistedMethod name of methods to ignore
+         * @param blacklistedMethods name of methods to ignore
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder addBlacklistedMethod(String blacklistedMethod) {
-            this.blacklistedMethods = concat(this.blacklistedMethods, blacklistedMethod);
+        public PopulateConfigBuilder setBlacklistedMethods(String... blacklistedMethods) {
+            return setBlacklistedMethods(Arrays.asList(blacklistedMethods));
+        }
+
+        /**
+         * Add blacklisted methods to existing ones.
+         *
+         * @param blacklistedMethods name of methods to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedMethods(Collection<String> blacklistedMethods) {
+            this.blacklistedMethods.addAll(blacklistedMethods);
             return this;
         }
 
         /**
-         * Set blacklist fields. I.E fields that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         * Add blacklisted methods to existing ones.
+         *
+         * @param blacklistedMethods name of methods to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedMethods(String... blacklistedMethods) {
+            return addBlacklistedMethods(Arrays.asList(blacklistedMethods));
+        }
+
+        /**
+         * Set blacklist fields, replacing existing ones.
          *
          * @param blacklistedFields name of fields to ignore
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder blacklistedFields(List<String> blacklistedFields) {
-            this.blacklistedFields = blacklistedFields;
+        public PopulateConfigBuilder setBlacklistedFields(Collection<String> blacklistedFields) {
+            this.blacklistedFields = new HashSet<>(blacklistedFields);
             return this;
         }
 
         /**
-         * Add blacklist field. I.E a field that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         * Set blacklist fields, replacing existing ones.
          *
-         * @param blacklistedField name of fields to ignore
+         * @param blacklistedFields name of fields to ignore
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder addBlacklistedField(String blacklistedField) {
-            this.blacklistedFields = concat(this.blacklistedFields, blacklistedField);
+        public PopulateConfigBuilder setBlacklistedFields(String... blacklistedFields) {
+            return setBlacklistedFields(Arrays.asList(blacklistedFields));
+        }
+
+        /**
+         * Add blacklist fields to existing ones.
+         *
+         * @param blacklistedFields name of fields to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedFields(Collection<String> blacklistedFields) {
+            this.blacklistedFields.addAll(blacklistedFields);
             return this;
         }
 
         /**
-         * Set strategy order, overwriting any already existing strategy orders.
+         * Add blacklist fields to existing ones.
+         *
+         * @param blacklistedFields name of fields to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedFields(String... blacklistedFields) {
+            return addBlacklistedFields(Arrays.asList(blacklistedFields));
+        }
+
+        /**
+         * Reorder existing strategy order. This overwrites any already existing strategy orders.
          *
          * @param strategyOrder contains a list of strategies to use when populating in order of appearance
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder strategyOrder(List<Strategy> strategyOrder) {
-            this.strategyOrder = strategyOrder;
+        public PopulateConfigBuilder reorderStrategies(Strategy... strategyOrder) {
+            List<Strategy> newOrder = Arrays.asList(strategyOrder);
+            if (!new HashSet<>(this.strategyOrder).containsAll(newOrder)) {
+                List<Strategy> missing = newOrder.stream()
+                        .filter(s -> !this.strategyOrder.contains(s))
+                        .collect(Collectors.toList());
+                throw new IllegalArgumentException("Cannot reorder strategies that have not been configured: " + missing);
+            }
+            this.strategyOrder = new ArrayList<>(newOrder);
             return this;
         }
 
+        private void addStrategyOrder(Strategy strategy) {
+            if (!this.strategyOrder.contains(strategy)) {
+                this.strategyOrder = concat(this.strategyOrder, strategy);
+            }
+        }
+
         /**
-         * Add strategy order at the end of existing list
+         * Set override populates, replacing existing ones.
          *
-         * @param strategy declares what strategy to use when populating
+         * @param overridePopulates implementations from this map will be used whenever a class they can produce is encountered.
          * @return PopulateConfigBuilder
          */
-        @Deprecated // use addStrategyOrder()
-        public PopulateConfigBuilder strategyOrder(Strategy strategy) {
-            this.strategyOrder = concat(this.strategyOrder, strategy);
+        public PopulateConfigBuilder setOverridePopulates(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
+            this.overridePopulate = new HashMap<>(overridePopulates);
             return this;
         }
 
         /**
-         * Add strategy order at the end of existing list
+         * Add override populates to existing ones.
          *
-         * @param strategy declares what strategy to use when populating
+         * @param overridePopulates implementations from this map will be used whenever a class they can produce is encountered.
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder addStrategyOrder(Strategy strategy) {
-            this.strategyOrder = concat(this.strategyOrder, strategy);
+        public PopulateConfigBuilder addOverridePopulates(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
+            this.overridePopulate.putAll(overridePopulates);
             return this;
         }
 
         /**
-         * Provide your own implementations of how objects should be created when those classes are encountered during population.
-         * This overwrites any existing overridePopulates.
+         * Add an override populate.
          *
-         * @param overridePopulates implementations from this list will be used whenever a class they can produce is encountered.
+         * @param clazz class to override
+         * @param overridePopulate implementation to use
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder overridePopulate(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
-            this.overridePopulate = overridePopulates;
-            return this;
-        }
-
-        /**
-         * Add your own implementation of how an object should be created when that class is encountered during population.
-         * @param overridePopulate this implementation will be used whenever a class it can produce is encountered.
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder overridePopulate(Class<?> clazz, OverridePopulate<?> overridePopulate) {
+        public PopulateConfigBuilder addOverridePopulate(Class<?> clazz, OverridePopulate<?> overridePopulate) {
             this.overridePopulate.put(clazz, overridePopulate);
             return this;
         }
@@ -184,39 +223,45 @@ public class PopulateConfig {
         }
 
         /**
-         * Use setters with a different format than set*, overwriting any already existing setters.
+         * Set setter prefixes, replacing existing ones.
          *
-         * @param setterPrefixes a list of prefixes for methods that work in a similar way as a regular setter method.
-         * Use empty String to match any method that follows the setter pattern without actually being named prefix*
+         * @param setterPrefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
+         * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder setterPrefixes(List<String> setterPrefixes) {
-            this.setterPrefixes = setterPrefixes;
+        public PopulateConfigBuilder setSetterPrefixes(Collection<String> setterPrefixes) {
+            this.setterPrefixes = new HashSet<>(setterPrefixes);
             return this;
         }
 
         /**
-         * Use setters with a different format than set*
+         * Set setter prefixes, replacing existing ones.
          *
-         * @param setterPrefix a prefix for methods that work in a similar way as a regular setter method.
-         * Use empty String to match any method that follows the setter pattern without actually being named prefix*
+         * @param setterPrefixes prefixes for methods that work in a similar way as a regular setter method.
          * @return PopulateConfigBuilder
          */
-        @Deprecated //use addSetterPrefix()
-        public PopulateConfigBuilder setterPrefix(String setterPrefix) {
-            this.setterPrefixes = concat(setterPrefixes, setterPrefix);
+        public PopulateConfigBuilder setSetterPrefixes(String... setterPrefixes) {
+            return setSetterPrefixes(Arrays.asList(setterPrefixes));
+        }
+
+        /**
+         * Add setter prefixes to existing ones.
+         *
+         * @param setterPrefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addSetterPrefixes(Collection<String> setterPrefixes) {
+            this.setterPrefixes.addAll(setterPrefixes);
             return this;
         }
 
         /**
-         * add a setter prefix
+         * Add setter prefixes to existing ones.
          *
-         * @param setterPrefix a prefix for methods that work in a similar way as a regular setter method.
-         * Use empty String to match any method that follows the setter pattern without actually being named prefix*
+         * @param setterPrefixes prefixes for methods that work in a similar way as a regular setter method.
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder addSetterPrefix(String setterPrefix) {
-            this.setterPrefixes = concat(setterPrefixes, setterPrefix);
-            return this;
+        public PopulateConfigBuilder addSetterPrefixes(String... setterPrefixes) {
+            return addSetterPrefixes(Arrays.asList(setterPrefixes));
         }
 
         /**
@@ -289,6 +334,70 @@ public class PopulateConfig {
         }
 
         /**
+         * Clear existing strategy order. This is useful when modifying an existing configuration via toBuilder().
+         *
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder clearStrategies() {
+            this.strategyOrder = new ArrayList<>();
+            return this;
+        }
+
+        /**
+         * Configure BUILDER strategy options
+         * @return builder for BUILDER strategy configuration
+         */
+        public BuilderStrategyBuilder builderStrategy() {
+            addStrategyOrder(BUILDER);
+            return new BuilderStrategyBuilder(this);
+        }
+
+        /**
+         * Configure CONSTRUCTOR strategy options
+         * @return builder for CONSTRUCTOR strategy configuration
+         */
+        public ConstructorStrategyBuilder constructorStrategy() {
+            addStrategyOrder(CONSTRUCTOR);
+            return new ConstructorStrategyBuilder(this);
+        }
+
+        /**
+         * Configure FIELD strategy options
+         * @return builder for FIELD strategy configuration
+         */
+        public FieldStrategyBuilder fieldStrategy() {
+            addStrategyOrder(FIELD);
+            return new FieldStrategyBuilder(this);
+        }
+
+        /**
+         * Configure SETTER strategy options
+         * @return builder for SETTER strategy configuration
+         */
+        public SetterStrategyBuilder setterStrategy() {
+            addStrategyOrder(SETTER);
+            return new SetterStrategyBuilder(this);
+        }
+
+        /**
+         * Configure MUTATOR strategy options
+         * @return builder for MUTATOR strategy configuration
+         */
+        public MutatorStrategyBuilder mutatorStrategy() {
+            addStrategyOrder(MUTATOR);
+            return new MutatorStrategyBuilder(this);
+        }
+
+        /**
+         * Configure STATIC_METHOD strategy options
+         * @return builder for STATIC_METHOD strategy configuration
+         */
+        public StaticMethodStrategyBuilder staticMethodStrategy() {
+            addStrategyOrder(STATIC_METHOD);
+            return new StaticMethodStrategyBuilder(this);
+        }
+
+        /**
          * Build and validate a configuration
          * @return built PopulateConfig
          */
@@ -312,14 +421,14 @@ public class PopulateConfig {
         return new PopulateConfigBuilder();
     }
 
-    private final List<String> blacklistedMethods;
-    private final List<String> blacklistedFields;
+    private final Set<String> blacklistedMethods;
+    private final Set<String> blacklistedFields;
     private final List<Strategy> strategyOrder;
     private final Map<Class<?>, OverridePopulate<?>> overridePopulate;
     private final BuilderPattern builderPattern;
     private final boolean randomValues;
     private final boolean accessNonPublicConstructors;
-    private final List<String> setterPrefixes;
+    private final Set<String> setterPrefixes;
     private final boolean objectFactoryEnabled;
     private final boolean nullOnCircularDependency;
     private final ConstructorType constructorType;
@@ -328,38 +437,38 @@ public class PopulateConfig {
     private final MethodType methodType;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
-        this.blacklistedMethods = populateConfigBuilder.blacklistedMethods.isEmpty() ? DEFAULT_BLACKLISTED_METHODS : populateConfigBuilder.blacklistedMethods;
-        this.blacklistedFields = populateConfigBuilder.blacklistedFields.isEmpty() ? DEFAULT_BLACKLISTED_FIELDS : populateConfigBuilder.blacklistedFields;
-        this.strategyOrder = populateConfigBuilder.strategyOrder.isEmpty() ? DEFAULT_STRATEGY_ORDER : populateConfigBuilder.strategyOrder;
+        this.blacklistedMethods = collectionOrDefault(populateConfigBuilder.blacklistedMethods, DEFAULT_BLACKLISTED_METHODS);
+        this.blacklistedFields = collectionOrDefault(populateConfigBuilder.blacklistedFields, DEFAULT_BLACKLISTED_FIELDS);
+        this.strategyOrder = collectionOrDefault(populateConfigBuilder.strategyOrder, DEFAULT_STRATEGY_ORDER);
         this.overridePopulate = populateConfigBuilder.overridePopulate;
-        this.builderPattern = populateConfigBuilder.builderPattern == null ? DEFAULT_BUILDER_PATTERN : populateConfigBuilder.builderPattern;
-        this.randomValues = populateConfigBuilder.randomValues == null ? DEFAULT_RANDOM_VALUES : populateConfigBuilder.randomValues;
-        this.accessNonPublicConstructors = populateConfigBuilder.accessNonPublicConstructors == null ? DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS : populateConfigBuilder.accessNonPublicConstructors;
-        this.setterPrefixes = populateConfigBuilder.setterPrefixes.isEmpty() ? DEFAULT_SETTER_PREFIXES : populateConfigBuilder.setterPrefixes;
-        this.objectFactoryEnabled = populateConfigBuilder.objectFactoryEnabled == null ? DEFAULT_OBJECT_FACTORY_ENABLED : populateConfigBuilder.objectFactoryEnabled;
-        this.nullOnCircularDependency = populateConfigBuilder.nullOnCircularDependency == null ? DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY : populateConfigBuilder.nullOnCircularDependency;
-        this.constructorType = populateConfigBuilder.constructorType == null ? DEFAULT_CONSTRUCTOR_TYPE : populateConfigBuilder.constructorType;
+        this.builderPattern = valueOrDefault(populateConfigBuilder.builderPattern, DEFAULT_BUILDER_PATTERN);
+        this.randomValues = valueOrDefault(populateConfigBuilder.randomValues, DEFAULT_RANDOM_VALUES);
+        this.accessNonPublicConstructors = valueOrDefault(populateConfigBuilder.accessNonPublicConstructors, DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS);
+        this.setterPrefixes = collectionOrDefault(populateConfigBuilder.setterPrefixes, DEFAULT_SETTER_PREFIXES);
+        this.objectFactoryEnabled = valueOrDefault(populateConfigBuilder.objectFactoryEnabled, DEFAULT_OBJECT_FACTORY_ENABLED);
+        this.nullOnCircularDependency = valueOrDefault(populateConfigBuilder.nullOnCircularDependency, DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY);
+        this.constructorType = valueOrDefault(populateConfigBuilder.constructorType, DEFAULT_CONSTRUCTOR_TYPE);
         switch (this.builderPattern) {
             case PROTOBUF:
                 this.builderMethod = PROTOBUF_BUILDER_METHOD;
                 this.buildMethod = DEFAULT_BUILD_METHOD;
                 break;
             case CUSTOM:
-                this.builderMethod = populateConfigBuilder.builderMethod == null ? DEFAULT_BUILDER_METHOD : populateConfigBuilder.builderMethod;
-                this.buildMethod = populateConfigBuilder.buildMethod == null ? DEFAULT_BUILD_METHOD : populateConfigBuilder.buildMethod;
+                this.builderMethod = valueOrDefault(populateConfigBuilder.builderMethod, DEFAULT_BUILDER_METHOD);
+                this.buildMethod = valueOrDefault(populateConfigBuilder.buildMethod, DEFAULT_BUILD_METHOD);
                 break;
             default:
                 this.builderMethod = DEFAULT_BUILDER_METHOD;
                 this.buildMethod = DEFAULT_BUILD_METHOD;
         }
-        this.methodType = populateConfigBuilder.methodType == null ? DEFAULT_METHOD_TYPE : populateConfigBuilder.methodType;
+        this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
     }
 
-    public List<String> getBlacklistedMethods() {
+    public Set<String> getBlacklistedMethods() {
         return blacklistedMethods;
     }
 
-    public List<String> getBlacklistedFields() {
+    public Set<String> getBlacklistedFields() {
         return blacklistedFields;
     }
 
@@ -383,7 +492,7 @@ public class PopulateConfig {
         return accessNonPublicConstructors;
     }
 
-    public List<String> getSetterPrefixes() {
+    public Set<String> getSetterPrefixes() {
         return setterPrefixes;
     }
 
@@ -417,21 +526,22 @@ public class PopulateConfig {
      * @return PopulateConfigBuilder
      */
     public PopulateConfigBuilder toBuilder() {
-        return PopulateConfig.builder()
-                .blacklistedMethods(new ArrayList<>(blacklistedMethods))
-                .blacklistedFields(new ArrayList<>(blacklistedFields))
-                .strategyOrder(new ArrayList<>(strategyOrder))
-                .overridePopulate(new HashMap<>(overridePopulate))
+        PopulateConfigBuilder populateConfigBuilder = PopulateConfig.builder()
+                .setBlacklistedMethods(new ArrayList<>(blacklistedMethods))
+                .setBlacklistedFields(new ArrayList<>(blacklistedFields))
+                .setOverridePopulates(new HashMap<>(overridePopulate))
                 .builderPattern(builderPattern)
                 .randomValues(randomValues)
                 .accessNonPublicConstructors(accessNonPublicConstructors)
-                .setterPrefixes(new ArrayList<>(setterPrefixes))
+                .setSetterPrefixes(new ArrayList<>(setterPrefixes))
                 .objectFactoryEnabled(objectFactoryEnabled)
                 .nullOnCircularDependency(nullOnCircularDependency)
                 .constructorType(constructorType)
                 .builderMethod(builderMethod)
                 .buildMethod(buildMethod)
                 .methodType(methodType);
+        populateConfigBuilder.strategyOrder = new ArrayList<>(strategyOrder);
+        return populateConfigBuilder;
     }
 
     private void validate() {
@@ -441,6 +551,14 @@ public class PopulateConfig {
         if (strategyOrder.contains(FIELD) && objectFactoryEnabled) {
             throw new IllegalArgumentException(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
         }
+    }
+
+    private static <T> T valueOrDefault(T value, T defaultValue) {
+        return value == null ? defaultValue : value;
+    }
+
+    private static <T extends Collection<?>> T collectionOrDefault(T collection, T defaultCollection) {
+        return collection == null || collection.isEmpty() ? defaultCollection : collection;
     }
 
     @Override
@@ -461,5 +579,161 @@ public class PopulateConfig {
                 ", buildMethod='" + buildMethod + '\'' +
                 ", methodType=" + methodType +
                 '}';
+    }
+
+    /**
+     * Base builder for strategy configuration
+     */
+    public abstract static class StrategyBuilder {
+        protected final PopulateConfigBuilder parent;
+
+        StrategyBuilder(PopulateConfigBuilder parent) {
+            this.parent = parent;
+        }
+
+        /**
+         * Return to the main builder to continue configuration
+         * @return main builder
+         */
+        public PopulateConfigBuilder and() {
+            return parent;
+        }
+
+        /**
+         * Build and validate the configuration
+         * @return built PopulateConfig
+         */
+        public PopulateConfig build() {
+            return parent.build();
+        }
+    }
+
+    /**
+     * Builder for BUILDER strategy configuration
+     */
+    public static class BuilderStrategyBuilder extends StrategyBuilder {
+
+        BuilderStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        public BuilderStrategyBuilder pattern(BuilderPattern pattern) {
+            parent.builderPattern(pattern);
+            return this;
+        }
+
+        public BuilderStrategyBuilder method(String builderMethod) {
+            parent.builderMethod(builderMethod);
+            return this;
+        }
+
+        public BuilderStrategyBuilder buildMethod(String buildMethod) {
+            parent.buildMethod(buildMethod);
+            return this;
+        }
+    }
+
+    /**
+     * Builder for CONSTRUCTOR strategy configuration
+     */
+    public static class ConstructorStrategyBuilder extends StrategyBuilder {
+
+        ConstructorStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+    }
+
+    /**
+     * Builder for FIELD strategy configuration
+     */
+    public static class FieldStrategyBuilder extends StrategyBuilder {
+
+        FieldStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+    }
+
+    /**
+     * Builder for SETTER strategy configuration
+     */
+    public static class SetterStrategyBuilder extends StrategyBuilder {
+
+        SetterStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        /**
+         * Set setter prefixes, replacing existing ones.
+         *
+         * @param prefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
+         * @return SetterStrategyBuilder
+         */
+        public SetterStrategyBuilder setPrefixes(Collection<String> prefixes) {
+            parent.setSetterPrefixes(prefixes);
+            return this;
+        }
+
+        /**
+         * Set setter prefixes, replacing existing ones.
+         *
+         * @param prefixes prefixes for methods that work in a similar way as a regular setter method.
+         * @return SetterStrategyBuilder
+         */
+        public SetterStrategyBuilder setPrefixes(String... prefixes) {
+            parent.setSetterPrefixes(prefixes);
+            return this;
+        }
+
+        /**
+         * Add setter prefixes to existing ones.
+         *
+         * @param prefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
+         * @return SetterStrategyBuilder
+         */
+        public SetterStrategyBuilder addPrefixes(Collection<String> prefixes) {
+            parent.addSetterPrefixes(prefixes);
+            return this;
+        }
+
+        /**
+         * Add setter prefixes to existing ones.
+         *
+         * @param prefixes prefixes for methods that work in a similar way as a regular setter method.
+         * @return SetterStrategyBuilder
+         */
+        public SetterStrategyBuilder addPrefixes(String... prefixes) {
+            parent.addSetterPrefixes(prefixes);
+            return this;
+        }
+    }
+
+    /**
+     * Builder for MUTATOR strategy configuration
+     */
+    public static class MutatorStrategyBuilder extends StrategyBuilder {
+
+        MutatorStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        public MutatorStrategyBuilder constructorType(ConstructorType type) {
+            parent.constructorType(type);
+            return this;
+        }
+    }
+
+    /**
+     * Builder for STATIC_METHOD strategy configuration
+     */
+    public static class StaticMethodStrategyBuilder extends StrategyBuilder {
+
+        StaticMethodStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        public StaticMethodStrategyBuilder methodType(MethodType type) {
+            parent.methodType(type);
+            return this;
+        }
     }
 }

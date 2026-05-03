@@ -5,6 +5,7 @@ import com.github.anhem.testpopulator.config.Strategy;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
@@ -33,7 +34,7 @@ public class BuilderUtil {
         return false;
     }
 
-    public static <T> List<Method> getMethodsForCustomBuilder(Class<T> clazz, List<String> blacklistedMethods) {
+    public static <T> List<Method> getMethodsForCustomBuilder(Class<T> clazz, Set<String> blacklistedMethods) {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> method.getReturnType().equals(clazz) && method.getParameterCount() > 0)
                 .collect(Collectors.toList());

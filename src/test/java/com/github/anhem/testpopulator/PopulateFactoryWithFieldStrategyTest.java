@@ -11,8 +11,6 @@ import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
@@ -30,7 +28,8 @@ class PopulateFactoryWithFieldStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(FIELD))
+                .fieldStrategy()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
