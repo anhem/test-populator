@@ -29,7 +29,8 @@ class PopulateFactoryWithSetterStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(SETTER))
+                .setterStrategy()
+                    .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -188,14 +189,24 @@ class PopulateFactoryWithSetterStrategyTest {
     void setterIsUsedWhenClassOnlySupportsSetterAndOtherStrategiesAreAvailable() {
         Class<Pojo> clazz = Pojo.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR))
+                .clearStrategies()
+                .builderStrategy()
+                    .and()
+                .constructorStrategy()
+                    .and()
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, SETTER))
+                .clearStrategies()
+                .builderStrategy()
+                    .and()
+                .constructorStrategy()
+                    .and()
+                .setterStrategy()
+                    .and()
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

@@ -30,7 +30,8 @@ class PopulateFactoryWithFieldStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(FIELD))
+                .fieldStrategy()
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }

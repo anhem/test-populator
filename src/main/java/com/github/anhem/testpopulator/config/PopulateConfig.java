@@ -1,9 +1,6 @@
 package com.github.anhem.testpopulator.config;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -95,37 +92,27 @@ public class PopulateConfig {
         }
 
         /**
-         * Set strategy order, overwriting any already existing strategy orders.
+         * Reorder existing strategy order. This overwrites any already existing strategy orders.
          *
          * @param strategyOrder contains a list of strategies to use when populating in order of appearance
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder strategyOrder(List<Strategy> strategyOrder) {
-            this.strategyOrder = strategyOrder;
+        public PopulateConfigBuilder reorderStrategies(Strategy... strategyOrder) {
+            List<Strategy> newOrder = Arrays.asList(strategyOrder);
+            if (!new HashSet<>(this.strategyOrder).containsAll(newOrder)) {
+                List<Strategy> missing = newOrder.stream()
+                        .filter(s -> !this.strategyOrder.contains(s))
+                        .collect(Collectors.toList());
+                throw new IllegalArgumentException("Cannot reorder strategies that have not been configured: " + missing);
+            }
+            this.strategyOrder = new ArrayList<>(newOrder);
             return this;
         }
 
-        /**
-         * Add strategy order at the end of existing list
-         *
-         * @param strategy declares what strategy to use when populating
-         * @return PopulateConfigBuilder
-         */
-        @Deprecated // use addStrategyOrder()
-        public PopulateConfigBuilder strategyOrder(Strategy strategy) {
-            this.strategyOrder = concat(this.strategyOrder, strategy);
-            return this;
-        }
-
-        /**
-         * Add strategy order at the end of existing list
-         *
-         * @param strategy declares what strategy to use when populating
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder addStrategyOrder(Strategy strategy) {
-            this.strategyOrder = concat(this.strategyOrder, strategy);
-            return this;
+        private void addStrategyOrder(Strategy strategy) {
+            if (!this.strategyOrder.contains(strategy)) {
+                this.strategyOrder = concat(this.strategyOrder, strategy);
+            }
         }
 
         /**
@@ -191,19 +178,6 @@ public class PopulateConfig {
          */
         public PopulateConfigBuilder setterPrefixes(List<String> setterPrefixes) {
             this.setterPrefixes = setterPrefixes;
-            return this;
-        }
-
-        /**
-         * Use setters with a different format than set*
-         *
-         * @param setterPrefix a prefix for methods that work in a similar way as a regular setter method.
-         * Use empty String to match any method that follows the setter pattern without actually being named prefix*
-         * @return PopulateConfigBuilder
-         */
-        @Deprecated //use addSetterPrefix()
-        public PopulateConfigBuilder setterPrefix(String setterPrefix) {
-            this.setterPrefixes = concat(setterPrefixes, setterPrefix);
             return this;
         }
 
@@ -286,6 +260,70 @@ public class PopulateConfig {
         public PopulateConfigBuilder methodType(MethodType methodType) {
             this.methodType = methodType;
             return this;
+        }
+
+        /**
+         * Clear existing strategy order. This is useful when modifying an existing configuration via toBuilder().
+         *
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder clearStrategies() {
+            this.strategyOrder = new ArrayList<>();
+            return this;
+        }
+
+        /**
+         * Configure BUILDER strategy options
+         * @return builder for BUILDER strategy configuration
+         */
+        public BuilderStrategyBuilder builderStrategy() {
+            addStrategyOrder(BUILDER);
+            return new BuilderStrategyBuilder(this);
+        }
+
+        /**
+         * Configure CONSTRUCTOR strategy options
+         * @return builder for CONSTRUCTOR strategy configuration
+         */
+        public ConstructorStrategyBuilder constructorStrategy() {
+            addStrategyOrder(CONSTRUCTOR);
+            return new ConstructorStrategyBuilder(this);
+        }
+
+        /**
+         * Configure FIELD strategy options
+         * @return builder for FIELD strategy configuration
+         */
+        public FieldStrategyBuilder fieldStrategy() {
+            addStrategyOrder(FIELD);
+            return new FieldStrategyBuilder(this);
+        }
+
+        /**
+         * Configure SETTER strategy options
+         * @return builder for SETTER strategy configuration
+         */
+        public SetterStrategyBuilder setterStrategy() {
+            addStrategyOrder(SETTER);
+            return new SetterStrategyBuilder(this);
+        }
+
+        /**
+         * Configure MUTATOR strategy options
+         * @return builder for MUTATOR strategy configuration
+         */
+        public MutatorStrategyBuilder mutatorStrategy() {
+            addStrategyOrder(MUTATOR);
+            return new MutatorStrategyBuilder(this);
+        }
+
+        /**
+         * Configure STATIC_METHOD strategy options
+         * @return builder for STATIC_METHOD strategy configuration
+         */
+        public StaticMethodStrategyBuilder staticMethodStrategy() {
+            addStrategyOrder(STATIC_METHOD);
+            return new StaticMethodStrategyBuilder(this);
         }
 
         /**
@@ -417,10 +455,9 @@ public class PopulateConfig {
      * @return PopulateConfigBuilder
      */
     public PopulateConfigBuilder toBuilder() {
-        return PopulateConfig.builder()
+        PopulateConfigBuilder populateConfigBuilder = PopulateConfig.builder()
                 .blacklistedMethods(new ArrayList<>(blacklistedMethods))
                 .blacklistedFields(new ArrayList<>(blacklistedFields))
-                .strategyOrder(new ArrayList<>(strategyOrder))
                 .overridePopulate(new HashMap<>(overridePopulate))
                 .builderPattern(builderPattern)
                 .randomValues(randomValues)
@@ -432,6 +469,8 @@ public class PopulateConfig {
                 .builderMethod(builderMethod)
                 .buildMethod(buildMethod)
                 .methodType(methodType);
+        populateConfigBuilder.strategyOrder = new ArrayList<>(strategyOrder);
+        return populateConfigBuilder;
     }
 
     private void validate() {
@@ -461,5 +500,127 @@ public class PopulateConfig {
                 ", buildMethod='" + buildMethod + '\'' +
                 ", methodType=" + methodType +
                 '}';
+    }
+
+    /**
+     * Base builder for strategy configuration
+     */
+    public abstract static class StrategyBuilder {
+        protected final PopulateConfigBuilder parent;
+
+        StrategyBuilder(PopulateConfigBuilder parent) {
+            this.parent = parent;
+        }
+
+        /**
+         * Return to the main builder to continue configuration
+         * @return main builder
+         */
+        public PopulateConfigBuilder and() {
+            return parent;
+        }
+
+        /**
+         * Build and validate the configuration
+         * @return built PopulateConfig
+         */
+        public PopulateConfig build() {
+            return parent.build();
+        }
+    }
+
+    /**
+     * Builder for BUILDER strategy configuration
+     */
+    public static class BuilderStrategyBuilder extends StrategyBuilder {
+
+        BuilderStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        public BuilderStrategyBuilder pattern(BuilderPattern pattern) {
+            parent.builderPattern(pattern);
+            return this;
+        }
+
+        public BuilderStrategyBuilder method(String builderMethod) {
+            parent.builderMethod(builderMethod);
+            return this;
+        }
+
+        public BuilderStrategyBuilder buildMethod(String buildMethod) {
+            parent.buildMethod(buildMethod);
+            return this;
+        }
+    }
+
+    /**
+     * Builder for CONSTRUCTOR strategy configuration
+     */
+    public static class ConstructorStrategyBuilder extends StrategyBuilder {
+
+        ConstructorStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+    }
+
+    /**
+     * Builder for FIELD strategy configuration
+     */
+    public static class FieldStrategyBuilder extends StrategyBuilder {
+
+        FieldStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+    }
+
+    /**
+     * Builder for SETTER strategy configuration
+     */
+    public static class SetterStrategyBuilder extends StrategyBuilder {
+
+        SetterStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        public SetterStrategyBuilder prefixes(List<String> prefixes) {
+            parent.setterPrefixes(prefixes);
+            return this;
+        }
+
+        public SetterStrategyBuilder prefixes(String... prefixes) {
+            parent.setterPrefixes(List.of(prefixes));
+            return this;
+        }
+    }
+
+    /**
+     * Builder for MUTATOR strategy configuration
+     */
+    public static class MutatorStrategyBuilder extends StrategyBuilder {
+
+        MutatorStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        public MutatorStrategyBuilder constructorType(ConstructorType type) {
+            parent.constructorType(type);
+            return this;
+        }
+    }
+
+    /**
+     * Builder for STATIC_METHOD strategy configuration
+     */
+    public static class StaticMethodStrategyBuilder extends StrategyBuilder {
+
+        StaticMethodStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        public StaticMethodStrategyBuilder methodType(MethodType type) {
+            parent.methodType(type);
+            return this;
+        }
     }
 }

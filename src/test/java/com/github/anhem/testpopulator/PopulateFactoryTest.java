@@ -72,16 +72,27 @@ class PopulateFactoryTest {
 
     private static PopulateConfig createFullyConfiguredPopulateConfig() {
         return PopulateConfig.builder()
-                .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD))
-                .builderPattern(LOMBOK)
+                .builderStrategy()
+                    .pattern(LOMBOK)
+                    .and()
+                .setterStrategy()
+                    .prefixes("")
+                    .and()
+                .mutatorStrategy()
+                    .constructorType(LARGEST)
+                    .and()
+                .constructorStrategy()
+                    .and()
+                .staticMethodStrategy()
+                    .methodType(MethodType.SIMPLEST)
+                    .and()
+                .fieldStrategy()
+                    .and()
                 .randomValues(true)
-                .addSetterPrefix("")
                 .accessNonPublicConstructors(true)
                 .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
                 .objectFactoryEnabled(false)
                 .nullOnCircularDependency(true)
-                .constructorType(LARGEST)
-                .methodType(MethodType.SIMPLEST)
                 .build();
     }
 

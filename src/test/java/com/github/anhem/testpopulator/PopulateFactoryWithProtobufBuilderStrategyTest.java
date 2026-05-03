@@ -27,8 +27,9 @@ public class PopulateFactoryWithProtobufBuilderStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(BUILDER))
-                .builderPattern(PROTOBUF)
+                .builderStrategy()
+                    .pattern(PROTOBUF)
+                    .and()
                 .objectFactoryEnabled(true)
                 .methodType(MethodType.SIMPLEST)
                 .build();

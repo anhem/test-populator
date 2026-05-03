@@ -30,8 +30,9 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(BUILDER))
-                .builderPattern(LOMBOK)
+                .builderStrategy()
+                    .pattern(LOMBOK)
+                    .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -142,14 +143,24 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     void builderIsUsedWhenClassOnlySupportsBuilderAndOtherStrategiesAreAvailable() {
         Class<LombokImmutable> clazz = LombokImmutable.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(SETTER, CONSTRUCTOR))
+                .clearStrategies()
+                .setterStrategy()
+                    .and()
+                .constructorStrategy()
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(SETTER, CONSTRUCTOR, BUILDER))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .setterStrategy()
+                    .and()
+                .constructorStrategy()
+                    .and()
+                .builderStrategy()
+                    .pattern(LOMBOK)
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         LombokImmutable value1 = populateFactory.populate(clazz);

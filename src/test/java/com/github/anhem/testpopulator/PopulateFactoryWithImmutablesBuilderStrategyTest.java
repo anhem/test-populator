@@ -25,8 +25,9 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(BUILDER))
-                .builderPattern(IMMUTABLES)
+                .builderStrategy()
+                    .pattern(IMMUTABLES)
+                    .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -109,14 +110,24 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
     void builderIsUsedWhenClassOnlySupportsBuilderAndOtherStrategiesAreAvailable() {
         Class<ImmutableImmutablesInterface> clazz = ImmutableImmutablesInterface.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(SETTER, CONSTRUCTOR))
+                .clearStrategies()
+                .setterStrategy()
+                    .and()
+                .constructorStrategy()
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(SETTER, CONSTRUCTOR, BUILDER))
-                .builderPattern(IMMUTABLES)
+                .clearStrategies()
+                .setterStrategy()
+                    .and()
+                .constructorStrategy()
+                    .and()
+                .builderStrategy()
+                    .pattern(IMMUTABLES)
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         ImmutableImmutablesInterface value1 = populateFactory.populate(clazz);

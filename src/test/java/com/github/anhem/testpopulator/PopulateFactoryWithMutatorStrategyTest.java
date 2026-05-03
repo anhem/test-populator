@@ -35,7 +35,8 @@ class PopulateFactoryWithMutatorStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(MUTATOR))
+                .mutatorStrategy()
+                    .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -182,15 +183,25 @@ class PopulateFactoryWithMutatorStrategyTest {
     void setterIsUsedWhenClassOnlySupportsSetterAndOtherStrategiesAreAvailable() {
         Class<Pojo> clazz = Pojo.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                    .pattern(LOMBOK)
+                    .and()
+                .constructorStrategy()
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, MUTATOR))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                    .pattern(LOMBOK)
+                    .and()
+                .constructorStrategy()
+                    .and()
+                .mutatorStrategy()
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         Pojo value1 = populateFactory.populate(clazz);
@@ -209,15 +220,29 @@ class PopulateFactoryWithMutatorStrategyTest {
     void mutatorIsUsedWhenClassOnlyMutatorAndOtherStrategiesAreAvailable() {
         Class<Mutator> clazz = Mutator.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, SETTER))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                    .pattern(LOMBOK)
+                    .and()
+                .constructorStrategy()
+                    .and()
+                .setterStrategy()
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, SETTER, MUTATOR))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                    .pattern(LOMBOK)
+                    .and()
+                .constructorStrategy()
+                    .and()
+                .setterStrategy()
+                    .and()
+                .mutatorStrategy()
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         Mutator value1 = populateFactory.populate(clazz);

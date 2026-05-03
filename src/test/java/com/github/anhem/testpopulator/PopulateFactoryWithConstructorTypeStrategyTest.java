@@ -29,7 +29,8 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(CONSTRUCTOR))
+                .constructorStrategy()
+                    .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -173,15 +174,25 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
     void constructorIsUsedWhenClassOnlySupportsConstructorAndOtherStrategiesAreAvailable() {
         Class<AllArgsConstructor> clazz = AllArgsConstructor.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, SETTER))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                    .pattern(LOMBOK)
+                    .and()
+                .setterStrategy()
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, SETTER, CONSTRUCTOR))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                    .pattern(LOMBOK)
+                    .and()
+                .setterStrategy()
+                    .and()
+                .constructorStrategy()
+                    .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         AllArgsConstructor value1 = populateFactory.populate(clazz);
