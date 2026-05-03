@@ -36,6 +36,7 @@ public class PopulateConfig {
         private Set<String> blacklistedFields = new HashSet<>();
         private List<Strategy> strategyOrder = new ArrayList<>();
         private Map<Class<?>, OverridePopulate<?>> overridePopulate = new HashMap<>();
+        private Map<String, OverridePopulate<?>> overridePopulateNames = new HashMap<>();
         private BuilderPattern builderPattern;
         private Boolean randomValues;
         private Boolean accessNonPublicConstructors;
@@ -186,6 +187,40 @@ public class PopulateConfig {
          */
         public PopulateConfigBuilder addOverridePopulate(Class<?> clazz, OverridePopulate<?> overridePopulate) {
             this.overridePopulate.put(clazz, overridePopulate);
+            return this;
+        }
+
+        /**
+         * Set override populates, replacing existing ones.
+         *
+         * @param overridePopulateNames implementations from this map will be used whenever a field or method name they can produce is encountered.
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder setOverridePopulateNames(Map<String, OverridePopulate<?>> overridePopulateNames) {
+            this.overridePopulateNames = new HashMap<>(overridePopulateNames);
+            return this;
+        }
+
+        /**
+         * Add override populates to existing ones.
+         *
+         * @param overridePopulateNames implementations from this map will be used whenever a field or method name they can produce is encountered.
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addOverridePopulateNames(Map<String, OverridePopulate<?>> overridePopulateNames) {
+            this.overridePopulateNames.putAll(overridePopulateNames);
+            return this;
+        }
+
+        /**
+         * Add an override populate.
+         *
+         * @param name name to override
+         * @param overridePopulate implementation to use
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addOverridePopulate(String name, OverridePopulate<?> overridePopulate) {
+            this.overridePopulateNames.put(name, overridePopulate);
             return this;
         }
 
@@ -425,6 +460,7 @@ public class PopulateConfig {
     private final Set<String> blacklistedFields;
     private final List<Strategy> strategyOrder;
     private final Map<Class<?>, OverridePopulate<?>> overridePopulate;
+    private final Map<String, OverridePopulate<?>> overridePopulateNames;
     private final BuilderPattern builderPattern;
     private final boolean randomValues;
     private final boolean accessNonPublicConstructors;
@@ -441,6 +477,7 @@ public class PopulateConfig {
         this.blacklistedFields = collectionOrDefault(populateConfigBuilder.blacklistedFields, DEFAULT_BLACKLISTED_FIELDS);
         this.strategyOrder = collectionOrDefault(populateConfigBuilder.strategyOrder, DEFAULT_STRATEGY_ORDER);
         this.overridePopulate = populateConfigBuilder.overridePopulate;
+        this.overridePopulateNames = populateConfigBuilder.overridePopulateNames;
         this.builderPattern = valueOrDefault(populateConfigBuilder.builderPattern, DEFAULT_BUILDER_PATTERN);
         this.randomValues = valueOrDefault(populateConfigBuilder.randomValues, DEFAULT_RANDOM_VALUES);
         this.accessNonPublicConstructors = valueOrDefault(populateConfigBuilder.accessNonPublicConstructors, DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS);
@@ -478,6 +515,10 @@ public class PopulateConfig {
 
     public Map<Class<?>, OverridePopulate<?>> getOverridePopulate() {
         return overridePopulate;
+    }
+
+    public Map<String, OverridePopulate<?>> getOverridePopulateNames() {
+        return overridePopulateNames;
     }
 
     public BuilderPattern getBuilderPattern() {
@@ -530,6 +571,7 @@ public class PopulateConfig {
                 .setBlacklistedMethods(new ArrayList<>(blacklistedMethods))
                 .setBlacklistedFields(new ArrayList<>(blacklistedFields))
                 .setOverridePopulates(new HashMap<>(overridePopulate))
+                .setOverridePopulateNames(new HashMap<>(overridePopulateNames))
                 .builderPattern(builderPattern)
                 .randomValues(randomValues)
                 .accessNonPublicConstructors(accessNonPublicConstructors)
@@ -568,6 +610,7 @@ public class PopulateConfig {
                 ", blacklistedFields=" + blacklistedFields +
                 ", strategyOrder=" + strategyOrder +
                 ", overridePopulate=" + overridePopulate +
+                ", overridePopulateNames=" + overridePopulateNames +
                 ", builderPattern=" + builderPattern +
                 ", randomValues=" + randomValues +
                 ", accessNonPublicConstructors=" + accessNonPublicConstructors +

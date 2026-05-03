@@ -45,12 +45,14 @@ public class ValueFactory {
 
     private final boolean setRandomValues;
     private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
+    private final Map<String, OverridePopulate<?>> overridePopulateNames;
     private final BuilderPattern builderPattern;
 
-    public ValueFactory(boolean setRandomValues, Map<Class<?>, OverridePopulate<?>> overridePopulates, BuilderPattern builderPattern) {
+    public ValueFactory(boolean setRandomValues, Map<Class<?>, OverridePopulate<?>> overridePopulates, Map<String, OverridePopulate<?>> overridePopulateNames, BuilderPattern builderPattern) {
         this.setRandomValues = setRandomValues;
         this.typeSuppliers = getDefaultTypeSuppliers();
         this.typeSuppliers.putAll(overridePopulates);
+        this.overridePopulateNames = overridePopulateNames;
         this.builderPattern = builderPattern;
     }
 
@@ -94,8 +96,17 @@ public class ValueFactory {
 
     @SuppressWarnings("unchecked")
     public <T> T createValue(Class<T> clazz) {
+        return createValue(clazz, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T createValue(Class<T> clazz, String name) {
         if (clazz.isEnum()) {
             return getEnum(clazz);
+        }
+
+        if (name != null && overridePopulateNames.containsKey(name)) {
+            return (T) overridePopulateNames.get(name).create();
         }
 
         return Optional.ofNullable(typeSuppliers.get(clazz))
@@ -105,6 +116,10 @@ public class ValueFactory {
 
     public boolean hasType(Class<?> clazz) {
         return clazz.isEnum() || typeSuppliers.containsKey(clazz);
+    }
+
+    public boolean hasOverridePopulateName(String name) {
+        return overridePopulateNames.containsKey(name);
     }
 
     private <T> T getEnum(Class<T> clazz) {
