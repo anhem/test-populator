@@ -28,12 +28,12 @@ public class PopulateUtil {
                 .collect(Collectors.toList());
     }
 
-    public static <T> List<Field> getDeclaredFields(Class<T> clazz, List<String> blacklistedFields) {
+    public static <T> List<Field> getDeclaredFields(Class<T> clazz, Set<String> blacklistedFields) {
         List<Field> declaredFields = getAllDeclaredFields(clazz, new ArrayList<>());
         return removeUnwantedFields(declaredFields, blacklistedFields);
     }
 
-    public static <T> List<Method> getDeclaredMethods(Class<T> clazz, List<String> blacklistedMethods) {
+    public static <T> List<Method> getDeclaredMethods(Class<T> clazz, Set<String> blacklistedMethods) {
         List<Method> declaredMethods = getAllDeclaredMethods(clazz, new ArrayList<>());
         return removeUnwantedMethods(declaredMethods, blacklistedMethods);
     }
@@ -105,11 +105,11 @@ public class PopulateUtil {
         throw new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName()));
     }
 
-    static boolean isBlackListed(Method method, List<String> blacklistedMethods) {
+    static boolean isBlackListed(Method method, Set<String> blacklistedMethods) {
         return blacklistedMethods.contains(method.getName());
     }
 
-    static boolean isBlackListed(Field field, List<String> blacklistedFields) {
+    static boolean isBlackListed(Field field, Set<String> blacklistedFields) {
         return blacklistedFields.contains(field.getName());
     }
 
@@ -171,13 +171,13 @@ public class PopulateUtil {
         return setterPrefix.isEmpty() ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
     }
 
-    private static List<Field> removeUnwantedFields(List<Field> declaredFields, List<String> blacklistedFields) {
+    private static List<Field> removeUnwantedFields(List<Field> declaredFields, Set<String> blacklistedFields) {
         return declaredFields.stream()
                 .filter(field -> !isBlackListed(field, blacklistedFields))
                 .collect(Collectors.toList());
     }
 
-    private static List<Method> removeUnwantedMethods(List<Method> declaredMethods, List<String> blacklistedMethods) {
+    private static List<Method> removeUnwantedMethods(List<Method> declaredMethods, Set<String> blacklistedMethods) {
         return declaredMethods.stream()
                 .filter(method -> {
                     if (isBlackListed(method, blacklistedMethods)) {

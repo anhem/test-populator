@@ -29,13 +29,13 @@ public class StaticMethodUtil {
 
     public static <T> boolean isMatchingStaticMethodStrategy(Strategy strategy, Class<T> clazz) {
         if (strategy.equals(STATIC_METHOD)) {
-            return getDeclaredMethods(clazz, new ArrayList<>()).stream()
+            return getDeclaredMethods(clazz, new HashSet<>()).stream()
                     .anyMatch(method -> isMatchingStaticMethod(method, clazz));
         }
         return false;
     }
 
-    public static <T> Method getStaticMethod(Class<T> clazz, List<String> blacklistedMethods, MethodType methodType) {
+    public static <T> Method getStaticMethod(Class<T> clazz, Set<String> blacklistedMethods, MethodType methodType) {
         List<Method> methods = getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> isMatchingStaticMethod(method, clazz))
                 .sorted(Comparator.comparing(Method::getName))

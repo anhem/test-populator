@@ -5,6 +5,7 @@ import com.github.anhem.testpopulator.config.Strategy;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.Strategy.SETTER;
@@ -15,7 +16,7 @@ public class SetterUtil {
     private SetterUtil() {
     }
 
-    public static <T> boolean isMatchingSetterStrategy(Strategy strategy, Class<T> clazz, List<String> setterPrefixes, boolean accessNonPublicConstructor) {
+    public static <T> boolean isMatchingSetterStrategy(Strategy strategy, Class<T> clazz, Set<String> setterPrefixes, boolean accessNonPublicConstructor) {
         if (strategy.equals(SETTER) && hasConstructorWithoutArguments(clazz, accessNonPublicConstructor)) {
             List<String> setterMethodFormats = getMethodFormats(setterPrefixes);
             return getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
@@ -25,7 +26,7 @@ public class SetterUtil {
         return false;
     }
 
-    public static <T> List<Method> getSetterMethods(Class<T> clazz, List<String> blacklistedMethods, List<String> setterPrefixes) {
+    public static <T> List<Method> getSetterMethods(Class<T> clazz, Set<String> blacklistedMethods, Set<String> setterPrefixes) {
         List<String> setterMethodFormats = getMethodFormats(setterPrefixes);
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> !isWaitMethod(method))
@@ -33,7 +34,7 @@ public class SetterUtil {
                 .collect(Collectors.toList());
     }
 
-    private static List<String> getMethodFormats(List<String> setterPrefixes) {
+    private static List<String> getMethodFormats(Set<String> setterPrefixes) {
         return setterPrefixes.stream()
                 .map(PopulateUtil::getMethodFormat)
                 .collect(Collectors.toList());

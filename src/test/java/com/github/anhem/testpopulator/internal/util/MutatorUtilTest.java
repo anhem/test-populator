@@ -12,7 +12,7 @@ import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
 import static com.github.anhem.testpopulator.internal.util.MutatorUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.NO_CONSTRUCTOR_FOUND;
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -33,7 +33,7 @@ class MutatorUtilTest {
 
     @Test
     void getMutatorMethodsReturnsMethods() {
-        assertThat(getMutatorMethods(Mutator.class, emptyList())).hasSize(8);
+        assertThat(getMutatorMethods(Mutator.class, emptySet())).hasSize(8);
     }
 
     @Test

@@ -40,7 +40,7 @@ public class ProtobufUtil {
         return populateConfig.getBuilderPattern().equals(PROTOBUF) && clazz.getName().equals(BYTE_STRING_NAME);
     }
 
-    public static <T> List<Method> getMethodsForProtobufBuilder(Class<T> clazz, List<String> blacklistedMethods) {
+    public static <T> List<Method> getMethodsForProtobufBuilder(Class<T> clazz, Set<String> blacklistedMethods) {
         List<Method> filteredMethods = getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(ProtobufUtil::isPublic)
                 .filter(method -> isChainable(method, clazz))

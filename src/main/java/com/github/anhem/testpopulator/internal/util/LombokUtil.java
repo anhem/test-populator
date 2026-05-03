@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator.internal.util;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
@@ -14,7 +15,7 @@ public class LombokUtil {
     private LombokUtil() {
     }
 
-    public static Map<Integer, List<Method>> getMethodsForLombokBuilderGroupedByInvokeOrder(Class<?> clazz, List<String> blacklistedMethods) {
+    public static Map<Integer, List<Method>> getMethodsForLombokBuilderGroupedByInvokeOrder(Class<?> clazz, Set<String> blacklistedMethods) {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> !isDeclaringJavaBaseClass(method))
                 .collect(Collectors.groupingBy(LombokUtil::lombokMethodInvokeOrder));

@@ -138,11 +138,11 @@ You can provide a lambda directly in the configuration:
 ```java
 PopulateConfig populateConfig = PopulateConfig.builder()
         // Solves the problem by providing a correctly formatted string for MyUUID
-        .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+        .addOverridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
         // Also useful for setting specific values, like the current date
-        .overridePopulate(LocalDate.class, LocalDate::now)
+        .addOverridePopulate(LocalDate.class, LocalDate::now)
         // or setting all Strings to a random UUID
-        .overridePopulate(String.class, () -> UUID.randomUUID().toString())
+        .addOverridePopulate(String.class, () -> UUID.randomUUID().toString())
         .build();
 ```
 
@@ -214,9 +214,9 @@ public class TestPopulator {
     // 1. Define the configuration once
     private static final PopulateConfig POPULATE_CONFIG = PopulateConfig.builder()
             // Provide custom logic for creating MyUUID objects
-            .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+            .addOverridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
             // Always set LocalDate to the current date
-            .overridePopulate(LocalDate.class, LocalDate::now)
+            .addOverridePopulate(LocalDate.class, LocalDate::now)
             .build();
 
     // 2. Create a single factory instance
@@ -243,20 +243,32 @@ This example shows a configuration designed to handle a wide variety of class st
 ```java
 private static final PopulateConfig FULL_CONFIG = PopulateConfig.builder()
         // Try all strategies, starting with the most specific (BUILDER)
-        .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD))
-        // Specify the builder pattern to use
-        .builderPattern(LOMBOK)
+        .builderStrategy()
+            // Specify the builder pattern to use
+            .pattern(LOMBOK)
+            .and()
+        .setterStrategy()
+            // For the SETTER strategy, consider any void method with one arg a setter
+            .setPrefixes("")
+            .and()
+        .mutatorStrategy()
+            // For the MUTATOR strategy, prefer the constructor with the most arguments
+            .constructorType(LARGEST)
+            .and()
+        .constructorStrategy()
+            .and()
+        .staticMethodStrategy()
+            // For STATIC_METHOD strategy, prioritizes method with simple parameter types
+            .methodType(MethodType.SIMPLEST)
+            .and()
+        .fieldStrategy()
+            .and()
+        .reorderStrategies(BUILDER, CONSTRUCTOR, SETTER) // Explicitly set or reorder strategies
         // Use random values for broader test coverage
         .randomValues(true)
         // Allow access to private constructors if no public ones are suitable
         .accessNonPublicConstructors(true)
         // Prevent infinite loops with circular dependencies
         .nullOnCircularDependency(true)
-        // For the MUTATOR strategy, prefer the constructor with the most arguments
-        .constructorType(LARGEST)
-        // For the SETTER strategy, consider any void method with one arg a setter
-        .setterPrefix("")
-        // For STATIC_METHOD strategy, prioritizes method with simple parameter types  
-        .methodType(MethodType.SIMPLEST)
         .build();
 ```

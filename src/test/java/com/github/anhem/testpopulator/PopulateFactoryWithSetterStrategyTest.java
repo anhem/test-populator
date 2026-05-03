@@ -8,10 +8,8 @@ import com.github.anhem.testpopulator.model.java.setter.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.SETTER;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
@@ -29,7 +27,8 @@ class PopulateFactoryWithSetterStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(SETTER))
+                .setterStrategy()
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -87,7 +86,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("with")
+                .addSetterPrefixes("with")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -98,7 +97,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithBlankSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("")
+                .addSetterPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -109,10 +108,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("set")
-                .addSetterPrefix("with")
-                .addSetterPrefix("also")
-                .addSetterPrefix("as")
+                .addSetterPrefixes("set", "with", "also", "as")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -123,7 +119,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSettersUsingBlankSetter() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("")
+                .addSetterPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -188,14 +184,24 @@ class PopulateFactoryWithSetterStrategyTest {
     void setterIsUsedWhenClassOnlySupportsSetterAndOtherStrategiesAreAvailable() {
         Class<Pojo> clazz = Pojo.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR))
+                .clearStrategies()
+                .builderStrategy()
+                .and()
+                .constructorStrategy()
+                .and()
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, SETTER))
+                .clearStrategies()
+                .builderStrategy()
+                .and()
+                .constructorStrategy()
+                .and()
+                .setterStrategy()
+                .and()
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
