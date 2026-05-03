@@ -56,7 +56,7 @@ public class Populator {
 
     private <T> T createValue(ClassCarrier<T> classCarrier) {
         T value = valueFactory.createValue(classCarrier.getClazz(), classCarrier.getName());
-        classCarrier.getObjectFactory().value(value);
+        classCarrier.getObjectFactory().value(value, classCarrier.getClazz(), classCarrier.getName());
         return value;
     }
 

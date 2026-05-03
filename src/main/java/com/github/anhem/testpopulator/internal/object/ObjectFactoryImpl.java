@@ -27,12 +27,17 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     static {
         stringSuppliers.put(Integer.class, Object::toString);
+        stringSuppliers.put(int.class, Object::toString);
         stringSuppliers.put(Long.class, object -> object + "L");
+        stringSuppliers.put(long.class, object -> object + "L");
         stringSuppliers.put(Double.class, Object::toString);
+        stringSuppliers.put(double.class, Object::toString);
         stringSuppliers.put(Boolean.class, Object::toString);
+        stringSuppliers.put(boolean.class, Object::toString);
         stringSuppliers.put(BigDecimal.class, object -> String.format("BigDecimal.valueOf(%d)", ((BigDecimal) object).intValue()));
         stringSuppliers.put(String.class, object -> "\"" + object + "\"");
         stringSuppliers.put(Character.class, object -> "'" + object + "'");
+        stringSuppliers.put(char.class, object -> "'" + object + "'");
         stringSuppliers.put(LocalDate.class, object -> String.format("LocalDate.parse(\"%s\")", object));
         stringSuppliers.put(LocalDateTime.class, object -> String.format("LocalDateTime.parse(\"%s\")", object));
         stringSuppliers.put(ZonedDateTime.class, object -> String.format("ZonedDateTime.parse(\"%s\")", object));
@@ -40,8 +45,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Date.class, object -> String.format("new Date(%sL)", ((Date) object).getTime()));
         stringSuppliers.put(UUID.class, object -> String.format("UUID.fromString(\"%s\")", object));
         stringSuppliers.put(Byte.class, object -> String.format("Byte.parseByte(\"%s\")", object));
+        stringSuppliers.put(byte.class, object -> String.format("Byte.parseByte(\"%s\")", object));
         stringSuppliers.put(Short.class, object -> String.format("Short.parseShort(\"%s\")", object));
+        stringSuppliers.put(short.class, object -> String.format("Short.parseShort(\"%s\")", object));
         stringSuppliers.put(Float.class, object -> object + "f");
+        stringSuppliers.put(float.class, object -> object + "f");
         stringSuppliers.put(LocalTime.class, object -> String.format("LocalTime.parse(\"%s\")", object));
         stringSuppliers.put(BigInteger.class, object -> String.format("BigInteger.valueOf(%d)", ((BigInteger) object).intValue()));
         stringSuppliers.put(OffsetDateTime.class, object -> String.format("OffsetDateTime.parse(\"%s\")", object));
@@ -150,9 +158,9 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public <T> void value(T value) {
-        setNextObjectBuilder(value.getClass(), VALUE, 0);
-        String stringValue = toStringValue(value);
+    public <T> void value(T value, Class<T> clazz, String name) {
+        setNextObjectBuilder(clazz, VALUE, 0);
+        String stringValue = toStringValue(value, clazz, name);
         if (currentObjectBuilder.isUseFullyQualifiedName()) {
             if (stringValue.startsWith(NEW_PREFIX)) {
                 currentObjectBuilder.setValue(String.format("%s%s.%s", NEW_PREFIX, currentObjectBuilder.getClazz().getPackageName(), stringValue.replace(NEW_PREFIX, "")));
@@ -199,17 +207,23 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .orElse(null);
     }
 
-    private String toStringValue(Object object) {
-        Class<?> clazz = object.getClass();
-        if (clazz.isEnum()) {
+    private String toStringValue(Object object, Class<?> clazz, String name) {
+        if (object.getClass().isEnum()) {
             return object.toString();
         }
 
-        return Optional.ofNullable(stringSuppliers.get(clazz))
-                .map(supplier -> supplier.apply(object))
-                .orElseGet(() -> populateConfig.getOverridePopulate().getOrDefault(object.getClass(), () -> {
-                    throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
-                }).createString());
+        Function<Object, String> stringSupplier = stringSuppliers.get(object.getClass());
+        if (stringSupplier != null) {
+            return stringSupplier.apply(object);
+        }
+
+        if (name != null && populateConfig.getOverridePopulateNames().containsKey(name)) {
+            return populateConfig.getOverridePopulateNames().get(name).createString();
+        }
+
+        return populateConfig.getOverridePopulate().getOrDefault(clazz, () -> {
+            throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
+        }).createString();
     }
 
     private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {

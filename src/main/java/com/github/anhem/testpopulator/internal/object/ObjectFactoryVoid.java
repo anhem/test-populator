@@ -74,7 +74,7 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
-    public <T> void value(T value) {
+    public <T> void value(T value, Class<T> clazz, String name) {
         //ignored
     }
 

@@ -1,12 +1,12 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.NamedDates;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.setter.*;
-import lombok.Data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -225,11 +225,7 @@ class PopulateFactoryWithSetterStrategyTest {
 
     @Test
     void canPopulateDatesBasedOnNames() {
-        populateConfig = populateConfig.toBuilder()
-                .objectFactoryEnabled(false)
-                .build();
-        populateFactory = new PopulateFactory(populateConfig);
-        NamedDates namedDates = populateFactory.populate(NamedDates.class);
+        NamedDates namedDates = populateAndAssertWithGeneratedCode(NamedDates.class);
 
         assertThat(namedDates.getFromDate()).isNotNull();
         assertThat(namedDates.getToDate()).isNotNull();
@@ -243,11 +239,11 @@ class PopulateFactoryWithSetterStrategyTest {
     void canPopulateBasedOnCustomName() {
         LocalDate localDate = LocalDate.of(2000, 1, 1);
         populateConfig = populateConfig.toBuilder()
-                .objectFactoryEnabled(false)
                 .addOverridePopulate("setFromDate", () -> localDate)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        NamedDates namedDates = populateFactory.populate(NamedDates.class);
+
+        NamedDates namedDates = populateAndAssertWithGeneratedCode(NamedDates.class);
 
         assertThat(namedDates.getFromDate()).isEqualTo(localDate);
         assertThat(namedDates.getToDate()).isNotEqualTo(localDate);
@@ -255,12 +251,18 @@ class PopulateFactoryWithSetterStrategyTest {
 
     @Test
     void canOverrideCollectionByName() {
-        populateConfig = populateConfig.toBuilder()
-                .objectFactoryEnabled(false)
-                .build();
-        populateFactory = new PopulateFactory(populateConfig);
-        List<String> overrideValue = List.of("foo", "bar");
-        Pojo pojo = populateFactory.populate(Pojo.class, Map.of("setListOfStrings", () -> overrideValue));
+        OverridePopulate<List<String>> listOverride = new OverridePopulate<>() {
+            @Override
+            public List<String> create() {
+                return List.of("foo", "bar");
+            }
+
+            @Override
+            public String createString() {
+                return "List.of(\"foo\", \"bar\")";
+            }
+        };
+        Pojo pojo = populateFactory.populate(Pojo.class, Map.of("setListOfStrings", listOverride));
 
         assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }

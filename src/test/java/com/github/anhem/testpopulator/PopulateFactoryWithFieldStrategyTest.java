@@ -175,6 +175,7 @@ class PopulateFactoryWithFieldStrategyTest {
                 .addOverridePopulate("fromDate", () -> localDate)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
+
         NamedDates namedDates = populateFactory.populate(NamedDates.class);
 
         assertThat(namedDates.getFromDate()).isEqualTo(localDate);
@@ -183,8 +184,7 @@ class PopulateFactoryWithFieldStrategyTest {
 
     @Test
     void canOverrideCollectionByName() {
-        List<String> overrideValue = List.of("foo", "bar");
-        Pojo pojo = populateFactory.populate(Pojo.class, Map.of("listOfStrings", () -> overrideValue));
+        Pojo pojo = populateFactory.populate(Pojo.class, Map.of("listOfStrings", () -> List.of("foo", "bar")));
 
         assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }
