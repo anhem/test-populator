@@ -84,6 +84,19 @@ public class PopulateFactoryWithProtobufBuilderStrategyTest {
         assertRandomlyPopulatedValues(value1, value2);
     }
 
+    @Test
+    void canPopulateBasedOnCustomName() {
+        String name = "myCustomName";
+        populateConfig = populateConfig.toBuilder()
+                .addOverridePopulate("setName", () -> name)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        Person person = populateAndAssertWithGeneratedCode(Person.class);
+
+        assertThat(person.getName()).isEqualTo(name);
+    }
+
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER);

@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
@@ -166,6 +167,29 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         LombokImmutable value1 = populateFactory.populate(clazz);
         LombokImmutable value2 = populateFactory.populate(clazz);
         assertRandomlyPopulatedValues(value1, value2);
+    }
+
+    @Test
+    void canOverrideCollectionByName() {
+        List<String> list = List.of("foo", "bar");
+        populateConfig = populateConfig.toBuilder()
+                .addOverridePopulate("listOfStrings", new OverridePopulate<>() {
+                    @Override
+                    public List<String> create() {
+                        return list;
+                    }
+
+                    @Override
+                    public String createString() {
+                        return "List.of(\"foo\", \"bar\")";
+                    }
+                })
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        LombokImmutable lombokImmutable = populateAndAssertWithGeneratedCode(LombokImmutable.class);
+
+        assertThat(lombokImmutable.getListOfStrings()).isEqualTo(list);
     }
 
     private void assertObjectCanBeRebuilt(LombokImmutable lombokImmutable) {
