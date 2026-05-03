@@ -16,12 +16,12 @@ import static com.github.anhem.testpopulator.config.Strategy.*;
 public class PopulateConfig {
     public static final String INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY = "objectFactory can not be enabled while accessNonPublicConstructors is true";
     public static final String INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY = "objectFactory can not be enabled while strategyOrder contains FIELD";
-    public static final List<String> DEFAULT_BLACKLISTED_METHODS = List.of("$jacocoInit");
-    public static final List<String> DEFAULT_BLACKLISTED_FIELDS = List.of("__$lineHits$__", "$jacocoData");
+    public static final Set<String> DEFAULT_BLACKLISTED_METHODS = Set.of("$jacocoInit");
+    public static final Set<String> DEFAULT_BLACKLISTED_FIELDS = Set.of("__$lineHits$__", "$jacocoData");
     public static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER, STATIC_METHOD);
     public static final boolean DEFAULT_RANDOM_VALUES = true;
     public static final boolean DEFAULT_ACCESS_NON_PUBLIC_CONSTRUCTORS = false;
-    public static final List<String> DEFAULT_SETTER_PREFIXES = List.of("set");
+    public static final Set<String> DEFAULT_SETTER_PREFIXES = Set.of("set");
     public static final boolean DEFAULT_OBJECT_FACTORY_ENABLED = false;
     public static final boolean DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY = false;
     public static final ConstructorType DEFAULT_CONSTRUCTOR_TYPE = NO_ARGS;
@@ -32,14 +32,14 @@ public class PopulateConfig {
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
 
     public static class PopulateConfigBuilder {
-        private List<String> blacklistedMethods = new ArrayList<>();
-        private List<String> blacklistedFields = new ArrayList<>();
+        private Set<String> blacklistedMethods = new HashSet<>();
+        private Set<String> blacklistedFields = new HashSet<>();
         private List<Strategy> strategyOrder = new ArrayList<>();
         private Map<Class<?>, OverridePopulate<?>> overridePopulate = new HashMap<>();
         private BuilderPattern builderPattern;
         private Boolean randomValues;
         private Boolean accessNonPublicConstructors;
-        private List<String> setterPrefixes = new ArrayList<>();
+        private Set<String> setterPrefixes = new HashSet<>();
         private Boolean objectFactoryEnabled;
         private Boolean nullOnCircularDependency;
         private ConstructorType constructorType;
@@ -54,7 +54,7 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder setBlacklistedMethods(Collection<String> blacklistedMethods) {
-            this.blacklistedMethods = new ArrayList<>(blacklistedMethods);
+            this.blacklistedMethods = new HashSet<>(blacklistedMethods);
             return this;
         }
 
@@ -96,7 +96,7 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder setBlacklistedFields(Collection<String> blacklistedFields) {
-            this.blacklistedFields = new ArrayList<>(blacklistedFields);
+            this.blacklistedFields = new HashSet<>(blacklistedFields);
             return this;
         }
 
@@ -229,7 +229,7 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder setSetterPrefixes(Collection<String> setterPrefixes) {
-            this.setterPrefixes = new ArrayList<>(setterPrefixes);
+            this.setterPrefixes = new HashSet<>(setterPrefixes);
             return this;
         }
 
@@ -421,14 +421,14 @@ public class PopulateConfig {
         return new PopulateConfigBuilder();
     }
 
-    private final List<String> blacklistedMethods;
-    private final List<String> blacklistedFields;
+    private final Set<String> blacklistedMethods;
+    private final Set<String> blacklistedFields;
     private final List<Strategy> strategyOrder;
     private final Map<Class<?>, OverridePopulate<?>> overridePopulate;
     private final BuilderPattern builderPattern;
     private final boolean randomValues;
     private final boolean accessNonPublicConstructors;
-    private final List<String> setterPrefixes;
+    private final Set<String> setterPrefixes;
     private final boolean objectFactoryEnabled;
     private final boolean nullOnCircularDependency;
     private final ConstructorType constructorType;
@@ -464,11 +464,11 @@ public class PopulateConfig {
         this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
     }
 
-    public List<String> getBlacklistedMethods() {
+    public Set<String> getBlacklistedMethods() {
         return blacklistedMethods;
     }
 
-    public List<String> getBlacklistedFields() {
+    public Set<String> getBlacklistedFields() {
         return blacklistedFields;
     }
 
@@ -492,7 +492,7 @@ public class PopulateConfig {
         return accessNonPublicConstructors;
     }
 
-    public List<String> getSetterPrefixes() {
+    public Set<String> getSetterPrefixes() {
         return setterPrefixes;
     }
 

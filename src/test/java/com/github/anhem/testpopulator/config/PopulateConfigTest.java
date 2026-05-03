@@ -173,7 +173,7 @@ class PopulateConfigTest {
         assertThat(populateConfig.useRandomValues()).isTrue();
         assertThat(populateConfig.canAccessNonPublicConstructors()).isFalse();
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
-        assertThat(populateConfig.getSetterPrefixes()).containsExactly("also", "with", "as");
+        assertThat(populateConfig.getSetterPrefixes()).containsExactlyInAnyOrder("also", "with", "as");
         assertThat(populateConfig.isNullOnCircularDependency()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.getMethodType()).isEqualTo(MethodType.LARGEST);
         assertThat(populateConfig.getBlacklistedMethods()).containsExactly("blacklistedMethod");
@@ -197,9 +197,9 @@ class PopulateConfigTest {
                 .addOverridePopulate(Integer.class, () -> 1)
                 .build();
 
-        assertThat(populateConfig.getSetterPrefixes()).containsExactly("set", "with");
-        assertThat(populateConfig.getBlacklistedFields()).containsExactlyElementsOf(Stream.concat(DEFAULT_BLACKLISTED_FIELDS.stream(), Stream.of(blacklistedField)).collect(Collectors.toList()));
-        assertThat(populateConfig.getBlacklistedMethods()).containsExactlyElementsOf(Stream.concat(DEFAULT_BLACKLISTED_METHODS.stream(), Stream.of(blacklistedMethod)).collect(Collectors.toList()));
+        assertThat(populateConfig.getSetterPrefixes()).containsExactlyInAnyOrder("set", "with");
+        assertThat(populateConfig.getBlacklistedFields()).containsExactlyInAnyOrderElementsOf(Stream.concat(DEFAULT_BLACKLISTED_FIELDS.stream(), Stream.of(blacklistedField)).collect(Collectors.toList()));
+        assertThat(populateConfig.getBlacklistedMethods()).containsExactlyInAnyOrderElementsOf(Stream.concat(DEFAULT_BLACKLISTED_METHODS.stream(), Stream.of(blacklistedMethod)).collect(Collectors.toList()));
         assertThat(populateConfig.getOverridePopulate()).hasSize(2);
         assertThat(populateConfig.getOverridePopulate().get(Integer.class).create()).isEqualTo(1);
         assertThat(populateConfig.getOverridePopulate().get(Double.class).create()).isEqualTo(3.0);
@@ -223,9 +223,9 @@ class PopulateConfigTest {
                     .and()
                 .build();
 
-        assertThat(modified.getBlacklistedMethods()).containsExactly("m1", "m2");
-        assertThat(modified.getBlacklistedFields()).containsExactly("f1", "f2");
-        assertThat(modified.getSetterPrefixes()).containsExactly("p1", "p2");
+        assertThat(modified.getBlacklistedMethods()).containsExactlyInAnyOrder("m1", "m2");
+        assertThat(modified.getBlacklistedFields()).containsExactlyInAnyOrder("f1", "f2");
+        assertThat(modified.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2");
     }
 
     @Test
@@ -313,9 +313,9 @@ class PopulateConfigTest {
 
     @Test
     void buildingCustomPopulateConfigWithLists() {
-        List<String> blacklistedMethods = List.of("method1", "method2");
-        List<String> blacklistedFields = List.of("field1", "field2");
-        List<String> setterPrefixes = List.of("set", "with");
+        Set<String> blacklistedMethods = Set.of("method1", "method2");
+        Set<String> blacklistedFields = Set.of("field1", "field2");
+        Set<String> setterPrefixes = Set.of("set", "with");
 
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .setBlacklistedMethods(blacklistedMethods)

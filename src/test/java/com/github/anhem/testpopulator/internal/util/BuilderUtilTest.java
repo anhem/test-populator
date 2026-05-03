@@ -11,7 +11,7 @@ import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.internal.util.BuilderUtil.getMethodsForCustomBuilder;
 import static com.github.anhem.testpopulator.internal.util.BuilderUtil.isMatchingBuilderStrategy;
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class BuilderUtilTest {
@@ -29,6 +29,6 @@ class BuilderUtilTest {
 
     @Test
     void getMethodsForCustomBuilderReturnsMethods() {
-        assertThat(getMethodsForCustomBuilder(CustomBuilder.CustomBuilderBuilder.class, emptyList())).hasSize(7);
+        assertThat(getMethodsForCustomBuilder(CustomBuilder.CustomBuilderBuilder.class, emptySet())).hasSize(7);
     }
 }

@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
@@ -29,7 +30,7 @@ public class MutatorUtil {
         return false;
     }
 
-    public static <T> List<Method> getMutatorMethods(Class<T> clazz, List<String> blacklistedMethods) {
+    public static <T> List<Method> getMutatorMethods(Class<T> clazz, Set<String> blacklistedMethods) {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> isMutatorMethod(method, clazz))
                 .collect(Collectors.toList());

@@ -11,7 +11,7 @@ import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.config.Strategy.STATIC_METHOD;
 import static com.github.anhem.testpopulator.internal.util.StaticMethodUtil.getStaticMethod;
 import static com.github.anhem.testpopulator.internal.util.StaticMethodUtil.isMatchingStaticMethodStrategy;
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class StaticMethodUtilTest {
@@ -30,7 +30,7 @@ class StaticMethodUtilTest {
 
     @Test
     void getStaticMethodWithMethodTypeLargestReturnsMethod() {
-        assertThat(getStaticMethod(Users.class, emptyList(), MethodType.LARGEST))
+        assertThat(getStaticMethod(Users.class, emptySet(), MethodType.LARGEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("ofTwo");
@@ -38,7 +38,7 @@ class StaticMethodUtilTest {
 
     @Test
     void getStaticMethodWithMethodTypeSmallestReturnsMethod() {
-        assertThat(getStaticMethod(Users.class, emptyList(), MethodType.SMALLEST))
+        assertThat(getStaticMethod(Users.class, emptySet(), MethodType.SMALLEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isIn("with", "of");
@@ -46,15 +46,15 @@ class StaticMethodUtilTest {
 
     @Test
     void getStaticMethodWithMethodTypeWillNotReturnMethodWithSelfReferencingParameter() {
-        assertThat(getStaticMethod(User.class, emptyList(), MethodType.LARGEST))
+        assertThat(getStaticMethod(User.class, emptySet(), MethodType.LARGEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("of");
-        assertThat(getStaticMethod(User.class, emptyList(), MethodType.SMALLEST))
+        assertThat(getStaticMethod(User.class, emptySet(), MethodType.SMALLEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("of");
-        assertThat(getStaticMethod(User.class, emptyList(), MethodType.SIMPLEST))
+        assertThat(getStaticMethod(User.class, emptySet(), MethodType.SIMPLEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("of");
@@ -62,27 +62,27 @@ class StaticMethodUtilTest {
 
     @Test
     void getStaticMethodWithDifferentMethodTypesWillReturnDifferentMethods() {
-        assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.LARGEST))
+        assertThat(getStaticMethod(MultipleStaticMethods.class, emptySet(), MethodType.LARGEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("createFull");
-        assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.SMALLEST))
+        assertThat(getStaticMethod(MultipleStaticMethods.class, emptySet(), MethodType.SMALLEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("fromCsvRecord");
-        assertThat(getStaticMethod(MultipleStaticMethods.class, emptyList(), MethodType.SIMPLEST))
+        assertThat(getStaticMethod(MultipleStaticMethods.class, emptySet(), MethodType.SIMPLEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("fromIdAndName");
-        assertThat(getStaticMethod(UserGroup.class, emptyList(), MethodType.SIMPLEST))
+        assertThat(getStaticMethod(UserGroup.class, emptySet(), MethodType.SIMPLEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("from");
-        assertThat(getStaticMethod(Users.class, emptyList(), MethodType.SIMPLEST))
+        assertThat(getStaticMethod(Users.class, emptySet(), MethodType.SIMPLEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("with");
-        assertThat(getStaticMethod(UserId.class, emptyList(), MethodType.SIMPLEST))
+        assertThat(getStaticMethod(UserId.class, emptySet(), MethodType.SIMPLEST))
                 .isNotNull()
                 .extracting(Method::getName)
                 .isEqualTo("of");
