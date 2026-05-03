@@ -229,6 +229,36 @@ class PopulateConfigTest {
     }
 
     @Test
+    void toBuilderCanAddConfigAdditivelyUsingVarargs() {
+        PopulateConfig config = PopulateConfig.builder()
+                .setterStrategy()
+                .addPrefixes("p1")
+                .and()
+                .build();
+
+        PopulateConfig modified = config.toBuilder()
+                .setterStrategy()
+                .addPrefixes("p2", "p3")
+                .and()
+                .build();
+
+        assertThat(modified.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2", "p3");
+    }
+
+    @Test
+    void canAddOverridePopulatesUsingMap() {
+        PopulateConfig config = PopulateConfig.builder()
+                .addOverridePopulate(String.class, () -> "s1")
+                .addOverridePopulates(Map.of(Integer.class, () -> 1, Double.class, () -> 2.0))
+                .build();
+
+        assertThat(config.getOverridePopulate()).hasSize(3);
+        assertThat(config.getOverridePopulate().get(String.class).create()).isEqualTo("s1");
+        assertThat(config.getOverridePopulate().get(Integer.class).create()).isEqualTo(1);
+        assertThat(config.getOverridePopulate().get(Double.class).create()).isEqualTo(2.0);
+    }
+
+    @Test
     void pluralMethodsReplaceExistingConfig() {
         PopulateConfig config = PopulateConfig.builder()
                 .setBlacklistedMethods("m1")
