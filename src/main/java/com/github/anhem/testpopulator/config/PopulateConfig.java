@@ -48,47 +48,87 @@ public class PopulateConfig {
         private MethodType methodType;
 
         /**
-         * Set blacklisted methods. I.E methods that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         * Set blacklisted methods, replacing existing ones.
          *
          * @param blacklistedMethods name of methods to ignore
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder blacklistedMethods(List<String> blacklistedMethods) {
-            this.blacklistedMethods = blacklistedMethods;
+        public PopulateConfigBuilder setBlacklistedMethods(Collection<String> blacklistedMethods) {
+            this.blacklistedMethods = new ArrayList<>(blacklistedMethods);
             return this;
         }
 
         /**
-         * Add blacklisted method. I.E a method that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         * Set blacklisted methods, replacing existing ones.
          *
-         * @param blacklistedMethod name of methods to ignore
+         * @param blacklistedMethods name of methods to ignore
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder addBlacklistedMethod(String blacklistedMethod) {
-            this.blacklistedMethods = concat(this.blacklistedMethods, blacklistedMethod);
+        public PopulateConfigBuilder setBlacklistedMethods(String... blacklistedMethods) {
+            return setBlacklistedMethods(Arrays.asList(blacklistedMethods));
+        }
+
+        /**
+         * Add blacklisted methods to existing ones.
+         *
+         * @param blacklistedMethods name of methods to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedMethods(Collection<String> blacklistedMethods) {
+            this.blacklistedMethods.addAll(blacklistedMethods);
             return this;
         }
 
         /**
-         * Set blacklist fields. I.E fields that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         * Add blacklisted methods to existing ones.
+         *
+         * @param blacklistedMethods name of methods to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedMethods(String... blacklistedMethods) {
+            return addBlacklistedMethods(Arrays.asList(blacklistedMethods));
+        }
+
+        /**
+         * Set blacklist fields, replacing existing ones.
          *
          * @param blacklistedFields name of fields to ignore
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder blacklistedFields(List<String> blacklistedFields) {
-            this.blacklistedFields = blacklistedFields;
+        public PopulateConfigBuilder setBlacklistedFields(Collection<String> blacklistedFields) {
+            this.blacklistedFields = new ArrayList<>(blacklistedFields);
             return this;
         }
 
         /**
-         * Add blacklist field. I.E a field that should be ignored if encountered. This is mostly a code coverage issue and default values should be sufficient in most cases.
+         * Set blacklist fields, replacing existing ones.
          *
-         * @param blacklistedField name of fields to ignore
+         * @param blacklistedFields name of fields to ignore
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder addBlacklistedField(String blacklistedField) {
-            this.blacklistedFields = concat(this.blacklistedFields, blacklistedField);
+        public PopulateConfigBuilder setBlacklistedFields(String... blacklistedFields) {
+            return setBlacklistedFields(Arrays.asList(blacklistedFields));
+        }
+
+        /**
+         * Add blacklist fields to existing ones.
+         *
+         * @param blacklistedFields name of fields to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedFields(Collection<String> blacklistedFields) {
+            this.blacklistedFields.addAll(blacklistedFields);
             return this;
+        }
+
+        /**
+         * Add blacklist fields to existing ones.
+         *
+         * @param blacklistedFields name of fields to ignore
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addBlacklistedFields(String... blacklistedFields) {
+            return addBlacklistedFields(Arrays.asList(blacklistedFields));
         }
 
         /**
@@ -116,23 +156,35 @@ public class PopulateConfig {
         }
 
         /**
-         * Provide your own implementations of how objects should be created when those classes are encountered during population.
-         * This overwrites any existing overridePopulates.
+         * Set override populates, replacing existing ones.
          *
-         * @param overridePopulates implementations from this list will be used whenever a class they can produce is encountered.
+         * @param overridePopulates implementations from this map will be used whenever a class they can produce is encountered.
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder overridePopulate(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
-            this.overridePopulate = overridePopulates;
+        public PopulateConfigBuilder setOverridePopulates(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
+            this.overridePopulate = new HashMap<>(overridePopulates);
             return this;
         }
 
         /**
-         * Add your own implementation of how an object should be created when that class is encountered during population.
-         * @param overridePopulate this implementation will be used whenever a class it can produce is encountered.
+         * Add override populates to existing ones.
+         *
+         * @param overridePopulates implementations from this map will be used whenever a class they can produce is encountered.
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder overridePopulate(Class<?> clazz, OverridePopulate<?> overridePopulate) {
+        public PopulateConfigBuilder addOverridePopulates(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
+            this.overridePopulate.putAll(overridePopulates);
+            return this;
+        }
+
+        /**
+         * Add an override populate.
+         *
+         * @param clazz class to override
+         * @param overridePopulate implementation to use
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addOverridePopulate(Class<?> clazz, OverridePopulate<?> overridePopulate) {
             this.overridePopulate.put(clazz, overridePopulate);
             return this;
         }
@@ -171,26 +223,45 @@ public class PopulateConfig {
         }
 
         /**
-         * Use setters with a different format than set*, overwriting any already existing setters.
+         * Set setter prefixes, replacing existing ones.
          *
-         * @param setterPrefixes a list of prefixes for methods that work in a similar way as a regular setter method.
-         * Use empty String to match any method that follows the setter pattern without actually being named prefix*
+         * @param setterPrefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
+         * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder setterPrefixes(List<String> setterPrefixes) {
-            this.setterPrefixes = setterPrefixes;
+        public PopulateConfigBuilder setSetterPrefixes(Collection<String> setterPrefixes) {
+            this.setterPrefixes = new ArrayList<>(setterPrefixes);
             return this;
         }
 
         /**
-         * add a setter prefix
+         * Set setter prefixes, replacing existing ones.
          *
-         * @param setterPrefix a prefix for methods that work in a similar way as a regular setter method.
-         * Use empty String to match any method that follows the setter pattern without actually being named prefix*
+         * @param setterPrefixes prefixes for methods that work in a similar way as a regular setter method.
          * @return PopulateConfigBuilder
          */
-        public PopulateConfigBuilder addSetterPrefix(String setterPrefix) {
-            this.setterPrefixes = concat(setterPrefixes, setterPrefix);
+        public PopulateConfigBuilder setSetterPrefixes(String... setterPrefixes) {
+            return setSetterPrefixes(Arrays.asList(setterPrefixes));
+        }
+
+        /**
+         * Add setter prefixes to existing ones.
+         *
+         * @param setterPrefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addSetterPrefixes(Collection<String> setterPrefixes) {
+            this.setterPrefixes.addAll(setterPrefixes);
             return this;
+        }
+
+        /**
+         * Add setter prefixes to existing ones.
+         *
+         * @param setterPrefixes prefixes for methods that work in a similar way as a regular setter method.
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder addSetterPrefixes(String... setterPrefixes) {
+            return addSetterPrefixes(Arrays.asList(setterPrefixes));
         }
 
         /**
@@ -456,13 +527,13 @@ public class PopulateConfig {
      */
     public PopulateConfigBuilder toBuilder() {
         PopulateConfigBuilder populateConfigBuilder = PopulateConfig.builder()
-                .blacklistedMethods(new ArrayList<>(blacklistedMethods))
-                .blacklistedFields(new ArrayList<>(blacklistedFields))
-                .overridePopulate(new HashMap<>(overridePopulate))
+                .setBlacklistedMethods(new ArrayList<>(blacklistedMethods))
+                .setBlacklistedFields(new ArrayList<>(blacklistedFields))
+                .setOverridePopulates(new HashMap<>(overridePopulate))
                 .builderPattern(builderPattern)
                 .randomValues(randomValues)
                 .accessNonPublicConstructors(accessNonPublicConstructors)
-                .setterPrefixes(new ArrayList<>(setterPrefixes))
+                .setSetterPrefixes(new ArrayList<>(setterPrefixes))
                 .objectFactoryEnabled(objectFactoryEnabled)
                 .nullOnCircularDependency(nullOnCircularDependency)
                 .constructorType(constructorType)
@@ -583,13 +654,47 @@ public class PopulateConfig {
             super(parent);
         }
 
-        public SetterStrategyBuilder prefixes(List<String> prefixes) {
-            parent.setterPrefixes(prefixes);
+        /**
+         * Set setter prefixes, replacing existing ones.
+         *
+         * @param prefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
+         * @return SetterStrategyBuilder
+         */
+        public SetterStrategyBuilder setPrefixes(Collection<String> prefixes) {
+            parent.setSetterPrefixes(prefixes);
             return this;
         }
 
-        public SetterStrategyBuilder prefixes(String... prefixes) {
-            parent.setterPrefixes(List.of(prefixes));
+        /**
+         * Set setter prefixes, replacing existing ones.
+         *
+         * @param prefixes prefixes for methods that work in a similar way as a regular setter method.
+         * @return SetterStrategyBuilder
+         */
+        public SetterStrategyBuilder setPrefixes(String... prefixes) {
+            parent.setSetterPrefixes(prefixes);
+            return this;
+        }
+
+        /**
+         * Add setter prefixes to existing ones.
+         *
+         * @param prefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
+         * @return SetterStrategyBuilder
+         */
+        public SetterStrategyBuilder addPrefixes(Collection<String> prefixes) {
+            parent.addSetterPrefixes(prefixes);
+            return this;
+        }
+
+        /**
+         * Add setter prefixes to existing ones.
+         *
+         * @param prefixes prefixes for methods that work in a similar way as a regular setter method.
+         * @return SetterStrategyBuilder
+         */
+        public SetterStrategyBuilder addPrefixes(String... prefixes) {
+            parent.addSetterPrefixes(prefixes);
             return this;
         }
     }

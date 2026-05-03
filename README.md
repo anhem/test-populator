@@ -138,11 +138,11 @@ You can provide a lambda directly in the configuration:
 ```java
 PopulateConfig populateConfig = PopulateConfig.builder()
         // Solves the problem by providing a correctly formatted string for MyUUID
-        .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+        .addOverridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
         // Also useful for setting specific values, like the current date
-        .overridePopulate(LocalDate.class, LocalDate::now)
+        .addOverridePopulate(LocalDate.class, LocalDate::now)
         // or setting all Strings to a random UUID
-        .overridePopulate(String.class, () -> UUID.randomUUID().toString())
+        .addOverridePopulate(String.class, () -> UUID.randomUUID().toString())
         .build();
 ```
 
@@ -214,9 +214,9 @@ public class TestPopulator {
     // 1. Define the configuration once
     private static final PopulateConfig POPULATE_CONFIG = PopulateConfig.builder()
             // Provide custom logic for creating MyUUID objects
-            .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+            .addOverridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
             // Always set LocalDate to the current date
-            .overridePopulate(LocalDate.class, LocalDate::now)
+            .addOverridePopulate(LocalDate.class, LocalDate::now)
             .build();
 
     // 2. Create a single factory instance
@@ -249,7 +249,7 @@ private static final PopulateConfig FULL_CONFIG = PopulateConfig.builder()
             .and()
         .setterStrategy()
             // For the SETTER strategy, consider any void method with one arg a setter
-            .prefixes("")
+            .setPrefixes("")
             .and()
         .mutatorStrategy()
             // For the MUTATOR strategy, prefer the constructor with the most arguments

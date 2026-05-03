@@ -75,7 +75,7 @@ class PopulateFactoryTest {
                 .pattern(LOMBOK)
                 .and()
                 .setterStrategy()
-                .prefixes("")
+                .setPrefixes("")
                 .and()
                 .mutatorStrategy()
                 .constructorType(LARGEST)
@@ -89,7 +89,7 @@ class PopulateFactoryTest {
                 .and()
                 .randomValues(true)
                 .accessNonPublicConstructors(true)
-                .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+                .addOverridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
                 .objectFactoryEnabled(false)
                 .nullOnCircularDependency(true)
                 .build();

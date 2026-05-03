@@ -86,7 +86,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("with")
+                .addSetterPrefixes("with")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -97,7 +97,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithBlankSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("")
+                .addSetterPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -108,10 +108,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("set")
-                .addSetterPrefix("with")
-                .addSetterPrefix("also")
-                .addSetterPrefix("as")
+                .addSetterPrefixes("set", "with", "also", "as")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -122,7 +119,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSettersUsingBlankSetter() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("")
+                .addSetterPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);

@@ -118,7 +118,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void PojoWithMultipleCustomSettersUsingBlankSetter() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("")
+                .addSetterPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -339,7 +339,7 @@ class PopulateFactoryWithMutatorStrategyTest {
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
                 .objectFactoryEnabled(false)
-                .blacklistedMethods(List.of("from"))
+                .setBlacklistedMethods("from")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         ImmutableImmutablesAbstract value1 = populateAndAssert(ImmutableImmutablesAbstract.Builder.class).build();
