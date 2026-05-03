@@ -236,6 +236,28 @@ public class TestPopulator {
 MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
 ```
 
+### Per-Execution Overrides
+
+While `PopulateConfig` is great for defining global rules for your project, you might sometimes need to override those rules for a specific test case. 
+`PopulateFactory` provides methods to pass additional overrides directly when calling `populate()`. These local overrides take precedence over any globally configured ones.
+
+You can provide multiple overrides using a map:
+
+```java
+Map<Class<?>, OverridePopulate<?>> localOverrides = Map.of(
+    String.class, () -> "localValue",
+    Integer.class, () -> 42
+);
+
+MyClass myClass = populateFactory.populate(MyClass.class, localOverrides);
+```
+
+Or a single override using a convenience method:
+
+```java
+MyClass myClass = populateFactory.populate(MyClass.class, String.class, () -> "localValue");
+```
+
 ### "Full Coverage" Setup
 
 This example shows a configuration designed to handle a wide variety of class structures by enabling almost all features.
