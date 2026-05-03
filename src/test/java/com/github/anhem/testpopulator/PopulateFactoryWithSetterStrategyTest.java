@@ -8,10 +8,8 @@ import com.github.anhem.testpopulator.model.java.setter.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.SETTER;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
@@ -30,7 +28,7 @@ class PopulateFactoryWithSetterStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .setterStrategy()
-                    .and()
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -191,9 +189,9 @@ class PopulateFactoryWithSetterStrategyTest {
         populateConfig = populateConfig.toBuilder()
                 .clearStrategies()
                 .builderStrategy()
-                    .and()
+                .and()
                 .constructorStrategy()
-                    .and()
+                .and()
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -202,11 +200,11 @@ class PopulateFactoryWithSetterStrategyTest {
         populateConfig = populateConfig.toBuilder()
                 .clearStrategies()
                 .builderStrategy()
-                    .and()
+                .and()
                 .constructorStrategy()
-                    .and()
+                .and()
                 .setterStrategy()
-                    .and()
+                .and()
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

@@ -8,10 +8,8 @@ import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
@@ -30,7 +28,7 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .constructorStrategy()
-                    .and()
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -176,10 +174,10 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         populateConfig = populateConfig.toBuilder()
                 .clearStrategies()
                 .builderStrategy()
-                    .pattern(LOMBOK)
-                    .and()
+                .pattern(LOMBOK)
+                .and()
                 .setterStrategy()
-                    .and()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
@@ -187,12 +185,12 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         populateConfig = populateConfig.toBuilder()
                 .clearStrategies()
                 .builderStrategy()
-                    .pattern(LOMBOK)
-                    .and()
+                .pattern(LOMBOK)
+                .and()
                 .setterStrategy()
-                    .and()
+                .and()
                 .constructorStrategy()
-                    .and()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         AllArgsConstructor value1 = populateFactory.populate(clazz);

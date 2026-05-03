@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.ConstructorType.LARGEST;
-import static com.github.anhem.testpopulator.config.Strategy.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -73,21 +72,21 @@ class PopulateFactoryTest {
     private static PopulateConfig createFullyConfiguredPopulateConfig() {
         return PopulateConfig.builder()
                 .builderStrategy()
-                    .pattern(LOMBOK)
-                    .and()
+                .pattern(LOMBOK)
+                .and()
                 .setterStrategy()
-                    .prefixes("")
-                    .and()
+                .prefixes("")
+                .and()
                 .mutatorStrategy()
-                    .constructorType(LARGEST)
-                    .and()
+                .constructorType(LARGEST)
+                .and()
                 .constructorStrategy()
-                    .and()
+                .and()
                 .staticMethodStrategy()
-                    .methodType(MethodType.SIMPLEST)
-                    .and()
+                .methodType(MethodType.SIMPLEST)
+                .and()
                 .fieldStrategy()
-                    .and()
+                .and()
                 .randomValues(true)
                 .accessNonPublicConstructors(true)
                 .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))

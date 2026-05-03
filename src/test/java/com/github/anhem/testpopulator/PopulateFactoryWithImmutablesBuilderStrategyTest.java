@@ -7,10 +7,8 @@ import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static com.github.anhem.testpopulator.config.BuilderPattern.IMMUTABLES;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
@@ -26,8 +24,8 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .builderStrategy()
-                    .pattern(IMMUTABLES)
-                    .and()
+                .pattern(IMMUTABLES)
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -112,9 +110,9 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
         populateConfig = populateConfig.toBuilder()
                 .clearStrategies()
                 .setterStrategy()
-                    .and()
+                .and()
                 .constructorStrategy()
-                    .and()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
@@ -122,12 +120,12 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
         populateConfig = populateConfig.toBuilder()
                 .clearStrategies()
                 .setterStrategy()
-                    .and()
+                .and()
                 .constructorStrategy()
-                    .and()
+                .and()
                 .builderStrategy()
-                    .pattern(IMMUTABLES)
-                    .and()
+                .pattern(IMMUTABLES)
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         ImmutableImmutablesInterface value1 = populateFactory.populate(clazz);

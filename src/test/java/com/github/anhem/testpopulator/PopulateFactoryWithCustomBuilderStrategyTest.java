@@ -25,7 +25,7 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .builderStrategy()
-                    .and()
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -50,9 +50,9 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
         this.populateConfig = populateConfig.toBuilder()
                 .clearStrategies()
                 .builderStrategy()
-                    .method("newBuilder")
-                    .buildMethod("done")
-                    .and()
+                .method("newBuilder")
+                .buildMethod("done")
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         CustomBuilderCustomName value1 = populateAndAssertWithGeneratedCode(CustomBuilderCustomName.class);

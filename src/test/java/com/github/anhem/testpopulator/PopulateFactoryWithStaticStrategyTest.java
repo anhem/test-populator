@@ -22,7 +22,7 @@ class PopulateFactoryWithStaticStrategyTest {
     void setUp() {
         populateConfig = PopulateConfig.builder()
                 .staticMethodStrategy()
-                    .and()
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -76,8 +76,8 @@ class PopulateFactoryWithStaticStrategyTest {
     void multipleStaticMethodsWithSimplestMethodType() {
         populateConfig = PopulateConfig.builder()
                 .staticMethodStrategy()
-                    .methodType(MethodType.SIMPLEST)
-                    .and()
+                .methodType(MethodType.SIMPLEST)
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -90,8 +90,8 @@ class PopulateFactoryWithStaticStrategyTest {
     void multipleStaticMethodsWithSmallestMethodType() {
         populateConfig = PopulateConfig.builder()
                 .staticMethodStrategy()
-                    .methodType(MethodType.SMALLEST)
-                    .and()
+                .methodType(MethodType.SMALLEST)
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
