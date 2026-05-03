@@ -13,8 +13,6 @@ import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.ConstructorType.*;
 import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
