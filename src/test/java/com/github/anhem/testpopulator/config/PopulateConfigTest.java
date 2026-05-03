@@ -259,6 +259,43 @@ class PopulateConfigTest {
     }
 
     @Test
+    void canSetSetterPrefixesUsingVarargs() {
+        PopulateConfig config = PopulateConfig.builder()
+                .setSetterPrefixes("p1", "p2")
+                .build();
+
+        assertThat(config.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2");
+    }
+
+    @Test
+    void canSetSetterPrefixesUsingCollection() {
+        PopulateConfig config = PopulateConfig.builder()
+                .setSetterPrefixes(Set.of("p1", "p2"))
+                .build();
+
+        assertThat(config.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2");
+    }
+
+    @Test
+    void canAddSetterPrefixesUsingCollection() {
+        PopulateConfig config = PopulateConfig.builder()
+                .addSetterPrefixes(Set.of("p1"))
+                .addSetterPrefixes(List.of("p2"))
+                .build();
+
+        assertThat(config.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2");
+    }
+
+    @Test
+    void canSetBuilderPatternDirectly() {
+        PopulateConfig config = PopulateConfig.builder()
+                .builderPattern(LOMBOK)
+                .build();
+
+        assertThat(config.getBuilderPattern()).isEqualTo(LOMBOK);
+    }
+
+    @Test
     void pluralMethodsReplaceExistingConfig() {
         PopulateConfig config = PopulateConfig.builder()
                 .setBlacklistedMethods("m1")
