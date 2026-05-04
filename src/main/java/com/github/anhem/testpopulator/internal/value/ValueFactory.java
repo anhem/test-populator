@@ -48,7 +48,12 @@ public class ValueFactory {
     private final Map<String, OverridePopulate<?>> overridePopulateNames;
     private final BuilderPattern builderPattern;
 
-    public ValueFactory(boolean setRandomValues, Map<Class<?>, OverridePopulate<?>> overridePopulates, Map<String, OverridePopulate<?>> overridePopulateNames, BuilderPattern builderPattern) {
+    public ValueFactory(
+            boolean setRandomValues,
+            Map<Class<?>, OverridePopulate<?>> overridePopulates,
+            Map<String, OverridePopulate<?>> overridePopulateNames,
+            BuilderPattern builderPattern
+    ) {
         this.setRandomValues = setRandomValues;
         this.typeSuppliers = getDefaultTypeSuppliers();
         this.typeSuppliers.putAll(overridePopulates);
@@ -94,7 +99,6 @@ public class ValueFactory {
         return typeSuppliers;
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T createValue(Class<T> clazz) {
         return createValue(clazz, null);
     }
