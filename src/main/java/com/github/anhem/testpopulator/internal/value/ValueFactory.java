@@ -55,12 +55,12 @@ public class ValueFactory {
             BuilderPattern builderPattern
     ) {
         this.setRandomValues = setRandomValues;
-        this.classTypeSuppliers = setTypeSuppliers(overridePopulates);
+        this.classTypeSuppliers = setClassTypeSuppliers(overridePopulates);
         this.nameTypeSuppliers = new HashMap<>(overridePopulateNames);
         this.builderPattern = builderPattern;
     }
 
-    private Map<Class<?>, TypeSupplier<?>> setTypeSuppliers(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
+    private Map<Class<?>, TypeSupplier<?>> setClassTypeSuppliers(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
         Map<Class<?>, TypeSupplier<?>> typeSuppliers = new HashMap<>();
         typeSuppliers.put(Integer.class, this::getInteger);
         typeSuppliers.put(int.class, this::getInteger);
