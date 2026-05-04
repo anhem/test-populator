@@ -148,6 +148,23 @@ PopulateConfig populateConfig = PopulateConfig.builder()
 
 Instead of a lambda, you can also implement the `OverridePopulate` interface for more complex cases.
 
+#### `overridePopulateNames`
+
+Similar to `overridePopulates`, but allows you to provide custom logic based on the **name of the field or method parameter**, rather than just the class type. 
+
+This is particularly useful when you have multiple fields of the same type but want to assign them different values or if you want to target a specific field across multiple classes.
+
+```java
+PopulateConfig populateConfig = PopulateConfig.builder()
+        // Targets a field named 'fromDate'
+        .addOverridePopulate("fromDate", () -> LocalDate.of(2021, 1, 1))
+        // Targets a setter method named 'setFromDate'
+        .addOverridePopulate("setFromDate", () -> LocalDate.of(2021, 1, 1))
+        .build();
+```
+
+`overridePopulateNames` takes precedence over `overridePopulates`.
+
 #### `nullOnCircularDependency`
 
 Handles circular dependencies (e.g., `ClassA` has a field of `ClassB`, and `ClassB` has a field of `ClassA`).
@@ -256,6 +273,12 @@ Or a single override using a convenience method:
 
 ```java
 MyClass myClass = populateFactory.populate(MyClass.class, String.class, () -> "localValue");
+```
+
+You can also provide name-based overrides:
+
+```java
+MyClass myClass = populateFactory.populate(MyClass.class, "stringValue", () -> "localValue");
 ```
 
 ### "Full Coverage" Setup
