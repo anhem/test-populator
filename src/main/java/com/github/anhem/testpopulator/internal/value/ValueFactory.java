@@ -44,8 +44,8 @@ public class ValueFactory {
 
 
     private final boolean setRandomValues;
-    private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
-    private final Map<String, OverridePopulate<?>> overridePopulateNames;
+    private final Map<Class<?>, TypeSupplier<?>> classTypeSuppliers;
+    private final Map<String, TypeSupplier<?>> nameTypeSuppliers;
     private final BuilderPattern builderPattern;
 
     public ValueFactory(
@@ -55,13 +55,12 @@ public class ValueFactory {
             BuilderPattern builderPattern
     ) {
         this.setRandomValues = setRandomValues;
-        this.typeSuppliers = getDefaultTypeSuppliers();
-        this.typeSuppliers.putAll(overridePopulates);
-        this.overridePopulateNames = overridePopulateNames;
+        this.classTypeSuppliers = setTypeSuppliers(overridePopulates);
+        this.nameTypeSuppliers = new HashMap<>(overridePopulateNames);
         this.builderPattern = builderPattern;
     }
 
-    private Map<Class<?>, TypeSupplier<?>> getDefaultTypeSuppliers() {
+    private Map<Class<?>, TypeSupplier<?>> setTypeSuppliers(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
         Map<Class<?>, TypeSupplier<?>> typeSuppliers = new HashMap<>();
         typeSuppliers.put(Integer.class, this::getInteger);
         typeSuppliers.put(int.class, this::getInteger);
@@ -96,6 +95,7 @@ public class ValueFactory {
         typeSuppliers.put(UUID.class, this::getUUID);
         typeSuppliers.put(byte.class, this::getByte);
         typeSuppliers.put(Byte.class, this::getByte);
+        typeSuppliers.putAll(overridePopulates);
         return typeSuppliers;
     }
 
@@ -109,21 +109,21 @@ public class ValueFactory {
             return getEnum(clazz);
         }
 
-        if (name != null && overridePopulateNames.containsKey(name)) {
-            return (T) overridePopulateNames.get(name).create();
+        if (name != null && nameTypeSuppliers.containsKey(name)) {
+            return (T) nameTypeSuppliers.get(name).create();
         }
 
-        return Optional.ofNullable(typeSuppliers.get(clazz))
+        return Optional.ofNullable(classTypeSuppliers.get(clazz))
                 .map(supplier -> (T) supplier.create())
                 .orElseThrow(() -> new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName())));
     }
 
     public boolean hasType(Class<?> clazz) {
-        return clazz.isEnum() || typeSuppliers.containsKey(clazz);
+        return clazz.isEnum() || classTypeSuppliers.containsKey(clazz);
     }
 
     public boolean hasOverridePopulateName(String name) {
-        return overridePopulateNames.containsKey(name);
+        return nameTypeSuppliers.containsKey(name);
     }
 
     private <T> T getEnum(Class<T> clazz) {
