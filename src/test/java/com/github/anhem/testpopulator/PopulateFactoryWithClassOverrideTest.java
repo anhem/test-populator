@@ -15,7 +15,7 @@ import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGe
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
-class PopulateFactoryWithOverridePopulateTest {
+class PopulateFactoryWithClassOverrideTest {
 
     private PopulateFactory populateFactory;
     private PopulateConfig populateConfig;

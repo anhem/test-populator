@@ -1,11 +1,13 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.MethodType;
+import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
 import com.github.anhem.testpopulator.model.java.field.Fields;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithConstructor;
+import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoWithMultipleCustomSetters;
 import com.github.anhem.testpopulator.model.java.stc.MultipleStaticMethods;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
@@ -67,6 +70,37 @@ class PopulateFactoryTest {
         assertThatThrownBy(() -> populateFactory.populate(PojoPrivateConstructor.class))
                 .isInstanceOf(PopulateException.class)
                 .hasMessageContaining("No matching strategy found");
+    }
+
+    @Test
+    void canPopulateWithMapOverrides() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        String overrideValue = "overridden";
+        Map<Class<?>, OverridePopulate<?>> overrides = Map.of(String.class, () -> overrideValue);
+
+        String result = populateFactory.populate(String.class, overrides);
+
+        assertThat(result).isEqualTo(overrideValue);
+    }
+
+    @Test
+    void canPopulateWithClassOverride() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        String overrideValue = "overridden";
+
+        String result = populateFactory.populate(String.class, String.class, () -> overrideValue);
+
+        assertThat(result).isEqualTo(overrideValue);
+    }
+
+    @Test
+    void canPopulateWithNameAndClassOverride() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        String overrideValue = "overridden";
+
+        Pojo pojo = populateFactory.populate(Pojo.class, "setStringValue", String.class, () -> overrideValue);
+
+        assertThat(pojo.getStringValue()).isEqualTo(overrideValue);
     }
 
     private static PopulateConfig createFullyConfiguredPopulateConfig() {

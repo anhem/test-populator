@@ -206,29 +206,29 @@ class PopulateConfigTest {
 
     @Test
     void setNameOverridesReplacesExisting() {
-        Map<String, OverridePopulate<?>> overrides = new HashMap<>();
-        overrides.put("name1", () -> "val1");
-        overrides.put("name2", () -> "val2");
+        Map<OverrideTarget, OverridePopulate<?>> overrides = new HashMap<>();
+        overrides.put(OverrideTarget.of("name1", String.class), () -> "val1");
+        overrides.put(OverrideTarget.of("name2", String.class), () -> "val2");
 
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .setNameOverrides(overrides)
                 .build();
 
         assertThat(populateConfig.getNameOverrides()).hasSize(2);
-        assertThat(populateConfig.getNameOverrides()).containsKey("name1");
-        assertThat(populateConfig.getNameOverrides()).containsKey("name2");
+        assertThat(populateConfig.getNameOverrides()).containsKey(OverrideTarget.of("name1", String.class));
+        assertThat(populateConfig.getNameOverrides()).containsKey(OverrideTarget.of("name2", String.class));
     }
 
     @Test
     void addNameOverridesAddsToExisting() {
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .addOverride("name1", () -> "val1")
-                .addNameOverrides(Map.of("name2", () -> "val3"))
+                .addOverride("name1", String.class, () -> "val1")
+                .addNameOverrides(Map.of(OverrideTarget.of("name2", String.class), () -> "val3"))
                 .build();
 
         assertThat(populateConfig.getNameOverrides()).hasSize(2);
-        assertThat(populateConfig.getNameOverrides().get("name1").create()).isEqualTo("val1");
-        assertThat(populateConfig.getNameOverrides().get("name2").create()).isEqualTo("val3");
+        assertThat(populateConfig.getNameOverrides().get(OverrideTarget.of("name1", String.class)).create()).isEqualTo("val1");
+        assertThat(populateConfig.getNameOverrides().get(OverrideTarget.of("name2", String.class)).create()).isEqualTo("val3");
     }
 
     @Test
@@ -266,7 +266,7 @@ class PopulateConfigTest {
     void toBuilderCreatesCopy() {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .addOverride(Integer.class, () -> 1)
-                .addOverride("name", () -> "val")
+                .addOverride("name", String.class, () -> "val")
                 .build();
 
         PopulateConfig copy = populateConfig.toBuilder().build();

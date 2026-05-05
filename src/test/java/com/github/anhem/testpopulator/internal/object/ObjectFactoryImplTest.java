@@ -247,7 +247,7 @@ class ObjectFactoryImplTest {
         String overrideName = "myCustomName";
         List<String> overrideValue = List.of("myOverriddenValue");
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .addOverride(overrideName, new OverridePopulate<>() {
+                .addOverride(overrideName, List.class, new OverridePopulate<>() {
                     @Override
                     public Object create() {
                         return overrideValue;

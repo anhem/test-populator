@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
@@ -239,7 +240,7 @@ class PopulateFactoryWithSetterStrategyTest {
     void canPopulateBasedOnCustomName() {
         LocalDate localDate = LocalDate.of(2000, 1, 1);
         populateConfig = populateConfig.toBuilder()
-                .addOverride("setFromDate", () -> localDate)
+                .addOverride("setFromDate", LocalDate.class, () -> localDate)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 
@@ -262,7 +263,7 @@ class PopulateFactoryWithSetterStrategyTest {
                 return "List.of(\"foo\", \"bar\")";
             }
         };
-        Pojo pojo = populateFactory.populate(Pojo.class, Map.of("setListOfStrings", listOverride));
+        Pojo pojo = populateFactory.populate(Pojo.class, Map.of(OverrideTarget.of("setListOfStrings", List.class), listOverride));
 
         assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }

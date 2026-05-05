@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator.internal.value;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.util.RandomUtil;
 
@@ -45,13 +46,13 @@ public class ValueFactory {
 
     private final boolean setRandomValues;
     private final Map<Class<?>, TypeSupplier<?>> classTypeSuppliers;
-    private final Map<String, TypeSupplier<?>> nameTypeSuppliers;
+    private final Map<OverrideTarget, TypeSupplier<?>> nameTypeSuppliers;
     private final BuilderPattern builderPattern;
 
     public ValueFactory(
             boolean setRandomValues,
             Map<Class<?>, OverridePopulate<?>> classOverrides,
-            Map<String, OverridePopulate<?>> nameOverrides,
+            Map<OverrideTarget, OverridePopulate<?>> nameOverrides,
             BuilderPattern builderPattern
     ) {
         this.setRandomValues = setRandomValues;
@@ -109,8 +110,11 @@ public class ValueFactory {
             return getEnum(clazz);
         }
 
-        if (name != null && nameTypeSuppliers.containsKey(name)) {
-            return (T) nameTypeSuppliers.get(name).create();
+        if (name != null) {
+            OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
+            if (nameTypeSuppliers.containsKey(overrideTarget)) {
+                return (T) nameTypeSuppliers.get(overrideTarget).create();
+            }
         }
 
         return Optional.ofNullable(classTypeSuppliers.get(clazz))
@@ -122,8 +126,8 @@ public class ValueFactory {
         return clazz.isEnum() || classTypeSuppliers.containsKey(clazz);
     }
 
-    public boolean hasOverridePopulateName(String name) {
-        return nameTypeSuppliers.containsKey(name);
+    public boolean hasOverridePopulateName(String name, Class<?> clazz) {
+        return nameTypeSuppliers.containsKey(OverrideTarget.of(name, clazz));
     }
 
     private <T> T getEnum(Class<T> clazz) {

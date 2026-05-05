@@ -150,20 +150,20 @@ Instead of a lambda, you can also implement the `OverridePopulate` interface for
 
 #### `nameOverrides`
 
-Similar to `classOverrides`, but allows you to provide custom logic based on the **name of the field or method parameter**, rather than just the class type. 
+Similar to `classOverrides`, but allows you to provide custom logic based on the **name of the field or method parameter**, and its **expected class type**.
 
 This is particularly useful when you have multiple fields of the same type but want to assign them different values or if you want to target a specific field across multiple classes.
 
 ```java
 PopulateConfig populateConfig = PopulateConfig.builder()
-        // Targets a field named 'fromDate'
-        .addOverride("fromDate", () -> LocalDate.of(2021, 1, 1))
-        // Targets a setter method named 'setFromDate'
-        .addOverride("setFromDate", () -> LocalDate.of(2021, 1, 1))
+        // Targets a field named 'fromDate' of type LocalDate
+        .addOverride("fromDate", LocalDate.class, () -> LocalDate.of(2021, 1, 1))
+        // Targets a setter method named 'setFromDate' of type LocalDate
+        .addOverride("setFromDate", LocalDate.class, () -> LocalDate.of(2021, 1, 1))
         .build();
 ```
 
-`nameOverrides` takes precedence over `classOverrides`.
+`nameOverrides` takes precedence over `classOverrides`. Name-based overrides are fully type-safe; an override is only applied if both the name and the expected type match exactly. If no match is found, the library falls back to class overrides or default population logic.
 
 #### `nullOnCircularDependency`
 
@@ -278,7 +278,7 @@ MyClass myClass = populateFactory.populate(MyClass.class, String.class, () -> "l
 You can also provide name-based overrides:
 
 ```java
-MyClass myClass = populateFactory.populate(MyClass.class, "stringValue", () -> "localValue");
+MyClass myClass = populateFactory.populate(MyClass.class, "stringValue", String.class, () -> "localValue");
 ```
 
 ### "Full Coverage" Setup

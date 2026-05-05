@@ -91,7 +91,7 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
     void canOverrideCollectionByName() {
         List<String> list = List.of("foo", "bar");
         populateConfig = populateConfig.toBuilder()
-                .addOverride("strings", new OverridePopulate<>() {
+                .addOverride("strings", List.class, new OverridePopulate<>() {
                     @Override
                     public List<String> create() {
                         return list;
@@ -113,7 +113,7 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
     @Test
     void canPopulateBasedOnCustomName() {
         populateConfig = populateConfig.toBuilder()
-                .addOverride("available", () -> true)
+                .addOverride("available", boolean.class, () -> true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 

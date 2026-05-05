@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
@@ -172,7 +171,7 @@ class PopulateFactoryWithFieldStrategyTest {
     void canPopulateBasedOnCustomName() {
         LocalDate localDate = LocalDate.of(2000, 1, 1);
         populateConfig = populateConfig.toBuilder()
-                .addOverride("fromDate", () -> localDate)
+                .addOverride("fromDate", LocalDate.class, () -> localDate)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 
@@ -184,7 +183,7 @@ class PopulateFactoryWithFieldStrategyTest {
 
     @Test
     void canOverrideCollectionByName() {
-        Pojo pojo = populateFactory.populate(Pojo.class, Map.of("listOfStrings", () -> List.of("foo", "bar")));
+        Pojo pojo = populateFactory.populate(Pojo.class, "listOfStrings", List.class, () -> List.of("foo", "bar"));
 
         assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }

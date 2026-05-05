@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
 
@@ -217,8 +218,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
             return stringSupplier.apply(object);
         }
 
-        if (name != null && populateConfig.getNameOverrides().containsKey(name)) {
-            return populateConfig.getNameOverrides().get(name).createString();
+        if (name != null) {
+            OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
+            if (populateConfig.getNameOverrides().containsKey(overrideTarget)) {
+                return populateConfig.getNameOverrides().get(overrideTarget).createString();
+            }
         }
 
         return populateConfig.getClassOverrides().getOrDefault(clazz, () -> {
