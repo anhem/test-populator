@@ -89,7 +89,7 @@ class PopulateFactoryTest {
                 .and()
                 .randomValues(true)
                 .accessNonPublicConstructors(true)
-                .addOverridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+                .addOverride(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
                 .objectFactoryEnabled(false)
                 .nullOnCircularDependency(true)
                 .build();

@@ -173,7 +173,7 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     void canOverrideCollectionByName() {
         List<String> list = List.of("foo", "bar");
         populateConfig = populateConfig.toBuilder()
-                .addOverridePopulate("listOfStrings", new OverridePopulate<>() {
+                .addOverride("listOfStrings", new OverridePopulate<>() {
                     @Override
                     public List<String> create() {
                         return list;

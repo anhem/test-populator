@@ -172,7 +172,7 @@ class PopulateFactoryWithFieldStrategyTest {
     void canPopulateBasedOnCustomName() {
         LocalDate localDate = LocalDate.of(2000, 1, 1);
         populateConfig = populateConfig.toBuilder()
-                .addOverridePopulate("fromDate", () -> localDate)
+                .addOverride("fromDate", () -> localDate)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 

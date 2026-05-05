@@ -247,7 +247,7 @@ class ObjectFactoryImplTest {
         String overrideName = "myCustomName";
         List<String> overrideValue = List.of("myOverriddenValue");
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .addOverridePopulate(overrideName, new OverridePopulate<>() {
+                .addOverride(overrideName, new OverridePopulate<>() {
                     @Override
                     public Object create() {
                         return overrideValue;
@@ -274,7 +274,7 @@ class ObjectFactoryImplTest {
         Class<List<String>> overrideClass = (Class<List<String>>) (Class<?>) List.class;
         List<String> overrideValue = List.of("myOverriddenValue");
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .addOverridePopulate(overrideClass, new OverridePopulate<>() {
+                .addOverride(overrideClass, new OverridePopulate<>() {
                     @Override
                     public List<String> create() {
                         return overrideValue;

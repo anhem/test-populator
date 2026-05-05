@@ -23,9 +23,9 @@ class PopulateFactoryWithOverridePopulateTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .addOverridePopulate(MyUUID.class, new MyUUIDOverridePopulate())
-                .addOverridePopulate(Integer.class, () -> -1)
-                .addOverridePopulate(ZonedDateTime.class, ZonedDateTime::now)
+                .addOverride(MyUUID.class, new MyUUIDOverridePopulate())
+                .addOverride(Integer.class, () -> -1)
+                .addOverride(ZonedDateTime.class, ZonedDateTime::now)
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

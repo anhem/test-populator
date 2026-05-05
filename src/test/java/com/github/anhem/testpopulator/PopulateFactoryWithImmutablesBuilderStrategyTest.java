@@ -137,7 +137,7 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
     void canPopulateBasedOnCustomName() {
         String stringValue = "myCustomString";
         populateConfig = populateConfig.toBuilder()
-                .addOverridePopulate("stringValue", () -> stringValue)
+                .addOverride("stringValue", () -> stringValue)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 

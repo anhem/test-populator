@@ -50,17 +50,17 @@ public class ValueFactory {
 
     public ValueFactory(
             boolean setRandomValues,
-            Map<Class<?>, OverridePopulate<?>> overridePopulates,
-            Map<String, OverridePopulate<?>> overridePopulateNames,
+            Map<Class<?>, OverridePopulate<?>> classOverrides,
+            Map<String, OverridePopulate<?>> nameOverrides,
             BuilderPattern builderPattern
     ) {
         this.setRandomValues = setRandomValues;
-        this.classTypeSuppliers = setClassTypeSuppliers(overridePopulates);
-        this.nameTypeSuppliers = new HashMap<>(overridePopulateNames);
+        this.classTypeSuppliers = setClassTypeSuppliers(classOverrides);
+        this.nameTypeSuppliers = new HashMap<>(nameOverrides);
         this.builderPattern = builderPattern;
     }
 
-    private Map<Class<?>, TypeSupplier<?>> setClassTypeSuppliers(Map<Class<?>, OverridePopulate<?>> overridePopulates) {
+    private Map<Class<?>, TypeSupplier<?>> setClassTypeSuppliers(Map<Class<?>, OverridePopulate<?>> classOverrides) {
         Map<Class<?>, TypeSupplier<?>> typeSuppliers = new HashMap<>();
         typeSuppliers.put(Integer.class, this::getInteger);
         typeSuppliers.put(int.class, this::getInteger);
@@ -95,7 +95,7 @@ public class ValueFactory {
         typeSuppliers.put(UUID.class, this::getUUID);
         typeSuppliers.put(byte.class, this::getByte);
         typeSuppliers.put(Byte.class, this::getByte);
-        typeSuppliers.putAll(overridePopulates);
+        typeSuppliers.putAll(classOverrides);
         return typeSuppliers;
     }
 

@@ -217,11 +217,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
             return stringSupplier.apply(object);
         }
 
-        if (name != null && populateConfig.getOverridePopulateNames().containsKey(name)) {
-            return populateConfig.getOverridePopulateNames().get(name).createString();
+        if (name != null && populateConfig.getNameOverrides().containsKey(name)) {
+            return populateConfig.getNameOverrides().get(name).createString();
         }
 
-        return populateConfig.getOverridePopulate().getOrDefault(clazz, () -> {
+        return populateConfig.getClassOverrides().getOrDefault(clazz, () -> {
             throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
         }).createString();
     }

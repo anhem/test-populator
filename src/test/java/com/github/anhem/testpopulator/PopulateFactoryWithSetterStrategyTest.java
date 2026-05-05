@@ -239,7 +239,7 @@ class PopulateFactoryWithSetterStrategyTest {
     void canPopulateBasedOnCustomName() {
         LocalDate localDate = LocalDate.of(2000, 1, 1);
         populateConfig = populateConfig.toBuilder()
-                .addOverridePopulate("setFromDate", () -> localDate)
+                .addOverride("setFromDate", () -> localDate)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 

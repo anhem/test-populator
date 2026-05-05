@@ -73,17 +73,17 @@ public class PopulateFactory {
     /**
      * Call to create a fully populated object from a class with additional overrides for this execution
      *
-     * @param clazz                  Class that should be populated
-     * @param overridePopulates      additional overrides that take precedence over overrides in PopulateConfig
-     * @param overridePopulateNames additional overrides that take precedence over overrides in PopulateConfig
-     * @param <T>                    type of object to return
+     * @param clazz          Class that should be populated
+     * @param classOverrides additional overrides that take precedence over overrides in PopulateConfig
+     * @param nameOverrides  additional overrides that take precedence over overrides in PopulateConfig
+     * @param <T>            type of object to return
      * @return object of clazz
      */
-    public <T> T populate(Class<T> clazz, Map<Class<?>, OverridePopulate<?>> overridePopulates, Map<String, OverridePopulate<?>> overridePopulateNames) {
-        boolean noOverrides = overridePopulates.isEmpty() && overridePopulateNames.isEmpty();
+    public <T> T populate(Class<T> clazz, Map<Class<?>, OverridePopulate<?>> classOverrides, Map<String, OverridePopulate<?>> nameOverrides) {
+        boolean noOverrides = classOverrides.isEmpty() && nameOverrides.isEmpty();
         PopulateConfig config = noOverrides ? populateConfig : populateConfig.toBuilder()
-                .addOverridePopulates(overridePopulates)
-                .addOverridePopulateNames(overridePopulateNames)
+                .addClassOverrides(classOverrides)
+                .addNameOverrides(nameOverrides)
                 .build();
         Populator p = noOverrides ? populator : new Populator(createValueFactory(config));
         ObjectFactory objectFactory = config.isObjectFactoryEnabled() ? new ObjectFactoryImpl(config) : new ObjectFactoryVoid();
@@ -122,8 +122,8 @@ public class PopulateFactory {
     private static ValueFactory createValueFactory(PopulateConfig populateConfig) {
         return new ValueFactory(
                 populateConfig.useRandomValues(),
-                populateConfig.getOverridePopulate(),
-                populateConfig.getOverridePopulateNames(),
+                populateConfig.getClassOverrides(),
+                populateConfig.getNameOverrides(),
                 populateConfig.getBuilderPattern()
         );
     }

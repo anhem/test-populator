@@ -88,7 +88,7 @@ public class PopulateFactoryWithProtobufBuilderStrategyTest {
     void canPopulateBasedOnCustomName() {
         String name = "myCustomName";
         populateConfig = populateConfig.toBuilder()
-                .addOverridePopulate("setName", () -> name)
+                .addOverride("setName", () -> name)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 
