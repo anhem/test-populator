@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator.internal.populate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
+import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -30,9 +31,14 @@ public class FieldPopulator implements PopulatingStrategy {
                         try {
                             setAccessible(field, objectOfClass);
                             if (isCollectionLike(field.getType())) {
-                                field.set(objectOfClass, populator.populate(classCarrier.toCollectionCarrier(field.getType(), ((ParameterizedType) field.getGenericType()).getActualTypeArguments())));
+                                CollectionCarrier<Object> collectionCarrier = classCarrier.toCollectionCarrier(
+                                        field.getType(),
+                                        field.getName(),
+                                        ((ParameterizedType) field.getGenericType()).getActualTypeArguments()
+                                );
+                                field.set(objectOfClass, populator.populate(collectionCarrier));
                             } else {
-                                field.set(objectOfClass, populator.populate(classCarrier.toClassCarrier(field.getType())));
+                                field.set(objectOfClass, populator.populate(classCarrier.toClassCarrier(field.getType(), field.getName())));
                             }
                         } catch (Exception e) {
                             throw new PopulateException(format(FAILED_TO_SET_FIELD, field.getName(), objectOfClass.getClass().getName()), e);

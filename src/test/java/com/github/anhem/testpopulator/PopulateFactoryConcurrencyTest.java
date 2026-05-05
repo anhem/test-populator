@@ -17,7 +17,7 @@ class PopulateFactoryConcurrencyTest {
         int iterationsPerThread = 100;
         String globalValue = "global";
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .addOverridePopulate(String.class, () -> globalValue)
+                .addOverride(String.class, () -> globalValue)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);

@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.custombuilder.CustomBuilder;
 import com.github.anhem.testpopulator.model.custombuilder.CustomBuilderCustomName;
@@ -84,6 +85,41 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
                     assertThat(value.getMapOfStringsToIntegers().values()).hasSize(2);
                     assertThat(value.getSetOfIntegers()).hasSize(2);
                 });
+    }
+
+    @Test
+    void canOverrideCollectionByName() {
+        List<String> list = List.of("foo", "bar");
+        populateConfig = populateConfig.toBuilder()
+                .addOverride("strings", List.class, new OverridePopulate<>() {
+                    @Override
+                    public List<String> create() {
+                        return list;
+                    }
+
+                    @Override
+                    public String createString() {
+                        return "List.of(\"foo\", \"bar\")";
+                    }
+                })
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        CustomBuilder customBuilder = populateAndAssertWithGeneratedCode(CustomBuilder.class);
+
+        assertThat(customBuilder.getStrings()).isEqualTo(list);
+    }
+
+    @Test
+    void canPopulateBasedOnCustomName() {
+        populateConfig = populateConfig.toBuilder()
+                .addOverride("available", boolean.class, () -> true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        CustomBuilder customBuilder = populateAndAssertWithGeneratedCode(CustomBuilder.class);
+
+        assertThat(customBuilder.isBooleanValue()).isTrue();
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

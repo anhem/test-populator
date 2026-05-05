@@ -36,6 +36,9 @@ public class Populator {
 
     public <T> T populate(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
+        if (classCarrier.getName() != null && valueFactory.hasOverridePopulateName(classCarrier.getName(), clazz)) {
+            return createValue(classCarrier);
+        }
         if (valueFactory.hasType(clazz)) {
             return createValue(classCarrier);
         }
@@ -52,8 +55,8 @@ public class Populator {
     }
 
     private <T> T createValue(ClassCarrier<T> classCarrier) {
-        T value = valueFactory.createValue(classCarrier.getClazz());
-        classCarrier.getObjectFactory().value(value);
+        T value = valueFactory.createValue(classCarrier.getClazz(), classCarrier.getName());
+        classCarrier.getObjectFactory().value(value, classCarrier.getClazz(), classCarrier.getName());
         return value;
     }
 

@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
+import com.github.anhem.testpopulator.model.java.NamedDates;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.field.Fields;
 import com.github.anhem.testpopulator.model.java.field.FieldsDateAndTimeMix;
@@ -10,6 +11,9 @@ import com.github.anhem.testpopulator.model.java.setter.*;
 import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
@@ -153,6 +157,35 @@ class PopulateFactoryWithFieldStrategyTest {
         FieldsDateAndTimeMix value1 = populateAndAssert(FieldsDateAndTimeMix.class);
         FieldsDateAndTimeMix value2 = populateAndAssert(FieldsDateAndTimeMix.class);
         assertRandomlyPopulatedValues(value1, value2);
+    }
+
+    @Test
+    void canPopulateDatesBasedOnNames() {
+        NamedDates namedDates = populateFactory.populate(NamedDates.class);
+
+        assertThat(namedDates.getFromDate()).isNotNull();
+        assertThat(namedDates.getToDate()).isNotNull();
+    }
+
+    @Test
+    void canPopulateBasedOnCustomName() {
+        LocalDate localDate = LocalDate.of(2000, 1, 1);
+        populateConfig = populateConfig.toBuilder()
+                .addOverride("fromDate", LocalDate.class, () -> localDate)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        NamedDates namedDates = populateFactory.populate(NamedDates.class);
+
+        assertThat(namedDates.getFromDate()).isEqualTo(localDate);
+        assertThat(namedDates.getToDate()).isNotEqualTo(localDate);
+    }
+
+    @Test
+    void canOverrideCollectionByName() {
+        Pojo pojo = populateFactory.populate(Pojo.class, "listOfStrings", List.class, () -> List.of("foo", "bar"));
+
+        assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }
 
     private A getPopulate() {

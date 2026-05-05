@@ -35,4 +35,9 @@ public abstract class Carrier {
     public <T> CollectionCarrier<T> toCollectionCarrier(Type type, Type[] typeArguments) {
         return new CollectionCarrier<>((Class<T>) type, typeArguments, objectFactory, visited, populateConfig);
     }
+
+    @SuppressWarnings("unchecked")
+    public <T> CollectionCarrier<T> toCollectionCarrier(Type type, String name, Type[] typeArguments) {
+        return new CollectionCarrier<>((Class<T>) type, name, typeArguments, objectFactory, visited, populateConfig);
+    }
 }

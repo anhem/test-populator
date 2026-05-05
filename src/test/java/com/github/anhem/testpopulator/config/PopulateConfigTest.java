@@ -2,27 +2,26 @@ package com.github.anhem.testpopulator.config;
 
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.github.anhem.testpopulator.config.BuilderPattern.CUSTOM;
-import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
+import static com.github.anhem.testpopulator.config.BuilderPattern.*;
+import static com.github.anhem.testpopulator.config.ConstructorType.SMALLEST;
 import static com.github.anhem.testpopulator.config.PopulateConfig.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
-import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateConfigTest {
+
+    private static final PopulateConfig DEFAULT_POPULATE_CONFIG = PopulateConfig.builder().build();
 
     @Test
     void buildingPopulateConfigResultsInDefaultValues() {
         assertThat(DEFAULT_POPULATE_CONFIG).isNotNull();
         assertThat(DEFAULT_POPULATE_CONFIG.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER, STATIC_METHOD);
-        assertThat(DEFAULT_POPULATE_CONFIG.getOverridePopulate()).isEmpty();
+        assertThat(DEFAULT_POPULATE_CONFIG.getClassOverrides()).isEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.useRandomValues()).isTrue();
         assertThat(DEFAULT_POPULATE_CONFIG.canAccessNonPublicConstructors()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.getSetterPrefixes()).containsExactly("set");
@@ -44,7 +43,7 @@ class PopulateConfigTest {
                 .setterStrategy()
                     .setPrefixes("with")
                     .and()
-                .addOverridePopulate(Integer.class, () -> 1)
+                .addOverride(Integer.class, () -> 1)
                 .randomValues(false)
                 .accessNonPublicConstructors(true)
                 .nullOnCircularDependency(true)
@@ -53,385 +52,303 @@ class PopulateConfigTest {
 
         assertThat(populateConfig.getStrategyOrder()).hasSize(2);
         assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER, SETTER);
-        assertThat(populateConfig.getOverridePopulate()).hasSize(1);
-        assertThat(populateConfig.getOverridePopulate()).containsKey(Integer.class);
+        assertThat(populateConfig.getClassOverrides()).hasSize(1);
+        assertThat(populateConfig.getClassOverrides()).containsKey(Integer.class);
         assertThat(populateConfig.useRandomValues()).isFalse();
         assertThat(populateConfig.canAccessNonPublicConstructors()).isTrue();
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
-        assertThat(populateConfig.getSetterPrefixes()).hasSize(1);
         assertThat(populateConfig.getSetterPrefixes()).containsExactly("with");
         assertThat(populateConfig.isNullOnCircularDependency()).isTrue();
         assertThat(populateConfig.getMethodType()).isEqualTo(MethodType.SIMPLEST);
-        assertEqual(populateConfig.toBuilder().build(), populateConfig);
-    }
-
-    @Test
-    void buildingCustomPopulateConfigWithImplicitStrategyOrder() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .builderStrategy()
-                    .pattern(LOMBOK)
-                    .and()
-                .constructorStrategy()
-                    .and()
-                .setterStrategy()
-                    .setPrefixes("set")
-                    .and()
-                .staticMethodStrategy()
-                    .methodType(MethodType.SIMPLEST)
-                    .and()
-                .fieldStrategy()
-                    .and()
-                .mutatorStrategy()
-                    .constructorType(ConstructorType.SMALLEST)
-                    .and()
-                .build();
-
-        assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER, CONSTRUCTOR, SETTER, STATIC_METHOD, FIELD, MUTATOR);
-        assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
-        assertThat(populateConfig.getSetterPrefixes()).containsExactly("set");
-        assertThat(populateConfig.getMethodType()).isEqualTo(MethodType.SIMPLEST);
-        assertThat(populateConfig.getConstructorType()).isEqualTo(ConstructorType.SMALLEST);
-    }
-
-    @Test
-    void canBuildDirectlyFromStrategyBuilder() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .constructorStrategy()
-                .build();
-
-        assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR);
-    }
-
-    @Test
-    void reorderingUnconfiguredStrategiesThrowsException() {
-        PopulateConfigBuilder populateConfigBuilder = PopulateConfig.builder()
-                .constructorStrategy()
-                .and();
-
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> populateConfigBuilder.reorderStrategies(SETTER));
-        assertThat(illegalArgumentException.getMessage()).contains("Cannot reorder strategies that have not been configured: [SETTER]");
-    }
-
-    @Test
-    void toBuilderCanReorderStrategies() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .constructorStrategy()
-                    .and()
-                .setterStrategy()
-                    .and()
-                .build();
-
-        assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER);
-
-        PopulateConfig modifiedConfig = populateConfig.toBuilder()
-                .reorderStrategies(SETTER, CONSTRUCTOR)
-                .build();
-
-        assertThat(modifiedConfig.getStrategyOrder()).containsExactly(SETTER, CONSTRUCTOR);
-    }
-
-    @Test
-    void toBuilderCanClearStrategiesAndSetNewOrder() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .constructorStrategy()
-                    .and()
-                .build();
-
-        assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR);
-
-        PopulateConfig modifiedConfig = populateConfig.toBuilder()
-                .clearStrategies()
-                .setterStrategy()
-                .and()
-                .build();
-
-        assertThat(modifiedConfig.getStrategyOrder()).containsExactly(SETTER);
     }
 
     @Test
     void buildingCustomPopulateConfig2() {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .builderStrategy()
-                    .pattern(LOMBOK)
+                    .pattern(IMMUTABLES)
                     .and()
-                .setterStrategy()
-                    .setPrefixes("also", "with", "as")
+                .mutatorStrategy()
+                    .constructorType(SMALLEST)
                     .and()
-                .setOverridePopulates(Map.of(Integer.class, () -> 2, Double.class, () -> 3.0))
-                .randomValues(true)
-                .accessNonPublicConstructors(false)
-                .nullOnCircularDependency(false)
-                .addBlacklistedMethods("blacklistedMethod")
-                .addBlacklistedFields("blacklistedField")
+                .addBlacklistedMethods("getSomething")
+                .addBlacklistedFields("something")
                 .build();
 
         assertThat(populateConfig.getStrategyOrder()).hasSize(2);
-        assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER, SETTER);
-        assertThat(populateConfig.getOverridePopulate()).hasSize(2);
-        assertThat(populateConfig.getOverridePopulate()).containsKey(Integer.class);
-        assertThat(populateConfig.getOverridePopulate()).containsKey(Double.class);
-        assertThat(populateConfig.useRandomValues()).isTrue();
-        assertThat(populateConfig.canAccessNonPublicConstructors()).isFalse();
-        assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
-        assertThat(populateConfig.getSetterPrefixes()).containsExactlyInAnyOrder("also", "with", "as");
-        assertThat(populateConfig.isNullOnCircularDependency()).isFalse();
-        assertThat(DEFAULT_POPULATE_CONFIG.getMethodType()).isEqualTo(MethodType.LARGEST);
-        assertThat(populateConfig.getBlacklistedMethods()).containsExactly("blacklistedMethod");
-        assertThat(populateConfig.getBlacklistedFields()).containsExactly("blacklistedField");
-        assertEqual(populateConfig.toBuilder().build(), populateConfig);
+        assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER, MUTATOR);
+        assertThat(populateConfig.getBuilderPattern()).isEqualTo(IMMUTABLES);
+        assertThat(populateConfig.getConstructorType()).isEqualTo(SMALLEST);
+        assertThat(populateConfig.getBlacklistedMethods()).contains("getSomething");
+        assertThat(populateConfig.getBlacklistedFields()).contains("something");
     }
 
     @Test
-    void buildingCustomPopulateConfigWithAdditiveMethods() {
-        String blacklistedField = "blacklistedField";
-        String blacklistedMethod = "blacklistedMethod";
+    void buildingCustomPopulateConfig3() {
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .build()
-                .toBuilder()
-                .addSetterPrefixes("with")
-                .addBlacklistedFields(blacklistedField)
-                .addBlacklistedMethods(blacklistedMethod)
-                .setOverridePopulates(Map.of(Integer.class, () -> 2, Double.class, () -> 3.0))
-                .build()
-                .toBuilder()
-                .addOverridePopulate(Integer.class, () -> 1)
-                .build();
-
-        assertThat(populateConfig.getSetterPrefixes()).containsExactlyInAnyOrder("set", "with");
-        assertThat(populateConfig.getBlacklistedFields()).containsExactlyInAnyOrderElementsOf(Stream.concat(DEFAULT_BLACKLISTED_FIELDS.stream(), Stream.of(blacklistedField)).collect(Collectors.toList()));
-        assertThat(populateConfig.getBlacklistedMethods()).containsExactlyInAnyOrderElementsOf(Stream.concat(DEFAULT_BLACKLISTED_METHODS.stream(), Stream.of(blacklistedMethod)).collect(Collectors.toList()));
-        assertThat(populateConfig.getOverridePopulate()).hasSize(2);
-        assertThat(populateConfig.getOverridePopulate().get(Integer.class).create()).isEqualTo(1);
-        assertThat(populateConfig.getOverridePopulate().get(Double.class).create()).isEqualTo(3.0);
-    }
-
-    @Test
-    void toBuilderCanAddConfigAdditivelyUsingCollections() {
-        PopulateConfig config = PopulateConfig.builder()
-                .addBlacklistedMethods(Set.of("m1"))
-                .addBlacklistedFields(List.of("f1"))
-                .setterStrategy()
-                    .addPrefixes(Set.of("p1"))
+                .staticMethodStrategy()
+                    .methodType(MethodType.SMALLEST)
                     .and()
-                .build();
-
-        PopulateConfig modified = config.toBuilder()
-                .addBlacklistedMethods(List.of("m2"))
-                .addBlacklistedFields(Set.of("f2"))
-                .setterStrategy()
-                    .addPrefixes(List.of("p2"))
-                    .and()
-                .build();
-
-        assertThat(modified.getBlacklistedMethods()).containsExactlyInAnyOrder("m1", "m2");
-        assertThat(modified.getBlacklistedFields()).containsExactlyInAnyOrder("f1", "f2");
-        assertThat(modified.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2");
-    }
-
-    @Test
-    void toBuilderCanAddConfigAdditivelyUsingVarargs() {
-        PopulateConfig config = PopulateConfig.builder()
-                .setterStrategy()
-                .addPrefixes("p1")
-                .and()
-                .build();
-
-        PopulateConfig modified = config.toBuilder()
-                .setterStrategy()
-                .addPrefixes("p2", "p3")
-                .and()
-                .build();
-
-        assertThat(modified.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2", "p3");
-    }
-
-    @Test
-    void canAddOverridePopulatesUsingMap() {
-        PopulateConfig config = PopulateConfig.builder()
-                .addOverridePopulate(String.class, () -> "s1")
-                .addOverridePopulates(Map.of(Integer.class, () -> 1, Double.class, () -> 2.0))
-                .build();
-
-        assertThat(config.getOverridePopulate()).hasSize(3);
-        assertThat(config.getOverridePopulate().get(String.class).create()).isEqualTo("s1");
-        assertThat(config.getOverridePopulate().get(Integer.class).create()).isEqualTo(1);
-        assertThat(config.getOverridePopulate().get(Double.class).create()).isEqualTo(2.0);
-    }
-
-    @Test
-    void canSetSetterPrefixesUsingVarargs() {
-        PopulateConfig config = PopulateConfig.builder()
-                .setSetterPrefixes("p1", "p2")
-                .build();
-
-        assertThat(config.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2");
-    }
-
-    @Test
-    void canSetSetterPrefixesUsingCollection() {
-        PopulateConfig config = PopulateConfig.builder()
-                .setSetterPrefixes(Set.of("p1", "p2"))
-                .build();
-
-        assertThat(config.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2");
-    }
-
-    @Test
-    void canAddSetterPrefixesUsingCollection() {
-        PopulateConfig config = PopulateConfig.builder()
-                .addSetterPrefixes(Set.of("p1"))
-                .addSetterPrefixes(List.of("p2"))
-                .build();
-
-        assertThat(config.getSetterPrefixes()).containsExactlyInAnyOrder("p1", "p2");
-    }
-
-    @Test
-    void canSetBuilderPatternDirectly() {
-        PopulateConfig config = PopulateConfig.builder()
-                .builderPattern(LOMBOK)
-                .build();
-
-        assertThat(config.getBuilderPattern()).isEqualTo(LOMBOK);
-    }
-
-    @Test
-    void pluralMethodsReplaceExistingConfig() {
-        PopulateConfig config = PopulateConfig.builder()
-                .setBlacklistedMethods("m1")
-                .setBlacklistedFields("f1")
-                .setterStrategy()
-                    .setPrefixes("p1")
-                    .and()
-                .build();
-
-        PopulateConfig modified = config.toBuilder()
-                .setBlacklistedMethods("m2")
-                .setBlacklistedFields("f2")
-                .setterStrategy()
-                    .setPrefixes("p2")
-                    .and()
-                .build();
-
-        assertThat(modified.getBlacklistedMethods()).containsExactly("m2");
-        assertThat(modified.getBlacklistedFields()).containsExactly("f2");
-        assertThat(modified.getSetterPrefixes()).containsExactly("p2");
-    }
-
-    @Test
-    void combiningAccessNonPublicConstructorsAndObjectFactoryEnabledThrowsException() {
-        PopulateConfigBuilder populateConfigBuilder = DEFAULT_POPULATE_CONFIG.toBuilder()
-                .accessNonPublicConstructors(true)
-                .objectFactoryEnabled(true);
-
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, populateConfigBuilder::build);
-        assertThat(illegalArgumentException.getMessage()).isEqualTo(INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY);
-    }
-
-    @Test
-    void combiningFieldStrategyAndObjectFactoryEnabledThrowsException() {
-        PopulateConfigBuilder populateConfigBuilder = DEFAULT_POPULATE_CONFIG.toBuilder()
                 .fieldStrategy()
-                .and()
-                .objectFactoryEnabled(true);
-
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, populateConfigBuilder::build);
-        assertThat(illegalArgumentException.getMessage()).isEqualTo(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
-    }
-
-    @Test
-    void toStringReturnsAllConfiguredFields() {
-        List<String> fieldNames = Arrays.stream(PopulateConfig.class.getDeclaredFields())
-                .filter(field -> !Modifier.isStatic(field.getModifiers()))
-                .map(Field::getName)
-                .map(s -> String.format("%s=", s))
-                .collect(Collectors.toList());
-
-        assertThat(DEFAULT_POPULATE_CONFIG.toString()).contains(fieldNames);
-    }
-
-    @Test
-    void buildingCustomPopulateConfigWithProtobufBuilderPattern() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .builderStrategy()
-                    .pattern(BuilderPattern.PROTOBUF)
                     .and()
                 .build();
 
-        assertThat(populateConfig.getBuilderPattern()).isEqualTo(BuilderPattern.PROTOBUF);
-        assertThat(populateConfig.getBuilderMethod()).isEqualTo(PROTOBUF_BUILDER_METHOD);
-        assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
+        assertThat(populateConfig.getStrategyOrder()).hasSize(2);
+        assertThat(populateConfig.getStrategyOrder()).containsExactly(STATIC_METHOD, FIELD);
+        assertThat(populateConfig.getMethodType()).isEqualTo(MethodType.SMALLEST);
     }
 
     @Test
-    void buildingCustomPopulateConfigWithCustomBuilderPattern() {
+    void buildingCustomPopulateConfig4() {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .builderStrategy()
                     .pattern(CUSTOM)
-                    .method("customBuilder")
-                    .buildMethod("customBuild")
+                    .method("create")
+                    .buildMethod("finish")
                     .and()
                 .build();
 
+        assertThat(populateConfig.getStrategyOrder()).hasSize(1);
+        assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER);
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(CUSTOM);
-        assertThat(populateConfig.getBuilderMethod()).isEqualTo("customBuilder");
-        assertThat(populateConfig.getBuildMethod()).isEqualTo("customBuild");
+        assertThat(populateConfig.getBuilderMethod()).isEqualTo("create");
+        assertThat(populateConfig.getBuildMethod()).isEqualTo("finish");
     }
 
     @Test
-    void buildingCustomPopulateConfigWithLists() {
-        Set<String> blacklistedMethods = Set.of("method1", "method2");
-        Set<String> blacklistedFields = Set.of("field1", "field2");
-        Set<String> setterPrefixes = Set.of("set", "with");
+    void reorderStrategiesThrowsExceptionIfStrategyNotConfigured() {
+        PopulateConfig.PopulateConfigBuilder builder = PopulateConfig.builder()
+                .constructorStrategy()
+                .and();
 
+        assertThatThrownBy(() -> builder.reorderStrategies(SETTER, CONSTRUCTOR))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Cannot reorder strategies that have not been configured: [SETTER]");
+    }
+
+    @Test
+    void reorderStrategiesWorks() {
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .setBlacklistedMethods(blacklistedMethods)
-                .setBlacklistedFields(blacklistedFields)
+                .constructorStrategy()
+                    .and()
                 .setterStrategy()
-                    .setPrefixes(setterPrefixes)
+                    .and()
+                .reorderStrategies(SETTER, CONSTRUCTOR)
+                .build();
+
+        assertThat(populateConfig.getStrategyOrder()).containsExactly(SETTER, CONSTRUCTOR);
+    }
+
+    @Test
+    void setBlacklistedMethodsReplacesExisting() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .setBlacklistedMethods("m1", "m2")
+                .build();
+
+        assertThat(populateConfig.getBlacklistedMethods()).containsExactlyInAnyOrder("m1", "m2");
+    }
+
+    @Test
+    void addBlacklistedMethodsAddsToExisting() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addBlacklistedMethods("m1")
+                .addBlacklistedMethods("m2")
+                .build();
+
+        assertThat(populateConfig.getBlacklistedMethods()).contains("m1", "m2");
+    }
+
+    @Test
+    void setBlacklistedFieldsReplacesExisting() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .setBlacklistedFields("f1", "f2")
+                .build();
+
+        assertThat(populateConfig.getBlacklistedFields()).containsExactlyInAnyOrder("f1", "f2");
+    }
+
+    @Test
+    void addBlacklistedFieldsAddsToExisting() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addBlacklistedFields("f1")
+                .addBlacklistedFields("f2")
+                .build();
+
+        assertThat(populateConfig.getBlacklistedFields()).contains("f1", "f2");
+    }
+
+    @Test
+    void setClassOverridesReplacesExisting() {
+        Map<Class<?>, OverridePopulate<?>> overrides = new HashMap<>();
+        overrides.put(Integer.class, () -> 1);
+        overrides.put(Double.class, () -> 2.0);
+
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .setClassOverrides(overrides)
+                .build();
+
+        assertThat(populateConfig.getClassOverrides()).hasSize(2);
+        assertThat(populateConfig.getClassOverrides()).containsKey(Integer.class);
+        assertThat(populateConfig.getClassOverrides()).containsKey(Double.class);
+    }
+
+    @Test
+    void addClassOverridesAddsToExisting() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(Integer.class, () -> 1)
+                .addClassOverrides(Map.of(Double.class, () -> 3.0))
+                .build();
+
+        assertThat(populateConfig.getClassOverrides()).hasSize(2);
+        assertThat(populateConfig.getClassOverrides().get(Integer.class).create()).isEqualTo(1);
+        assertThat(populateConfig.getClassOverrides().get(Double.class).create()).isEqualTo(3.0);
+    }
+
+    @Test
+    void setNameOverridesReplacesExisting() {
+        Map<OverrideTarget, OverridePopulate<?>> overrides = new HashMap<>();
+        overrides.put(OverrideTarget.of("name1", String.class), () -> "val1");
+        overrides.put(OverrideTarget.of("name2", String.class), () -> "val2");
+
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .setNameOverrides(overrides)
+                .build();
+
+        assertThat(populateConfig.getNameOverrides()).hasSize(2);
+        assertThat(populateConfig.getNameOverrides()).containsKey(OverrideTarget.of("name1", String.class));
+        assertThat(populateConfig.getNameOverrides()).containsKey(OverrideTarget.of("name2", String.class));
+    }
+
+    @Test
+    void addNameOverridesAddsToExisting() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride("name1", String.class, () -> "val1")
+                .addNameOverrides(Map.of(OverrideTarget.of("name2", String.class), () -> "val3"))
+                .build();
+
+        assertThat(populateConfig.getNameOverrides()).hasSize(2);
+        assertThat(populateConfig.getNameOverrides().get(OverrideTarget.of("name1", String.class)).create()).isEqualTo("val1");
+        assertThat(populateConfig.getNameOverrides().get(OverrideTarget.of("name2", String.class)).create()).isEqualTo("val3");
+    }
+
+    @Test
+    void setterPrefixesMethods() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .setterStrategy()
+                    .setPrefixes(List.of("with"))
                     .and()
                 .build();
+        assertThat(populateConfig.getSetterPrefixes()).containsExactly("with");
 
-        assertThat(populateConfig.getBlacklistedMethods()).isEqualTo(blacklistedMethods);
-        assertThat(populateConfig.getBlacklistedFields()).isEqualTo(blacklistedFields);
-        assertThat(populateConfig.getSetterPrefixes()).isEqualTo(setterPrefixes);
-    }
-
-    @Test
-    void buildingCustomPopulateConfigWithReorderStrategies() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .constructorStrategy().and()
-                .setterStrategy().and()
-                .reorderStrategies(CONSTRUCTOR, SETTER)
-                .build();
-
-        assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR, SETTER);
-    }
-
-    @Test
-    void buildingPopulateConfigWithBuilderMethods() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .builderMethod("builder")
-                .buildMethod("build")
-                .constructorType(ConstructorType.SMALLEST)
-                .build();
-
-        assertThat(populateConfig.getBuilderMethod()).isEqualTo("builder");
-        assertThat(populateConfig.getBuildMethod()).isEqualTo("build");
-        assertThat(populateConfig.getConstructorType()).isEqualTo(ConstructorType.SMALLEST);
-    }
-
-    @Test
-    void buildingCustomPopulateConfigWithLombokBuilderPatternUsesDefaultMethods() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .builderStrategy()
-                    .pattern(LOMBOK)
+        populateConfig = PopulateConfig.builder()
+                .setterStrategy()
+                    .setPrefixes("with")
                     .and()
+                .build();
+        assertThat(populateConfig.getSetterPrefixes()).containsExactly("with");
+
+        populateConfig = PopulateConfig.builder()
+                .setterStrategy()
+                    .addPrefixes(List.of("set"))
+                    .and()
+                .build();
+        assertThat(populateConfig.getSetterPrefixes()).contains("set");
+
+        populateConfig = PopulateConfig.builder()
+                .setterStrategy()
+                    .addPrefixes("set")
+                    .and()
+                .build();
+        assertThat(populateConfig.getSetterPrefixes()).contains("set");
+    }
+
+    @Test
+    void toBuilderCreatesCopy() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(Integer.class, () -> 1)
+                .addOverride("name", String.class, () -> "val")
+                .build();
+
+        PopulateConfig copy = populateConfig.toBuilder().build();
+
+        assertEqual(copy, populateConfig);
+        assertThat(copy).isNotSameAs(populateConfig);
+    }
+
+    @Test
+    void validateThrowsExceptionWhenAccessNonPublicConstructorsAndObjectFactoryEnabled() {
+        assertThatThrownBy(() -> PopulateConfig.builder()
+                .accessNonPublicConstructors(true)
+                .objectFactoryEnabled(true)
+                .build())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY);
+    }
+
+    @Test
+    void validateThrowsExceptionWhenFieldStrategyAndObjectFactoryEnabled() {
+        assertThatThrownBy(() -> PopulateConfig.builder()
+                .fieldStrategy()
+                .and()
+                .objectFactoryEnabled(true)
+                .build())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
+    }
+
+    @Test
+    void builderPatternSpecificMethodNames() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .builderPattern(PROTOBUF)
+                .build();
+
+        assertThat(populateConfig.getBuilderPattern()).isEqualTo(PROTOBUF);
+        assertThat(populateConfig.getBuilderMethod()).isEqualTo(PROTOBUF_BUILDER_METHOD);
+        assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
+
+        populateConfig = PopulateConfig.builder()
+                .builderPattern(LOMBOK)
                 .build();
 
         assertThat(populateConfig.getBuilderPattern()).isEqualTo(LOMBOK);
         assertThat(populateConfig.getBuilderMethod()).isEqualTo(DEFAULT_BUILDER_METHOD);
         assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
+
+        populateConfig = PopulateConfig.builder()
+                .builderPattern(IMMUTABLES)
+                .build();
+
+        assertThat(populateConfig.getBuilderPattern()).isEqualTo(IMMUTABLES);
+        assertThat(populateConfig.getBuilderMethod()).isEqualTo(DEFAULT_BUILDER_METHOD);
+        assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
+
+        populateConfig = PopulateConfig.builder()
+                .builderPattern(CUSTOM)
+                .build();
+
+        assertThat(populateConfig.getBuilderPattern()).isEqualTo(CUSTOM);
+        assertThat(populateConfig.getBuilderMethod()).isEqualTo(DEFAULT_BUILDER_METHOD);
+        assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
+    }
+
+    @Test
+    void toStringContainsAllFields() {
+        String toString = DEFAULT_POPULATE_CONFIG.toString();
+        assertThat(toString).contains("classOverrides");
+        assertThat(toString).contains("nameOverrides");
+    }
+
+    @Test
+    void clearStrategiesWorks() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .constructorStrategy()
+                .and()
+                .clearStrategies()
+                .setterStrategy()
+                .and()
+                .build();
+
+        assertThat(populateConfig.getStrategyOrder()).containsExactly(SETTER);
     }
 
     private static void assertEqual(PopulateConfig populateConfig, PopulateConfig expectedPopulateConfig) {

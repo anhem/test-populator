@@ -133,6 +133,19 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
         assertRandomlyPopulatedValues(value1, value2);
     }
 
+    @Test
+    void canPopulateBasedOnCustomName() {
+        String stringValue = "myCustomString";
+        populateConfig = populateConfig.toBuilder()
+                .addOverride("stringValue", String.class, () -> stringValue)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        ImmutablesInterface value = populateAndAssertWithGeneratedCode(ImmutablesInterface.class);
+
+        assertThat(value.getStringValue()).isEqualTo(stringValue);
+    }
+
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(BUILDER);

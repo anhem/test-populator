@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator.internal.value;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.util.RandomUtil;
 
@@ -44,17 +45,23 @@ public class ValueFactory {
 
 
     private final boolean setRandomValues;
-    private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
+    private final Map<Class<?>, TypeSupplier<?>> classTypeSuppliers;
+    private final Map<OverrideTarget, TypeSupplier<?>> nameTypeSuppliers;
     private final BuilderPattern builderPattern;
 
-    public ValueFactory(boolean setRandomValues, Map<Class<?>, OverridePopulate<?>> overridePopulates, BuilderPattern builderPattern) {
+    public ValueFactory(
+            boolean setRandomValues,
+            Map<Class<?>, OverridePopulate<?>> classOverrides,
+            Map<OverrideTarget, OverridePopulate<?>> nameOverrides,
+            BuilderPattern builderPattern
+    ) {
         this.setRandomValues = setRandomValues;
-        this.typeSuppliers = getDefaultTypeSuppliers();
-        this.typeSuppliers.putAll(overridePopulates);
+        this.classTypeSuppliers = setClassTypeSuppliers(classOverrides);
+        this.nameTypeSuppliers = new HashMap<>(nameOverrides);
         this.builderPattern = builderPattern;
     }
 
-    private Map<Class<?>, TypeSupplier<?>> getDefaultTypeSuppliers() {
+    private Map<Class<?>, TypeSupplier<?>> setClassTypeSuppliers(Map<Class<?>, OverridePopulate<?>> classOverrides) {
         Map<Class<?>, TypeSupplier<?>> typeSuppliers = new HashMap<>();
         typeSuppliers.put(Integer.class, this::getInteger);
         typeSuppliers.put(int.class, this::getInteger);
@@ -89,22 +96,38 @@ public class ValueFactory {
         typeSuppliers.put(UUID.class, this::getUUID);
         typeSuppliers.put(byte.class, this::getByte);
         typeSuppliers.put(Byte.class, this::getByte);
+        typeSuppliers.putAll(classOverrides);
         return typeSuppliers;
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T createValue(Class<T> clazz) {
+        return createValue(clazz, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T createValue(Class<T> clazz, String name) {
         if (clazz.isEnum()) {
             return getEnum(clazz);
         }
 
-        return Optional.ofNullable(typeSuppliers.get(clazz))
+        if (name != null) {
+            OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
+            if (nameTypeSuppliers.containsKey(overrideTarget)) {
+                return (T) nameTypeSuppliers.get(overrideTarget).create();
+            }
+        }
+
+        return Optional.ofNullable(classTypeSuppliers.get(clazz))
                 .map(supplier -> (T) supplier.create())
                 .orElseThrow(() -> new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName())));
     }
 
     public boolean hasType(Class<?> clazz) {
-        return clazz.isEnum() || typeSuppliers.containsKey(clazz);
+        return clazz.isEnum() || classTypeSuppliers.containsKey(clazz);
+    }
+
+    public boolean hasOverridePopulateName(String name, Class<?> clazz) {
+        return nameTypeSuppliers.containsKey(OverrideTarget.of(name, clazz));
     }
 
     private <T> T getEnum(Class<T> clazz) {

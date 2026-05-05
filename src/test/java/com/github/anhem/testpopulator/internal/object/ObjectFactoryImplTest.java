@@ -1,5 +1,7 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
@@ -8,8 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 
 import static com.github.anhem.testpopulator.config.PopulateConfig.DEFAULT_BUILDER_METHOD;
@@ -30,8 +31,8 @@ class ObjectFactoryImplTest {
     @Test
     void createObjectUsingConstructor() {
         objectFactoryImpl.constructor(MyClass.class, 2);
-        objectFactoryImpl.value("myString");
-        objectFactoryImpl.value(1);
+        objectFactoryImpl.value("myString", String.class, null);
+        objectFactoryImpl.value(1, Integer.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -45,9 +46,9 @@ class ObjectFactoryImplTest {
     void createObjectUsingSetter() {
         objectFactoryImpl.setter(MyClass.class, 2);
         objectFactoryImpl.method("setString", 1);
-        objectFactoryImpl.value("myString");
+        objectFactoryImpl.value("myString", String.class, null);
         objectFactoryImpl.method("setInteger", 1);
-        objectFactoryImpl.value(1);
+        objectFactoryImpl.value(1, Integer.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -67,9 +68,9 @@ class ObjectFactoryImplTest {
     void createObjectUsingBuilder() {
         objectFactoryImpl.builder(MyClass.class, 2, DEFAULT_BUILDER_METHOD, DEFAULT_BUILD_METHOD);
         objectFactoryImpl.method("string", 1);
-        objectFactoryImpl.value("myString");
+        objectFactoryImpl.value("myString", String.class, null);
         objectFactoryImpl.method("integer", 1);
-        objectFactoryImpl.value(1);
+        objectFactoryImpl.value(1, Integer.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -88,7 +89,7 @@ class ObjectFactoryImplTest {
     void createSetOf() {
         objectFactoryImpl.constructor(MyClass.class, 1);
         objectFactoryImpl.setOf();
-        objectFactoryImpl.value("myString");
+        objectFactoryImpl.value("myString", String.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -107,7 +108,7 @@ class ObjectFactoryImplTest {
     void createSet() {
         objectFactoryImpl.constructor(MyClass.class, 1);
         objectFactoryImpl.set(HashSet.class);
-        objectFactoryImpl.value("myString");
+        objectFactoryImpl.value("myString", String.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -130,8 +131,8 @@ class ObjectFactoryImplTest {
     void createMapOf() {
         objectFactoryImpl.constructor(MyClass.class, 1);
         objectFactoryImpl.mapOf();
-        objectFactoryImpl.value("myKey");
-        objectFactoryImpl.value("myValue");
+        objectFactoryImpl.value("myKey", String.class, null);
+        objectFactoryImpl.value("myValue", String.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -150,8 +151,8 @@ class ObjectFactoryImplTest {
     void createMap() {
         objectFactoryImpl.constructor(MyClass.class, 1);
         objectFactoryImpl.map(HashMap.class);
-        objectFactoryImpl.value("myKey");
-        objectFactoryImpl.value("myValue");
+        objectFactoryImpl.value("myKey", String.class, null);
+        objectFactoryImpl.value("myValue", String.class, null);
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
@@ -172,7 +173,7 @@ class ObjectFactoryImplTest {
     void createListOf() {
         objectFactoryImpl.constructor(MyClass.class, 1);
         objectFactoryImpl.listOf();
-        objectFactoryImpl.value("myString");
+        objectFactoryImpl.value("myString", String.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -191,7 +192,7 @@ class ObjectFactoryImplTest {
     void createList() {
         objectFactoryImpl.constructor(MyClass.class, 1);
         objectFactoryImpl.list(ArrayList.class);
-        objectFactoryImpl.value("myString");
+        objectFactoryImpl.value("myString", String.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -213,7 +214,7 @@ class ObjectFactoryImplTest {
     void createArray() {
         objectFactoryImpl.constructor(MyClass.class, 1);
         objectFactoryImpl.array(Boolean.class);
-        objectFactoryImpl.value(true);
+        objectFactoryImpl.value(true, Boolean.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -228,7 +229,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void value() {
-        objectFactoryImpl.value("myString");
+        objectFactoryImpl.value("myString", String.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -241,21 +242,75 @@ class ObjectFactoryImplTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void valueWithNameOverride() {
+        String overrideName = "myCustomName";
+        List<String> overrideValue = List.of("myOverriddenValue");
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(overrideName, List.class, new OverridePopulate<>() {
+                    @Override
+                    public Object create() {
+                        return overrideValue;
+                    }
+
+                    @Override
+                    public String createString() {
+                        return "CUSTOM_STRING";
+                    }
+                }).build();
+        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+
+        objectFactoryImpl.value(overrideValue, (Class<List<String>>) (Class<?>) List.class, overrideName);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final List list_0 = CUSTOM_STRING;"
+        ));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void valueWithClassOverride() {
+        Class<List<String>> overrideClass = (Class<List<String>>) (Class<?>) List.class;
+        List<String> overrideValue = List.of("myOverriddenValue");
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(overrideClass, new OverridePopulate<>() {
+                    @Override
+                    public List<String> create() {
+                        return overrideValue;
+                    }
+
+                    @Override
+                    public String createString() {
+                        return "CUSTOM_STRING_FOR_CLASS";
+                    }
+                }).build();
+        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+
+        objectFactoryImpl.value(overrideValue, overrideClass, null);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final List list_0 = CUSTOM_STRING_FOR_CLASS;"
+        ));
+    }
+
+    @Test
     void allValues() {
         objectFactoryImpl.constructor(MyClass.class, 13);
-        objectFactoryImpl.value(ArbitraryEnum.A);
-        objectFactoryImpl.value(1);
-        objectFactoryImpl.value(2L);
-        objectFactoryImpl.value(3D);
-        objectFactoryImpl.value(true);
-        objectFactoryImpl.value(BigDecimal.ONE);
-        objectFactoryImpl.value("myString");
-        objectFactoryImpl.value(LocalDate.EPOCH);
-        objectFactoryImpl.value(LocalDate.EPOCH.atTime(0, 0, 0));
-        objectFactoryImpl.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")));
-        objectFactoryImpl.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")).toInstant());
-        objectFactoryImpl.value('c');
-        objectFactoryImpl.value(UUID.fromString("82e8962f-885d-4845-914b-c206a42d7c91"));
+        objectFactoryImpl.value(ArbitraryEnum.A, ArbitraryEnum.class, null);
+        objectFactoryImpl.value(1, Integer.class, null);
+        objectFactoryImpl.value(2L, Long.class, null);
+        objectFactoryImpl.value(3D, Double.class, null);
+        objectFactoryImpl.value(true, Boolean.class, null);
+        objectFactoryImpl.value(BigDecimal.ONE, BigDecimal.class, null);
+        objectFactoryImpl.value("myString", String.class, null);
+        objectFactoryImpl.value(LocalDate.EPOCH, LocalDate.class, null);
+        objectFactoryImpl.value(LocalDate.EPOCH.atTime(0, 0, 0), LocalDateTime.class, null);
+        objectFactoryImpl.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")), ZonedDateTime.class, null);
+        objectFactoryImpl.value(LocalDate.EPOCH.atTime(0, 0, 0).atZone(ZoneId.of("UTC")).toInstant(), Instant.class, null);
+        objectFactoryImpl.value('c', Character.class, null);
+        objectFactoryImpl.value(UUID.fromString("82e8962f-885d-4845-914b-c206a42d7c91"), UUID.class, null);
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
@@ -292,7 +347,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void valueThrowsException() {
-        Assertions.assertThrows(ObjectException.class, () -> objectFactoryImpl.value(Pojo.class));
+        Assertions.assertThrows(ObjectException.class, () -> objectFactoryImpl.value(Pojo.class, Class.class, null));
     }
 
     private String getExpectedMyClassStaticImport() {

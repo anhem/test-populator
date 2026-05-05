@@ -1,12 +1,19 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
+import com.github.anhem.testpopulator.model.java.NamedDates;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.setter.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.Strategy.SETTER;
@@ -215,6 +222,50 @@ class PopulateFactoryWithSetterStrategyTest {
         DateAndTimeMix value1 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
         DateAndTimeMix value2 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
         assertRandomlyPopulatedValues(value1, value2);
+    }
+
+    @Test
+    void canPopulateDatesBasedOnNames() {
+        NamedDates namedDates = populateAndAssertWithGeneratedCode(NamedDates.class);
+
+        assertThat(namedDates.getFromDate()).isNotNull();
+        assertThat(namedDates.getToDate()).isNotNull();
+        assertThat(namedDates.getStartDateTime()).isNotNull();
+        assertThat(namedDates.getEndDateTime()).isNotNull();
+        assertThat(namedDates.getPreviousDate()).isNotNull();
+        assertThat(namedDates.getNextDate()).isNotNull();
+    }
+
+    @Test
+    void canPopulateBasedOnCustomName() {
+        LocalDate localDate = LocalDate.of(2000, 1, 1);
+        populateConfig = populateConfig.toBuilder()
+                .addOverride("setFromDate", LocalDate.class, () -> localDate)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        NamedDates namedDates = populateAndAssertWithGeneratedCode(NamedDates.class);
+
+        assertThat(namedDates.getFromDate()).isEqualTo(localDate);
+        assertThat(namedDates.getToDate()).isNotEqualTo(localDate);
+    }
+
+    @Test
+    void canOverrideCollectionByName() {
+        OverridePopulate<List<String>> listOverride = new OverridePopulate<>() {
+            @Override
+            public List<String> create() {
+                return List.of("foo", "bar");
+            }
+
+            @Override
+            public String createString() {
+                return "List.of(\"foo\", \"bar\")";
+            }
+        };
+        Pojo pojo = populateFactory.populate(Pojo.class, Map.of(OverrideTarget.of("setListOfStrings", List.class), listOverride));
+
+        assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
