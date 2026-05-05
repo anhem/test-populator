@@ -18,7 +18,7 @@ class PopulateFactoryWithLocalOverridesTest {
         String globalValue = "global";
         String localValue = "local";
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .addOverridePopulate(String.class, () -> globalValue)
+                .addOverride(String.class, () -> globalValue)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
@@ -32,7 +32,7 @@ class PopulateFactoryWithLocalOverridesTest {
         String globalString = "globalString";
         Integer localInteger = 999;
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .addOverridePopulate(String.class, () -> globalString)
+                .addOverride(String.class, () -> globalString)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 

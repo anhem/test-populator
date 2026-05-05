@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.object.ObjectFactory;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryImpl;
@@ -52,14 +53,40 @@ public class PopulateFactory {
     /**
      * Call to create a fully populated object from a class with additional overrides for this execution
      *
-     * @param clazz             Class that should be populated
-     * @param overridePopulates additional overrides that take precedence over overrides in PopulateConfig
-     * @param <T>               type of object to return
+     * @param clazz     Class that should be populated
+     * @param overrides additional overrides that take precedence over overrides in PopulateConfig. Can be Map&lt;Class, OverridePopulate&gt;, Map&lt;String, OverridePopulate&gt; or Map&lt;OverrideTarget, OverridePopulate&gt;
+     * @param <T>       type of object to return
      * @return object of clazz
      */
-    public <T> T populate(Class<T> clazz, Map<Class<?>, OverridePopulate<?>> overridePopulates) {
-        PopulateConfig config = overridePopulates.isEmpty() ? populateConfig : populateConfig.toBuilder().addOverridePopulates(overridePopulates).build();
-        Populator p = overridePopulates.isEmpty() ? populator : new Populator(createValueFactory(config));
+    public <T> T populate(Class<T> clazz, Map<?, OverridePopulate<?>> overrides) {
+        Map<Class<?>, OverridePopulate<?>> classOverrides = new HashMap<>();
+        Map<OverrideTarget, OverridePopulate<?>> nameOverrides = new HashMap<>();
+        overrides.forEach((k, v) -> {
+            if (k instanceof Class) {
+                classOverrides.put((Class<?>) k, v);
+            } else if (k instanceof OverrideTarget) {
+                nameOverrides.put((OverrideTarget) k, v);
+            }
+        });
+        return populate(clazz, classOverrides, nameOverrides);
+    }
+
+    /**
+     * Call to create a fully populated object from a class with additional overrides for this execution
+     *
+     * @param clazz          Class that should be populated
+     * @param classOverrides additional overrides that take precedence over overrides in PopulateConfig
+     * @param nameOverrides  additional overrides that take precedence over overrides in PopulateConfig
+     * @param <T>            type of object to return
+     * @return object of clazz
+     */
+    public <T> T populate(Class<T> clazz, Map<Class<?>, OverridePopulate<?>> classOverrides, Map<OverrideTarget, OverridePopulate<?>> nameOverrides) {
+        boolean noOverrides = classOverrides.isEmpty() && nameOverrides.isEmpty();
+        PopulateConfig config = noOverrides ? populateConfig : populateConfig.toBuilder()
+                                                               .addClassOverrides(classOverrides)
+                                                               .addNameOverrides(nameOverrides)
+                                                               .build();
+        Populator p = noOverrides ? populator : new Populator(createValueFactory(config));
         ObjectFactory objectFactory = config.isObjectFactoryEnabled() ? new ObjectFactoryImpl(config) : new ObjectFactoryVoid();
         T result = p.populate(initialize(clazz, objectFactory, config));
         objectFactory.writeToFile();
@@ -80,10 +107,25 @@ public class PopulateFactory {
         return populate(clazz, Map.of(overrideClass, overridePopulate));
     }
 
+    /**
+     * Call to create a fully populated object from a class with an additional override for this execution
+     *
+     * @param clazz            Class that should be populated
+     * @param overrideName     name to override
+     * @param overrideClass    class to override
+     * @param overridePopulate implementation to use
+     * @param <T>              type of object to return
+     * @return object of clazz
+     */
+    public <T> T populate(Class<T> clazz, String overrideName, Class<?> overrideClass, OverridePopulate<?> overridePopulate) {
+        return populate(clazz, Collections.emptyMap(), Map.of(OverrideTarget.of(overrideName, overrideClass), overridePopulate));
+    }
+
     private static ValueFactory createValueFactory(PopulateConfig populateConfig) {
         return new ValueFactory(
                 populateConfig.useRandomValues(),
-                populateConfig.getOverridePopulate(),
+                populateConfig.getClassOverrides(),
+                populateConfig.getNameOverrides(),
                 populateConfig.getBuilderPattern()
         );
     }

@@ -51,7 +51,7 @@ class ValueFactoryTest {
 
     @Test
     void randomValuesAreCreated() {
-        valueFactory = new ValueFactory(true, Map.of(), CUSTOM);
+        valueFactory = new ValueFactory(true, Map.of(), Map.of(), CUSTOM);
         CLASSES.forEach(this::createAndAssertRandomValues);
         createAndAssertRandomIntValues();
         createAndAssertRandomLongValues();
@@ -65,7 +65,7 @@ class ValueFactoryTest {
 
     @Test
     void fixedValuesAreCreated() {
-        valueFactory = new ValueFactory(false, Map.of(), CUSTOM);
+        valueFactory = new ValueFactory(false, Map.of(), Map.of(), CUSTOM);
         CLASSES.forEach(this::createAndAssertFixedValues);
         createAndAssertFixedIntValues();
         createAndAssertFixedLongValues();
@@ -79,7 +79,7 @@ class ValueFactoryTest {
 
     @Test
     void attemptingToCreateValueOfUnsupportedTypeThrowsException() {
-        valueFactory = new ValueFactory(true, Map.of(), CUSTOM);
+        valueFactory = new ValueFactory(true, Map.of(), Map.of(), CUSTOM);
         assertThatThrownBy(() -> valueFactory.createValue(Pojo.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(UNSUPPORTED_TYPE, Pojo.class.getTypeName()));

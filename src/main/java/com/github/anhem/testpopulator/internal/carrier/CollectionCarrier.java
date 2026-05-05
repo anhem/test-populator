@@ -14,13 +14,37 @@ public class CollectionCarrier<T> extends ClassCarrier<T> {
 
     private final List<Type> argumentTypes;
 
-    public CollectionCarrier(Class<T> clazz, Type[] typeArguments, ObjectFactory objectFactory, List<String> visited, PopulateConfig populateConfig) {
+    public CollectionCarrier(
+            Class<T> clazz,
+            Type[] typeArguments,
+            ObjectFactory objectFactory,
+            List<String> visited,
+            PopulateConfig populateConfig
+    ) {
         super(clazz, objectFactory, visited, populateConfig);
         this.argumentTypes = Arrays.asList(typeArguments);
     }
 
-    public CollectionCarrier(Class<T> clazz, Parameter parameter, ObjectFactory objectFactory, List<String> visited, PopulateConfig populateConfig) {
-        super(clazz, objectFactory, visited, populateConfig);
+    public CollectionCarrier(
+            Class<T> clazz,
+            String name,
+            Type[] typeArguments,
+            ObjectFactory objectFactory,
+            List<String> visited,
+            PopulateConfig populateConfig
+    ) {
+        super(clazz, name, objectFactory, visited, populateConfig);
+        this.argumentTypes = Arrays.asList(typeArguments);
+    }
+
+    public CollectionCarrier(
+            Class<T> clazz,
+            Parameter parameter,
+            ObjectFactory objectFactory,
+            List<String> visited,
+            PopulateConfig populateConfig
+    ) {
+        super(clazz, parameter.getName(), objectFactory, visited, populateConfig);
         this.argumentTypes = toArgumentTypes(parameter);
     }
 

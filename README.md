@@ -123,7 +123,7 @@ Controls whether data is random or fixed.
 * **Details**: When set to `false`, populating the same class twice will produce identical objects. Random values are generated within sensible
   ranges (e.g., dates are +/- 1 year from the current date).
 
-#### `overridePopulates`
+#### `classOverrides`
 
 Provides **custom logic** for creating instances of specific classes. This is essential when a class requires values with a specific format, or if you
 want to control the outcome for a specific class.
@@ -131,22 +131,39 @@ want to control the outcome for a specific class.
 For example, imagine a class `MyUUID` whose constructor takes a `String` but requires it to be a valid UUID. Test-Populator would normally provide a
 random string like `"fghjklmnpa"`, which would cause the `MyUUID` constructor to fail.
 
-`overridePopulates` lets you "teach" the library how to correctly create these objects.
+`classOverrides` lets you "teach" the library how to correctly create these objects.
 
 You can provide a lambda directly in the configuration:
 
 ```java
 PopulateConfig populateConfig = PopulateConfig.builder()
         // Solves the problem by providing a correctly formatted string for MyUUID
-        .addOverridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+        .addOverride(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
         // Also useful for setting specific values, like the current date
-        .addOverridePopulate(LocalDate.class, LocalDate::now)
+        .addOverride(LocalDate.class, LocalDate::now)
         // or setting all Strings to a random UUID
-        .addOverridePopulate(String.class, () -> UUID.randomUUID().toString())
+        .addOverride(String.class, () -> UUID.randomUUID().toString())
         .build();
 ```
 
 Instead of a lambda, you can also implement the `OverridePopulate` interface for more complex cases.
+
+#### `nameOverrides`
+
+Similar to `classOverrides`, but allows you to provide custom logic based on the **name of the field or method parameter**, and its **expected class type**.
+
+This is particularly useful when you have multiple fields of the same type but want to assign them different values or if you want to target a specific field across multiple classes.
+
+```java
+PopulateConfig populateConfig = PopulateConfig.builder()
+        // Targets a field named 'fromDate' of type LocalDate
+        .addOverride("fromDate", LocalDate.class, () -> LocalDate.of(2021, 1, 1))
+        // Targets a setter method named 'setFromDate' of type LocalDate
+        .addOverride("setFromDate", LocalDate.class, () -> LocalDate.of(2021, 1, 1))
+        .build();
+```
+
+`nameOverrides` takes precedence over `classOverrides`. Name-based overrides are fully type-safe; an override is only applied if both the name and the expected type match exactly. If no match is found, the library falls back to class overrides or default population logic.
 
 #### `nullOnCircularDependency`
 
@@ -214,9 +231,9 @@ public class TestPopulator {
     // 1. Define the configuration once
     private static final PopulateConfig POPULATE_CONFIG = PopulateConfig.builder()
             // Provide custom logic for creating MyUUID objects
-            .addOverridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+            .addOverride(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
             // Always set LocalDate to the current date
-            .addOverridePopulate(LocalDate.class, LocalDate::now)
+            .addOverride(LocalDate.class, LocalDate::now)
             .build();
 
     // 2. Create a single factory instance
@@ -256,6 +273,12 @@ Or a single override using a convenience method:
 
 ```java
 MyClass myClass = populateFactory.populate(MyClass.class, String.class, () -> "localValue");
+```
+
+You can also provide name-based overrides:
+
+```java
+MyClass myClass = populateFactory.populate(MyClass.class, "stringValue", String.class, () -> "localValue");
 ```
 
 ### "Full Coverage" Setup
