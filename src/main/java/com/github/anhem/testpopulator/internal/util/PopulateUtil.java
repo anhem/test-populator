@@ -57,8 +57,8 @@ public class PopulateUtil {
     public static <T> boolean isCollectionLike(Class<T> clazz) {
         return Collection.class.isAssignableFrom(clazz) ||
                 Map.class.isAssignableFrom(clazz) ||
-                Iterable.class.isAssignableFrom(clazz) ||
-                Map.Entry.class.isAssignableFrom(clazz);
+                Map.Entry.class.isAssignableFrom(clazz) ||
+                (Iterable.class.isAssignableFrom(clazz) && (clazz.equals(Iterable.class) || !isJavaBaseClass(clazz)));
     }
 
     public static <T> boolean isCollectionCarrier(ClassCarrier<T> classCarrier) {

@@ -6,8 +6,11 @@ import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.util.RandomUtil;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
@@ -42,6 +45,16 @@ public class ValueFactory {
     private static final java.sql.Date SQL_DATE = java.sql.Date.valueOf(LOCAL_DATE);
     private static final Time SQL_TIME = Time.valueOf(LOCAL_TIME);
     private static final Timestamp SQL_TIMESTAMP = Timestamp.from(INSTANT);
+    private static final Currency CURRENCY = Currency.getInstance("USD");
+    private static final Locale LOCALE = Locale.US;
+    private static final TimeZone TIME_ZONE = TimeZone.getTimeZone("UTC");
+    private static final ZoneId ZONE_ID = ZoneId.of("UTC");
+    private static final ZoneOffset ZONE_OFFSET = ZoneOffset.UTC;
+    private static final Year YEAR = Year.of(1970);
+    private static final YearMonth YEAR_MONTH = YearMonth.of(1970, 1);
+    private static final MonthDay MONTH_DAY = MonthDay.of(1, 1);
+    private static final File FILE = new File("file");
+    private static final Path PATH = Paths.get("path");
 
 
     private final boolean setRandomValues;
@@ -96,6 +109,16 @@ public class ValueFactory {
         typeSuppliers.put(UUID.class, this::getUUID);
         typeSuppliers.put(byte.class, this::getByte);
         typeSuppliers.put(Byte.class, this::getByte);
+        typeSuppliers.put(Currency.class, this::getCurrency);
+        typeSuppliers.put(Locale.class, this::getLocale);
+        typeSuppliers.put(TimeZone.class, this::getTimeZone);
+        typeSuppliers.put(ZoneId.class, this::getZoneId);
+        typeSuppliers.put(ZoneOffset.class, this::getZoneOffset);
+        typeSuppliers.put(Year.class, this::getYear);
+        typeSuppliers.put(YearMonth.class, this::getYearMonth);
+        typeSuppliers.put(MonthDay.class, this::getMonthDay);
+        typeSuppliers.put(File.class, this::getFile);
+        typeSuppliers.put(Path.class, this::getPath);
         typeSuppliers.putAll(classOverrides);
         return typeSuppliers;
     }
@@ -235,6 +258,65 @@ public class ValueFactory {
 
     private Timestamp getSqlTimestamp() {
         return setRandomValues ? Timestamp.from(getInstant()) : SQL_TIMESTAMP;
+    }
+
+    private Currency getCurrency() {
+        if (setRandomValues) {
+            List<Currency> currencies = new ArrayList<>(Currency.getAvailableCurrencies());
+            return currencies.get(new Random().nextInt(currencies.size()));
+        }
+        return CURRENCY;
+    }
+
+    private Locale getLocale() {
+        if (setRandomValues) {
+            Locale[] locales = Locale.getAvailableLocales();
+            return locales[new Random().nextInt(locales.length)];
+        }
+        return LOCALE;
+    }
+
+    private TimeZone getTimeZone() {
+        if (setRandomValues) {
+            String[] ids = TimeZone.getAvailableIDs();
+            return TimeZone.getTimeZone(ids[new Random().nextInt(ids.length)]);
+        }
+        return TIME_ZONE;
+    }
+
+    private ZoneId getZoneId() {
+        if (setRandomValues) {
+            List<String> ids = new ArrayList<>(ZoneId.getAvailableZoneIds());
+            return ZoneId.of(ids.get(new Random().nextInt(ids.size())));
+        }
+        return ZONE_ID;
+    }
+
+    private ZoneOffset getZoneOffset() {
+        if (setRandomValues) {
+            return ZoneOffset.ofHours(new Random().nextInt(37) - 18);
+        }
+        return ZONE_OFFSET;
+    }
+
+    private Year getYear() {
+        return setRandomValues ? Year.from(getRandomLocalDate(5)) : YEAR;
+    }
+
+    private YearMonth getYearMonth() {
+        return setRandomValues ? YearMonth.from(getRandomLocalDate(5)) : YEAR_MONTH;
+    }
+
+    private MonthDay getMonthDay() {
+        return setRandomValues ? MonthDay.from(getRandomLocalDate(5)) : MONTH_DAY;
+    }
+
+    private File getFile() {
+        return setRandomValues ? new File(getRandomString()) : FILE;
+    }
+
+    private Path getPath() {
+        return setRandomValues ? Paths.get(getRandomString()) : PATH;
     }
 
 }

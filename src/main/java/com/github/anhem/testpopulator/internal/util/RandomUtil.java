@@ -25,6 +25,10 @@ public class RandomUtil {
         return random.nextInt(RANDOM_INT_MAX_VALUE);
     }
 
+    public static int getRandomInt(int min, int max) {
+        return random.nextInt(max - min + 1) + min;
+    }
+
     public static short getRandomShort() {
         return (short) random.nextInt(Short.MAX_VALUE + 1);
     }
@@ -45,7 +49,11 @@ public class RandomUtil {
     }
 
     public static LocalDate getRandomLocalDate() {
-        return LocalDate.now().minusYears(1).plusDays(random.nextInt(730));
+        return getRandomLocalDate(1);
+    }
+
+    public static LocalDate getRandomLocalDate(int yearRange) {
+        return LocalDate.now().minusYears(yearRange).plusDays(random.nextInt(yearRange * 2 * 365 + yearRange));
     }
 
     public static LocalDateTime getRandomLocalDateTime() {

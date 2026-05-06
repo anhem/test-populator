@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.File;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
@@ -56,5 +58,15 @@ public class Pojo {
     private java.sql.Date sqlDate;
     private Time sqlTime;
     private Timestamp sqlTimestamp;
+    private Currency currency;
+    private Locale locale;
+    private TimeZone timeZone;
+    private ZoneId zoneId;
+    private ZoneOffset zoneOffset;
+    private Year year;
+    private YearMonth yearMonth;
+    private MonthDay monthDay;
+    private File file;
+    private Path path;
 
 }

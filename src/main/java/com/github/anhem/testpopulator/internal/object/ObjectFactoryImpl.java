@@ -4,6 +4,7 @@ import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Path;
@@ -60,6 +61,16 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(java.sql.Date.class, object -> String.format("Date.valueOf(\"%s\")", object.toString()));
         stringSuppliers.put(Time.class, object -> String.format("Time.valueOf(\"%s\")", object.toString()));
         stringSuppliers.put(Timestamp.class, object -> String.format("Timestamp.valueOf(\"%s\")", object.toString()));
+        stringSuppliers.put(Currency.class, object -> String.format("Currency.getInstance(\"%s\")", object));
+        stringSuppliers.put(Locale.class, object -> String.format("Locale.forLanguageTag(\"%s\")", ((Locale) object).toLanguageTag()));
+        stringSuppliers.put(TimeZone.class, object -> String.format("TimeZone.getTimeZone(\"%s\")", ((TimeZone) object).getID()));
+        stringSuppliers.put(ZoneId.class, object -> String.format("ZoneId.of(\"%s\")", object));
+        stringSuppliers.put(ZoneOffset.class, object -> String.format("ZoneOffset.of(\"%s\")", object));
+        stringSuppliers.put(Year.class, object -> String.format("Year.of(%d)", ((Year) object).getValue()));
+        stringSuppliers.put(YearMonth.class, object -> String.format("YearMonth.of(%d, %d)", ((YearMonth) object).getYear(), ((YearMonth) object).getMonthValue()));
+        stringSuppliers.put(MonthDay.class, object -> String.format("MonthDay.of(%d, %d)", ((MonthDay) object).getMonthValue(), ((MonthDay) object).getDayOfMonth()));
+        stringSuppliers.put(File.class, object -> String.format("new File(\"%s\")", ((File) object).getPath()));
+        stringSuppliers.put(Path.class, object -> String.format("Path.of(\"%s\")", object.toString()));
     }
 
     private final PopulateConfig populateConfig;
@@ -213,7 +224,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
             return object.toString();
         }
 
-        Function<Object, String> stringSupplier = stringSuppliers.get(object.getClass());
+        Function<Object, String> stringSupplier = stringSuppliers.get(clazz);
+        if (stringSupplier == null) {
+            stringSupplier = stringSuppliers.get(object.getClass());
+        }
+
         if (stringSupplier != null) {
             return stringSupplier.apply(object);
         }
