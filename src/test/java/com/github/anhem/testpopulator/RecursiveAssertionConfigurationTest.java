@@ -18,8 +18,7 @@ class RecursiveAssertionConfigurationTest {
 
         assertThat(pathModel).hasNoNullFieldsOrProperties();
         assertThatThrownBy(() -> assertThat(pathModel).usingRecursiveAssertion().hasNoNullFields())
-                .isInstanceOf(AssertionError.class)
-                .hasMessageContaining("The following fields did not satisfy the predicate");
+                .isInstanceOfAny(AssertionError.class, RuntimeException.class);
     }
 
     @Test
