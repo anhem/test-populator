@@ -23,6 +23,10 @@ import static com.github.anhem.testpopulator.internal.util.RandomUtil.*;
 
 public class ValueFactory {
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
+    private static final List<Currency> AVAILABLE_CURRENCIES = new ArrayList<>(Currency.getAvailableCurrencies());
+    private static final Locale[] AVAILABLE_LOCALES = Locale.getAvailableLocales();
+    private static final String[] AVAILABLE_TIMEZONE_IDS = TimeZone.getAvailableIDs();
+    private static final List<String> AVAILABLE_ZONE_IDS = new ArrayList<>(ZoneId.getAvailableZoneIds());
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
     private static final ZonedDateTime ZONED_DATE_TIME = LOCAL_DATE_TIME.atZone(ZoneId.of("UTC"));
     private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();
@@ -50,16 +54,16 @@ public class ValueFactory {
     private static final java.sql.Date SQL_DATE = java.sql.Date.valueOf(LOCAL_DATE);
     private static final Time SQL_TIME = Time.valueOf(LOCAL_TIME);
     private static final Timestamp SQL_TIMESTAMP = Timestamp.from(INSTANT);
-    private static final Currency CURRENCY = Currency.getInstance("USD");
-    private static final Locale LOCALE = Locale.US;
+    private static final Currency CURRENCY = Currency.getInstance("XTS");
+    private static final Locale LOCALE = Locale.ROOT;
     private static final TimeZone TIME_ZONE = TimeZone.getTimeZone("UTC");
     private static final ZoneId ZONE_ID = ZoneId.of("UTC");
     private static final ZoneOffset ZONE_OFFSET = ZoneOffset.UTC;
     private static final Year YEAR = Year.of(1970);
     private static final YearMonth YEAR_MONTH = YearMonth.of(1970, 1);
     private static final MonthDay MONTH_DAY = MonthDay.of(1, 1);
-    private static final File FILE = new File("file");
-    private static final Path PATH = Paths.get("path");
+    private static final File FILE = new File("test-file");
+    private static final Path PATH = Paths.get("test-path");
 
 
     private final boolean setRandomValues;
@@ -268,42 +272,23 @@ public class ValueFactory {
     }
 
     private Currency getCurrency() {
-        if (setRandomValues) {
-            List<Currency> currencies = new ArrayList<>(Currency.getAvailableCurrencies());
-            return currencies.get(getRandomInt(currencies.size()));
-        }
-        return CURRENCY;
+        return setRandomValues ? AVAILABLE_CURRENCIES.get(getRandomInt(AVAILABLE_CURRENCIES.size())) : CURRENCY;
     }
 
     private Locale getLocale() {
-        if (setRandomValues) {
-            Locale[] locales = Locale.getAvailableLocales();
-            return locales[getRandomInt(locales.length)];
-        }
-        return LOCALE;
+        return setRandomValues ? AVAILABLE_LOCALES[getRandomInt(AVAILABLE_LOCALES.length)] : LOCALE;
     }
 
     private TimeZone getTimeZone() {
-        if (setRandomValues) {
-            String[] ids = TimeZone.getAvailableIDs();
-            return TimeZone.getTimeZone(ids[getRandomInt(ids.length)]);
-        }
-        return TIME_ZONE;
+        return setRandomValues ? TimeZone.getTimeZone(AVAILABLE_TIMEZONE_IDS[getRandomInt(AVAILABLE_TIMEZONE_IDS.length)]) : TIME_ZONE;
     }
 
     private ZoneId getZoneId() {
-        if (setRandomValues) {
-            List<String> ids = new ArrayList<>(ZoneId.getAvailableZoneIds());
-            return ZoneId.of(ids.get(getRandomInt(ids.size())));
-        }
-        return ZONE_ID;
+        return setRandomValues ? ZoneId.of(AVAILABLE_ZONE_IDS.get(getRandomInt(AVAILABLE_ZONE_IDS.size()))) : ZONE_ID;
     }
 
     private ZoneOffset getZoneOffset() {
-        if (setRandomValues) {
-            return ZoneOffset.ofHours(getRandomInt(37) - 18);
-        }
-        return ZONE_OFFSET;
+        return setRandomValues ? ZoneOffset.ofHours(getRandomInt(37) - 18) : ZONE_OFFSET;
     }
 
     private Year getYear() {
