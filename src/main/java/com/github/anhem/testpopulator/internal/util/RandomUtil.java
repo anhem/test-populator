@@ -25,6 +25,10 @@ public class RandomUtil {
         return random.nextInt(RANDOM_INT_MAX_VALUE);
     }
 
+    public static int getRandomInt(int bound) {
+        return random.nextInt(bound);
+    }
+
     public static int getRandomInt(int min, int max) {
         return random.nextInt(max - min + 1) + min;
     }

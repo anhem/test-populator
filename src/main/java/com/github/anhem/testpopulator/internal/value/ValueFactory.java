@@ -270,7 +270,7 @@ public class ValueFactory {
     private Currency getCurrency() {
         if (setRandomValues) {
             List<Currency> currencies = new ArrayList<>(Currency.getAvailableCurrencies());
-            return currencies.get(new Random().nextInt(currencies.size()));
+            return currencies.get(getRandomInt(currencies.size()));
         }
         return CURRENCY;
     }
@@ -278,7 +278,7 @@ public class ValueFactory {
     private Locale getLocale() {
         if (setRandomValues) {
             Locale[] locales = Locale.getAvailableLocales();
-            return locales[new Random().nextInt(locales.length)];
+            return locales[getRandomInt(locales.length)];
         }
         return LOCALE;
     }
@@ -286,7 +286,7 @@ public class ValueFactory {
     private TimeZone getTimeZone() {
         if (setRandomValues) {
             String[] ids = TimeZone.getAvailableIDs();
-            return TimeZone.getTimeZone(ids[new Random().nextInt(ids.length)]);
+            return TimeZone.getTimeZone(ids[getRandomInt(ids.length)]);
         }
         return TIME_ZONE;
     }
@@ -294,14 +294,14 @@ public class ValueFactory {
     private ZoneId getZoneId() {
         if (setRandomValues) {
             List<String> ids = new ArrayList<>(ZoneId.getAvailableZoneIds());
-            return ZoneId.of(ids.get(new Random().nextInt(ids.size())));
+            return ZoneId.of(ids.get(getRandomInt(ids.size())));
         }
         return ZONE_ID;
     }
 
     private ZoneOffset getZoneOffset() {
         if (setRandomValues) {
-            return ZoneOffset.ofHours(new Random().nextInt(37) - 18);
+            return ZoneOffset.ofHours(getRandomInt(37) - 18);
         }
         return ZONE_OFFSET;
     }

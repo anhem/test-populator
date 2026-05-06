@@ -45,7 +45,19 @@ class ValueFactoryTest {
             Period.class,
             java.sql.Date.class,
             Time.class,
-            Timestamp.class
+            Timestamp.class,
+            java.util.Currency.class,
+            java.util.Locale.class,
+            java.util.TimeZone.class,
+            ZoneId.class,
+            ZoneOffset.class,
+            Year.class,
+            YearMonth.class,
+            MonthDay.class,
+            java.io.File.class,
+            java.nio.file.Path.class,
+            java.net.URL.class,
+            java.net.URI.class
     );
     private ValueFactory valueFactory;
 
@@ -87,67 +99,67 @@ class ValueFactoryTest {
 
     private void createAndAssertRandomValues(Class<?> clazz) {
         Object value1 = valueFactory.createValue(clazz);
-        Object value2 = createSecondNonMatchingValue(value1);
+        Object value2 = createSecondNonMatchingValue(value1, clazz);
         assertThat(value1).isNotNull();
         assertThat(value2).isNotNull();
-        assertThat(value1.getClass()).isEqualTo(clazz);
-        assertThat(value2.getClass()).isEqualTo(clazz);
+        assertThat(value1).isInstanceOf(clazz);
+        assertThat(value2).isInstanceOf(clazz);
         assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomIntValues() {
         int value1 = valueFactory.createValue(int.class);
-        int value2 = (int) createSecondNonMatchingValue(value1);
+        int value2 = (int) createSecondNonMatchingValue(value1, int.class);
         assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomLongValues() {
         long value1 = valueFactory.createValue(long.class);
-        long value2 = (long) createSecondNonMatchingValue(value1);
+        long value2 = (long) createSecondNonMatchingValue(value1, long.class);
         assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomDoubleValues() {
         double value1 = valueFactory.createValue(double.class);
-        double value2 = (double) createSecondNonMatchingValue(value1);
+        double value2 = (double) createSecondNonMatchingValue(value1, double.class);
         assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomShortValues() {
         short value1 = valueFactory.createValue(short.class);
-        short value2 = (short) createSecondNonMatchingValue(value1);
+        short value2 = (short) createSecondNonMatchingValue(value1, short.class);
         assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomFloatValues() {
         float value1 = valueFactory.createValue(float.class);
-        float value2 = (float) createSecondNonMatchingValue(value1);
+        float value2 = (float) createSecondNonMatchingValue(value1, float.class);
         assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomBooleanValues() {
         boolean value1 = valueFactory.createValue(boolean.class);
-        boolean value2 = (boolean) createSecondNonMatchingValue(value1);
+        boolean value2 = (boolean) createSecondNonMatchingValue(value1, boolean.class);
         assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomCharValues() {
         char value1 = valueFactory.createValue(char.class);
-        char value2 = (char) createSecondNonMatchingValue(value1);
+        char value2 = (char) createSecondNonMatchingValue(value1, char.class);
         assertThat(value1).isNotEqualTo(value2);
     }
 
     private void createAndAssertRandomByteValues() {
         byte value1 = valueFactory.createValue(byte.class);
-        byte value2 = (byte) createSecondNonMatchingValue(value1);
+        byte value2 = (byte) createSecondNonMatchingValue(value1, byte.class);
         assertThat(value1).isNotEqualTo(value2);
     }
 
-    private Object createSecondNonMatchingValue(Object value) {
-        Object secondValue = valueFactory.createValue(value.getClass());
+    private Object createSecondNonMatchingValue(Object value, Class<?> clazz) {
+        Object secondValue = valueFactory.createValue(clazz);
         int retry = 0;
         while (value.equals(secondValue) && retry < 10) {
-            secondValue = valueFactory.createValue(value.getClass());
+            secondValue = valueFactory.createValue(clazz);
             retry++;
         }
         return secondValue;
@@ -158,8 +170,8 @@ class ValueFactoryTest {
         Object value2 = valueFactory.createValue(clazz);
         assertThat(value1).isNotNull();
         assertThat(value2).isNotNull();
-        assertThat(value1.getClass()).isEqualTo(clazz);
-        assertThat(value2.getClass()).isEqualTo(clazz);
+        assertThat(value1).isInstanceOf(clazz);
+        assertThat(value2).isInstanceOf(clazz);
         assertThat(value1).isEqualTo(value2);
     }
 
