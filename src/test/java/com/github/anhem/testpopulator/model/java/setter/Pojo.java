@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -68,5 +70,7 @@ public class Pojo {
     private MonthDay monthDay;
     private File file;
     private Path path;
+    private URL url;
+    private URI uri;
 
 }

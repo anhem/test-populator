@@ -4,11 +4,14 @@ import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.internal.util.PopulateUtil;
 import com.github.anhem.testpopulator.internal.util.RandomUtil;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Time;
@@ -25,6 +28,8 @@ public class ValueFactory {
     private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();
     private static final LocalDate LOCAL_DATE = LOCAL_DATE_TIME.toLocalDate();
     private static final LocalTime LOCAL_TIME = LOCAL_DATE_TIME.toLocalTime();
+    private static final URL URL = PopulateUtil.toUrl("http://example.com");
+    private static final URI URI = java.net.URI.create("http://example.com");
     private static final Date DATE = Date.from(INSTANT);
     private static final String STRING = "string";
     private static final Boolean BOOLEAN = Boolean.TRUE;
@@ -119,6 +124,8 @@ public class ValueFactory {
         typeSuppliers.put(MonthDay.class, this::getMonthDay);
         typeSuppliers.put(File.class, this::getFile);
         typeSuppliers.put(Path.class, this::getPath);
+        typeSuppliers.put(URL.class, this::getUrl);
+        typeSuppliers.put(URI.class, this::getUri);
         typeSuppliers.putAll(classOverrides);
         return typeSuppliers;
     }
@@ -317,6 +324,14 @@ public class ValueFactory {
 
     private Path getPath() {
         return setRandomValues ? Paths.get(getRandomString()) : PATH;
+    }
+
+    private URL getUrl() {
+        return setRandomValues ? PopulateUtil.toUrl("http://example.com/" + getRandomString()) : URL;
+    }
+
+    private URI getUri() {
+        return setRandomValues ? java.net.URI.create("http://example.com/" + getRandomString()) : URI;
     }
 
 }

@@ -7,6 +7,8 @@ import com.github.anhem.testpopulator.exception.ObjectException;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -71,6 +73,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(MonthDay.class, object -> String.format("MonthDay.of(%d, %d)", ((MonthDay) object).getMonthValue(), ((MonthDay) object).getDayOfMonth()));
         stringSuppliers.put(File.class, object -> String.format("new File(\"%s\")", ((File) object).getPath()));
         stringSuppliers.put(Path.class, object -> String.format("Path.of(\"%s\")", object.toString()));
+        stringSuppliers.put(URL.class, object -> String.format("toUrl(\"%s\")", object));
+        stringSuppliers.put(URI.class, object -> String.format("URI.create(\"%s\")", object));
     }
 
     private final PopulateConfig populateConfig;
@@ -209,9 +213,10 @@ public class ObjectFactoryImpl implements ObjectFactory {
             writeStaticImports(objectResult, path);
             writeStartClass(objectResult, path, populateConfig);
             writeObjects(objectResult, path);
+            writeMethods(objectResult, path);
             writeEndClass(path);
-        }
-    }
+            }
+            }
 
     private ObjectBuilder toTop() {
         return Stream.iterate(currentObjectBuilder, Objects::nonNull, ObjectBuilder::getParent)

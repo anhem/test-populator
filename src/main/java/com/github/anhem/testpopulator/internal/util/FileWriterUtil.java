@@ -69,12 +69,21 @@ public class FileWriterUtil {
         writeLine(path, "}");
     }
 
+    public static void writeMethods(ObjectResult objectResult, Path path) {
+        if (!objectResult.getMethods().isEmpty()) {
+            writeLine(path, "");
+            objectResult.getMethods().stream()
+                    .sorted()
+                    .forEach(method -> writeLine(path, method));
+        }
+    }
+
     public static void writeObjects(ObjectResult objectResult, Path path) {
         objectResult.getObjects().forEach(s -> {
             if (s.startsWith(STATIC_BLOCK_START)) {
                 writeLine(path, String.format("%s\t%s", System.lineSeparator(), s));
             } else if (s.startsWith(STATIC_BLOCK_END)) {
-                writeLine(path, String.format("\t%s%s", s, System.lineSeparator()));
+                writeLine(path, String.format("\t%s", s));
             } else if (s.startsWith(PSF)) {
                 writeLine(path, String.format("\t%s", s));
             } else {

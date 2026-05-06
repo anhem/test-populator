@@ -73,13 +73,21 @@ public abstract class ObjectBuilder {
         Set<String> staticImports = new HashSet<>();
         getImports(imports, staticImports);
         List<String> objects = build();
+        Set<String> methods = getMethods();
 
-        return new ObjectResult(packageName, className, imports, staticImports, objects);
+        return new ObjectResult(packageName, className, imports, staticImports, objects, methods);
     }
 
     private void getImports(Set<String> imports, Set<String> staticImports) {
         addImport(getClazz(), value, isUseFullyQualifiedName(), imports, staticImports);
         children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
+    }
+
+    private Set<String> getMethods() {
+        Set<String> methods = new HashSet<>();
+        Optional.ofNullable(getHelperMethod(getClazz())).ifPresent(methods::add);
+        children.forEach(child -> methods.addAll(child.getMethods()));
+        return methods;
     }
 
     protected Stream<String> buildChildren() {

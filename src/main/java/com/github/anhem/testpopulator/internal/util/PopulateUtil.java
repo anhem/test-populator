@@ -125,9 +125,17 @@ public class PopulateUtil {
         }
     }
 
-    public static <T> void setAccessible(Field field, T object) {
+    public static void setAccessible(Field field, Object object) {
         if (!field.canAccess(object)) {
             field.setAccessible(true);
+        }
+    }
+
+    public static java.net.URL toUrl(String url) {
+        try {
+            return new java.net.URL(url);
+        } catch (java.net.MalformedURLException e) {
+            throw new RuntimeException(e);
         }
     }
 

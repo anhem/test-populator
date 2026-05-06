@@ -89,6 +89,20 @@ public class ObjectBuilderUtil {
         return false;
     }
 
+    public static String getHelperMethod(Class<?> clazz) {
+        if (clazz != null && clazz.equals(java.net.URL.class)) {
+            return String.join(System.lineSeparator(),
+                    "\tprivate static java.net.URL toUrl(String url) {",
+                    "\t\ttry {",
+                    "\t\t\treturn new java.net.URL(url);",
+                    "\t\t} catch (java.net.MalformedURLException e) {",
+                    "\t\t\tthrow new RuntimeException(e);",
+                    "\t\t}",
+                    "\t}");
+        }
+        return null;
+    }
+
     private static boolean requiresImport(Class<?> clazz) {
         return !"java.lang".equals(clazz.getPackageName());
     }
