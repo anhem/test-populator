@@ -16,40 +16,40 @@ public class RandomUtil {
     private static final int RIGHT_LIMIT = 122; // letter 'z'
     static final int STRING_LENGTH = 10;
     private static final int DAY_IN_SECONDS = 86400;
-    private static final Random random = new SecureRandom();
+    private static final Random RANDOM = new SecureRandom();
 
     private RandomUtil() {
     }
 
     public static int getRandomInt() {
-        return random.nextInt(RANDOM_INT_MAX_VALUE);
+        return RANDOM.nextInt(RANDOM_INT_MAX_VALUE);
     }
 
     public static int getRandomInt(int bound) {
-        return random.nextInt(bound);
+        return RANDOM.nextInt(bound);
     }
 
     public static int getRandomInt(int min, int max) {
-        return random.nextInt(max - min + 1) + min;
+        return RANDOM.nextInt(max - min + 1) + min;
     }
 
     public static short getRandomShort() {
-        return (short) random.nextInt(Short.MAX_VALUE + 1);
+        return (short) RANDOM.nextInt(Short.MAX_VALUE + 1);
     }
 
     public static Float getRandomFloat() {
-        return random.nextFloat();
+        return RANDOM.nextFloat();
     }
 
     public static String getRandomString() {
-        return random.ints(LEFT_LIMIT, RIGHT_LIMIT + 1)
+        return RANDOM.ints(LEFT_LIMIT, RIGHT_LIMIT + 1)
                 .limit(STRING_LENGTH)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
 
     public static Boolean getRandomBoolean() {
-        return random.nextBoolean();
+        return RANDOM.nextBoolean();
     }
 
     public static LocalDate getRandomLocalDate() {
@@ -57,7 +57,7 @@ public class RandomUtil {
     }
 
     public static LocalDate getRandomLocalDate(int yearRange) {
-        return LocalDate.now().minusYears(yearRange).plusDays(random.nextInt(yearRange * 2 * 365 + yearRange));
+        return LocalDate.now().minusYears(yearRange).plusDays(RANDOM.nextInt(yearRange * 2 * 365 + yearRange));
     }
 
     public static LocalDateTime getRandomLocalDateTime() {
@@ -72,16 +72,16 @@ public class RandomUtil {
         List<T> enumValues = Stream.of(clazz.getEnumConstants())
                 .filter(enumValue -> !removeUnrecognized || !enumValue.toString().equals("UNRECOGNIZED"))
                 .collect(Collectors.toList());
-        return enumValues.get(random.nextInt(enumValues.size()));
+        return enumValues.get(RANDOM.nextInt(enumValues.size()));
     }
 
     public static Byte getRandomByte() {
         byte[] bytes = new byte[1];
-        random.nextBytes(bytes);
+        RANDOM.nextBytes(bytes);
         return bytes[0];
     }
 
     public static LocalTime getRandomLocalTime() {
-        return LocalTime.ofSecondOfDay(random.nextInt(DAY_IN_SECONDS));
+        return LocalTime.ofSecondOfDay(RANDOM.nextInt(DAY_IN_SECONDS));
     }
 }
