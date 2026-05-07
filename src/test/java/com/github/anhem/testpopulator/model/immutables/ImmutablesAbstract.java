@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -46,6 +47,10 @@ public abstract class ImmutablesAbstract {
     public abstract Optional<Integer> getOptionalInteger();
 
     public abstract Optional<String> getOptionalString();
+
+    public abstract Charset getCharset();
+
+    public abstract Calendar getCalendar();
 
     public abstract LocalDate getLocalDate();
 

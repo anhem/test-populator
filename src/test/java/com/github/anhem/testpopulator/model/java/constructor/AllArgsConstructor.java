@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -35,6 +36,8 @@ public class AllArgsConstructor {
     private final UUID uuid;
     private final Optional<Integer> optionalInteger;
     private final Optional<String> optionalString;
+    private final Charset charset;
+    private final Calendar calendar;
     private final LocalDate localDate;
     private final LocalDateTime localDateTime;
     private final ZonedDateTime zonedDateTime;

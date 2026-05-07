@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -76,6 +77,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Path.class, object -> String.format("Path.of(\"%s\")", object.toString()));
         stringSuppliers.put(URL.class, object -> String.format("toUrl(\"%s\")", object));
         stringSuppliers.put(URI.class, object -> String.format("URI.create(\"%s\")", object));
+        stringSuppliers.put(Charset.class, object -> String.format("Charset.forName(\"%s\")", ((Charset) object).name()));
+        stringSuppliers.put(Calendar.class, object -> String.format("new Calendar.Builder().setInstant(%sL).build()", ((Calendar) object).getTimeInMillis()));
     }
 
     private final PopulateConfig populateConfig;
@@ -221,8 +224,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
             writeObjects(objectResult, path);
             writeMethods(objectResult, path);
             writeEndClass(path);
-            }
-            }
+        }
+    }
 
     private ObjectBuilder toTop() {
         return Stream.iterate(currentObjectBuilder, Objects::nonNull, ObjectBuilder::getParent)

@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Time;
@@ -27,6 +29,7 @@ public class ValueFactory {
     private static final Locale[] AVAILABLE_LOCALES = Locale.getAvailableLocales();
     private static final String[] AVAILABLE_TIMEZONE_IDS = TimeZone.getAvailableIDs();
     private static final List<String> AVAILABLE_ZONE_IDS = new ArrayList<>(ZoneId.getAvailableZoneIds());
+    private static final List<Charset> AVAILABLE_CHARSETS = new ArrayList<>(Charset.availableCharsets().values());
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
     private static final ZonedDateTime ZONED_DATE_TIME = LOCAL_DATE_TIME.atZone(ZoneId.of("UTC"));
     private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();
@@ -64,6 +67,8 @@ public class ValueFactory {
     private static final MonthDay MONTH_DAY = MonthDay.of(1, 1);
     private static final File FILE = new File("test-file");
     private static final Path PATH = Paths.get("test-path");
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
+    private static final Calendar CALENDAR = new GregorianCalendar(1970, Calendar.JANUARY, 1);
 
 
     private final boolean setRandomValues;
@@ -130,6 +135,8 @@ public class ValueFactory {
         typeSuppliers.put(Path.class, this::getPath);
         typeSuppliers.put(URL.class, this::getUrl);
         typeSuppliers.put(URI.class, this::getUri);
+        typeSuppliers.put(Charset.class, this::getCharset);
+        typeSuppliers.put(Calendar.class, this::getCalendar);
         typeSuppliers.putAll(classOverrides);
         return typeSuppliers;
     }
@@ -317,6 +324,14 @@ public class ValueFactory {
 
     private URI getUri() {
         return setRandomValues ? java.net.URI.create("http://example.com/" + getRandomString()) : URI;
+    }
+
+    private Charset getCharset() {
+        return setRandomValues ? AVAILABLE_CHARSETS.get(getRandomInt(AVAILABLE_CHARSETS.size())) : CHARSET;
+    }
+
+    private Calendar getCalendar() {
+        return setRandomValues ? new Calendar.Builder().setInstant(RandomUtil.getRandomLong()).build() : CALENDAR;
     }
 
 }

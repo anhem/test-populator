@@ -33,6 +33,10 @@ public class RandomUtil {
         return RANDOM.nextInt(max - min + 1) + min;
     }
 
+    public static long getRandomLong() {
+        return RANDOM.nextLong();
+    }
+
     public static short getRandomShort() {
         return (short) RANDOM.nextInt(Short.MAX_VALUE + 1);
     }

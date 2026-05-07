@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -34,6 +35,8 @@ public class LombokImmutable {
     UUID uuid;
     Optional<Integer> optionalInteger;
     Optional<String> optionalString;
+    Charset charset;
+    Calendar calendar;
     LocalDate localDate;
     LocalDateTime localDateTime;
     ZonedDateTime zonedDateTime;

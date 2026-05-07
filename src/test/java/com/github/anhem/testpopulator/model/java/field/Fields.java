@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -31,6 +32,8 @@ public class Fields {
     private UUID uuid;
     private Optional<Integer> optionalInteger;
     private Optional<String> optionalString;
+    private Charset charset;
+    private Calendar calendar;
     private LocalDate localDate;
     private LocalDateTime localDateTime;
     private ZonedDateTime zonedDateTime;
