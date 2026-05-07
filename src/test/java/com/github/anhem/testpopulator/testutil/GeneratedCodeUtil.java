@@ -34,6 +34,17 @@ public class GeneratedCodeUtil {
         assertGeneratedCode(object, path, packageName, object.getClass().getSimpleName());
     }
 
+    public static <T> void assertGeneratedCodeContains(T object, PopulateConfig populateConfig, String... expectedSnippets) {
+        String packageName = getPackageName(object.getClass());
+        Path path = getPath(packageName, formatClassName(object.getClass()), populateConfig);
+        try {
+            String sourceCode = Files.readString(path);
+            assertThat(sourceCode).contains(expectedSnippets);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static <T> void assertGeneratedCode(T object, Path path, String packageName, String simpleName) {
         try {
             compileGeneratedFile(path);

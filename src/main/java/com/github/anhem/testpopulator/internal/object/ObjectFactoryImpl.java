@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
@@ -229,6 +230,27 @@ public class ObjectFactoryImpl implements ObjectFactory {
             return object.toString();
         }
 
+        if (name != null) {
+            OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
+            if (populateConfig.getNameOverrides().containsKey(overrideTarget)) {
+                OverridePopulate<?> overridePopulate = populateConfig.getNameOverrides().get(overrideTarget);
+                if (isCreateCodeOverridden(overridePopulate)) {
+                    currentObjectBuilder.addMethods(overridePopulate.createMethods());
+                    currentObjectBuilder.addImports(overridePopulate.createImports());
+                    currentObjectBuilder.addStaticImports(overridePopulate.createStaticImports());
+                    return overridePopulate.createCode();
+                }
+            }
+        }
+
+        OverridePopulate<?> overridePopulate = populateConfig.getClassOverrides().get(clazz);
+        if (overridePopulate != null && isCreateCodeOverridden(overridePopulate)) {
+            currentObjectBuilder.addMethods(overridePopulate.createMethods());
+            currentObjectBuilder.addImports(overridePopulate.createImports());
+            currentObjectBuilder.addStaticImports(overridePopulate.createStaticImports());
+            return overridePopulate.createCode();
+        }
+
         Function<Object, String> stringSupplier = stringSuppliers.get(clazz);
         if (stringSupplier == null) {
             stringSupplier = stringSuppliers.get(object.getClass());
@@ -245,9 +267,19 @@ public class ObjectFactoryImpl implements ObjectFactory {
             }
         }
 
-        return populateConfig.getClassOverrides().getOrDefault(clazz, () -> {
-            throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
-        }).createCode();
+        if (overridePopulate != null) {
+            return overridePopulate.createCode();
+        }
+
+        throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
+    }
+
+    private boolean isCreateCodeOverridden(OverridePopulate<?> overridePopulate) {
+        try {
+            return !overridePopulate.getClass().getMethod("createCode").getDeclaringClass().equals(OverridePopulate.class);
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
     }
 
     private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {

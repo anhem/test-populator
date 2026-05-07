@@ -14,6 +14,9 @@ public abstract class ObjectBuilder {
     private final String name;
     private final BuildType buildType;
     private final List<ObjectBuilder> children = new ArrayList<>();
+    private final Set<String> extraMethods = new HashSet<>();
+    private final Set<String> extraImports = new HashSet<>();
+    private final Set<String> extraStaticImports = new HashSet<>();
     private final int expectedChildren;
     private ObjectBuilder parent;
     private String value;
@@ -36,6 +39,18 @@ public abstract class ObjectBuilder {
 
     public List<ObjectBuilder> getChildren() {
         return children;
+    }
+
+    public void addMethods(Collection<String> methods) {
+        this.extraMethods.addAll(methods);
+    }
+
+    public void addImports(Collection<String> imports) {
+        this.extraImports.addAll(imports);
+    }
+
+    public void addStaticImports(Collection<String> staticImports) {
+        this.extraStaticImports.addAll(staticImports);
     }
 
     public boolean hasAllChildren() {
@@ -80,11 +95,13 @@ public abstract class ObjectBuilder {
 
     private void getImports(Set<String> imports, Set<String> staticImports) {
         addImport(getClazz(), value, isUseFullyQualifiedName(), imports, staticImports);
+        imports.addAll(extraImports);
+        staticImports.addAll(extraStaticImports);
         children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
     }
 
     private Set<String> getMethods() {
-        Set<String> methods = new HashSet<>();
+        Set<String> methods = new HashSet<>(extraMethods);
         Optional.ofNullable(getHelperMethod(getClazz())).ifPresent(methods::add);
         children.forEach(child -> methods.addAll(child.getMethods()));
         return methods;

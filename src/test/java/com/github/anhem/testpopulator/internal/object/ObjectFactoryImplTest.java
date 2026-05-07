@@ -296,6 +296,246 @@ class ObjectFactoryImplTest {
     }
 
     @Test
+    void valueWithClassOverrideAndMethods() {
+        Class<MyClass> overrideClass = MyClass.class;
+        MyClass overrideValue = new MyClass();
+        String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(overrideClass, new OverridePopulate<>() {
+                    @Override
+                    public MyClass create() {
+                        return overrideValue;
+                    }
+
+                    @Override
+                    public String createCode() {
+                        return "myHelper()";
+                    }
+
+                    @Override
+                    public Set<String> createMethods() {
+                        return Set.of(methodDefinition);
+                    }
+                }).build();
+        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+
+        objectFactoryImpl.value(overrideValue, overrideClass, null);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final MyClass myClass_0 = myHelper();"
+        ));
+        assertThat(objectResult.getMethods()).contains(methodDefinition);
+    }
+
+    @Test
+    void valueWithNameOverrideAndMethods() {
+        String overrideName = "myCustomName";
+        MyClass overrideValue = new MyClass();
+        String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(overrideName, MyClass.class, new OverridePopulate<>() {
+                    @Override
+                    public Object create() {
+                        return overrideValue;
+                    }
+
+                    @Override
+                    public String createCode() {
+                        return "myHelper()";
+                    }
+
+                    @Override
+                    public Set<String> createMethods() {
+                        return Set.of(methodDefinition);
+                    }
+                }).build();
+        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+
+        objectFactoryImpl.value(overrideValue, MyClass.class, overrideName);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final MyClass myClass_0 = myHelper();"
+        ));
+        assertThat(objectResult.getMethods()).contains(methodDefinition);
+    }
+
+    @Test
+    void valueWithClassOverrideAndMethodsAndImports() {
+        Class<MyClass> overrideClass = MyClass.class;
+        MyClass overrideValue = new MyClass();
+        String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
+        String importDefinition = "java.util.Collections";
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(overrideClass, new OverridePopulate<>() {
+                    @Override
+                    public MyClass create() {
+                        return overrideValue;
+                    }
+
+                    @Override
+                    public String createCode() {
+                        return "myHelper()";
+                    }
+
+                    @Override
+                    public Set<String> createMethods() {
+                        return Set.of(methodDefinition);
+                    }
+
+                    @Override
+                    public Set<String> createImports() {
+                        return Set.of(importDefinition);
+                    }
+                }).build();
+        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+
+        objectFactoryImpl.value(overrideValue, overrideClass, null);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final MyClass myClass_0 = myHelper();"
+        ));
+        assertThat(objectResult.getMethods()).contains(methodDefinition);
+        assertThat(objectResult.getImports()).contains(importDefinition);
+    }
+
+    @Test
+    void valueWithNameOverrideAndMethodsAndImports() {
+        String overrideName = "myCustomName";
+        MyClass overrideValue = new MyClass();
+        String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
+        String importDefinition = "java.util.Collections";
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(overrideName, MyClass.class, new OverridePopulate<>() {
+                    @Override
+                    public Object create() {
+                        return overrideValue;
+                    }
+
+                    @Override
+                    public String createCode() {
+                        return "myHelper()";
+                    }
+
+                    @Override
+                    public Set<String> createMethods() {
+                        return Set.of(methodDefinition);
+                    }
+
+                    @Override
+                    public Set<String> createImports() {
+                        return Set.of(importDefinition);
+                    }
+                }).build();
+        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+
+        objectFactoryImpl.value(overrideValue, MyClass.class, overrideName);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final MyClass myClass_0 = myHelper();"
+        ));
+        assertThat(objectResult.getMethods()).contains(methodDefinition);
+        assertThat(objectResult.getImports()).contains(importDefinition);
+    }
+
+    @Test
+    void valueWithClassOverrideAndMethodsAndImportsAndStaticImports() {
+        Class<MyClass> overrideClass = MyClass.class;
+        MyClass overrideValue = new MyClass();
+        String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
+        String importDefinition = "java.util.Collections";
+        String staticImportDefinition = "java.util.Collections.singletonList";
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(overrideClass, new OverridePopulate<>() {
+                    @Override
+                    public MyClass create() {
+                        return overrideValue;
+                    }
+
+                    @Override
+                    public String createCode() {
+                        return "myHelper()";
+                    }
+
+                    @Override
+                    public Set<String> createMethods() {
+                        return Set.of(methodDefinition);
+                    }
+
+                    @Override
+                    public Set<String> createImports() {
+                        return Set.of(importDefinition);
+                    }
+
+                    @Override
+                    public Set<String> createStaticImports() {
+                        return Set.of(staticImportDefinition);
+                    }
+                }).build();
+        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+
+        objectFactoryImpl.value(overrideValue, overrideClass, null);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final MyClass myClass_0 = myHelper();"
+        ));
+        assertThat(objectResult.getMethods()).contains(methodDefinition);
+        assertThat(objectResult.getImports()).contains(importDefinition);
+        assertThat(objectResult.getStaticImports()).contains(staticImportDefinition);
+    }
+
+    @Test
+    void valueWithNameOverrideAndMethodsAndImportsAndStaticImports() {
+        String overrideName = "myCustomName";
+        MyClass overrideValue = new MyClass();
+        String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
+        String importDefinition = "java.util.Collections";
+        String staticImportDefinition = "java.util.Collections.singletonList";
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .addOverride(overrideName, MyClass.class, new OverridePopulate<>() {
+                    @Override
+                    public Object create() {
+                        return overrideValue;
+                    }
+
+                    @Override
+                    public String createCode() {
+                        return "myHelper()";
+                    }
+
+                    @Override
+                    public Set<String> createMethods() {
+                        return Set.of(methodDefinition);
+                    }
+
+                    @Override
+                    public Set<String> createImports() {
+                        return Set.of(importDefinition);
+                    }
+
+                    @Override
+                    public Set<String> createStaticImports() {
+                        return Set.of(staticImportDefinition);
+                    }
+                }).build();
+        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+
+        objectFactoryImpl.value(overrideValue, MyClass.class, overrideName);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final MyClass myClass_0 = myHelper();"
+        ));
+        assertThat(objectResult.getMethods()).contains(methodDefinition);
+        assertThat(objectResult.getImports()).contains(importDefinition);
+        assertThat(objectResult.getStaticImports()).contains(staticImportDefinition);
+    }
+
+    @Test
     void allValues() {
         objectFactoryImpl.constructor(MyClass.class, 13);
         objectFactoryImpl.value(ArbitraryEnum.A, ArbitraryEnum.class, null);
