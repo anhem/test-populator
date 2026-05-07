@@ -27,7 +27,7 @@ public interface OverridePopulate<T> extends TypeSupplier<T> {
     }
 
     /**
-     * Implementation required _only_ if ObjectFactory is used and you need to provide additional methods
+     * Implementation required _only_ if ObjectFactory is used, and you need to provide additional methods
      * to the generated class.
      *
      * @return a set of method definitions to be included in the generated class.
@@ -37,7 +37,7 @@ public interface OverridePopulate<T> extends TypeSupplier<T> {
     }
 
     /**
-     * Implementation required _only_ if ObjectFactory is used and you need to provide additional imports
+     * Implementation required _only_ if ObjectFactory is used, and you need to provide additional imports
      * to the generated class.
      *
      * @return a set of imports to be included in the generated class.
@@ -47,7 +47,7 @@ public interface OverridePopulate<T> extends TypeSupplier<T> {
     }
 
     /**
-     * Implementation required _only_ if ObjectFactory is used and you need to provide additional static imports
+     * Implementation required _only_ if ObjectFactory is used, and you need to provide additional static imports
      * to the generated class.
      *
      * @return a set of static imports to be included in the generated class.
