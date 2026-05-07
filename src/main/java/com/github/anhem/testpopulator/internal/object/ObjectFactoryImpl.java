@@ -241,13 +241,13 @@ public class ObjectFactoryImpl implements ObjectFactory {
         if (name != null) {
             OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
             if (populateConfig.getNameOverrides().containsKey(overrideTarget)) {
-                return populateConfig.getNameOverrides().get(overrideTarget).createString();
+                return populateConfig.getNameOverrides().get(overrideTarget).createCode();
             }
         }
 
         return populateConfig.getClassOverrides().getOrDefault(clazz, () -> {
             throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
-        }).createString();
+        }).createCode();
     }
 
     private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {

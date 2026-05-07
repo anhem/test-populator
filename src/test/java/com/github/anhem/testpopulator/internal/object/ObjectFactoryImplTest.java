@@ -254,7 +254,7 @@ class ObjectFactoryImplTest {
                     }
 
                     @Override
-                    public String createString() {
+                    public String createCode() {
                         return "CUSTOM_STRING";
                     }
                 }).build();
@@ -281,7 +281,7 @@ class ObjectFactoryImplTest {
                     }
 
                     @Override
-                    public String createString() {
+                    public String createCode() {
                         return "CUSTOM_STRING_FOR_CLASS";
                     }
                 }).build();

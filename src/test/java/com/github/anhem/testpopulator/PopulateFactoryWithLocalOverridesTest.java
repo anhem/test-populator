@@ -65,7 +65,7 @@ class PopulateFactoryWithLocalOverridesTest {
             }
 
             @Override
-            public String createString() {
+            public String createCode() {
                 return "new MyUUID(\"uuid\")";
             }
         })).isEqualTo(localValue);

@@ -19,7 +19,7 @@ public interface OverridePopulate<T> extends TypeSupplier<T> {
      * "new MyFutureDate(LocalDate.of(3000, 1, 1))"
      * "new MyUUID(java.util.UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\").toString())"
      */
-    default String createString() {
+    default String createCode() {
         throw new ObjectException(String.format("createString() is not implemented for class %s", create().getClass().getName()));
     }
 }

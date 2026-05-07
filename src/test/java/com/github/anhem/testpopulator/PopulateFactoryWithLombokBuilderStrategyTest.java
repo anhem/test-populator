@@ -180,7 +180,7 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
                     }
 
                     @Override
-                    public String createString() {
+                    public String createCode() {
                         return "List.of(\"foo\", \"bar\")";
                     }
                 })
