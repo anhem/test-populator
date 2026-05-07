@@ -4,7 +4,11 @@ import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import lombok.Builder;
 import lombok.Value;
 
+import java.io.File;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
@@ -25,6 +29,8 @@ public class LombokImmutable {
     Double doubleValue;
     LocalDate localDate;
     LocalDateTime localDateTime;
+    ZonedDateTime zonedDateTime;
+    Instant instant;
     List<String> listOfStrings;
     Set<String> setOfStrings;
     Map<Integer, String> mapOfIntegersToStrings;
@@ -50,4 +56,16 @@ public class LombokImmutable {
     java.sql.Date sqlDate;
     Time sqlTime;
     Timestamp sqlTimestamp;
+    Currency currency;
+    Locale locale;
+    TimeZone timeZone;
+    ZoneId zoneId;
+    ZoneOffset zoneOffset;
+    Year year;
+    YearMonth yearMonth;
+    MonthDay monthDay;
+    File file;
+    Path path;
+    URL url;
+    URI uri;
 }

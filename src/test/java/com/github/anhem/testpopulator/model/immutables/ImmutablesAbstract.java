@@ -3,14 +3,15 @@ package com.github.anhem.testpopulator.model.immutables;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import org.immutables.value.Value;
 
+import java.io.File;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Value.Immutable
 public abstract class ImmutablesAbstract {
@@ -37,6 +38,10 @@ public abstract class ImmutablesAbstract {
 
     public abstract LocalDateTime getLocalDateTime();
 
+    public abstract ZonedDateTime getZonedDateTime();
+
+    public abstract Instant getInstant();
+
     public abstract List<String> getListOfStrings();
 
     public abstract Set<String> getSetOfStrings();
@@ -48,6 +53,12 @@ public abstract class ImmutablesAbstract {
     public abstract ArbitraryEnum getArbitraryEnum();
 
     public abstract String[] getArrayOfStrings();
+
+    public abstract ArrayList<String> getArrayList();
+
+    public abstract HashMap<String, String> getHashMap();
+
+    public abstract HashSet<String> getHashSet();
 
     public abstract Date date();
 
@@ -80,5 +91,29 @@ public abstract class ImmutablesAbstract {
     public abstract Time getSqlTime();
 
     public abstract Timestamp getSqlTimestamp();
+
+    public abstract Currency getCurrency();
+
+    public abstract Locale getLocale();
+
+    public abstract TimeZone getTimeZone();
+
+    public abstract ZoneId getZoneId();
+
+    public abstract ZoneOffset getZoneOffset();
+
+    public abstract Year getYear();
+
+    public abstract YearMonth getYearMonth();
+
+    public abstract MonthDay getMonthDay();
+
+    public abstract File getFile();
+
+    public abstract Path getPath();
+
+    public abstract URL getUrl();
+
+    public abstract URI getUri();
 
 }

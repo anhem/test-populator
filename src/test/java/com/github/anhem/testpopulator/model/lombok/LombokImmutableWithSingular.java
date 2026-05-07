@@ -5,14 +5,15 @@ import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
 
+import java.io.File;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Value
 @Builder
@@ -29,6 +30,8 @@ public class LombokImmutableWithSingular {
     Double doubleValue;
     LocalDate localDate;
     LocalDateTime localDateTime;
+    ZonedDateTime zonedDateTime;
+    Instant instant;
     @Singular
     List<String> listOfStrings;
     @Singular
@@ -41,6 +44,9 @@ public class LombokImmutableWithSingular {
     Map<String, Integer> mapOfStringsToIntegers;
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
+    ArrayList<String> arrayList;
+    HashMap<String, String> hashMap;
+    HashSet<String> hashSet;
     Date date;
     Byte byteValue;
     byte primitiveByteValue;
@@ -57,4 +63,16 @@ public class LombokImmutableWithSingular {
     java.sql.Date sqlDate;
     Time sqlTime;
     Timestamp sqlTimestamp;
+    Currency currency;
+    Locale locale;
+    TimeZone timeZone;
+    ZoneId zoneId;
+    ZoneOffset zoneOffset;
+    Year year;
+    YearMonth yearMonth;
+    MonthDay monthDay;
+    File file;
+    Path path;
+    URL url;
+    URI uri;
 }

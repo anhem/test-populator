@@ -3,14 +3,15 @@ package com.github.anhem.testpopulator.model.java.field;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import lombok.Getter;
 
+import java.io.File;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 public class Fields {
@@ -25,12 +26,17 @@ public class Fields {
     private Double doubleValue;
     private LocalDate localDate;
     private LocalDateTime localDateTime;
+    private ZonedDateTime zonedDateTime;
+    private Instant instant;
     private List<String> listOfStrings;
     private Set<String> setOfStrings;
     private Map<Integer, String> mapOfIntegersToStrings;
     private Map<String, Integer> mapOfStringsToIntegers;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
+    private ArrayList<String> arrayList;
+    private HashMap<String, String> hashMap;
+    private HashSet<String> hashSet;
     private Date date;
     private Byte byteValue;
     private byte primitiveByteValue;
@@ -47,4 +53,16 @@ public class Fields {
     private java.sql.Date sqlDate;
     private Time sqlTime;
     private Timestamp sqlTimestamp;
+    private Currency currency;
+    private Locale locale;
+    private TimeZone timeZone;
+    private ZoneId zoneId;
+    private ZoneOffset zoneOffset;
+    private Year year;
+    private YearMonth yearMonth;
+    private MonthDay monthDay;
+    private File file;
+    private Path path;
+    private URL url;
+    private URI uri;
 }
