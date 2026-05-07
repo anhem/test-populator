@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
@@ -28,6 +29,12 @@ public class AllArgsConstructor {
     private final Long longValue;
     private final double primitiveDoubleValue;
     private final Double doubleValue;
+    private final boolean primitiveBooleanValue;
+    private final Boolean booleanValue;
+    private final BigDecimal bigDecimal;
+    private final UUID uuid;
+    private final Optional<Integer> optionalInteger;
+    private final Optional<String> optionalString;
     private final LocalDate localDate;
     private final LocalDateTime localDateTime;
     private final ZonedDateTime zonedDateTime;

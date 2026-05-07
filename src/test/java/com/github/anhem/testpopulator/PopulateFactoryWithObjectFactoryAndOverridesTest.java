@@ -133,11 +133,14 @@ public class PopulateFactoryWithObjectFactoryAndOverridesTest {
         assertThat(result.getStringValue()).isEqualTo(customString);
         assertThat(result.getIntegerValue()).isEqualTo(customInt);
         assertThat(result.getListOfStrings()).isEqualTo(customList);
+        assertThat(result.getOptionalInteger()).isPresent();
+        assertThat(result.getOptionalString()).isPresent();
         com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCodeContains(result, populateConfig,
                 "private static String createString() { return \"customStringValue\"; }",
                 "private static Integer createInt() { return 888; }",
                 "private static List<String> createList() {",
-                "return Arrays.asList(\"A\", \"B\");"
+                "return Arrays.asList(\"A\", \"B\");",
+                "Optional.ofNullable("
         );
         assertGeneratedCode(result, populateConfig);
     }

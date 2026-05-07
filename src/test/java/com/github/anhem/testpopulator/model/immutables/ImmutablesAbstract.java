@@ -4,6 +4,7 @@ import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import org.immutables.value.Value;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
@@ -33,6 +34,18 @@ public abstract class ImmutablesAbstract {
     public abstract double getPrimitiveDoubleValue();
 
     public abstract Double getDoubleValue();
+
+    public abstract boolean getPrimitiveBooleanValue();
+
+    public abstract Boolean getBooleanValue();
+
+    public abstract BigDecimal getBigDecimal();
+
+    public abstract UUID getUuid();
+
+    public abstract Optional<Integer> getOptionalInteger();
+
+    public abstract Optional<String> getOptionalString();
 
     public abstract LocalDate getLocalDate();
 

@@ -54,10 +54,15 @@ public class PopulateUtil {
         return Map.Entry.class.isAssignableFrom(clazz);
     }
 
+    public static <T> boolean isOptional(Class<T> clazz) {
+        return Optional.class.isAssignableFrom(clazz);
+    }
+
     public static <T> boolean isCollectionLike(Class<T> clazz) {
         return Collection.class.isAssignableFrom(clazz) ||
                 Map.class.isAssignableFrom(clazz) ||
                 Map.Entry.class.isAssignableFrom(clazz) ||
+                isOptional(clazz) ||
                 (Iterable.class.isAssignableFrom(clazz) && (clazz.equals(Iterable.class) || !isJavaBaseClass(clazz)));
     }
 

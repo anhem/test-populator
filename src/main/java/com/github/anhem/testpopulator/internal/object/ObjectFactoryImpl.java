@@ -170,6 +170,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
+    public void optional() {
+        setNextObjectBuilder(Optional.class, OPTIONAL, 1);
+    }
+
+    @Override
     public <T> void array(Class<T> clazz) {
         setNextObjectBuilder(clazz, ARRAY, 1);
     }

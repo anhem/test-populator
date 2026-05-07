@@ -20,6 +20,7 @@ public class BuildTypeObjectBuilder extends ObjectBuilder {
     private static final String LIST_OF = "%s %s<%s> %s = List.of(%s);";
     private static final String MAP_OF = "%s %s<%s> %s = Map.of(%s);";
     private static final String MAP_ENTRY = "%s %s<%s> %s = new AbstractMap.SimpleEntry<>(%s);";
+    private static final String OPTIONAL_OF = "%s %s<%s> %s = Optional.ofNullable(%s);";
     private static final String NEW_ARRAY = "%s %s[] %s = new %s[]{%s};";
     private static final String NEW_VALUE = "%s %s %s = %s;";
 
@@ -67,6 +68,8 @@ public class BuildTypeObjectBuilder extends ObjectBuilder {
                 return buildMapOf();
             case MAP_ENTRY:
                 return buildMapEntry();
+            case OPTIONAL:
+                return buildOptional();
             case ARRAY:
                 return buildArray();
             case VALUE:
@@ -143,6 +146,13 @@ public class BuildTypeObjectBuilder extends ObjectBuilder {
         return concatenate(
                 buildChildren(),
                 Stream.of(String.format(MAP_ENTRY, PSF, getClassName(), formatTypes(), getName(), buildArguments())))
+                .collect(Collectors.toList());
+    }
+
+    private List<String> buildOptional() {
+        return concatenate(
+                buildChildren(),
+                Stream.of(String.format(OPTIONAL_OF, PSF, getClassName(), formatTypes(), getName(), buildArguments())))
                 .collect(Collectors.toList());
     }
 

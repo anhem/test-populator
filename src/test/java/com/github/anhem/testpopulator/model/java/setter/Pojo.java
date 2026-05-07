@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
@@ -31,6 +32,12 @@ public class Pojo {
     private Long longValue;
     private double primitiveDoubleValue;
     private Double doubleValue;
+    private boolean primitiveBooleanValue;
+    private Boolean booleanValue;
+    private BigDecimal bigDecimal;
+    private UUID uuid;
+    private Optional<Integer> optionalInteger;
+    private Optional<String> optionalString;
     private LocalDate localDate;
     private LocalDateTime localDateTime;
     private ZonedDateTime zonedDateTime;

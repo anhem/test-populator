@@ -69,6 +69,11 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public void optional() {
+        //ignored
+    }
+
+    @Override
     public <T> void array(Class<T> clazz) {
         //ignored
     }

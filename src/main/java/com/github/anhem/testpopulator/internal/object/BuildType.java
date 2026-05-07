@@ -15,6 +15,7 @@ public enum BuildType {
     MAP_OF,
     MAP_ENTRY,
     ARRAY,
+    OPTIONAL,
     VALUE;
 
     public boolean isParameterizedType() {
@@ -25,6 +26,7 @@ public enum BuildType {
             case LIST_OF:
             case MAP:
             case MAP_OF:
+            case OPTIONAL:
                 return true;
             default:
                 return false;

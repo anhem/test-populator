@@ -28,6 +28,8 @@ public interface ObjectFactory {
 
     <T> void mapEntry(Class<T> clazz);
 
+    void optional();
+
     <T> void array(Class<T> clazz);
 
     <T> void value(T value, Class<T> clazz, String name);

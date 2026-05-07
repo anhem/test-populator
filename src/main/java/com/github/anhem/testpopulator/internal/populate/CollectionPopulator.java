@@ -31,6 +31,8 @@ public class CollectionPopulator implements PopulatingStrategy {
                 return populateForSet(collectionCarrier, populator);
             } else if (isMapEntry(clazz)) {
                 return populateForMapEntry(collectionCarrier, populator);
+            } else if (isOptional(clazz)) {
+                return populateForOptional(collectionCarrier, populator);
             } else if (isCollectionLike(clazz)) {
                 return populateForList(collectionCarrier, populator);
             }
@@ -99,6 +101,12 @@ public class CollectionPopulator implements PopulatingStrategy {
                     .map(value -> (T) List.of(value))
                     .orElseGet(() -> (T) List.of());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T populateForOptional(CollectionCarrier<T> classCarrier, Populator populator) {
+        classCarrier.getObjectFactory().optional();
+        return (T) Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator));
     }
 
     private Object continuePopulateWithType(TypeCarrier typeCarrier, Populator populator) {

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
@@ -27,6 +28,12 @@ public class LombokImmutable {
     Long longValue;
     double primitiveDoubleValue;
     Double doubleValue;
+    boolean primitiveBooleanValue;
+    Boolean booleanValue;
+    BigDecimal bigDecimal;
+    UUID uuid;
+    Optional<Integer> optionalInteger;
+    Optional<String> optionalString;
     LocalDate localDate;
     LocalDateTime localDateTime;
     ZonedDateTime zonedDateTime;
