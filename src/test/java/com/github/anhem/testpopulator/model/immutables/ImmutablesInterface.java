@@ -50,6 +50,8 @@ public interface ImmutablesInterface {
 
     Charset getCharset();
 
+    Calendar getCalendar();
+
     LocalDate getLocalDate();
 
     LocalDateTime getLocalDateTime();

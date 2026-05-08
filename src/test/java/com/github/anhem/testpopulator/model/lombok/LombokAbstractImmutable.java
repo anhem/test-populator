@@ -38,6 +38,7 @@ public abstract class LombokAbstractImmutable {
     Optional<Integer> optionalInteger;
     Optional<String> optionalString;
     Charset charset;
+    Calendar calendar;
     LocalDate localDate;
     LocalDateTime localDateTime;
     ZonedDateTime zonedDateTime;

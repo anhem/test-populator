@@ -38,6 +38,7 @@ public abstract class AllArgsConstructorAbstract {
     private final Optional<Integer> optionalInteger;
     private final Optional<String> optionalString;
     private final Charset charset;
+    private final Calendar calendar;
     private final LocalDate localDate;
     private final LocalDateTime localDateTime;
     private final ZonedDateTime zonedDateTime;

@@ -26,7 +26,9 @@ import static com.github.anhem.testpopulator.internal.util.RandomUtil.*;
 public class ValueFactory {
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
     private static final List<Currency> AVAILABLE_CURRENCIES = new ArrayList<>(Currency.getAvailableCurrencies());
-    private static final Locale[] AVAILABLE_LOCALES = Locale.getAvailableLocales();
+    private static final Locale[] AVAILABLE_LOCALES = Arrays.stream(Locale.getAvailableLocales())
+            .filter(l -> l.equals(Locale.forLanguageTag(l.toLanguageTag())))
+            .toArray(Locale[]::new);
     private static final String[] AVAILABLE_TIMEZONE_IDS = TimeZone.getAvailableIDs();
     private static final List<String> AVAILABLE_ZONE_IDS = new ArrayList<>(ZoneId.getAvailableZoneIds());
     private static final List<Charset> AVAILABLE_CHARSETS = new ArrayList<>(Charset.availableCharsets().values());

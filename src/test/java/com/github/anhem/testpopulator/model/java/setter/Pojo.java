@@ -40,6 +40,7 @@ public class Pojo {
     private Optional<Integer> optionalInteger;
     private Optional<String> optionalString;
     private Charset charset;
+    private Calendar calendar;
     private LocalDate localDate;
     private LocalDateTime localDateTime;
     private ZonedDateTime zonedDateTime;
