@@ -49,6 +49,12 @@ public abstract class ImmutablesAbstract {
 
     public abstract Optional<String> getOptionalString();
 
+    public abstract OptionalInt getOptionalInt();
+
+    public abstract OptionalLong getOptionalLong();
+
+    public abstract OptionalDouble getOptionalDouble();
+
     public abstract Charset getCharset();
 
     public abstract Calendar getCalendar();
@@ -96,6 +102,16 @@ public abstract class ImmutablesAbstract {
     public abstract ArbitraryEnum getArbitraryEnum();
 
     public abstract String[] getArrayOfStrings();
+
+    public abstract byte[] getArrayOfBytes();
+
+    public abstract int[] getArrayOfInts();
+
+    public abstract long[] getArrayOfLongs();
+
+    public abstract double[] getArrayOfDoubles();
+
+    public abstract boolean[] getArrayOfBooleans();
 
     public abstract ArrayList<String> getArrayList();
 

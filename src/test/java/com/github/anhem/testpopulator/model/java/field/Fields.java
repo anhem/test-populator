@@ -33,6 +33,9 @@ public class Fields {
     private UUID uuid;
     private Optional<Integer> optionalInteger;
     private Optional<String> optionalString;
+    private OptionalInt optionalInt;
+    private OptionalLong optionalLong;
+    private OptionalDouble optionalDouble;
     private Charset charset;
     private Calendar calendar;
     private LocalDate localDate;
@@ -57,6 +60,11 @@ public class Fields {
     private ConcurrentSkipListSet<String> concurrentSkipListSet;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
+    private byte[] arrayOfBytes;
+    private int[] arrayOfInts;
+    private long[] arrayOfLongs;
+    private double[] arrayOfDoubles;
+    private boolean[] arrayOfBooleans;
     private ArrayList<String> arrayList;
     private LinkedList<String> linkedList;
     private HashMap<String, String> hashMap;

@@ -37,6 +37,9 @@ public class AllArgsConstructor {
     private final UUID uuid;
     private final Optional<Integer> optionalInteger;
     private final Optional<String> optionalString;
+    private final OptionalInt optionalInt;
+    private final OptionalLong optionalLong;
+    private final OptionalDouble optionalDouble;
     private final Charset charset;
     private final Calendar calendar;
     private final LocalDate localDate;
@@ -61,6 +64,11 @@ public class AllArgsConstructor {
     private final ConcurrentSkipListSet<String> concurrentSkipListSet;
     private final ArbitraryEnum arbitraryEnum;
     private final String[] arrayOfStrings;
+    private final byte[] arrayOfBytes;
+    private final int[] arrayOfInts;
+    private final long[] arrayOfLongs;
+    private final double[] arrayOfDoubles;
+    private final boolean[] arrayOfBooleans;
     private final ArrayList<String> arrayList;
     private final LinkedList<String> linkedList;
     private final HashMap<String, String> hashMap;

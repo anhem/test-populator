@@ -79,6 +79,9 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(URI.class, object -> String.format("URI.create(\"%s\")", object));
         stringSuppliers.put(Charset.class, object -> String.format("Charset.forName(\"%s\")", ((Charset) object).name()));
         stringSuppliers.put(Calendar.class, object -> String.format("new Calendar.Builder().setInstant(%sL).build()", ((Calendar) object).getTimeInMillis()));
+        stringSuppliers.put(OptionalInt.class, object -> String.format("OptionalInt.of(%d)", ((OptionalInt) object).getAsInt()));
+        stringSuppliers.put(OptionalLong.class, object -> String.format("OptionalLong.of(%dL)", ((OptionalLong) object).getAsLong()));
+        stringSuppliers.put(OptionalDouble.class, object -> String.format("OptionalDouble.of(%s)", ((OptionalDouble) object).getAsDouble()));
     }
 
     private final PopulateConfig populateConfig;

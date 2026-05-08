@@ -71,6 +71,9 @@ public class ValueFactory {
     private static final Path PATH = Paths.get("test-path");
     private static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final Calendar CALENDAR = new GregorianCalendar(1970, Calendar.JANUARY, 1);
+    private static final OptionalInt OPTIONAL_INT = OptionalInt.of(INTEGER);
+    private static final OptionalLong OPTIONAL_LONG = OptionalLong.of(LONG);
+    private static final OptionalDouble OPTIONAL_DOUBLE = OptionalDouble.of(DOUBLE);
 
 
     private final boolean setRandomValues;
@@ -139,6 +142,9 @@ public class ValueFactory {
         typeSuppliers.put(URI.class, this::getUri);
         typeSuppliers.put(Charset.class, this::getCharset);
         typeSuppliers.put(Calendar.class, this::getCalendar);
+        typeSuppliers.put(OptionalInt.class, this::getOptionalInt);
+        typeSuppliers.put(OptionalLong.class, this::getOptionalLong);
+        typeSuppliers.put(OptionalDouble.class, this::getOptionalDouble);
         typeSuppliers.putAll(classOverrides);
         return typeSuppliers;
     }
@@ -334,6 +340,18 @@ public class ValueFactory {
 
     private Calendar getCalendar() {
         return setRandomValues ? new Calendar.Builder().setInstant(RandomUtil.getRandomLong()).build() : CALENDAR;
+    }
+
+    private OptionalInt getOptionalInt() {
+        return setRandomValues ? OptionalInt.of(getRandomInt()) : OPTIONAL_INT;
+    }
+
+    private OptionalLong getOptionalLong() {
+        return setRandomValues ? OptionalLong.of(getRandomInt()) : OPTIONAL_LONG;
+    }
+
+    private OptionalDouble getOptionalDouble() {
+        return setRandomValues ? OptionalDouble.of(getRandomInt()) : OPTIONAL_DOUBLE;
     }
 
 }

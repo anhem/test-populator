@@ -37,6 +37,9 @@ public class LombokImmutableWithSingular {
     UUID uuid;
     Optional<Integer> optionalInteger;
     Optional<String> optionalString;
+    OptionalInt optionalInt;
+    OptionalLong optionalLong;
+    OptionalDouble optionalDouble;
     Charset charset;
     Calendar calendar;
     LocalDate localDate;
@@ -71,6 +74,11 @@ public class LombokImmutableWithSingular {
     ConcurrentSkipListSet<String> concurrentSkipListSet;
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
+    byte[] arrayOfBytes;
+    int[] arrayOfInts;
+    long[] arrayOfLongs;
+    double[] arrayOfDoubles;
+    boolean[] arrayOfBooleans;
     ArrayList<String> arrayList;
     LinkedList<String> linkedList;
     HashMap<String, String> hashMap;

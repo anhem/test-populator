@@ -49,6 +49,12 @@ public interface ImmutablesInterface {
 
     Optional<String> getOptionalString();
 
+    OptionalInt getOptionalInt();
+
+    OptionalLong getOptionalLong();
+
+    OptionalDouble getOptionalDouble();
+
     Charset getCharset();
 
     Calendar getCalendar();
@@ -96,6 +102,16 @@ public interface ImmutablesInterface {
     ArbitraryEnum getArbitraryEnum();
 
     String[] getArrayOfStrings();
+
+    byte[] getArrayOfBytes();
+
+    int[] getArrayOfInts();
+
+    long[] getArrayOfLongs();
+
+    double[] getArrayOfDoubles();
+
+    boolean[] getArrayOfBooleans();
 
     ArrayList<String> getArrayList();
 
