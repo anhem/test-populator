@@ -15,6 +15,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Getter
 @EqualsAndHashCode
@@ -52,6 +53,12 @@ public class AllArgsConstructor {
     private final Map<String, Integer> mapOfStringsToIntegers;
     private final SortedMap<String, Integer> sortedMap;
     private final NavigableMap<String, Integer> navigableMap;
+    private final ConcurrentMap<String, String> concurrentMap;
+    private final ConcurrentNavigableMap<String, String> concurrentNavigableMap;
+    private final ConcurrentSkipListMap<String, String> concurrentSkipListMap;
+    private final CopyOnWriteArrayList<String> copyOnWriteArrayList;
+    private final CopyOnWriteArraySet<String> copyOnWriteArraySet;
+    private final ConcurrentSkipListSet<String> concurrentSkipListSet;
     private final ArbitraryEnum arbitraryEnum;
     private final String[] arrayOfStrings;
     private final ArrayList<String> arrayList;

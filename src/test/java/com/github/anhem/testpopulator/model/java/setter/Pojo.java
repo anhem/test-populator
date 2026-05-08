@@ -17,6 +17,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Getter
 @Setter
@@ -55,6 +56,12 @@ public class Pojo {
     private Map<String, Integer> mapOfStringsToIntegers;
     private SortedMap<String, Integer> sortedMap;
     private NavigableMap<String, Integer> navigableMap;
+    private ConcurrentMap<String, String> concurrentMap;
+    private ConcurrentNavigableMap<String, String> concurrentNavigableMap;
+    private ConcurrentSkipListMap<String, String> concurrentSkipListMap;
+    private CopyOnWriteArrayList<String> copyOnWriteArrayList;
+    private CopyOnWriteArraySet<String> copyOnWriteArraySet;
+    private ConcurrentSkipListSet<String> concurrentSkipListSet;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
     private ArrayList<String> arrayList;

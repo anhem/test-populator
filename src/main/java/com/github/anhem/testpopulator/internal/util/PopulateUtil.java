@@ -6,6 +6,8 @@ import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
@@ -64,6 +66,14 @@ public class PopulateUtil {
 
     public static <T> boolean isNavigableMap(Class<T> clazz) {
         return NavigableMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isConcurrentMap(Class<T> clazz) {
+        return ConcurrentMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isConcurrentNavigableMap(Class<T> clazz) {
+        return ConcurrentNavigableMap.class.isAssignableFrom(clazz);
     }
 
     public static <T> boolean isDeque(Class<T> clazz) {

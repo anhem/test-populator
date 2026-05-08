@@ -16,6 +16,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Value
 @Builder
@@ -62,6 +63,12 @@ public class LombokImmutableWithSingular {
     SortedMap<String, Integer> sortedMap;
     @Singular("navigableMap")
     NavigableMap<String, Integer> navigableMap;
+    ConcurrentMap<String, String> concurrentMap;
+    ConcurrentNavigableMap<String, String> concurrentNavigableMap;
+    ConcurrentSkipListMap<String, String> concurrentSkipListMap;
+    CopyOnWriteArrayList<String> copyOnWriteArrayList;
+    CopyOnWriteArraySet<String> copyOnWriteArraySet;
+    ConcurrentSkipListSet<String> concurrentSkipListSet;
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
     ArrayList<String> arrayList;

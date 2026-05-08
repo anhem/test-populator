@@ -14,6 +14,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Value.Immutable
 public interface ImmutablesInterface {
@@ -79,6 +80,18 @@ public interface ImmutablesInterface {
     SortedMap<String, Integer> getSortedMap();
 
     NavigableMap<String, Integer> getNavigableMap();
+
+    ConcurrentMap<String, String> getConcurrentMap();
+
+    ConcurrentNavigableMap<String, String> getConcurrentNavigableMap();
+
+    ConcurrentSkipListMap<String, String> getConcurrentSkipListMap();
+
+    CopyOnWriteArrayList<String> getCopyOnWriteArrayList();
+
+    CopyOnWriteArraySet<String> getCopyOnWriteArraySet();
+
+    ConcurrentSkipListSet<String> getConcurrentSkipListSet();
 
     ArbitraryEnum getArbitraryEnum();
 

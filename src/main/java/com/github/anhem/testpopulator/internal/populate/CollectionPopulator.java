@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_COLLECTION;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.MISSING_COLLECTION_TYPE;
@@ -50,6 +51,9 @@ public class CollectionPopulator implements PopulatingStrategy {
             classCarrier.getObjectFactory().map(clazz);
             Map<Object, Object> map = (Map<Object, Object>) clazz.getConstructor().newInstance();
             return (T) populateMap(classCarrier, populator, map);
+        } else if (isConcurrentMap(clazz) || isConcurrentNavigableMap(clazz)) {
+            classCarrier.getObjectFactory().map(ConcurrentSkipListMap.class);
+            return (T) populateMap(classCarrier, populator, new ConcurrentSkipListMap<>());
         } else if (isSortedMap(clazz) || isNavigableMap(clazz)) {
             classCarrier.getObjectFactory().map(TreeMap.class);
             return (T) populateMap(classCarrier, populator, new TreeMap<>());
