@@ -46,8 +46,32 @@ public class PopulateUtil {
         return Set.class.isAssignableFrom(clazz);
     }
 
+    public static <T> boolean isSortedSet(Class<T> clazz) {
+        return SortedSet.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isNavigableSet(Class<T> clazz) {
+        return NavigableSet.class.isAssignableFrom(clazz);
+    }
+
     public static <T> boolean isMap(Class<T> clazz) {
         return Map.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isSortedMap(Class<T> clazz) {
+        return SortedMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isNavigableMap(Class<T> clazz) {
+        return NavigableMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isDeque(Class<T> clazz) {
+        return Deque.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isQueue(Class<T> clazz) {
+        return Queue.class.isAssignableFrom(clazz);
     }
 
     public static <T> boolean isMapEntry(Class<T> clazz) {

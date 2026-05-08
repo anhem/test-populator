@@ -6,9 +6,11 @@ import lombok.Singular;
 import lombok.Value;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -28,6 +30,13 @@ public class LombokImmutableWithSingular {
     Long longValue;
     double primitiveDoubleValue;
     Double doubleValue;
+    boolean primitiveBooleanValue;
+    Boolean booleanValue;
+    BigDecimal bigDecimal;
+    UUID uuid;
+    Optional<Integer> optionalInteger;
+    Optional<String> optionalString;
+    Charset charset;
     LocalDate localDate;
     LocalDateTime localDateTime;
     ZonedDateTime zonedDateTime;
@@ -38,15 +47,28 @@ public class LombokImmutableWithSingular {
     Set<String> setOfStrings;
     @Singular("setOfIntegerOverride")
     Set<Integer> setOfIntegers;
+    Queue<String> queue;
+    Deque<String> deque;
+    @Singular("sortedSet")
+    SortedSet<String> sortedSet;
+    @Singular("navigableSet")
+    NavigableSet<String> navigableSet;
     @Singular
     Map<Integer, String> mapOfIntegersToStrings;
     @Singular
     Map<String, Integer> mapOfStringsToIntegers;
+    @Singular("sortedMap")
+    SortedMap<String, Integer> sortedMap;
+    @Singular("navigableMap")
+    NavigableMap<String, Integer> navigableMap;
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
     ArrayList<String> arrayList;
+    LinkedList<String> linkedList;
     HashMap<String, String> hashMap;
+    LinkedHashMap<String, String> linkedHashMap;
     HashSet<String> hashSet;
+    LinkedHashSet<String> linkedHashSet;
     Date date;
     Byte byteValue;
     byte primitiveByteValue;

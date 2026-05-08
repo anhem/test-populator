@@ -34,7 +34,7 @@ public class CollectionPopulator implements PopulatingStrategy {
             } else if (isOptional(clazz)) {
                 return populateForOptional(collectionCarrier, populator);
             } else if (isCollectionLike(clazz)) {
-                return populateForList(collectionCarrier, populator);
+                return populateForCollection(collectionCarrier, populator);
             }
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_COLLECTION, collectionCarrier.getClazz().getTypeName()), e);
@@ -45,13 +45,14 @@ public class CollectionPopulator implements PopulatingStrategy {
 
     @SuppressWarnings("unchecked")
     private <T> T populateForMap(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<T> clazz = classCarrier.getClazz();
         if (hasConstructors(classCarrier)) {
-            classCarrier.getObjectFactory().map(classCarrier.getClazz());
-            Map<Object, Object> map = (Map<Object, Object>) classCarrier.getClazz().getConstructor().newInstance();
-            Optional<Object> key = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator));
-            Optional<Object> value = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1)), populator));
-            key.ifPresent(k -> map.put(k, value.orElse(null)));
-            return (T) map;
+            classCarrier.getObjectFactory().map(clazz);
+            Map<Object, Object> map = (Map<Object, Object>) clazz.getConstructor().newInstance();
+            return (T) populateMap(classCarrier, populator, map);
+        } else if (isSortedMap(clazz) || isNavigableMap(clazz)) {
+            classCarrier.getObjectFactory().map(TreeMap.class);
+            return (T) populateMap(classCarrier, populator, new TreeMap<>());
         } else {
             classCarrier.getObjectFactory().mapOf();
             Optional<Object> key = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator));
@@ -65,12 +66,14 @@ public class CollectionPopulator implements PopulatingStrategy {
 
     @SuppressWarnings("unchecked")
     private <T> T populateForSet(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<T> clazz = classCarrier.getClazz();
         if (hasConstructors(classCarrier)) {
-            classCarrier.getObjectFactory().set(classCarrier.getClazz());
-            Set<Object> set = (Set<Object>) classCarrier.getClazz().getConstructor().newInstance();
-            Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator))
-                    .ifPresent(set::add);
-            return (T) set;
+            classCarrier.getObjectFactory().set(clazz);
+            Set<Object> set = (Set<Object>) clazz.getConstructor().newInstance();
+            return (T) populateCollection(classCarrier, populator, set);
+        } else if (isSortedSet(clazz) || isNavigableSet(clazz)) {
+            classCarrier.getObjectFactory().set(TreeSet.class);
+            return (T) populateCollection(classCarrier, populator, new TreeSet<>());
         } else {
             classCarrier.getObjectFactory().setOf();
             return Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator))
@@ -88,19 +91,34 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForList(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private <T> T populateForCollection(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<T> clazz = classCarrier.getClazz();
         if (hasConstructors(classCarrier)) {
-            classCarrier.getObjectFactory().list(classCarrier.getClazz());
-            List<Object> list = (List<Object>) classCarrier.getClazz().getConstructor().newInstance();
-            Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator))
-                    .ifPresent(list::add);
-            return (T) list;
+            classCarrier.getObjectFactory().list(clazz);
+            Collection<Object> collection = (Collection<Object>) clazz.getConstructor().newInstance();
+            return (T) populateCollection(classCarrier, populator, collection);
+        } else if (isDeque(clazz) || isQueue(clazz)) {
+            classCarrier.getObjectFactory().list(LinkedList.class);
+            return (T) populateCollection(classCarrier, populator, new LinkedList<>());
         } else {
             classCarrier.getObjectFactory().listOf();
             return Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator))
                     .map(value -> (T) List.of(value))
                     .orElseGet(() -> (T) List.of());
         }
+    }
+
+    private <T> Map<Object, Object> populateMap(CollectionCarrier<T> classCarrier, Populator populator, Map<Object, Object> map) {
+        Optional<Object> key = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator));
+        Optional<Object> value = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1)), populator));
+        key.ifPresent(k -> map.put(k, value.orElse(null)));
+        return map;
+    }
+
+    private <T> Collection<Object> populateCollection(CollectionCarrier<T> classCarrier, Populator populator, Collection<Object> collection) {
+        Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator))
+                .ifPresent(collection::add);
+        return collection;
     }
 
     @SuppressWarnings("unchecked")

@@ -4,9 +4,11 @@ import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import org.immutables.value.Value;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -34,6 +36,20 @@ public interface ImmutablesInterface {
 
     Double getDoubleValue();
 
+    boolean getPrimitiveBooleanValue();
+
+    Boolean getBooleanValue();
+
+    BigDecimal getBigDecimal();
+
+    UUID getUuid();
+
+    Optional<Integer> getOptionalInteger();
+
+    Optional<String> getOptionalString();
+
+    Charset getCharset();
+
     LocalDate getLocalDate();
 
     LocalDateTime getLocalDateTime();
@@ -46,9 +62,21 @@ public interface ImmutablesInterface {
 
     Set<String> getSetOfStrings();
 
+    Queue<String> getQueue();
+
+    Deque<String> getDeque();
+
+    SortedSet<String> getSortedSet();
+
+    NavigableSet<String> getNavigableSet();
+
     Map<Integer, String> getMapOfIntegersToStrings();
 
     Map<String, Integer> getMapOfStringsToIntegers();
+
+    SortedMap<String, Integer> getSortedMap();
+
+    NavigableMap<String, Integer> getNavigableMap();
 
     ArbitraryEnum getArbitraryEnum();
 
@@ -56,9 +84,15 @@ public interface ImmutablesInterface {
 
     ArrayList<String> getArrayList();
 
+    LinkedList<String> getLinkedList();
+
     HashMap<String, String> getHashMap();
 
+    LinkedHashMap<String, String> getLinkedHashMap();
+
     HashSet<String> getHashSet();
+
+    LinkedHashSet<String> getLinkedHashSet();
 
     Date getDate();
 

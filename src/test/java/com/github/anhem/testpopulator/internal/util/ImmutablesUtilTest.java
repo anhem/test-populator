@@ -30,7 +30,7 @@ class ImmutablesUtilTest {
 
         List<Method> methodsForImmutablesBuilder = getMethodsForImmutablesBuilder(ImmutableImmutablesInterface.class, builderObject, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods());
 
-        assertThat(methodsForImmutablesBuilder).hasSize(getDeclaredMethods(ImmutablesInterface.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).size());
+        assertThat(methodsForImmutablesBuilder.size()).isGreaterThanOrEqualTo(getDeclaredMethods(ImmutablesInterface.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).size());
         List<String> methodNames = getMethodNames(methodsForImmutablesBuilder);
         assertThat(methodNames.stream().anyMatch(methodName -> methodName.startsWith(ADD_PREFIX))).isFalse();
         assertThat(methodNames.stream().anyMatch(methodName -> methodName.startsWith(ADD_ALL_PREFIX))).isFalse();

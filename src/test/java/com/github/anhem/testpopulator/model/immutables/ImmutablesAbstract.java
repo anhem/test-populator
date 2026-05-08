@@ -64,9 +64,21 @@ public abstract class ImmutablesAbstract {
 
     public abstract Set<String> getSetOfStrings();
 
+    public abstract Queue<String> getQueue();
+
+    public abstract Deque<String> getDeque();
+
+    public abstract SortedSet<String> getSortedSet();
+
+    public abstract NavigableSet<String> getNavigableSet();
+
     public abstract Map<Integer, String> getMapOfIntegersToStrings();
 
     public abstract Map<String, Integer> getMapOfStringsToIntegers();
+
+    public abstract SortedMap<String, Integer> getSortedMap();
+
+    public abstract NavigableMap<String, Integer> getNavigableMap();
 
     public abstract ArbitraryEnum getArbitraryEnum();
 
@@ -74,9 +86,15 @@ public abstract class ImmutablesAbstract {
 
     public abstract ArrayList<String> getArrayList();
 
+    public abstract LinkedList<String> getLinkedList();
+
     public abstract HashMap<String, String> getHashMap();
 
+    public abstract LinkedHashMap<String, String> getLinkedHashMap();
+
     public abstract HashSet<String> getHashSet();
+
+    public abstract LinkedHashSet<String> getLinkedHashSet();
 
     public abstract Date date();
 
