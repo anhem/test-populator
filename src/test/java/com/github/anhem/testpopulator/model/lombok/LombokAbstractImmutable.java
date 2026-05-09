@@ -108,6 +108,8 @@ public abstract class LombokAbstractImmutable {
     Year year;
     YearMonth yearMonth;
     MonthDay monthDay;
+    Map.Entry<String, String> mapEntry;
+    Properties properties;
     File file;
     Path path;
     URL url;

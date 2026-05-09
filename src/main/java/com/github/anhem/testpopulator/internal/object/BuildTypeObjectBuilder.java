@@ -199,19 +199,14 @@ public class BuildTypeObjectBuilder extends ObjectBuilder {
     }
 
     private List<String> buildCollection() {
-        if (collectionHasNullValues(this)) {
-            return concatenate(
-                    buildChildren(),
-                    Stream.of(String.format(NEW_TYPED_OBJECT, PSF, getClassName(), formatTypes(), getName(), getClassName())))
-                    .collect(Collectors.toList());
-        }
-        return concatenate(
-                buildChildren(),
-                Stream.of(String.format(NEW_TYPED_OBJECT, PSF, getClassName(), formatTypes(), getName(), getClassName())),
-                startStaticBlock(),
-                createMethods(),
-                endStaticBlock()
-        ).collect(Collectors.toList());
+        String collectionString = getClazz().getTypeParameters().length > 0 ?
+                String.format(NEW_TYPED_OBJECT, PSF, getClassName(), formatTypes(), getName(), getClassName()) :
+                String.format(NEW_OBJECT, PSF, getClassName(), getName(), getClassName());
+        Stream<String> mainLines = collectionHasNullValues(this) ?
+                Stream.of(collectionString) :
+                concatenate(Stream.of(collectionString), startStaticBlock(), createMethods(), endStaticBlock());
+
+        return concatenate(buildChildren(), mainLines).collect(Collectors.toList());
     }
 
 

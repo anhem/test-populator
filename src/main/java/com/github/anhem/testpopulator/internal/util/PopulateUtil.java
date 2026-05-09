@@ -25,9 +25,25 @@ public class PopulateUtil {
     }
 
     public static List<Type> toArgumentTypes(Parameter parameter) {
-        return Arrays.stream(((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments())
-                .map(type -> type instanceof WildcardType ? ((WildcardType) type).getUpperBounds()[0] : type)
-                .collect(Collectors.toList());
+        return toArgumentTypes(parameter.getParameterizedType(), parameter.getType());
+    }
+
+    public static List<Type> toArgumentTypes(Type type, Class<?> clazz) {
+        if (type instanceof ParameterizedType) {
+            return Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
+                    .map(t -> t instanceof WildcardType ? ((WildcardType) t).getUpperBounds()[0] : t)
+                    .collect(Collectors.toList());
+        }
+        if (clazz.equals(Properties.class)) {
+            return List.of(String.class, String.class);
+        }
+        if (isMap(clazz) || isMapEntry(clazz)) {
+            return List.of(Object.class, Object.class);
+        }
+        if (isCollectionLike(clazz)) {
+            return List.of(Object.class);
+        }
+        return Collections.emptyList();
     }
 
     public static <T> List<Field> getDeclaredFields(Class<T> clazz, Set<String> blacklistedFields) {

@@ -189,6 +189,10 @@ public abstract class ImmutablesAbstract {
 
     public abstract MonthDay getMonthDay();
 
+    public abstract Map.Entry<String, String> getMapEntry();
+
+    public abstract Properties getProperties();
+
     public abstract File getFile();
 
     public abstract Path getPath();

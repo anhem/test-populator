@@ -189,6 +189,10 @@ public interface ImmutablesInterface {
 
     MonthDay getMonthDay();
 
+    Map.Entry<String, String> getMapEntry();
+
+    Properties getProperties();
+
     File getFile();
 
     Path getPath();

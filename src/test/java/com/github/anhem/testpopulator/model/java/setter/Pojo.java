@@ -110,6 +110,8 @@ public class Pojo {
     private Year year;
     private YearMonth yearMonth;
     private MonthDay monthDay;
+    private Map.Entry<String, String> mapEntry;
+    private Properties properties;
     private File file;
     private Path path;
     private URL url;

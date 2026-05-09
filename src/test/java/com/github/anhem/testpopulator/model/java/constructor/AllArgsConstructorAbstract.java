@@ -108,6 +108,8 @@ public abstract class AllArgsConstructorAbstract {
     private final Year year;
     private final YearMonth yearMonth;
     private final MonthDay monthDay;
+    private final Map.Entry<String, String> mapEntry;
+    private final Properties properties;
     private final File file;
     private final Path path;
     private final URL url;
