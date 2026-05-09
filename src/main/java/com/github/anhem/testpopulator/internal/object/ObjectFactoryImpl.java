@@ -82,6 +82,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Charset.class, object -> String.format("Charset.forName(\"%s\")", ((Charset) object).name()));
         stringSuppliers.put(Calendar.class, object -> String.format("new Calendar.Builder().setInstant(%sL).build()", ((Calendar) object).getTimeInMillis()));
         stringSuppliers.put(BitSet.class, object -> String.format("BitSet.valueOf(new long[]{%sL})", ((BitSet) object).toLongArray()[0]));
+        stringSuppliers.put(StringBuilder.class, object -> String.format("new StringBuilder(\"%s\")", object));
+        stringSuppliers.put(StringBuffer.class, object -> String.format("new StringBuffer(\"%s\")", object));
+        stringSuppliers.put(Throwable.class, object -> String.format("new Throwable(\"%s\")", ((Throwable) object).getMessage()));
+        stringSuppliers.put(Exception.class, object -> String.format("new Exception(\"%s\")", ((Exception) object).getMessage()));
+        stringSuppliers.put(RuntimeException.class, object -> String.format("new RuntimeException(\"%s\")", ((RuntimeException) object).getMessage()));
+        stringSuppliers.put(Error.class, object -> String.format("new Error(\"%s\")", ((Error) object).getMessage()));
         stringSuppliers.put(ByteBuffer.class, object -> String.format("ByteBuffer.wrap(new byte[]{%s})", formatBytes(((ByteBuffer) object).array())));
         stringSuppliers.put(InetAddress.class, object -> String.format("toInetAddress(\"%s\")", ((InetAddress) object).getHostAddress()));
         stringSuppliers.put(Inet4Address.class, object -> String.format("(Inet4Address) toInetAddress(\"%s\")", ((Inet4Address) object).getHostAddress()));

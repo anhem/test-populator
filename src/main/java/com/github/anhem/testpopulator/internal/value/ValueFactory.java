@@ -153,6 +153,12 @@ public class ValueFactory {
         typeSuppliers.put(Charset.class, this::getCharset);
         typeSuppliers.put(Calendar.class, this::getCalendar);
         typeSuppliers.put(BitSet.class, this::getBitSet);
+        typeSuppliers.put(StringBuilder.class, this::getStringBuilder);
+        typeSuppliers.put(StringBuffer.class, this::getStringBuffer);
+        typeSuppliers.put(Throwable.class, this::getThrowable);
+        typeSuppliers.put(Exception.class, this::getException);
+        typeSuppliers.put(RuntimeException.class, this::getRuntimeException);
+        typeSuppliers.put(Error.class, this::getError);
         typeSuppliers.put(ByteBuffer.class, this::getByteBuffer);
         typeSuppliers.put(InetAddress.class, this::getInetAddress);
         typeSuppliers.put(Inet4Address.class, this::getInet4Address);
@@ -369,6 +375,30 @@ public class ValueFactory {
 
     private BitSet getBitSet() {
         return setRandomValues ? BitSet.valueOf(new long[]{RandomUtil.getRandomLong()}) : BitSet.valueOf(new long[]{1L});
+    }
+
+    private StringBuilder getStringBuilder() {
+        return new StringBuilder(getString());
+    }
+
+    private StringBuffer getStringBuffer() {
+        return new StringBuffer(getString());
+    }
+
+    private Throwable getThrowable() {
+        return new Throwable(getString());
+    }
+
+    private Exception getException() {
+        return new Exception(getString());
+    }
+
+    private RuntimeException getRuntimeException() {
+        return new RuntimeException(getString());
+    }
+
+    private Error getError() {
+        return new Error(getString());
     }
 
     private ByteBuffer getByteBuffer() {
