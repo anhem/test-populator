@@ -10,6 +10,7 @@ import org.assertj.core.api.recursive.assertion.RecursiveAssertionConfiguration;
 import org.assertj.core.api.recursive.assertion.RecursiveAssertionNode;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Currency;
 import java.util.List;
@@ -124,7 +125,8 @@ public class AssertTestUtil {
                 TimeZone.class,
                 File.class,
                 Locale.class,
-                Currency.class
+                Currency.class,
+                Charset.class
         );
 
         @Override
