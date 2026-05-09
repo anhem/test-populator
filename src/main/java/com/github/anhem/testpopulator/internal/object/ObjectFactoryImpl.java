@@ -330,10 +330,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private String getName(Class<?> clazz) {
-        String simpleName = clazz.getSimpleName().replace("[]", "Array");
-        int classCounter = classNameCounters.computeIfAbsent(simpleName, k -> 0);
+        String simpleName = clazz.getSimpleName();
+        String key = clazz.getSimpleName().toLowerCase();
+        int classCounter = classNameCounters.computeIfAbsent(key, k -> 0);
         String name = String.format("%s_%d", Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1), classCounter);
-        classNameCounters.put(simpleName, ++classCounter);
+        classNameCounters.put(key, ++classCounter);
         return name;
     }
 }

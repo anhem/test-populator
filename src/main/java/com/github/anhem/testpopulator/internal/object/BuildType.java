@@ -30,6 +30,7 @@ public enum BuildType {
             case MAP:
             case MAP_OF:
             case ENUM_MAP:
+            case MAP_ENTRY:
             case OPTIONAL:
                 return true;
             default:
