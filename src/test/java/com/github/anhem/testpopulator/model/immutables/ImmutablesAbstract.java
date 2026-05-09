@@ -193,6 +193,12 @@ public abstract class ImmutablesAbstract {
 
     public abstract Properties getProperties();
 
+    public abstract Hashtable<String, Integer> getHashtable();
+
+    public abstract Vector<String> getVector();
+
+    public abstract Map<String, List<String>> getNestedMap();
+
     public abstract File getFile();
 
     public abstract Path getPath();

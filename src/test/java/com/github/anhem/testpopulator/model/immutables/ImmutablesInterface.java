@@ -193,6 +193,12 @@ public interface ImmutablesInterface {
 
     Properties getProperties();
 
+    Hashtable<String, Integer> getHashtable();
+
+    Vector<String> getVector();
+
+    Map<String, List<String>> getNestedMap();
+
     File getFile();
 
     Path getPath();

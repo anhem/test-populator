@@ -112,6 +112,9 @@ public abstract class PojoAbstract {
     private MonthDay monthDay;
     private Map.Entry<String, String> mapEntry;
     private Properties properties;
+    private Hashtable<String, Integer> hashtable;
+    private Vector<String> vector;
+    private Map<String, List<String>> nestedMap;
     private File file;
     private Path path;
     private URL url;

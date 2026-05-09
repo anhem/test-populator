@@ -109,6 +109,9 @@ public class AllArgsConstructor {
     private final MonthDay monthDay;
     private final Map.Entry<String, String> mapEntry;
     private final Properties properties;
+    private final Hashtable<String, Integer> hashtable;
+    private final Vector<String> vector;
+    private final Map<String, List<String>> nestedMap;
     private final File file;
     private final Path path;
     private final URL url;

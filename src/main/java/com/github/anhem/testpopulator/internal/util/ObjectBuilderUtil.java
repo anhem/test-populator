@@ -28,7 +28,14 @@ public class ObjectBuilderUtil {
     }
 
     public static void addImport(Class<?> clazz, Object value, boolean useFullyQualifiedName, Set<String> imports, Set<String> staticImports) {
-        if (clazz != null && !clazz.isPrimitive() && !useFullyQualifiedName && !clazz.getName().startsWith("java.lang.")) {
+        if (clazz == null || useFullyQualifiedName) {
+            return;
+        }
+        if (clazz.isArray()) {
+            addImport(clazz.getComponentType(), value, useFullyQualifiedName, imports, staticImports);
+            return;
+        }
+        if (!clazz.isPrimitive() && !clazz.getName().startsWith("java.lang.")) {
             String className = clazz.getName().replace('$', '.');
             if (isMapEntry(clazz)) {
                 staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName().replace('$', '.'), clazz.getSimpleName()));

@@ -108,6 +108,9 @@ public class LombokImmutable {
     MonthDay monthDay;
     Map.Entry<String, String> mapEntry;
     Properties properties;
+    Hashtable<String, Integer> hashtable;
+    Vector<String> vector;
+    Map<String, List<String>> nestedMap;
     File file;
     Path path;
     URL url;
