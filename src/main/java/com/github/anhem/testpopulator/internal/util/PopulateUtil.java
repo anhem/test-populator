@@ -202,6 +202,14 @@ public class PopulateUtil {
         }
     }
 
+    public static java.net.InetAddress toInetAddress(String host) {
+        try {
+            return java.net.InetAddress.getByName(host);
+        } catch (java.net.UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static <T> boolean hasConstructors(CollectionCarrier<T> collectionCarrier) {
         return collectionCarrier.getClazz().getConstructors().length > 0;
     }

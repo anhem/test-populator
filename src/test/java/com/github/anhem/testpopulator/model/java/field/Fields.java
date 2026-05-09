@@ -6,8 +6,8 @@ import lombok.Getter;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
@@ -63,6 +63,8 @@ public class Fields {
     private CopyOnWriteArrayList<String> copyOnWriteArrayList;
     private CopyOnWriteArraySet<String> copyOnWriteArraySet;
     private ConcurrentSkipListSet<String> concurrentSkipListSet;
+    private TreeMap<String, String> treeMap;
+    private TreeSet<String> treeSet;
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
     private byte[] arrayOfBytes;
@@ -103,6 +105,8 @@ public class Fields {
     private Year year;
     private YearMonth yearMonth;
     private MonthDay monthDay;
+    private Month month;
+    private DayOfWeek dayOfWeek;
     private Map.Entry<String, String> mapEntry;
     private Properties properties;
     private Hashtable<String, Integer> hashtable;
@@ -120,5 +124,10 @@ public class Fields {
     private Path path;
     private URL url;
     private URI uri;
+    private ByteBuffer byteBuffer;
+    private InetAddress inetAddress;
+    private Inet4Address inet4Address;
+    private Inet6Address inet6Address;
+    private InetSocketAddress inetSocketAddress;
 
     }

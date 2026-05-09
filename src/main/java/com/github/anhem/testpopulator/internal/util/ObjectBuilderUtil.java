@@ -117,6 +117,16 @@ public class ObjectBuilderUtil {
                     "\t\t}",
                     "\t}");
         }
+        if (clazz != null && (clazz.equals(java.net.InetAddress.class) || clazz.equals(java.net.Inet4Address.class) || clazz.equals(java.net.Inet6Address.class))) {
+            return String.join(System.lineSeparator(),
+                    "\tprivate static java.net.InetAddress toInetAddress(String host) {",
+                    "\t\ttry {",
+                    "\t\t\treturn java.net.InetAddress.getByName(host);",
+                    "\t\t} catch (java.net.UnknownHostException e) {",
+                    "\t\t\tthrow new RuntimeException(e);",
+                    "\t\t}",
+                    "\t}");
+        }
         return null;
     }
 

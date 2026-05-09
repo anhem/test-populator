@@ -10,8 +10,8 @@ import com.github.anhem.testpopulator.internal.util.RandomUtil;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -69,9 +69,16 @@ public class ValueFactory {
     private static final Year YEAR = Year.of(1970);
     private static final YearMonth YEAR_MONTH = YearMonth.of(1970, 1);
     private static final MonthDay MONTH_DAY = MonthDay.of(1, 1);
+    private static final Month MONTH = Month.JANUARY;
+    private static final DayOfWeek DAY_OF_WEEK = DayOfWeek.MONDAY;
     private static final File FILE = new File("test-file");
     private static final Path PATH = Paths.get("test-path");
     private static final Charset CHARSET = StandardCharsets.UTF_8;
+    private static final ByteBuffer BYTE_BUFFER = ByteBuffer.wrap(new byte[]{1, 2, 3});
+    private static final InetAddress INET_ADDRESS = PopulateUtil.toInetAddress("127.0.0.1");
+    private static final Inet4Address INET4_ADDRESS = (Inet4Address) PopulateUtil.toInetAddress("127.0.0.1");
+    private static final Inet6Address INET6_ADDRESS = (Inet6Address) PopulateUtil.toInetAddress("::1");
+    private static final InetSocketAddress INET_SOCKET_ADDRESS = new InetSocketAddress(INET_ADDRESS, 8080);
     private static final OptionalInt OPTIONAL_INT = OptionalInt.of(INTEGER);
     private static final OptionalLong OPTIONAL_LONG = OptionalLong.of(LONG);
     private static final OptionalDouble OPTIONAL_DOUBLE = OptionalDouble.of(DOUBLE);
@@ -137,6 +144,8 @@ public class ValueFactory {
         typeSuppliers.put(Year.class, this::getYear);
         typeSuppliers.put(YearMonth.class, this::getYearMonth);
         typeSuppliers.put(MonthDay.class, this::getMonthDay);
+        typeSuppliers.put(Month.class, this::getMonth);
+        typeSuppliers.put(DayOfWeek.class, this::getDayOfWeek);
         typeSuppliers.put(File.class, this::getFile);
         typeSuppliers.put(Path.class, this::getPath);
         typeSuppliers.put(URL.class, this::getUrl);
@@ -144,6 +153,11 @@ public class ValueFactory {
         typeSuppliers.put(Charset.class, this::getCharset);
         typeSuppliers.put(Calendar.class, this::getCalendar);
         typeSuppliers.put(BitSet.class, this::getBitSet);
+        typeSuppliers.put(ByteBuffer.class, this::getByteBuffer);
+        typeSuppliers.put(InetAddress.class, this::getInetAddress);
+        typeSuppliers.put(Inet4Address.class, this::getInet4Address);
+        typeSuppliers.put(Inet6Address.class, this::getInet6Address);
+        typeSuppliers.put(InetSocketAddress.class, this::getInetSocketAddress);
         typeSuppliers.put(OptionalInt.class, this::getOptionalInt);
         typeSuppliers.put(OptionalLong.class, this::getOptionalLong);
         typeSuppliers.put(OptionalDouble.class, this::getOptionalDouble);
@@ -321,6 +335,14 @@ public class ValueFactory {
         return setRandomValues ? MonthDay.from(getRandomLocalDate(5)) : MONTH_DAY;
     }
 
+    private Month getMonth() {
+        return setRandomValues ? getRandomEnum(Month.class, false) : MONTH;
+    }
+
+    private DayOfWeek getDayOfWeek() {
+        return setRandomValues ? getRandomEnum(DayOfWeek.class, false) : DAY_OF_WEEK;
+    }
+
     private File getFile() {
         return setRandomValues ? new File(getRandomString()) : FILE;
     }
@@ -347,6 +369,40 @@ public class ValueFactory {
 
     private BitSet getBitSet() {
         return setRandomValues ? BitSet.valueOf(new long[]{RandomUtil.getRandomLong()}) : BitSet.valueOf(new long[]{1L});
+    }
+
+    private ByteBuffer getByteBuffer() {
+        return setRandomValues ? ByteBuffer.wrap(getRandomBytes(10)) : BYTE_BUFFER;
+    }
+
+    private InetAddress getInetAddress() {
+        return setRandomValues ? getInet4Address() : INET_ADDRESS;
+    }
+
+    private Inet4Address getInet4Address() {
+        if (setRandomValues) {
+            try {
+                return (Inet4Address) InetAddress.getByAddress(getRandomBytes(4));
+            } catch (UnknownHostException e) {
+                throw new PopulateException(e.getMessage(), e);
+            }
+        }
+        return INET4_ADDRESS;
+    }
+
+    private Inet6Address getInet6Address() {
+        if (setRandomValues) {
+            try {
+                return (Inet6Address) InetAddress.getByAddress(getRandomBytes(16));
+            } catch (UnknownHostException e) {
+                throw new PopulateException(e.getMessage(), e);
+            }
+        }
+        return INET6_ADDRESS;
+    }
+
+    private InetSocketAddress getInetSocketAddress() {
+        return setRandomValues ? new InetSocketAddress(getInetAddress(), getRandomInt(65535)) : INET_SOCKET_ADDRESS;
     }
 
     private OptionalInt getOptionalInt() {

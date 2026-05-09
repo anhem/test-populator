@@ -6,8 +6,8 @@ import org.immutables.value.Value;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
@@ -109,6 +109,10 @@ public interface ImmutablesInterface {
 
     ConcurrentSkipListSet<String> getConcurrentSkipListSet();
 
+    TreeMap<String, String> getTreeMap();
+
+    TreeSet<String> getTreeSet();
+
     ArbitraryEnum getArbitraryEnum();
 
     String[] getArrayOfStrings();
@@ -189,6 +193,10 @@ public interface ImmutablesInterface {
 
     MonthDay getMonthDay();
 
+    Month getMonth();
+
+    DayOfWeek getDayOfWeek();
+
     Map.Entry<String, String> getMapEntry();
 
     Properties getProperties();
@@ -222,5 +230,15 @@ public interface ImmutablesInterface {
     URL getUrl();
 
     URI getUri();
+
+    ByteBuffer getByteBuffer();
+
+    InetAddress getInetAddress();
+
+    Inet4Address getInet4Address();
+
+    Inet6Address getInet6Address();
+
+    InetSocketAddress getInetSocketAddress();
 
 }

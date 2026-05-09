@@ -45,7 +45,7 @@ class PopulateUtilTest {
     void getDeclaredFieldsReturnsAllDeclaredFields() {
         List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class, DEFAULT_POPULATE_CONFIG.getBlacklistedFields());
 
-        assertThat(declaredFields).isNotEmpty().hasSize(104);
+        assertThat(declaredFields).isNotEmpty().hasSize(113);
         List<String> fieldNames = declaredFields.stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());

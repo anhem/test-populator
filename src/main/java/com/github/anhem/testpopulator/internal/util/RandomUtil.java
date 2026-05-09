@@ -85,6 +85,12 @@ public class RandomUtil {
         return bytes[0];
     }
 
+    public static byte[] getRandomBytes(int length) {
+        byte[] bytes = new byte[length];
+        RANDOM.nextBytes(bytes);
+        return bytes;
+    }
+
     public static LocalTime getRandomLocalTime() {
         return LocalTime.ofSecondOfDay(RANDOM.nextInt(DAY_IN_SECONDS));
     }

@@ -8,8 +8,8 @@ import lombok.Getter;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
@@ -68,6 +68,8 @@ public abstract class AllArgsConstructorAbstract {
     private final CopyOnWriteArrayList<String> copyOnWriteArrayList;
     private final CopyOnWriteArraySet<String> copyOnWriteArraySet;
     private final ConcurrentSkipListSet<String> concurrentSkipListSet;
+    private final TreeMap<String, String> treeMap;
+    private final TreeSet<String> treeSet;
     private final ArbitraryEnum arbitraryEnum;
     private final String[] arrayOfStrings;
     private final byte[] arrayOfBytes;
@@ -108,6 +110,8 @@ public abstract class AllArgsConstructorAbstract {
     private final Year year;
     private final YearMonth yearMonth;
     private final MonthDay monthDay;
+    private final Month month;
+    private final DayOfWeek dayOfWeek;
     private final Map.Entry<String, String> mapEntry;
     private final Properties properties;
     private final Hashtable<String, Integer> hashtable;
@@ -125,5 +129,10 @@ public abstract class AllArgsConstructorAbstract {
     private final Path path;
     private final URL url;
     private final URI uri;
+    private final ByteBuffer byteBuffer;
+    private final InetAddress inetAddress;
+    private final Inet4Address inet4Address;
+    private final Inet6Address inet6Address;
+    private final InetSocketAddress inetSocketAddress;
 
 }

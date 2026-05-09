@@ -8,8 +8,8 @@ import lombok.experimental.SuperBuilder;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
@@ -68,6 +68,8 @@ public abstract class LombokAbstractImmutable {
     CopyOnWriteArrayList<String> copyOnWriteArrayList;
     CopyOnWriteArraySet<String> copyOnWriteArraySet;
     ConcurrentSkipListSet<String> concurrentSkipListSet;
+    TreeMap<String, String> treeMap;
+    TreeSet<String> treeSet;
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
     byte[] arrayOfBytes;
@@ -108,6 +110,8 @@ public abstract class LombokAbstractImmutable {
     Year year;
     YearMonth yearMonth;
     MonthDay monthDay;
+    Month month;
+    DayOfWeek dayOfWeek;
     Map.Entry<String, String> mapEntry;
     Properties properties;
     Hashtable<String, Integer> hashtable;
@@ -125,4 +129,9 @@ public abstract class LombokAbstractImmutable {
     Path path;
     URL url;
     URI uri;
+    ByteBuffer byteBuffer;
+    InetAddress inetAddress;
+    Inet4Address inet4Address;
+    Inet6Address inet6Address;
+    InetSocketAddress inetSocketAddress;
 }

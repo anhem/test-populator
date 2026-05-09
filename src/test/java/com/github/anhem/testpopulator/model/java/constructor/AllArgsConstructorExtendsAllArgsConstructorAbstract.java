@@ -7,8 +7,8 @@ import lombok.Getter;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
@@ -69,6 +69,8 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             CopyOnWriteArrayList<String> copyOnWriteArrayList,
             CopyOnWriteArraySet<String> copyOnWriteArraySet,
             ConcurrentSkipListSet<String> concurrentSkipListSet,
+            TreeMap<String, String> treeMap,
+            TreeSet<String> treeSet,
             ArbitraryEnum arbitraryEnum,
             String[] arrayOfStrings,
             byte[] arrayOfBytes,
@@ -109,6 +111,8 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             Year year,
             YearMonth yearMonth,
             MonthDay monthDay,
+            Month month,
+            DayOfWeek dayOfWeek,
             Map.Entry<String, String> mapEntry,
             Properties properties,
             Hashtable<String, Integer> hashtable,
@@ -126,6 +130,11 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             Path path,
             URL url,
             URI uri,
+            ByteBuffer byteBuffer,
+            InetAddress inetAddress,
+            Inet4Address inet4Address,
+            Inet6Address inet6Address,
+            InetSocketAddress inetSocketAddress,
             String anotherString
     ) {
         super(
@@ -174,6 +183,8 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
                 copyOnWriteArrayList,
                 copyOnWriteArraySet,
                 concurrentSkipListSet,
+                treeMap,
+                treeSet,
                 arbitraryEnum,
                 arrayOfStrings,
                 arrayOfBytes,
@@ -214,6 +225,8 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
                 year,
                 yearMonth,
                 monthDay,
+                month,
+                dayOfWeek,
                 mapEntry,
                 properties,
                 hashtable,
@@ -230,7 +243,12 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
                 file,
                 path,
                 url,
-                uri
+                uri,
+                byteBuffer,
+                inetAddress,
+                inet4Address,
+                inet6Address,
+                inetSocketAddress
         );
         this.anotherString = anotherString;
     }

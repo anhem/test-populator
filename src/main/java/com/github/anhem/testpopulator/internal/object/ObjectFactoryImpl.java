@@ -8,8 +8,8 @@ import com.github.anhem.testpopulator.exception.ObjectException;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Time;
@@ -73,6 +73,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Year.class, object -> String.format("Year.of(%d)", ((Year) object).getValue()));
         stringSuppliers.put(YearMonth.class, object -> String.format("YearMonth.of(%d, %d)", ((YearMonth) object).getYear(), ((YearMonth) object).getMonthValue()));
         stringSuppliers.put(MonthDay.class, object -> String.format("MonthDay.of(%d, %d)", ((MonthDay) object).getMonthValue(), ((MonthDay) object).getDayOfMonth()));
+        stringSuppliers.put(Month.class, object -> String.format("Month.%s", object));
+        stringSuppliers.put(DayOfWeek.class, object -> String.format("DayOfWeek.%s", object));
         stringSuppliers.put(File.class, object -> String.format("new File(\"%s\")", ((File) object).getPath()));
         stringSuppliers.put(Path.class, object -> String.format("Path.of(\"%s\")", object.toString()));
         stringSuppliers.put(URL.class, object -> String.format("toUrl(\"%s\")", object));
@@ -80,6 +82,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Charset.class, object -> String.format("Charset.forName(\"%s\")", ((Charset) object).name()));
         stringSuppliers.put(Calendar.class, object -> String.format("new Calendar.Builder().setInstant(%sL).build()", ((Calendar) object).getTimeInMillis()));
         stringSuppliers.put(BitSet.class, object -> String.format("BitSet.valueOf(new long[]{%sL})", ((BitSet) object).toLongArray()[0]));
+        stringSuppliers.put(ByteBuffer.class, object -> String.format("ByteBuffer.wrap(new byte[]{%s})", formatBytes(((ByteBuffer) object).array())));
+        stringSuppliers.put(InetAddress.class, object -> String.format("toInetAddress(\"%s\")", ((InetAddress) object).getHostAddress()));
+        stringSuppliers.put(Inet4Address.class, object -> String.format("(Inet4Address) toInetAddress(\"%s\")", ((Inet4Address) object).getHostAddress()));
+        stringSuppliers.put(Inet6Address.class, object -> String.format("(Inet6Address) toInetAddress(\"%s\")", ((Inet6Address) object).getHostAddress()));
+        stringSuppliers.put(InetSocketAddress.class, object -> String.format("new InetSocketAddress(toInetAddress(\"%s\"), %d)", ((InetSocketAddress) object).getAddress().getHostAddress(), ((InetSocketAddress) object).getPort()));
         stringSuppliers.put(OptionalInt.class, object -> String.format("OptionalInt.of(%d)", ((OptionalInt) object).getAsInt()));
         stringSuppliers.put(OptionalLong.class, object -> String.format("OptionalLong.of(%dL)", ((OptionalLong) object).getAsLong()));
         stringSuppliers.put(OptionalDouble.class, object -> String.format("OptionalDouble.of(%s)", ((OptionalDouble) object).getAsDouble()));
@@ -336,5 +343,13 @@ public class ObjectFactoryImpl implements ObjectFactory {
         String name = String.format("%s_%d", Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1), classCounter);
         classNameCounters.put(key, ++classCounter);
         return name;
+    }
+
+    private static String formatBytes(byte[] bytes) {
+        StringJoiner joiner = new StringJoiner(", ");
+        for (byte b : bytes) {
+            joiner.add(String.format("(byte) %d", b));
+        }
+        return joiner.toString();
     }
 }
