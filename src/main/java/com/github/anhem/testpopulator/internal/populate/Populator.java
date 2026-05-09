@@ -51,6 +51,12 @@ public class Populator {
         if (clazz.isArray()) {
             return populateForArray(classCarrier);
         }
+        if (isProtobufByteString(clazz, classCarrier.getPopulateConfig())) {
+            return staticMethodPopulator.populate(classCarrier, this, MethodType.SIMPLEST);
+        }
+        if (isCollectionLike(clazz)) {
+            return populate(classCarrier.toCollectionCarrier(clazz));
+        }
         return populateWithStrategies(classCarrier);
     }
 
@@ -97,9 +103,6 @@ public class Populator {
             if (isMatchingStaticMethodStrategy(strategy, clazz)) {
                 return staticMethodPopulator.populate(classCarrier, this);
             }
-        }
-        if (isProtobufByteString(clazz, populateConfig)) {
-            return staticMethodPopulator.populate(classCarrier, this, MethodType.SIMPLEST);
         }
         throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName(), populateConfig.getStrategyOrder()));
     }

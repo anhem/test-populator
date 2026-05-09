@@ -147,6 +147,7 @@ public class ValueFactory {
         typeSuppliers.put(OptionalInt.class, this::getOptionalInt);
         typeSuppliers.put(OptionalLong.class, this::getOptionalLong);
         typeSuppliers.put(OptionalDouble.class, this::getOptionalDouble);
+        typeSuppliers.put(Object.class, Object::new);
         typeSuppliers.putAll(classOverrides);
         return typeSuppliers;
     }
