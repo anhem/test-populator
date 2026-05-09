@@ -46,7 +46,6 @@ public class ValueFactory {
     private static final LocalTime LOCAL_TIME = LOCAL_DATE_TIME.toLocalTime();
     private static final URL URL = PopulateUtil.toUrl("http://example.com");
     private static final URI URI = java.net.URI.create("http://example.com");
-    private static final Date DATE = Date.from(INSTANT);
     private static final String STRING = "string";
     private static final Boolean BOOLEAN = Boolean.TRUE;
     private static final Long LONG = 1L;
@@ -63,12 +62,8 @@ public class ValueFactory {
     private static final OffsetTime OFFSET_TIME = ZONED_DATE_TIME.toOffsetDateTime().toOffsetTime();
     private static final Duration DURATION = Duration.ofDays(1);
     private static final Period PERIOD = Period.ofDays(1);
-    private static final java.sql.Date SQL_DATE = java.sql.Date.valueOf(LOCAL_DATE);
-    private static final Time SQL_TIME = Time.valueOf(LOCAL_TIME);
-    private static final Timestamp SQL_TIMESTAMP = Timestamp.from(INSTANT);
     private static final Currency CURRENCY = Currency.getInstance("XTS");
     private static final Locale LOCALE = Locale.ROOT;
-    private static final TimeZone TIME_ZONE = TimeZone.getTimeZone("UTC");
     private static final ZoneId ZONE_ID = ZoneId.of("UTC");
     private static final ZoneOffset ZONE_OFFSET = ZoneOffset.UTC;
     private static final Year YEAR = Year.of(1970);
@@ -77,8 +72,6 @@ public class ValueFactory {
     private static final File FILE = new File("test-file");
     private static final Path PATH = Paths.get("test-path");
     private static final Charset CHARSET = StandardCharsets.UTF_8;
-    private static final Calendar CALENDAR = new GregorianCalendar(1970, Calendar.JANUARY, 1);
-    private static final BitSet BIT_SET = BitSet.valueOf(new long[]{1L});
     private static final OptionalInt OPTIONAL_INT = OptionalInt.of(INTEGER);
     private static final OptionalLong OPTIONAL_LONG = OptionalLong.of(LONG);
     private static final OptionalDouble OPTIONAL_DOUBLE = OptionalDouble.of(DOUBLE);
@@ -240,7 +233,7 @@ public class ValueFactory {
     }
 
     private Date getDate() {
-        return setRandomValues ? Date.from(getRandomLocalDateTime().atZone(ZoneId.systemDefault()).toInstant()) : DATE;
+        return setRandomValues ? Date.from(getRandomLocalDateTime().atZone(ZoneId.systemDefault()).toInstant()) : Date.from(INSTANT);
     }
 
     private LocalDate getLocalDate() {
@@ -284,15 +277,15 @@ public class ValueFactory {
     }
 
     private java.sql.Date getSqlDate() {
-        return setRandomValues ? java.sql.Date.valueOf(getLocalDate()) : SQL_DATE;
+        return setRandomValues ? java.sql.Date.valueOf(getLocalDate()) : java.sql.Date.valueOf(LOCAL_DATE);
     }
 
     private Time getSqlTime() {
-        return setRandomValues ? Time.valueOf(getRandomLocalTime()) : SQL_TIME;
+        return setRandomValues ? Time.valueOf(getRandomLocalTime()) : Time.valueOf(LOCAL_TIME);
     }
 
     private Timestamp getSqlTimestamp() {
-        return setRandomValues ? Timestamp.from(getInstant()) : SQL_TIMESTAMP;
+        return setRandomValues ? Timestamp.from(getInstant()) : Timestamp.from(INSTANT);
     }
 
     private Currency getCurrency() {
@@ -304,7 +297,7 @@ public class ValueFactory {
     }
 
     private TimeZone getTimeZone() {
-        return setRandomValues ? TimeZone.getTimeZone(AVAILABLE_TIMEZONE_IDS[getRandomInt(AVAILABLE_TIMEZONE_IDS.length)]) : TIME_ZONE;
+        return setRandomValues ? TimeZone.getTimeZone(AVAILABLE_TIMEZONE_IDS[getRandomInt(AVAILABLE_TIMEZONE_IDS.length)]) : TimeZone.getTimeZone("UTC");
     }
 
     private ZoneId getZoneId() {
@@ -348,11 +341,11 @@ public class ValueFactory {
     }
 
     private Calendar getCalendar() {
-        return setRandomValues ? new Calendar.Builder().setInstant(RandomUtil.getRandomLong()).build() : CALENDAR;
+        return setRandomValues ? new Calendar.Builder().setInstant(RandomUtil.getRandomLong()).build() : new GregorianCalendar(1970, Calendar.JANUARY, 1);
     }
 
     private BitSet getBitSet() {
-        return setRandomValues ? BitSet.valueOf(new long[]{RandomUtil.getRandomLong()}) : BIT_SET;
+        return setRandomValues ? BitSet.valueOf(new long[]{RandomUtil.getRandomLong()}) : BitSet.valueOf(new long[]{1L});
     }
 
     private OptionalInt getOptionalInt() {
