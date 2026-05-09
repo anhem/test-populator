@@ -145,6 +145,7 @@
                 <version>3.5.0</version>
                 <configuration>
                     <runOrder>random</runOrder>
+                    <argLine>--add-opens java.base/java.nio.charset=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
             <plugin>
