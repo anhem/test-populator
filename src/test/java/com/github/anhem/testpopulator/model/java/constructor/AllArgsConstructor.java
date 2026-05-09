@@ -112,6 +112,14 @@ public class AllArgsConstructor {
     private final Hashtable<String, Integer> hashtable;
     private final Vector<String> vector;
     private final Map<String, List<String>> nestedMap;
+    private final List<List<String>> nestedList;
+    private final Set<Set<String>> nestedSet;
+    private final Map<String, Map<Integer, String>> nestedMap2;
+    private final Map<String, Optional<String>> mapOfOptionals;
+    private final List<Map.Entry<String, Integer>> listOfEntries;
+    private final Stack<String> stack;
+    private final Integer[] arrayOfIntegerObjects;
+    private final Long[] arrayOfLongObjects;
     private final File file;
     private final Path path;
     private final URL url;

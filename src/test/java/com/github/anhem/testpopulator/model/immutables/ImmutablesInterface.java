@@ -199,6 +199,22 @@ public interface ImmutablesInterface {
 
     Map<String, List<String>> getNestedMap();
 
+    List<List<String>> getNestedList();
+
+    Set<Set<String>> getNestedSet();
+
+    Map<String, Map<Integer, String>> getNestedMap2();
+
+    Map<String, Optional<String>> getMapOfOptionals();
+
+    List<Map.Entry<String, Integer>> getListOfEntries();
+
+    Stack<String> getStack();
+
+    Integer[] getArrayOfIntegerObjects();
+
+    Long[] getArrayOfLongObjects();
+
     File getFile();
 
     Path getPath();

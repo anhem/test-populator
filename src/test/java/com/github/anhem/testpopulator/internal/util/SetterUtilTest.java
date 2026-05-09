@@ -41,7 +41,7 @@ class SetterUtilTest {
     void getSetterMethodsReturnsMethodsWhenRegularSetter() {
         List<Method> setterMethods = getSetterMethods(Pojo.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), SETTER_PREFIXES);
 
-        assertThat(setterMethods).isNotEmpty().hasSize(94);
+        assertThat(setterMethods).isNotEmpty().hasSize(102);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }

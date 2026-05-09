@@ -199,6 +199,22 @@ public abstract class ImmutablesAbstract {
 
     public abstract Map<String, List<String>> getNestedMap();
 
+    public abstract List<List<String>> getNestedList();
+
+    public abstract Set<Set<String>> getNestedSet();
+
+    public abstract Map<String, Map<Integer, String>> getNestedMap2();
+
+    public abstract Map<String, Optional<String>> getMapOfOptionals();
+
+    public abstract List<Map.Entry<String, Integer>> getListOfEntries();
+
+    public abstract Stack<String> getStack();
+
+    public abstract Integer[] getArrayOfIntegerObjects();
+
+    public abstract Long[] getArrayOfLongObjects();
+
     public abstract File getFile();
 
     public abstract Path getPath();

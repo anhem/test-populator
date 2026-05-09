@@ -111,6 +111,14 @@ public class LombokImmutable {
     Hashtable<String, Integer> hashtable;
     Vector<String> vector;
     Map<String, List<String>> nestedMap;
+    List<List<String>> nestedList;
+    Set<Set<String>> nestedSet;
+    Map<String, Map<Integer, String>> nestedMap2;
+    Map<String, Optional<String>> mapOfOptionals;
+    List<Map.Entry<String, Integer>> listOfEntries;
+    Stack<String> stack;
+    Integer[] arrayOfIntegerObjects;
+    Long[] arrayOfLongObjects;
     File file;
     Path path;
     URL url;

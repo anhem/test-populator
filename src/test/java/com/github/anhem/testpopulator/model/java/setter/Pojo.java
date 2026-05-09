@@ -115,6 +115,14 @@ public class Pojo {
     private Hashtable<String, Integer> hashtable;
     private Vector<String> vector;
     private Map<String, List<String>> nestedMap;
+    private List<List<String>> nestedList;
+    private Set<Set<String>> nestedSet;
+    private Map<String, Map<Integer, String>> nestedMap2;
+    private Map<String, Optional<String>> mapOfOptionals;
+    private List<Map.Entry<String, Integer>> listOfEntries;
+    private Stack<String> stack;
+    private Integer[] arrayOfIntegerObjects;
+    private Long[] arrayOfLongObjects;
     private File file;
     private Path path;
     private URL url;
