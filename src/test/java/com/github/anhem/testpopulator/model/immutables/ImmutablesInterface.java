@@ -69,6 +69,8 @@ public interface ImmutablesInterface {
 
     List<String> getListOfStrings();
 
+    List<ArbitraryEnum> getListOfEnums();
+
     Set<String> getSetOfStrings();
 
     EnumSet<ArbitraryEnum> getEnumSet();
@@ -86,6 +88,8 @@ public interface ImmutablesInterface {
     Map<Integer, String> getMapOfIntegersToStrings();
 
     Map<String, Integer> getMapOfStringsToIntegers();
+
+    Map<String, ArbitraryEnum> getMapOfStringsToEnums();
 
     EnumMap<ArbitraryEnum, String> getEnumMap();
 
@@ -111,11 +115,17 @@ public interface ImmutablesInterface {
 
     byte[] getArrayOfBytes();
 
+    char[] getArrayOfChars();
+
     int[] getArrayOfInts();
 
     long[] getArrayOfLongs();
 
+    float[] getArrayOfFloats();
+
     double[] getArrayOfDoubles();
+
+    short[] getArrayOfShorts();
 
     boolean[] getArrayOfBooleans();
 

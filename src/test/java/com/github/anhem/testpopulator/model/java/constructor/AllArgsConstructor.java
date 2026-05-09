@@ -47,6 +47,7 @@ public class AllArgsConstructor {
     private final ZonedDateTime zonedDateTime;
     private final Instant instant;
     private final List<String> listOfStrings;
+    private final List<ArbitraryEnum> listOfEnums;
     private final Set<String> setOfStrings;
     private final EnumSet<ArbitraryEnum> enumSet;
     private final BitSet bitSet;
@@ -56,6 +57,7 @@ public class AllArgsConstructor {
     private final NavigableSet<String> navigableSet;
     private final Map<Integer, String> mapOfIntegersToStrings;
     private final Map<String, Integer> mapOfStringsToIntegers;
+    private final Map<String, ArbitraryEnum> mapOfStringsToEnums;
     private final EnumMap<ArbitraryEnum, String> enumMap;
     private final SortedMap<String, Integer> sortedMap;
     private final NavigableMap<String, Integer> navigableMap;
@@ -68,9 +70,12 @@ public class AllArgsConstructor {
     private final ArbitraryEnum arbitraryEnum;
     private final String[] arrayOfStrings;
     private final byte[] arrayOfBytes;
+    private final char[] arrayOfChars;
     private final int[] arrayOfInts;
     private final long[] arrayOfLongs;
+    private final float[] arrayOfFloats;
     private final double[] arrayOfDoubles;
+    private final short[] arrayOfShorts;
     private final boolean[] arrayOfBooleans;
     private final ArrayList<String> arrayList;
     private final LinkedList<String> linkedList;

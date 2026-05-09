@@ -48,6 +48,7 @@ public abstract class LombokAbstractImmutable {
     ZonedDateTime zonedDateTime;
     Instant instant;
     List<String> listOfStrings;
+    List<ArbitraryEnum> listOfEnums;
     Set<String> setOfStrings;
     EnumSet<ArbitraryEnum> enumSet;
     BitSet bitSet;
@@ -57,6 +58,7 @@ public abstract class LombokAbstractImmutable {
     NavigableSet<String> navigableSet;
     Map<Integer, String> mapOfIntegersToStrings;
     Map<String, Integer> mapOfStringsToIntegers;
+    Map<String, ArbitraryEnum> mapOfStringsToEnums;
     EnumMap<ArbitraryEnum, String> enumMap;
     SortedMap<String, Integer> sortedMap;
     NavigableMap<String, Integer> navigableMap;
@@ -69,9 +71,12 @@ public abstract class LombokAbstractImmutable {
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
     byte[] arrayOfBytes;
+    char[] arrayOfChars;
     int[] arrayOfInts;
     long[] arrayOfLongs;
+    float[] arrayOfFloats;
     double[] arrayOfDoubles;
+    short[] arrayOfShorts;
     boolean[] arrayOfBooleans;
     ArrayList<String> arrayList;
     LinkedList<String> linkedList;

@@ -50,6 +50,7 @@ public abstract class PojoAbstract {
     private ZonedDateTime zonedDateTime;
     private Instant instant;
     private List<String> listOfStrings;
+    private List<ArbitraryEnum> listOfEnums;
     private Set<String> setOfStrings;
     private EnumSet<ArbitraryEnum> enumSet;
     private BitSet bitSet;
@@ -59,6 +60,7 @@ public abstract class PojoAbstract {
     private NavigableSet<String> navigableSet;
     private Map<Integer, String> mapOfIntegersToStrings;
     private Map<String, Integer> mapOfStringsToIntegers;
+    private Map<String, ArbitraryEnum> mapOfStringsToEnums;
     private EnumMap<ArbitraryEnum, String> enumMap;
     private SortedMap<String, Integer> sortedMap;
     private NavigableMap<String, Integer> navigableMap;
@@ -71,9 +73,12 @@ public abstract class PojoAbstract {
     private ArbitraryEnum arbitraryEnum;
     private String[] arrayOfStrings;
     private byte[] arrayOfBytes;
+    private char[] arrayOfChars;
     private int[] arrayOfInts;
     private long[] arrayOfLongs;
+    private float[] arrayOfFloats;
     private double[] arrayOfDoubles;
+    private short[] arrayOfShorts;
     private boolean[] arrayOfBooleans;
     private ArrayList<String> arrayList;
     private LinkedList<String> linkedList;

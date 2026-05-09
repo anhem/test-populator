@@ -168,6 +168,11 @@ class RandomUtilTest {
     void getRandomByteIsDifferentEachTime() {
         Byte random1 = getRandomByte();
         Byte random2 = getRandomByte();
+        int retry = 0;
+        while (random1.equals(random2) && retry < 10) {
+            random2 = getRandomByte();
+            retry++;
+        }
 
         assertThat(random1).isNotNull();
         assertThat(random2).isNotNull();

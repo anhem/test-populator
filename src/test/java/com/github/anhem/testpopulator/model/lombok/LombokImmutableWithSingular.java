@@ -49,6 +49,8 @@ public class LombokImmutableWithSingular {
     @Singular
     List<String> listOfStrings;
     @Singular
+    List<ArbitraryEnum> listOfEnums;
+    @Singular
     Set<String> setOfStrings;
     EnumSet<ArbitraryEnum> enumSet;
     BitSet bitSet;
@@ -64,6 +66,8 @@ public class LombokImmutableWithSingular {
     Map<Integer, String> mapOfIntegersToStrings;
     @Singular
     Map<String, Integer> mapOfStringsToIntegers;
+    @Singular
+    Map<String, ArbitraryEnum> mapOfStringsToEnums;
     EnumMap<ArbitraryEnum, String> enumMap;
     @Singular("sortedMap")
     SortedMap<String, Integer> sortedMap;
@@ -78,9 +82,12 @@ public class LombokImmutableWithSingular {
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
     byte[] arrayOfBytes;
+    char[] arrayOfChars;
     int[] arrayOfInts;
     long[] arrayOfLongs;
+    float[] arrayOfFloats;
     double[] arrayOfDoubles;
+    short[] arrayOfShorts;
     boolean[] arrayOfBooleans;
     ArrayList<String> arrayList;
     LinkedList<String> linkedList;

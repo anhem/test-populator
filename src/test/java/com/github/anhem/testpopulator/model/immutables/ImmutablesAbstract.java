@@ -69,6 +69,8 @@ public abstract class ImmutablesAbstract {
 
     public abstract List<String> getListOfStrings();
 
+    public abstract List<ArbitraryEnum> getListOfEnums();
+
     public abstract Set<String> getSetOfStrings();
 
     public abstract EnumSet<ArbitraryEnum> getEnumSet();
@@ -86,6 +88,8 @@ public abstract class ImmutablesAbstract {
     public abstract Map<Integer, String> getMapOfIntegersToStrings();
 
     public abstract Map<String, Integer> getMapOfStringsToIntegers();
+
+    public abstract Map<String, ArbitraryEnum> getMapOfStringsToEnums();
 
     public abstract EnumMap<ArbitraryEnum, String> getEnumMap();
 
@@ -111,11 +115,17 @@ public abstract class ImmutablesAbstract {
 
     public abstract byte[] getArrayOfBytes();
 
+    public abstract char[] getArrayOfChars();
+
     public abstract int[] getArrayOfInts();
 
     public abstract long[] getArrayOfLongs();
 
+    public abstract float[] getArrayOfFloats();
+
     public abstract double[] getArrayOfDoubles();
+
+    public abstract short[] getArrayOfShorts();
 
     public abstract boolean[] getArrayOfBooleans();
 
