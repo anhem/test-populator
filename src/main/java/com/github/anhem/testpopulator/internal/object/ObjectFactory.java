@@ -18,6 +18,8 @@ public interface ObjectFactory {
 
     void setOf();
 
+    <T> void enumSet(Class<T> clazz, Class<?> enumClazz);
+
     <T> void list(Class<T> clazz);
 
     void listOf();
@@ -25,6 +27,8 @@ public interface ObjectFactory {
     <T> void map(Class<T> clazz);
 
     void mapOf();
+
+    <T> void enumMap(Class<T> clazz, Class<?> enumClazz);
 
     <T> void mapEntry(Class<T> clazz);
 

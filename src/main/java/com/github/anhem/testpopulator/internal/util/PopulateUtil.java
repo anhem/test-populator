@@ -56,6 +56,10 @@ public class PopulateUtil {
         return NavigableSet.class.isAssignableFrom(clazz);
     }
 
+    public static <T> boolean isEnumSet(Class<T> clazz) {
+        return EnumSet.class.isAssignableFrom(clazz);
+    }
+
     public static <T> boolean isMap(Class<T> clazz) {
         return Map.class.isAssignableFrom(clazz);
     }
@@ -66,6 +70,10 @@ public class PopulateUtil {
 
     public static <T> boolean isNavigableMap(Class<T> clazz) {
         return NavigableMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isEnumMap(Class<T> clazz) {
+        return EnumMap.class.isAssignableFrom(clazz);
     }
 
     public static <T> boolean isConcurrentMap(Class<T> clazz) {

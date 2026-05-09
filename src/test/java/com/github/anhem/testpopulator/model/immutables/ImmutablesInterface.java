@@ -71,6 +71,10 @@ public interface ImmutablesInterface {
 
     Set<String> getSetOfStrings();
 
+    EnumSet<ArbitraryEnum> getEnumSet();
+
+    BitSet getBitSet();
+
     Queue<String> getQueue();
 
     Deque<String> getDeque();
@@ -82,6 +86,8 @@ public interface ImmutablesInterface {
     Map<Integer, String> getMapOfIntegersToStrings();
 
     Map<String, Integer> getMapOfStringsToIntegers();
+
+    EnumMap<ArbitraryEnum, String> getEnumMap();
 
     SortedMap<String, Integer> getSortedMap();
 

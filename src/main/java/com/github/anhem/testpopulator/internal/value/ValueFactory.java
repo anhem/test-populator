@@ -71,6 +71,7 @@ public class ValueFactory {
     private static final Path PATH = Paths.get("test-path");
     private static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final Calendar CALENDAR = new GregorianCalendar(1970, Calendar.JANUARY, 1);
+    private static final BitSet BIT_SET = BitSet.valueOf(new long[]{1L});
     private static final OptionalInt OPTIONAL_INT = OptionalInt.of(INTEGER);
     private static final OptionalLong OPTIONAL_LONG = OptionalLong.of(LONG);
     private static final OptionalDouble OPTIONAL_DOUBLE = OptionalDouble.of(DOUBLE);
@@ -142,6 +143,7 @@ public class ValueFactory {
         typeSuppliers.put(URI.class, this::getUri);
         typeSuppliers.put(Charset.class, this::getCharset);
         typeSuppliers.put(Calendar.class, this::getCalendar);
+        typeSuppliers.put(BitSet.class, this::getBitSet);
         typeSuppliers.put(OptionalInt.class, this::getOptionalInt);
         typeSuppliers.put(OptionalLong.class, this::getOptionalLong);
         typeSuppliers.put(OptionalDouble.class, this::getOptionalDouble);
@@ -340,6 +342,10 @@ public class ValueFactory {
 
     private Calendar getCalendar() {
         return setRandomValues ? new Calendar.Builder().setInstant(RandomUtil.getRandomLong()).build() : CALENDAR;
+    }
+
+    private BitSet getBitSet() {
+        return setRandomValues ? BitSet.valueOf(new long[]{RandomUtil.getRandomLong()}) : BIT_SET;
     }
 
     private OptionalInt getOptionalInt() {

@@ -44,6 +44,11 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public <T> void enumSet(Class<T> clazz, Class<?> enumClazz) {
+        //ignored
+    }
+
+    @Override
     public <T> void list(Class<T> clazz) {
         //ignored
     }
@@ -60,6 +65,11 @@ public class ObjectFactoryVoid implements ObjectFactory {
 
     @Override
     public void mapOf() {
+        //ignored
+    }
+
+    @Override
+    public <T> void enumMap(Class<T> clazz, Class<?> enumClazz) {
         //ignored
     }
 

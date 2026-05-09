@@ -47,6 +47,13 @@ public class CollectionPopulator implements PopulatingStrategy {
     @SuppressWarnings("unchecked")
     private <T> T populateForMap(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<T> clazz = classCarrier.getClazz();
+        if (isEnumMap(clazz)) {
+            Class<?> enumClass = (Class<?>) classCarrier.getArgumentTypes().get(0);
+            if (enumClass.isEnum()) {
+                classCarrier.getObjectFactory().enumMap(clazz, enumClass);
+                return (T) populateMap(classCarrier, populator, createEnumMap(enumClass));
+            }
+        }
         if (hasConstructors(classCarrier)) {
             classCarrier.getObjectFactory().map(clazz);
             Map<Object, Object> map = (Map<Object, Object>) clazz.getConstructor().newInstance();
@@ -71,6 +78,13 @@ public class CollectionPopulator implements PopulatingStrategy {
     @SuppressWarnings("unchecked")
     private <T> T populateForSet(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<T> clazz = classCarrier.getClazz();
+        if (isEnumSet(clazz)) {
+            Class<?> enumClass = (Class<?>) classCarrier.getArgumentTypes().get(0);
+            if (enumClass.isEnum()) {
+                classCarrier.getObjectFactory().enumSet(clazz, enumClass);
+                return (T) populateCollection(classCarrier, populator, createEnumSet(enumClass));
+            }
+        }
         if (hasConstructors(classCarrier)) {
             classCarrier.getObjectFactory().set(clazz);
             Set<Object> set = (Set<Object>) clazz.getConstructor().newInstance();
@@ -112,14 +126,26 @@ public class CollectionPopulator implements PopulatingStrategy {
         }
     }
 
-    private <T> Map<Object, Object> populateMap(CollectionCarrier<T> classCarrier, Populator populator, Map<Object, Object> map) {
+    @SuppressWarnings("unchecked")
+    private Map<Object, Object> populateMap(CollectionCarrier<?> classCarrier, Populator populator, Map map) {
         Optional<Object> key = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator));
         Optional<Object> value = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1)), populator));
         key.ifPresent(k -> map.put(k, value.orElse(null)));
         return map;
     }
 
-    private <T> Collection<Object> populateCollection(CollectionCarrier<T> classCarrier, Populator populator, Collection<Object> collection) {
+    @SuppressWarnings("unchecked")
+    private <E extends Enum<E>> EnumSet<E> createEnumSet(Class<?> enumClass) {
+        return EnumSet.noneOf((Class<E>) enumClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <K extends Enum<K>, V> EnumMap<K, V> createEnumMap(Class<?> enumClass) {
+        return new EnumMap<>((Class<K>) enumClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Collection<Object> populateCollection(CollectionCarrier<?> classCarrier, Populator populator, Collection collection) {
         Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator))
                 .ifPresent(collection::add);
         return collection;

@@ -50,6 +50,8 @@ public class LombokImmutableWithSingular {
     List<String> listOfStrings;
     @Singular
     Set<String> setOfStrings;
+    EnumSet<ArbitraryEnum> enumSet;
+    BitSet bitSet;
     @Singular("setOfIntegerOverride")
     Set<Integer> setOfIntegers;
     Queue<String> queue;
@@ -62,6 +64,7 @@ public class LombokImmutableWithSingular {
     Map<Integer, String> mapOfIntegersToStrings;
     @Singular
     Map<String, Integer> mapOfStringsToIntegers;
+    EnumMap<ArbitraryEnum, String> enumMap;
     @Singular("sortedMap")
     SortedMap<String, Integer> sortedMap;
     @Singular("navigableMap")

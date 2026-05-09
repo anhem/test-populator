@@ -44,12 +44,15 @@ public class Fields {
     private Instant instant;
     private List<String> listOfStrings;
     private Set<String> setOfStrings;
+    private EnumSet<ArbitraryEnum> enumSet;
+    private BitSet bitSet;
     private Queue<String> queue;
     private Deque<String> deque;
     private SortedSet<String> sortedSet;
     private NavigableSet<String> navigableSet;
     private Map<Integer, String> mapOfIntegersToStrings;
     private Map<String, Integer> mapOfStringsToIntegers;
+    private EnumMap<ArbitraryEnum, String> enumMap;
     private SortedMap<String, Integer> sortedMap;
     private NavigableMap<String, Integer> navigableMap;
     private ConcurrentMap<String, String> concurrentMap;

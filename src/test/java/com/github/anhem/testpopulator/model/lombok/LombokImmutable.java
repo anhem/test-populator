@@ -47,12 +47,15 @@ public class LombokImmutable {
     Instant instant;
     List<String> listOfStrings;
     Set<String> setOfStrings;
+    EnumSet<ArbitraryEnum> enumSet;
+    BitSet bitSet;
     Queue<String> queue;
     Deque<String> deque;
     SortedSet<String> sortedSet;
     NavigableSet<String> navigableSet;
     Map<Integer, String> mapOfIntegersToStrings;
     Map<String, Integer> mapOfStringsToIntegers;
+    EnumMap<ArbitraryEnum, String> enumMap;
     SortedMap<String, Integer> sortedMap;
     NavigableMap<String, Integer> navigableMap;
     ConcurrentMap<String, String> concurrentMap;

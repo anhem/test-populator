@@ -14,6 +14,7 @@ public abstract class ObjectBuilder {
     private final String name;
     private final BuildType buildType;
     private final List<ObjectBuilder> children = new ArrayList<>();
+    private final Set<Class<?>> referencedClasses = new HashSet<>();
     private final Set<String> extraMethods = new HashSet<>();
     private final Set<String> extraImports = new HashSet<>();
     private final Set<String> extraStaticImports = new HashSet<>();
@@ -47,6 +48,10 @@ public abstract class ObjectBuilder {
 
     public void addImports(Collection<String> imports) {
         this.extraImports.addAll(imports);
+    }
+
+    public void addReferencedClass(Class<?> clazz) {
+        this.referencedClasses.add(clazz);
     }
 
     public void addStaticImports(Collection<String> staticImports) {
@@ -95,6 +100,7 @@ public abstract class ObjectBuilder {
 
     private void getImports(Set<String> imports, Set<String> staticImports) {
         addImport(getClazz(), value, isUseFullyQualifiedName(), imports, staticImports);
+        referencedClasses.forEach(clazz -> addImport(clazz, null, isUseFullyQualifiedName(), imports, staticImports));
         imports.addAll(extraImports);
         staticImports.addAll(extraStaticImports);
         children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));

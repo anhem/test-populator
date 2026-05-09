@@ -39,7 +39,7 @@ class LombokUtilTest {
 
         int expectedChildren = calculateExpectedChildren(methodsForLombokBuilderGroupedByInvokeOrder);
 
-        assertThat(expectedChildren).isEqualTo(100);
+        assertThat(expectedChildren).isEqualTo(103);
     }
 
 }

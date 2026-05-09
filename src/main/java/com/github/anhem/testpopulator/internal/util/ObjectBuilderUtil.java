@@ -29,20 +29,30 @@ public class ObjectBuilderUtil {
 
     public static void addImport(Class<?> clazz, Object value, boolean useFullyQualifiedName, Set<String> imports, Set<String> staticImports) {
         if (clazz != null && !clazz.isPrimitive() && !useFullyQualifiedName && !clazz.getName().startsWith("java.lang.")) {
+            String className = clazz.getName().replace('$', '.');
             if (isMapEntry(clazz)) {
-                staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
+                staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName().replace('$', '.'), clazz.getSimpleName()));
                 imports.add("java.util.AbstractMap");
             }
             if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
+                String enclosingClassName = clazz.getEnclosingClass().getName().replace('$', '.');
                 if (clazz.isEnum()) {
-                    staticImports.add(String.format("%s.%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName(), value));
+                    if (value != null) {
+                        staticImports.add(String.format("%s.%s.%s", enclosingClassName, clazz.getSimpleName(), value));
+                    } else {
+                        imports.add(className);
+                    }
                 } else {
-                    staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
+                    staticImports.add(String.format("%s.%s", enclosingClassName, clazz.getSimpleName()));
                 }
             } else if (clazz.isEnum()) {
-                staticImports.add(String.format("%s.%s", clazz.getName(), value));
+                if (value != null) {
+                    staticImports.add(String.format("%s.%s", className, value));
+                } else {
+                    imports.add(className);
+                }
             } else {
-                imports.add(clazz.getName());
+                imports.add(className);
             }
         }
     }
@@ -69,7 +79,7 @@ public class ObjectBuilderUtil {
     }
 
     public static boolean collectionHasNullValues(ObjectBuilder objectBuilder) {
-        if (List.of(LIST, SET, MAP).contains(objectBuilder.getBuildType())) {
+        if (List.of(LIST, SET, ENUM_SET, MAP, ENUM_MAP).contains(objectBuilder.getBuildType())) {
             return objectBuilder.getChildren().stream()
                     .map(ObjectBuilder::getChildren)
                     .flatMap(Collection::stream)

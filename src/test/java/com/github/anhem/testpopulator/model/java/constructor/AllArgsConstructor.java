@@ -48,12 +48,15 @@ public class AllArgsConstructor {
     private final Instant instant;
     private final List<String> listOfStrings;
     private final Set<String> setOfStrings;
+    private final EnumSet<ArbitraryEnum> enumSet;
+    private final BitSet bitSet;
     private final Queue<String> queue;
     private final Deque<String> deque;
     private final SortedSet<String> sortedSet;
     private final NavigableSet<String> navigableSet;
     private final Map<Integer, String> mapOfIntegersToStrings;
     private final Map<String, Integer> mapOfStringsToIntegers;
+    private final EnumMap<ArbitraryEnum, String> enumMap;
     private final SortedMap<String, Integer> sortedMap;
     private final NavigableMap<String, Integer> navigableMap;
     private final ConcurrentMap<String, String> concurrentMap;

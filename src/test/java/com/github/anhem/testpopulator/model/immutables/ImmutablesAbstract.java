@@ -71,6 +71,10 @@ public abstract class ImmutablesAbstract {
 
     public abstract Set<String> getSetOfStrings();
 
+    public abstract EnumSet<ArbitraryEnum> getEnumSet();
+
+    public abstract BitSet getBitSet();
+
     public abstract Queue<String> getQueue();
 
     public abstract Deque<String> getDeque();
@@ -82,6 +86,8 @@ public abstract class ImmutablesAbstract {
     public abstract Map<Integer, String> getMapOfIntegersToStrings();
 
     public abstract Map<String, Integer> getMapOfStringsToIntegers();
+
+    public abstract EnumMap<ArbitraryEnum, String> getEnumMap();
 
     public abstract SortedMap<String, Integer> getSortedMap();
 

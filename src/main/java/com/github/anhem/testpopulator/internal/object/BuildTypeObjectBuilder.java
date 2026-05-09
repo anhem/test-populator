@@ -20,17 +20,28 @@ public class BuildTypeObjectBuilder extends ObjectBuilder {
     private static final String LIST_OF = "%s %s<%s> %s = List.of(%s);";
     private static final String MAP_OF = "%s %s<%s> %s = Map.of(%s);";
     private static final String MAP_ENTRY = "%s %s<%s> %s = new AbstractMap.SimpleEntry<>(%s);";
+    private static final String ENUM_SET = "%s %s<%s> %s = EnumSet.noneOf(%s.class);";
+    private static final String ENUM_MAP = "%s %s<%s> %s = new EnumMap<>(%s.class);";
     private static final String OPTIONAL_OF = "%s %s<%s> %s = Optional.ofNullable(%s);";
     private static final String NEW_ARRAY = "%s %s[] %s = new %s[]{%s};";
     private static final String NEW_VALUE = "%s %s %s = %s;";
 
     private final Class<?> clazz;
+    private final Class<?> referencedClazz;
     private final boolean useFullyQualifiedName;
 
     public BuildTypeObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
+        this(clazz, null, name, buildType, useFullyQualifiedName, expectedChildren);
+    }
+
+    public BuildTypeObjectBuilder(Class<?> clazz, Class<?> referencedClazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
         super(name, buildType, expectedChildren);
         this.clazz = clazz;
+        this.referencedClazz = referencedClazz;
         this.useFullyQualifiedName = useFullyQualifiedName;
+        if (referencedClazz != null) {
+            addReferencedClass(referencedClazz);
+        }
     }
 
     @Override
@@ -58,6 +69,8 @@ public class BuildTypeObjectBuilder extends ObjectBuilder {
                 return buildSet();
             case SET_OF:
                 return buildSetOf();
+            case ENUM_SET:
+                return buildEnumSet();
             case LIST:
                 return buildList();
             case LIST_OF:
@@ -66,6 +79,8 @@ public class BuildTypeObjectBuilder extends ObjectBuilder {
                 return buildMap();
             case MAP_OF:
                 return buildMapOf();
+            case ENUM_MAP:
+                return buildEnumMap();
             case MAP_ENTRY:
                 return buildMapEntry();
             case OPTIONAL:
@@ -147,6 +162,26 @@ public class BuildTypeObjectBuilder extends ObjectBuilder {
                 buildChildren(),
                 Stream.of(String.format(MAP_ENTRY, PSF, getClassName(), formatTypes(), getName(), buildArguments())))
                 .collect(Collectors.toList());
+    }
+
+    private List<String> buildEnumSet() {
+        return concatenate(
+                buildChildren(),
+                Stream.of(String.format(ENUM_SET, PSF, getClassName(), formatTypes(), getName(), referencedClazz.getSimpleName())),
+                startStaticBlock(),
+                createMethods(),
+                endStaticBlock()
+        ).collect(Collectors.toList());
+    }
+
+    private List<String> buildEnumMap() {
+        return concatenate(
+                buildChildren(),
+                Stream.of(String.format(ENUM_MAP, PSF, getClassName(), formatTypes(), getName(), referencedClazz.getSimpleName())),
+                startStaticBlock(),
+                createMethods(),
+                endStaticBlock()
+        ).collect(Collectors.toList());
     }
 
     private List<String> buildOptional() {

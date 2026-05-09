@@ -79,6 +79,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(URI.class, object -> String.format("URI.create(\"%s\")", object));
         stringSuppliers.put(Charset.class, object -> String.format("Charset.forName(\"%s\")", ((Charset) object).name()));
         stringSuppliers.put(Calendar.class, object -> String.format("new Calendar.Builder().setInstant(%sL).build()", ((Calendar) object).getTimeInMillis()));
+        stringSuppliers.put(BitSet.class, object -> String.format("BitSet.valueOf(new long[]{%sL})", ((BitSet) object).toLongArray()[0]));
         stringSuppliers.put(OptionalInt.class, object -> String.format("OptionalInt.of(%d)", ((OptionalInt) object).getAsInt()));
         stringSuppliers.put(OptionalLong.class, object -> String.format("OptionalLong.of(%dL)", ((OptionalLong) object).getAsLong()));
         stringSuppliers.put(OptionalDouble.class, object -> String.format("OptionalDouble.of(%s)", ((OptionalDouble) object).getAsDouble()));
@@ -149,6 +150,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
+    public <T> void enumSet(Class<T> clazz, Class<?> enumClazz) {
+        setNextObjectBuilder(new BuildTypeObjectBuilder(clazz, enumClazz, getName(clazz), ENUM_SET, useFullyQualifiedName(clazz, classNames), 1));
+        method("add", 1);
+    }
+
+    @Override
     public <T> void list(Class<T> clazz) {
         setNextObjectBuilder(clazz, LIST, 1);
         method("add", 1);
@@ -168,6 +175,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public void mapOf() {
         setNextObjectBuilder(Map.class, MAP_OF, 2);
+    }
+
+    @Override
+    public <T> void enumMap(Class<T> clazz, Class<?> enumClazz) {
+        setNextObjectBuilder(new BuildTypeObjectBuilder(clazz, enumClazz, getName(clazz), ENUM_MAP, useFullyQualifiedName(clazz, classNames), 1));
+        method("put", 2);
     }
 
     @Override
