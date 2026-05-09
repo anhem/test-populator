@@ -31,7 +31,14 @@ public class ValueFactory {
             .toArray(Locale[]::new);
     private static final String[] AVAILABLE_TIMEZONE_IDS = TimeZone.getAvailableIDs();
     private static final List<String> AVAILABLE_ZONE_IDS = new ArrayList<>(ZoneId.getAvailableZoneIds());
-    private static final List<Charset> AVAILABLE_CHARSETS = new ArrayList<>(Charset.availableCharsets().values());
+    private static final List<Charset> AVAILABLE_CHARSETS = List.of(
+            StandardCharsets.UTF_8,
+            StandardCharsets.US_ASCII,
+            StandardCharsets.ISO_8859_1,
+            StandardCharsets.UTF_16,
+            StandardCharsets.UTF_16BE,
+            StandardCharsets.UTF_16LE
+    );
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
     private static final ZonedDateTime ZONED_DATE_TIME = LOCAL_DATE_TIME.atZone(ZoneId.of("UTC"));
     private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();
