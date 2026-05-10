@@ -121,6 +121,10 @@ public class PopulateUtil {
         return Map.Entry.class.isAssignableFrom(clazz);
     }
 
+    public static <T> boolean isCollection(Class<T> clazz) {
+        return Collection.class.isAssignableFrom(clazz);
+    }
+
     public static <T> boolean isOptional(Class<T> clazz) {
         return Optional.class.isAssignableFrom(clazz);
     }

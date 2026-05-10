@@ -37,6 +37,8 @@ public class CollectionPopulator implements PopulatingStrategy {
                 return populateForSet(collectionCarrier, populator);
             } else if (isMapEntry(clazz)) {
                 return populateForMapEntry(collectionCarrier, populator);
+            } else if (isCollection(clazz)) {
+                return populateForCollection(collectionCarrier, populator);
             } else if (isOptional(clazz)) {
                 return populateForOptional(collectionCarrier, populator);
             } else if (isStream(clazz)) {
@@ -47,8 +49,6 @@ public class CollectionPopulator implements PopulatingStrategy {
                 return populateForFuture(collectionCarrier, populator);
             } else if (isIterator(clazz)) {
                 return populateForIterator(collectionCarrier, populator);
-            } else if (Collection.class.isAssignableFrom(clazz)) {
-                return populateForCollection(collectionCarrier, populator);
             } else if (isIterable(clazz)) {
                 return populateForIterable(collectionCarrier, populator);
             }
@@ -57,7 +57,6 @@ public class CollectionPopulator implements PopulatingStrategy {
         }
         throw new PopulateException(format(MISSING_COLLECTION_TYPE, collectionCarrier.getClazz().getTypeName()));
     }
-
 
     @SuppressWarnings("unchecked")
     private <T> T populateForMap(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
