@@ -172,10 +172,6 @@ public class ValueFactory {
 
     @SuppressWarnings("unchecked")
     public <T> T createValue(Class<T> clazz, String name) {
-        if (clazz.isEnum()) {
-            return getEnum(clazz);
-        }
-
         if (name != null) {
             OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
             if (nameTypeSuppliers.containsKey(overrideTarget)) {
@@ -187,6 +183,10 @@ public class ValueFactory {
             return (T) classTypeSuppliers.get(clazz).create();
         }
 
+        if (clazz.isEnum()) {
+            return getEnum(clazz);
+        }
+
         throw new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
@@ -194,8 +194,8 @@ public class ValueFactory {
         return clazz.isEnum() || classTypeSuppliers.containsKey(clazz);
     }
 
-    public boolean hasOverridePopulateName(String name, Class<?> clazz) {
-        return nameTypeSuppliers.containsKey(OverrideTarget.of(name, clazz));
+    public boolean hasType(String name, Class<?> clazz) {
+        return name != null && nameTypeSuppliers.containsKey(OverrideTarget.of(name, clazz));
     }
 
     Set<Class<?>> getRegisteredTypes() {
