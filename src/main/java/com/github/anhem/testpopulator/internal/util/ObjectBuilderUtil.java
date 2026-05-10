@@ -4,6 +4,10 @@ import com.github.anhem.testpopulator.internal.object.BuildType;
 import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
 
 import java.lang.reflect.Modifier;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -117,7 +121,7 @@ public class ObjectBuilderUtil {
                     "\t\t}",
                     "\t}");
         }
-        if (clazz != null && (clazz.equals(java.net.InetAddress.class) || clazz.equals(java.net.Inet4Address.class) || clazz.equals(java.net.Inet6Address.class))) {
+        if (clazz != null && (clazz.equals(InetAddress.class) || clazz.equals(Inet4Address.class) || clazz.equals(Inet6Address.class) || clazz.equals(InetSocketAddress.class))) {
             return String.join(System.lineSeparator(),
                     "\tprivate static java.net.InetAddress toInetAddress(String host) {",
                     "\t\ttry {",

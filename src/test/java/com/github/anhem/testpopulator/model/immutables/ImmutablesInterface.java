@@ -49,12 +49,6 @@ public interface ImmutablesInterface {
 
     Optional<String> getOptionalString();
 
-    OptionalInt getOptionalInt();
-
-    OptionalLong getOptionalLong();
-
-    OptionalDouble getOptionalDouble();
-
     Charset getCharset();
 
     Calendar getCalendar();
@@ -238,7 +232,5 @@ public interface ImmutablesInterface {
     Inet4Address getInet4Address();
 
     Inet6Address getInet6Address();
-
-    InetSocketAddress getInetSocketAddress();
 
 }

@@ -38,9 +38,6 @@ public abstract class AllArgsConstructorAbstract {
     private final UUID uuid;
     private final Optional<Integer> optionalInteger;
     private final Optional<String> optionalString;
-    private final OptionalInt optionalInt;
-    private final OptionalLong optionalLong;
-    private final OptionalDouble optionalDouble;
     private final Charset charset;
     private final Calendar calendar;
     private final LocalDate localDate;
@@ -133,6 +130,5 @@ public abstract class AllArgsConstructorAbstract {
     private final InetAddress inetAddress;
     private final Inet4Address inet4Address;
     private final Inet6Address inet6Address;
-    private final InetSocketAddress inetSocketAddress;
 
 }

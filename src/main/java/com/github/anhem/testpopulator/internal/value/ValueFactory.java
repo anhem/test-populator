@@ -20,13 +20,11 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static com.github.anhem.testpopulator.internal.util.RandomUtil.*;
 
 public class ValueFactory {
+
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
 
     private static final List<Currency> AVAILABLE_CURRENCIES = new ArrayList<>(Currency.getAvailableCurrencies());
@@ -83,14 +81,7 @@ public class ValueFactory {
     private static final Inet4Address INET4_ADDRESS = (Inet4Address) PopulateUtil.toInetAddress("127.0.0.1");
     private static final Inet6Address INET6_ADDRESS = (Inet6Address) PopulateUtil.toInetAddress("::1");
     private static final InetSocketAddress INET_SOCKET_ADDRESS = new InetSocketAddress(INET_ADDRESS, 8080);
-    private static final OptionalInt OPTIONAL_INT = OptionalInt.of(INTEGER);
-    private static final OptionalLong OPTIONAL_LONG = OptionalLong.of(LONG);
-    private static final OptionalDouble OPTIONAL_DOUBLE = OptionalDouble.of(DOUBLE);
-    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(INTEGER);
-    private static final AtomicLong ATOMIC_LONG = new AtomicLong(LONG);
-    private static final AtomicBoolean ATOMIC_BOOLEAN = new AtomicBoolean(BOOLEAN);
     private static final Class<?> CLAZZ = Object.class;
-
 
     private final boolean setRandomValues;
     private final Map<Class<?>, TypeSupplier<?>> classTypeSuppliers;
@@ -126,6 +117,7 @@ public class ValueFactory {
         typeSuppliers.put(BigDecimal.class, this::getBigDecimal);
         typeSuppliers.put(BigInteger.class, this::getBigInteger);
         typeSuppliers.put(String.class, this::getString);
+        typeSuppliers.put(CharSequence.class, this::getString);
         typeSuppliers.put(LocalDate.class, this::getLocalDate);
         typeSuppliers.put(LocalTime.class, this::getLocalTime);
         typeSuppliers.put(LocalDateTime.class, this::getLocalDateTime);
@@ -161,8 +153,6 @@ public class ValueFactory {
         typeSuppliers.put(Charset.class, this::getCharset);
         typeSuppliers.put(Calendar.class, this::getCalendar);
         typeSuppliers.put(BitSet.class, this::getBitSet);
-        typeSuppliers.put(StringBuilder.class, this::getStringBuilder);
-        typeSuppliers.put(StringBuffer.class, this::getStringBuffer);
         typeSuppliers.put(Throwable.class, this::getThrowable);
         typeSuppliers.put(Exception.class, this::getException);
         typeSuppliers.put(RuntimeException.class, this::getRuntimeException);
@@ -172,12 +162,6 @@ public class ValueFactory {
         typeSuppliers.put(Inet4Address.class, this::getInet4Address);
         typeSuppliers.put(Inet6Address.class, this::getInet6Address);
         typeSuppliers.put(InetSocketAddress.class, this::getInetSocketAddress);
-        typeSuppliers.put(OptionalInt.class, this::getOptionalInt);
-        typeSuppliers.put(OptionalLong.class, this::getOptionalLong);
-        typeSuppliers.put(OptionalDouble.class, this::getOptionalDouble);
-        typeSuppliers.put(AtomicInteger.class, this::getAtomicInteger);
-        typeSuppliers.put(AtomicLong.class, this::getAtomicLong);
-        typeSuppliers.put(AtomicBoolean.class, this::getAtomicBoolean);
         typeSuppliers.put(Class.class, this::getClazz);
         typeSuppliers.put(Object.class, Object::new);
         typeSuppliers.putAll(classOverrides);
@@ -389,14 +373,6 @@ public class ValueFactory {
         return setRandomValues ? BitSet.valueOf(new long[]{RandomUtil.getRandomLong()}) : BitSet.valueOf(new long[]{1L});
     }
 
-    private StringBuilder getStringBuilder() {
-        return new StringBuilder(getString());
-    }
-
-    private StringBuffer getStringBuffer() {
-        return new StringBuffer(getString());
-    }
-
     private Throwable getThrowable() {
         return new Throwable(getString());
     }
@@ -445,30 +421,6 @@ public class ValueFactory {
 
     private InetSocketAddress getInetSocketAddress() {
         return setRandomValues ? new InetSocketAddress(getInetAddress(), getRandomInt(65535)) : INET_SOCKET_ADDRESS;
-    }
-
-    private OptionalInt getOptionalInt() {
-        return setRandomValues ? OptionalInt.of(getRandomInt()) : OPTIONAL_INT;
-    }
-
-    private OptionalLong getOptionalLong() {
-        return setRandomValues ? OptionalLong.of(getRandomInt()) : OPTIONAL_LONG;
-    }
-
-    private OptionalDouble getOptionalDouble() {
-        return setRandomValues ? OptionalDouble.of(getRandomInt()) : OPTIONAL_DOUBLE;
-    }
-
-    private AtomicInteger getAtomicInteger() {
-        return setRandomValues ? new AtomicInteger(getInteger()) : ATOMIC_INTEGER;
-    }
-
-    private AtomicLong getAtomicLong() {
-        return setRandomValues ? new AtomicLong(getLong()) : ATOMIC_LONG;
-    }
-
-    private AtomicBoolean getAtomicBoolean() {
-        return setRandomValues ? new AtomicBoolean(getBoolean()) : ATOMIC_BOOLEAN;
     }
 
     private Class<?> getClazz() {

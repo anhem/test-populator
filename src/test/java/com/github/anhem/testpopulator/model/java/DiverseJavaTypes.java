@@ -10,9 +10,6 @@ import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -24,8 +21,6 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public class DiverseJavaTypes {
 
-    private StringBuilder stringBuilder;
-    private StringBuffer stringBuffer;
     private Throwable throwable;
     private Exception exception;
     private RuntimeException runtimeException;
@@ -38,9 +33,6 @@ public class DiverseJavaTypes {
     private DoubleStream doubleStream;
     private Iterator<String> iterator;
     private Iterable<String> iterable;
-    private AtomicInteger atomicInteger;
-    private AtomicLong atomicLong;
-    private AtomicBoolean atomicBoolean;
     private CompletableFuture<String> completableFuture;
     private Future<String> future;
     private Class<?> clazz;
@@ -52,8 +44,6 @@ public class DiverseJavaTypes {
     private Future<Boolean> futureBoolean;
 
     public static DiverseJavaTypes of(
-            StringBuilder stringBuilder,
-            StringBuffer stringBuffer,
             Throwable throwable,
             Exception exception,
             RuntimeException runtimeException,
@@ -66,9 +56,6 @@ public class DiverseJavaTypes {
             DoubleStream doubleStream,
             Iterator<String> iterator,
             Iterable<String> iterable,
-            AtomicInteger atomicInteger,
-            AtomicLong atomicLong,
-            AtomicBoolean atomicBoolean,
             CompletableFuture<String> completableFuture,
             Future<String> future,
             Class<?> clazz,
@@ -80,8 +67,6 @@ public class DiverseJavaTypes {
             Future<Boolean> futureBoolean
     ) {
         return new DiverseJavaTypes(
-                stringBuilder,
-                stringBuffer,
                 throwable,
                 exception,
                 runtimeException,
@@ -94,9 +79,6 @@ public class DiverseJavaTypes {
                 doubleStream,
                 iterator,
                 iterable,
-                atomicInteger,
-                atomicLong,
-                atomicBoolean,
                 completableFuture,
                 future,
                 clazz,

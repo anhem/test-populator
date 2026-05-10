@@ -16,9 +16,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -85,8 +82,6 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Charset.class, object -> String.format("Charset.forName(\"%s\")", ((Charset) object).name()));
         stringSuppliers.put(Calendar.class, object -> String.format("new Calendar.Builder().setInstant(%sL).build()", ((Calendar) object).getTimeInMillis()));
         stringSuppliers.put(BitSet.class, object -> String.format("BitSet.valueOf(new long[]{%sL})", ((BitSet) object).toLongArray()[0]));
-        stringSuppliers.put(StringBuilder.class, object -> String.format("new StringBuilder(\"%s\")", object));
-        stringSuppliers.put(StringBuffer.class, object -> String.format("new StringBuffer(\"%s\")", object));
         stringSuppliers.put(Throwable.class, object -> String.format("new Throwable(\"%s\")", ((Throwable) object).getMessage()));
         stringSuppliers.put(Exception.class, object -> String.format("new Exception(\"%s\")", ((Exception) object).getMessage()));
         stringSuppliers.put(RuntimeException.class, object -> String.format("new RuntimeException(\"%s\")", ((RuntimeException) object).getMessage()));
@@ -96,13 +91,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Inet4Address.class, object -> String.format("(Inet4Address) toInetAddress(\"%s\")", ((Inet4Address) object).getHostAddress()));
         stringSuppliers.put(Inet6Address.class, object -> String.format("(Inet6Address) toInetAddress(\"%s\")", ((Inet6Address) object).getHostAddress()));
         stringSuppliers.put(InetSocketAddress.class, object -> String.format("new InetSocketAddress(toInetAddress(\"%s\"), %d)", ((InetSocketAddress) object).getAddress().getHostAddress(), ((InetSocketAddress) object).getPort()));
-        stringSuppliers.put(OptionalInt.class, object -> String.format("OptionalInt.of(%d)", ((OptionalInt) object).getAsInt()));
-        stringSuppliers.put(OptionalLong.class, object -> String.format("OptionalLong.of(%dL)", ((OptionalLong) object).getAsLong()));
-        stringSuppliers.put(OptionalDouble.class, object -> String.format("OptionalDouble.of(%s)", ((OptionalDouble) object).getAsDouble()));
-        stringSuppliers.put(Scanner.class, object -> "new Scanner(\"string\")");
-        stringSuppliers.put(AtomicInteger.class, object -> String.format("new AtomicInteger(%d)", ((AtomicInteger) object).get()));
-        stringSuppliers.put(AtomicLong.class, object -> String.format("new AtomicLong(%dL)", ((AtomicLong) object).get()));
-        stringSuppliers.put(AtomicBoolean.class, object -> String.format("new AtomicBoolean(%b)", ((AtomicBoolean) object).get()));
+        stringSuppliers.put(CharSequence.class, object -> String.format("\"%s\"", object));
         stringSuppliers.put(Class.class, object -> String.format("%s.class", ((Class<?>) object).getSimpleName()));
     }
 

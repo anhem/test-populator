@@ -39,9 +39,6 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             UUID uuid,
             Optional<Integer> optionalInteger,
             Optional<String> optionalString,
-            OptionalInt optionalInt,
-            OptionalLong optionalLong,
-            OptionalDouble optionalDouble,
             Charset charset,
             Calendar calendar,
             LocalDate localDate,
@@ -134,7 +131,6 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             InetAddress inetAddress,
             Inet4Address inet4Address,
             Inet6Address inet6Address,
-            InetSocketAddress inetSocketAddress,
             String anotherString
     ) {
         super(
@@ -153,9 +149,6 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
                 uuid,
                 optionalInteger,
                 optionalString,
-                optionalInt,
-                optionalLong,
-                optionalDouble,
                 charset,
                 calendar,
                 localDate,
@@ -247,8 +240,7 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
                 byteBuffer,
                 inetAddress,
                 inet4Address,
-                inet6Address,
-                inetSocketAddress
+                inet6Address
         );
         this.anotherString = anotherString;
     }

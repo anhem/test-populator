@@ -40,9 +40,6 @@ public abstract class PojoAbstract {
     private UUID uuid;
     private Optional<Integer> optionalInteger;
     private Optional<String> optionalString;
-    private OptionalInt optionalInt;
-    private OptionalLong optionalLong;
-    private OptionalDouble optionalDouble;
     private Charset charset;
     private Calendar calendar;
     private LocalDate localDate;
@@ -135,6 +132,5 @@ public abstract class PojoAbstract {
     private InetAddress inetAddress;
     private Inet4Address inet4Address;
     private Inet6Address inet6Address;
-    private InetSocketAddress inetSocketAddress;
 
 }

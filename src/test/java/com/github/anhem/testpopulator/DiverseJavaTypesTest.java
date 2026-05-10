@@ -65,8 +65,6 @@ public class DiverseJavaTypesTest {
 
         assertThat(result).isNotNull();
         assertThat(result).hasNoNullFieldsOrProperties();
-        assertThat(result.getStringBuilder()).isNotNull().isNotEmpty();
-        assertThat(result.getStringBuffer()).isNotNull().isNotEmpty();
         assertThat(result.getThrowable().getMessage()).isNotNull();
         assertThat(result.getException().getMessage()).isNotNull();
         assertThat(result.getRuntimeException().getMessage()).isNotNull();
@@ -79,9 +77,6 @@ public class DiverseJavaTypesTest {
         assertThat(result.getDoubleStream().count()).isPositive();
         assertThat(result.getIterator().hasNext()).isTrue();
         assertThat(result.getIterable()).isNotNull().isNotEmpty();
-        assertThat(result.getAtomicInteger()).isNotNull();
-        assertThat(result.getAtomicLong()).isNotNull();
-        assertThat(result.getAtomicBoolean()).isNotNull();
         assertThat(result.getCompletableFuture()).isDone();
         assertThat(result.getFuture()).isDone();
         assertThat(result.getClazz()).isNotNull();

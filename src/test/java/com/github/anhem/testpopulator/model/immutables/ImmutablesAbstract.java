@@ -49,12 +49,6 @@ public abstract class ImmutablesAbstract {
 
     public abstract Optional<String> getOptionalString();
 
-    public abstract OptionalInt getOptionalInt();
-
-    public abstract OptionalLong getOptionalLong();
-
-    public abstract OptionalDouble getOptionalDouble();
-
     public abstract Charset getCharset();
 
     public abstract Calendar getCalendar();
@@ -238,7 +232,5 @@ public abstract class ImmutablesAbstract {
     public abstract Inet4Address getInet4Address();
 
     public abstract Inet6Address getInet6Address();
-
-    public abstract InetSocketAddress getInetSocketAddress();
 
 }

@@ -9,8 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class IdentityEqualityPojo {
 
-    private StringBuilder stringBuilder;
-    private StringBuffer stringBuffer;
     private Throwable throwable;
     private Exception exception;
     private RuntimeException runtimeException;

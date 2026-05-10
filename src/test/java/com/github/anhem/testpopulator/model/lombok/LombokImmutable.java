@@ -36,9 +36,6 @@ public class LombokImmutable {
     UUID uuid;
     Optional<Integer> optionalInteger;
     Optional<String> optionalString;
-    OptionalInt optionalInt;
-    OptionalLong optionalLong;
-    OptionalDouble optionalDouble;
     Charset charset;
     Calendar calendar;
     LocalDate localDate;
@@ -131,5 +128,5 @@ public class LombokImmutable {
     InetAddress inetAddress;
     Inet4Address inet4Address;
     Inet6Address inet6Address;
-    InetSocketAddress inetSocketAddress;
+
 }

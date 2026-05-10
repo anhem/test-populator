@@ -23,8 +23,6 @@ public class IdentityEqualityTest {
 
         assertThat(identityEqualityPojo).isNotNull();
         assertThat(identityEqualityPojo).hasNoNullFieldsOrProperties();
-        assertThat(identityEqualityPojo.getStringBuilder()).isNotNull().isNotEmpty();
-        assertThat(identityEqualityPojo.getStringBuffer()).isNotNull().isNotEmpty();
         assertThat(identityEqualityPojo.getThrowable()).isNotNull();
         assertThat(identityEqualityPojo.getException()).isNotNull();
         assertThat(identityEqualityPojo.getRuntimeException()).isNotNull();
