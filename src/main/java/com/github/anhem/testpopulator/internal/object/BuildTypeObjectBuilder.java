@@ -5,10 +5,9 @@ import com.github.anhem.testpopulator.exception.ObjectException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.*;
 
-import static com.github.anhem.testpopulator.internal.object.BuildType.*;
+import static com.github.anhem.testpopulator.internal.object.BuildType.MUTATOR;
 import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
 import static java.util.Collections.emptyList;
 
@@ -49,18 +48,6 @@ public class BuildTypeObjectBuilder extends ObjectBuilder {
         this.useFullyQualifiedName = useFullyQualifiedName;
         if (referencedClazz != null) {
             addReferencedClass(referencedClazz);
-        }
-        if (buildType == STREAM) {
-            addReferencedClass(Stream.class);
-            if (clazz.equals(IntStream.class)) addReferencedClass(IntStream.class);
-            if (clazz.equals(LongStream.class)) addReferencedClass(LongStream.class);
-            if (clazz.equals(DoubleStream.class)) addReferencedClass(DoubleStream.class);
-        }
-        if (buildType == ITERATOR || buildType == ITERABLE) {
-            addReferencedClass(List.class);
-        }
-        if (buildType == FUTURE) {
-            addReferencedClass(CompletableFuture.class);
         }
     }
 

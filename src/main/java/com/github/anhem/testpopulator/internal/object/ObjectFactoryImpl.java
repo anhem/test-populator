@@ -214,12 +214,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void iterator(Class<T> clazz) {
-        setNextObjectBuilder(clazz, ITERATOR, 1);
+        setNextObjectBuilder(new BuildTypeObjectBuilder(clazz, List.class, getName(clazz), ITERATOR, useFullyQualifiedName(clazz, classNames), 1));
     }
 
     @Override
     public <T> void iterable(Class<T> clazz) {
-        setNextObjectBuilder(clazz, ITERABLE, 1);
+        setNextObjectBuilder(new BuildTypeObjectBuilder(clazz, List.class, getName(clazz), ITERABLE, useFullyQualifiedName(clazz, classNames), 1));
     }
 
     @Override
