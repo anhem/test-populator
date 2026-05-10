@@ -1,7 +1,7 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.model.java.ConstructorRequiredTypes;
+import com.github.anhem.testpopulator.model.java.constructor.ConstructorRequiredTypes;
 import org.junit.jupiter.api.Test;
 
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.RECURSIVE_ASSERTION_CONFIGURATION;

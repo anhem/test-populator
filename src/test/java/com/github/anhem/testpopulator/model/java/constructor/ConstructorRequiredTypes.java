@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.model.java;
+package com.github.anhem.testpopulator.model.java.constructor;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
