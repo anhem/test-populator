@@ -190,12 +190,10 @@ public class ValueFactory {
         throw new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
-    public boolean hasType(Class<?> clazz) {
-        return clazz.isEnum() || classTypeSuppliers.containsKey(clazz);
-    }
-
-    public boolean hasType(String name, Class<?> clazz) {
-        return name != null && nameTypeSuppliers.containsKey(OverrideTarget.of(name, clazz));
+    public boolean hasType(Class<?> clazz, String name) {
+        return clazz.isEnum() ||
+                classTypeSuppliers.containsKey(clazz) ||
+                (name != null && nameTypeSuppliers.containsKey(OverrideTarget.of(name, clazz)));
     }
 
     Set<Class<?>> getRegisteredTypes() {

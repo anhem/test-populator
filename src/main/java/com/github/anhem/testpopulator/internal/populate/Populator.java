@@ -41,10 +41,7 @@ public class Populator {
 
     public <T> T populate(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
-        if (valueFactory.hasType(classCarrier.getName(), clazz)) {
-            return createValue(classCarrier);
-        }
-        if (valueFactory.hasType(clazz)) {
+        if (valueFactory.hasType(clazz, classCarrier.getName())) {
             return createValue(classCarrier);
         }
         if (alreadyVisited(classCarrier, classCarrier.getPopulateConfig().isNullOnCircularDependency())) {
