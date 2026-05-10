@@ -40,7 +40,10 @@ public class PopulateUtil {
         if (isMap(clazz) || isMapEntry(clazz)) {
             return List.of(Object.class, Object.class);
         }
-        if (isCollectionLike(clazz)) {
+        if (isScanner(clazz)) {
+            return List.of(String.class);
+        }
+        if (isCollectionLike(clazz) || isStream(clazz) || isFuture(clazz)) {
             return List.of(Object.class);
         }
         return Collections.emptyList();
@@ -116,12 +119,36 @@ public class PopulateUtil {
         return Optional.class.isAssignableFrom(clazz);
     }
 
+    public static <T> boolean isStream(Class<T> clazz) {
+        return java.util.stream.BaseStream.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isFuture(Class<T> clazz) {
+        return java.util.concurrent.Future.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isScanner(Class<T> clazz) {
+        return Scanner.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isIterator(Class<T> clazz) {
+        return Iterator.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isIterable(Class<T> clazz) {
+        return Iterable.class.isAssignableFrom(clazz);
+    }
+
     public static <T> boolean isCollectionLike(Class<T> clazz) {
         return Collection.class.isAssignableFrom(clazz) ||
                 Map.class.isAssignableFrom(clazz) ||
                 Map.Entry.class.isAssignableFrom(clazz) ||
                 isOptional(clazz) ||
-                (Iterable.class.isAssignableFrom(clazz) && (clazz.equals(Iterable.class) || !isJavaBaseClass(clazz)));
+                isStream(clazz) ||
+                isIterable(clazz) ||
+                isIterator(clazz) ||
+                isScanner(clazz) ||
+                isFuture(clazz);
     }
 
     public static <T> boolean isCollectionCarrier(ClassCarrier<T> classCarrier) {

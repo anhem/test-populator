@@ -36,6 +36,16 @@ public interface ObjectFactory {
 
     <T> void array(Class<T> clazz);
 
+    <T> void stream(Class<T> clazz);
+
+    <T> void iterator(Class<T> clazz);
+
+    <T> void iterable(Class<T> clazz);
+
+    <T> void scanner(Class<T> clazz);
+
+    <T> void future(Class<T> clazz);
+
     <T> void value(T value, Class<T> clazz, String name);
 
     <T> void nullValue(Class<T> clazz);

@@ -20,11 +20,15 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.github.anhem.testpopulator.internal.util.RandomUtil.*;
 
 public class ValueFactory {
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
+
     private static final List<Currency> AVAILABLE_CURRENCIES = new ArrayList<>(Currency.getAvailableCurrencies());
     private static final Locale[] AVAILABLE_LOCALES = Arrays.stream(Locale.getAvailableLocales())
             .filter(l -> l.equals(Locale.forLanguageTag(l.toLanguageTag())))
@@ -82,6 +86,10 @@ public class ValueFactory {
     private static final OptionalInt OPTIONAL_INT = OptionalInt.of(INTEGER);
     private static final OptionalLong OPTIONAL_LONG = OptionalLong.of(LONG);
     private static final OptionalDouble OPTIONAL_DOUBLE = OptionalDouble.of(DOUBLE);
+    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(INTEGER);
+    private static final AtomicLong ATOMIC_LONG = new AtomicLong(LONG);
+    private static final AtomicBoolean ATOMIC_BOOLEAN = new AtomicBoolean(BOOLEAN);
+    private static final Class<?> CLAZZ = Object.class;
 
 
     private final boolean setRandomValues;
@@ -167,6 +175,10 @@ public class ValueFactory {
         typeSuppliers.put(OptionalInt.class, this::getOptionalInt);
         typeSuppliers.put(OptionalLong.class, this::getOptionalLong);
         typeSuppliers.put(OptionalDouble.class, this::getOptionalDouble);
+        typeSuppliers.put(AtomicInteger.class, this::getAtomicInteger);
+        typeSuppliers.put(AtomicLong.class, this::getAtomicLong);
+        typeSuppliers.put(AtomicBoolean.class, this::getAtomicBoolean);
+        typeSuppliers.put(Class.class, this::getClazz);
         typeSuppliers.put(Object.class, Object::new);
         typeSuppliers.putAll(classOverrides);
         return typeSuppliers;
@@ -445,6 +457,22 @@ public class ValueFactory {
 
     private OptionalDouble getOptionalDouble() {
         return setRandomValues ? OptionalDouble.of(getRandomInt()) : OPTIONAL_DOUBLE;
+    }
+
+    private AtomicInteger getAtomicInteger() {
+        return setRandomValues ? new AtomicInteger(getInteger()) : ATOMIC_INTEGER;
+    }
+
+    private AtomicLong getAtomicLong() {
+        return setRandomValues ? new AtomicLong(getLong()) : ATOMIC_LONG;
+    }
+
+    private AtomicBoolean getAtomicBoolean() {
+        return setRandomValues ? new AtomicBoolean(getBoolean()) : ATOMIC_BOOLEAN;
+    }
+
+    private Class<?> getClazz() {
+        return CLAZZ;
     }
 
 }

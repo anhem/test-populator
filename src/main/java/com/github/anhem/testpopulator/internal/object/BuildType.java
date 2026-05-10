@@ -18,6 +18,11 @@ public enum BuildType {
     MAP_ENTRY,
     ARRAY,
     OPTIONAL,
+    STREAM,
+    ITERATOR,
+    ITERABLE,
+    SCANNER,
+    FUTURE,
     VALUE;
 
     public boolean isParameterizedType() {
@@ -32,6 +37,11 @@ public enum BuildType {
             case ENUM_MAP:
             case MAP_ENTRY:
             case OPTIONAL:
+            case STREAM:
+            case ITERATOR:
+            case ITERABLE:
+            case SCANNER:
+            case FUTURE:
                 return true;
             default:
                 return false;

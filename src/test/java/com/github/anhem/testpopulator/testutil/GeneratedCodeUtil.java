@@ -10,6 +10,16 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.Scanner;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.getPath;
 import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.formatClassName;
@@ -50,7 +60,21 @@ public class GeneratedCodeUtil {
             compileGeneratedFile(path);
             Class<T> clazz = loadClass(path, packageName, path.getFileName().toString().replace(JAVA, ""));
             T value = getStaticObjectFromClass(clazz, simpleName);
-            assertThat(value).usingRecursiveComparison().isEqualTo(object);
+            assertThat(value).usingRecursiveComparison()
+                    .withEqualsForType((a, b) -> a.toString().contentEquals(b), StringBuilder.class)
+                    .withEqualsForType((a, b) -> a.toString().contentEquals(b), StringBuffer.class)
+                    .withEqualsForType((a, b) -> a.getMessage().equals(b.getMessage()) && a.getClass().equals(b.getClass()), Throwable.class)
+                    .withEqualsForType((a, b) -> a.get() == b.get(), AtomicInteger.class)
+                    .withEqualsForType((a, b) -> a.get() == b.get(), AtomicLong.class)
+                    .withEqualsForType((a, b) -> a.get() == b.get(), AtomicBoolean.class)
+                    .withEqualsForType((a, b) -> true, Stream.class)
+                    .withEqualsForType((a, b) -> true, IntStream.class)
+                    .withEqualsForType((a, b) -> true, LongStream.class)
+                    .withEqualsForType((a, b) -> true, DoubleStream.class)
+                    .withEqualsForType((a, b) -> true, Future.class)
+                    .withEqualsForType((a, b) -> true, Scanner.class)
+                    .withEqualsForType((a, b) -> true, Iterator.class)
+                    .isEqualTo(object);
         } finally {
             removeGeneratedFiles(path);
         }

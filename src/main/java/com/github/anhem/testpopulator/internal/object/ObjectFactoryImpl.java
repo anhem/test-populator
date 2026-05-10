@@ -16,6 +16,9 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -96,6 +99,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(OptionalInt.class, object -> String.format("OptionalInt.of(%d)", ((OptionalInt) object).getAsInt()));
         stringSuppliers.put(OptionalLong.class, object -> String.format("OptionalLong.of(%dL)", ((OptionalLong) object).getAsLong()));
         stringSuppliers.put(OptionalDouble.class, object -> String.format("OptionalDouble.of(%s)", ((OptionalDouble) object).getAsDouble()));
+        stringSuppliers.put(Scanner.class, object -> "new Scanner(\"string\")");
+        stringSuppliers.put(AtomicInteger.class, object -> String.format("new AtomicInteger(%d)", ((AtomicInteger) object).get()));
+        stringSuppliers.put(AtomicLong.class, object -> String.format("new AtomicLong(%dL)", ((AtomicLong) object).get()));
+        stringSuppliers.put(AtomicBoolean.class, object -> String.format("new AtomicBoolean(%b)", ((AtomicBoolean) object).get()));
+        stringSuppliers.put(Class.class, object -> String.format("%s.class", ((Class<?>) object).getSimpleName()));
     }
 
     private final PopulateConfig populateConfig;
@@ -209,6 +217,31 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void array(Class<T> clazz) {
         setNextObjectBuilder(clazz, ARRAY, 1);
+    }
+
+    @Override
+    public <T> void stream(Class<T> clazz) {
+        setNextObjectBuilder(clazz, STREAM, 1);
+    }
+
+    @Override
+    public <T> void iterator(Class<T> clazz) {
+        setNextObjectBuilder(clazz, ITERATOR, 1);
+    }
+
+    @Override
+    public <T> void iterable(Class<T> clazz) {
+        setNextObjectBuilder(clazz, ITERABLE, 1);
+    }
+
+    @Override
+    public <T> void scanner(Class<T> clazz) {
+        setNextObjectBuilder(clazz, SCANNER, 1);
+    }
+
+    @Override
+    public <T> void future(Class<T> clazz) {
+        setNextObjectBuilder(clazz, FUTURE, 1);
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
-import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -587,7 +586,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void valueThrowsException() {
-        Assertions.assertThrows(ObjectException.class, () -> objectFactoryImpl.value(Pojo.class, Class.class, null));
+        Assertions.assertThrows(ObjectException.class, () -> objectFactoryImpl.value(PopulateConfig.builder().build(), PopulateConfig.class, null));
     }
 
     private String getExpectedMyClassStaticImport() {

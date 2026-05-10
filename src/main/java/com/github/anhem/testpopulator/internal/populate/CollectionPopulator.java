@@ -9,7 +9,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_COLLECTION;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.MISSING_COLLECTION_TYPE;
@@ -34,8 +39,18 @@ public class CollectionPopulator implements PopulatingStrategy {
                 return populateForMapEntry(collectionCarrier, populator);
             } else if (isOptional(clazz)) {
                 return populateForOptional(collectionCarrier, populator);
-            } else if (isCollectionLike(clazz)) {
+            } else if (isStream(clazz)) {
+                return populateForStream(collectionCarrier, populator);
+            } else if (isScanner(clazz)) {
+                return populateForScanner(collectionCarrier, populator);
+            } else if (isFuture(clazz)) {
+                return populateForFuture(collectionCarrier, populator);
+            } else if (isIterator(clazz)) {
+                return populateForIterator(collectionCarrier, populator);
+            } else if (Collection.class.isAssignableFrom(clazz)) {
                 return populateForCollection(collectionCarrier, populator);
+            } else if (isIterable(clazz)) {
+                return populateForIterable(collectionCarrier, populator);
             }
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_COLLECTION, collectionCarrier.getClazz().getTypeName()), e);
@@ -124,6 +139,53 @@ public class CollectionPopulator implements PopulatingStrategy {
                     .map(value -> (T) List.of(value))
                     .orElseGet(() -> (T) List.of());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T populateForStream(CollectionCarrier<T> classCarrier, Populator populator) {
+        Class<T> clazz = classCarrier.getClazz();
+        classCarrier.getObjectFactory().stream(clazz);
+        if (clazz.equals(IntStream.class)) {
+            int val = (int) populator.populate(classCarrier.toClassCarrier(int.class));
+            return (T) IntStream.of(val);
+        } else if (clazz.equals(LongStream.class)) {
+            long val = (long) populator.populate(classCarrier.toClassCarrier(long.class));
+            return (T) LongStream.of(val);
+        } else if (clazz.equals(DoubleStream.class)) {
+            double val = (double) populator.populate(classCarrier.toClassCarrier(double.class));
+            return (T) DoubleStream.of(val);
+        } else {
+            Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
+            return (T) Stream.of(value);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T populateForIterator(CollectionCarrier<T> classCarrier, Populator populator) {
+        classCarrier.getObjectFactory().iterator(classCarrier.getClazz());
+        Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
+        return (T) List.of(value).iterator();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T populateForScanner(CollectionCarrier<T> classCarrier, Populator populator) {
+        classCarrier.getObjectFactory().scanner(classCarrier.getClazz());
+        String value = (String) continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
+        return (T) new Scanner(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T populateForFuture(CollectionCarrier<T> classCarrier, Populator populator) {
+        classCarrier.getObjectFactory().future(classCarrier.getClazz());
+        Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
+        return (T) CompletableFuture.completedFuture(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T populateForIterable(CollectionCarrier<T> classCarrier, Populator populator) {
+        classCarrier.getObjectFactory().iterable(classCarrier.getClazz());
+        Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
+        return (T) List.of(value);
     }
 
     @SuppressWarnings("unchecked")

@@ -89,6 +89,31 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public <T> void stream(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public <T> void iterator(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public <T> void iterable(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public <T> void scanner(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public <T> void future(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
     public <T> void value(T value, Class<T> clazz, String name) {
         //ignored
     }
