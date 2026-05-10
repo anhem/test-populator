@@ -4,15 +4,15 @@ import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.CUSTOM;
 import static com.github.anhem.testpopulator.internal.value.ValueFactory.UNSUPPORTED_TYPE;
@@ -21,50 +21,42 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ValueFactoryTest {
 
-    private static final List<Class<?>> CLASSES = List.of(
-            ArbitraryEnum.class,
-            Integer.class,
-            Long.class,
-            Double.class,
-            Boolean.class,
-            BigDecimal.class,
+    private static final List<Class<?>> CLASSES_TO_IGNORE = List.of(
             String.class,
-            LocalDate.class,
-            LocalDateTime.class,
-            ZonedDateTime.class,
-            Instant.class,
-            Date.class,
-            Character.class,
-            UUID.class,
-            Byte.class,
+            CharSequence.class,
             BigInteger.class,
-            LocalTime.class,
-            OffsetDateTime.class,
-            OffsetTime.class,
-            Duration.class,
-            Period.class,
+            BigDecimal.class,
+            Date.class,
             java.sql.Date.class,
             Time.class,
             Timestamp.class,
-            java.util.Currency.class,
-            java.util.Locale.class,
-            java.util.TimeZone.class,
-            ZoneId.class,
-            ZoneOffset.class,
-            Year.class,
-            YearMonth.class,
-            MonthDay.class,
-            java.io.File.class,
-            java.nio.file.Path.class,
+            UUID.class,
+            Calendar.class,
+            BitSet.class,
+            Throwable.class,
+            Exception.class,
+            RuntimeException.class,
+            Error.class,
+            InetSocketAddress.class,
+            Boolean.class,
+            Character.class,
+            Byte.class,
+            Short.class,
+            Integer.class,
+            Long.class,
+            Float.class,
+            Double.class,
             java.net.URL.class,
-            java.net.URI.class
+            java.net.URI.class,
+            Locale.class
     );
+
     private ValueFactory valueFactory;
 
     @Test
     void randomValuesAreCreated() {
         valueFactory = new ValueFactory(true, Map.of(), Map.of(), CUSTOM);
-        CLASSES.forEach(this::createAndAssertRandomValues);
+        getTestableTypes().forEach(this::createAndAssertRandomValues);
         createAndAssertRandomIntValues();
         createAndAssertRandomLongValues();
         createAndAssertRandomDoubleValues();
@@ -78,7 +70,7 @@ class ValueFactoryTest {
     @Test
     void fixedValuesAreCreated() {
         valueFactory = new ValueFactory(false, Map.of(), Map.of(), CUSTOM);
-        CLASSES.forEach(this::createAndAssertFixedValues);
+        getTestableTypes().forEach(this::createAndAssertFixedValues);
         createAndAssertFixedIntValues();
         createAndAssertFixedLongValues();
         createAndAssertFixedDoubleValues();
@@ -95,6 +87,30 @@ class ValueFactoryTest {
         assertThatThrownBy(() -> valueFactory.createValue(Pojo.class))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining(String.format(UNSUPPORTED_TYPE, Pojo.class.getTypeName()));
+    }
+
+    @Test
+    void onlyBaseTypesAreRegisteredInValueFactory() {
+        valueFactory = new ValueFactory(false, Map.of(), Map.of(), CUSTOM);
+        Set<Class<?>> registeredTypes = valueFactory.getRegisteredTypes();
+
+        List<Class<?>> typesThatCouldBeSolvedByConstructorStrategy = registeredTypes.stream()
+                .filter(clazz -> !clazz.isPrimitive())
+                .filter(clazz -> !CLASSES_TO_IGNORE.contains(clazz))
+                .filter(clazz -> Arrays.stream(clazz.getConstructors())
+                        .anyMatch(constructor -> Modifier.isPublic(constructor.getModifiers()) && constructor.getParameterCount() > 0))
+                .collect(Collectors.toList());
+
+        assertThat(typesThatCouldBeSolvedByConstructorStrategy).isEmpty();
+    }
+
+    private Set<Class<?>> getTestableTypes() {
+        Set<Class<?>> types = valueFactory.getRegisteredTypes().stream()
+                .filter(c -> !c.isPrimitive())
+                .filter(c -> !c.equals(Class.class))
+                .collect(Collectors.toSet());
+        types.add(ArbitraryEnum.class);
+        return types;
     }
 
     private void createAndAssertRandomValues(Class<?> clazz) {
@@ -172,7 +188,11 @@ class ValueFactoryTest {
         assertThat(value2).isNotNull();
         assertThat(value1).isInstanceOf(clazz);
         assertThat(value2).isInstanceOf(clazz);
-        assertThat(value1).isEqualTo(value2);
+        if (hasOverriddenEquals(clazz)) {
+            assertThat(value1).isEqualTo(value2);
+        } else {
+            assertThat(value1.toString()).isEqualTo(value2.toString());
+        }
     }
 
     private void createAndAssertFixedIntValues() {
@@ -221,5 +241,14 @@ class ValueFactoryTest {
         byte value1 = valueFactory.createValue(byte.class);
         byte value2 = valueFactory.createValue(byte.class);
         assertThat(value1).isEqualTo(value2);
+    }
+
+    private boolean hasOverriddenEquals(Class<?> clazz) {
+        try {
+            Method equalsMethod = clazz.getMethod("equals", Object.class);
+            return !equalsMethod.getDeclaringClass().equals(Object.class);
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
     }
 }

@@ -34,6 +34,9 @@ public class PopulateUtil {
                     .map(t -> t instanceof WildcardType ? ((WildcardType) t).getUpperBounds()[0] : t)
                     .collect(Collectors.toList());
         }
+        if (type instanceof GenericArrayType) {
+            return List.of(((GenericArrayType) type).getGenericComponentType());
+        }
         if (clazz.equals(Properties.class)) {
             return List.of(String.class, String.class);
         }
@@ -42,6 +45,9 @@ public class PopulateUtil {
         }
         if (isScanner(clazz)) {
             return List.of(String.class);
+        }
+        if (clazz.isArray()) {
+            return List.of(clazz.getComponentType());
         }
         if (isCollectionLike(clazz) || isStream(clazz) || isFuture(clazz)) {
             return List.of(Object.class);
@@ -143,6 +149,7 @@ public class PopulateUtil {
         return Collection.class.isAssignableFrom(clazz) ||
                 Map.class.isAssignableFrom(clazz) ||
                 Map.Entry.class.isAssignableFrom(clazz) ||
+                clazz.isArray() ||
                 isOptional(clazz) ||
                 isStream(clazz) ||
                 isIterable(clazz) ||

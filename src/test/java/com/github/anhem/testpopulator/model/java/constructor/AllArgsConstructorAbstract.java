@@ -1,11 +1,9 @@
 package com.github.anhem.testpopulator.model.java.constructor;
 
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
@@ -20,7 +18,7 @@ import java.util.concurrent.*;
 
 @Getter
 @EqualsAndHashCode
-@AllArgsConstructor
+@lombok.AllArgsConstructor
 public abstract class AllArgsConstructorAbstract {
 
     private final String stringValue;
@@ -35,7 +33,6 @@ public abstract class AllArgsConstructorAbstract {
     private final boolean primitiveBooleanValue;
     private final Boolean booleanValue;
     private final BigDecimal bigDecimal;
-    private final UUID uuid;
     private final Optional<Integer> optionalInteger;
     private final Optional<String> optionalString;
     private final Charset charset;
@@ -122,7 +119,6 @@ public abstract class AllArgsConstructorAbstract {
     private final Stack<String> stack;
     private final Integer[] arrayOfIntegerObjects;
     private final Long[] arrayOfLongObjects;
-    private final File file;
     private final Path path;
     private final URL url;
     private final URI uri;
@@ -130,5 +126,6 @@ public abstract class AllArgsConstructorAbstract {
     private final InetAddress inetAddress;
     private final Inet4Address inet4Address;
     private final Inet6Address inet6Address;
+    private final InetSocketAddress inetSocketAddress;
 
 }

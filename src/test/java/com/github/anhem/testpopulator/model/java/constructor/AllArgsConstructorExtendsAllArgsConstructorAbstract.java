@@ -4,7 +4,6 @@ import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
@@ -36,7 +35,6 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             boolean primitiveBooleanValue,
             Boolean booleanValue,
             BigDecimal bigDecimal,
-            UUID uuid,
             Optional<Integer> optionalInteger,
             Optional<String> optionalString,
             Charset charset,
@@ -123,7 +121,6 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             Stack<String> stack,
             Integer[] arrayOfIntegerObjects,
             Long[] arrayOfLongObjects,
-            File file,
             Path path,
             URL url,
             URI uri,
@@ -131,6 +128,7 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             InetAddress inetAddress,
             Inet4Address inet4Address,
             Inet6Address inet6Address,
+            InetSocketAddress inetSocketAddress,
             String anotherString
     ) {
         super(
@@ -146,7 +144,6 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
                 primitiveBooleanValue,
                 booleanValue,
                 bigDecimal,
-                uuid,
                 optionalInteger,
                 optionalString,
                 charset,
@@ -233,14 +230,14 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
                 stack,
                 arrayOfIntegerObjects,
                 arrayOfLongObjects,
-                file,
                 path,
                 url,
                 uri,
                 byteBuffer,
                 inetAddress,
                 inet4Address,
-                inet6Address
+                inet6Address,
+                inetSocketAddress
         );
         this.anotherString = anotherString;
     }

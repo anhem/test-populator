@@ -146,13 +146,13 @@ public class CollectionPopulator implements PopulatingStrategy {
         Class<T> clazz = classCarrier.getClazz();
         classCarrier.getObjectFactory().stream(clazz);
         if (clazz.equals(IntStream.class)) {
-            int val = (int) populator.populate(classCarrier.toClassCarrier(int.class));
+            int val = populator.populate(classCarrier.toClassCarrier(int.class));
             return (T) IntStream.of(val);
         } else if (clazz.equals(LongStream.class)) {
-            long val = (long) populator.populate(classCarrier.toClassCarrier(long.class));
+            long val = populator.populate(classCarrier.toClassCarrier(long.class));
             return (T) LongStream.of(val);
         } else if (clazz.equals(DoubleStream.class)) {
-            double val = (double) populator.populate(classCarrier.toClassCarrier(double.class));
+            double val = populator.populate(classCarrier.toClassCarrier(double.class));
             return (T) DoubleStream.of(val);
         } else {
             Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);

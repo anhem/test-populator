@@ -5,10 +5,15 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
+import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
+import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
 import com.github.anhem.testpopulator.internal.value.StaticMethodPopulator;
 import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.internal.util.BuilderUtil.isMatchingBuilderStrategy;
@@ -45,11 +50,11 @@ public class Populator {
         if (alreadyVisited(classCarrier, classCarrier.getPopulateConfig().isNullOnCircularDependency())) {
             return createNullValue(classCarrier);
         }
-        if (isCollectionCarrier(classCarrier)) {
-            return collectionPopulator.populate(classCarrier, this);
-        }
         if (clazz.isArray()) {
             return populateForArray(classCarrier);
+        }
+        if (isCollectionCarrier(classCarrier)) {
+            return collectionPopulator.populate(classCarrier, this);
         }
         if (isProtobufByteString(clazz, classCarrier.getPopulateConfig())) {
             return staticMethodPopulator.populate(classCarrier, this, MethodType.SIMPLEST);
@@ -75,10 +80,29 @@ public class Populator {
     private <T> T populateForArray(ClassCarrier<T> classCarrier) {
         Class<?> componentType = classCarrier.getClazz().getComponentType();
         classCarrier.getObjectFactory().array(componentType);
-        Object value = populate(classCarrier.toClassCarrier(componentType));
+        Object value;
+        if (isCollectionCarrier(classCarrier)) {
+            CollectionCarrier<T> collectionCarrier = (CollectionCarrier<T>) classCarrier;
+            value = continuePopulateWithType(collectionCarrier.toTypeCarrier(collectionCarrier.getArgumentTypes().get(0)));
+        } else {
+            value = populate(classCarrier.toClassCarrier(componentType));
+        }
         Object array = Array.newInstance(componentType, 1);
         Array.set(array, 0, value);
         return (T) array;
+    }
+
+    public Object continuePopulateWithType(TypeCarrier typeCarrier) {
+        Type type = typeCarrier.getType();
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            return populate(typeCarrier.toCollectionCarrier(parameterizedType.getRawType(), parameterizedType.getActualTypeArguments()));
+        }
+        if (type instanceof GenericArrayType) {
+            GenericArrayType genericArrayType = (GenericArrayType) type;
+            return populate(typeCarrier.toCollectionCarrier(type, new Type[]{genericArrayType.getGenericComponentType()}));
+        }
+        return populate(typeCarrier.toClassCarrier(type));
     }
 
     private <T> T populateWithStrategies(ClassCarrier<T> classCarrier) {

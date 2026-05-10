@@ -79,7 +79,6 @@ public class DiverseJavaTypesTest {
         assertThat(result.getIterable()).isNotNull().isNotEmpty();
         assertThat(result.getCompletableFuture()).isDone();
         assertThat(result.getFuture()).isDone();
-        assertThat(result.getClazz()).isNotNull();
         assertThat(result.getStreamInteger().count()).isPositive();
         assertThat(result.getPriorityQueueInteger()).isNotNull().isNotEmpty();
         assertThat(result.getIteratorBoolean().hasNext()).isTrue();

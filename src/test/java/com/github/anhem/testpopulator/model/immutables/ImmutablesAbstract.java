@@ -3,7 +3,6 @@ package com.github.anhem.testpopulator.model.immutables;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import org.immutables.value.Value;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
@@ -42,8 +41,6 @@ public abstract class ImmutablesAbstract {
     public abstract Boolean getBooleanValue();
 
     public abstract BigDecimal getBigDecimal();
-
-    public abstract UUID getUuid();
 
     public abstract Optional<Integer> getOptionalInteger();
 
@@ -217,8 +214,6 @@ public abstract class ImmutablesAbstract {
 
     public abstract Long[] getArrayOfLongObjects();
 
-    public abstract File getFile();
-
     public abstract Path getPath();
 
     public abstract URL getUrl();
@@ -232,5 +227,7 @@ public abstract class ImmutablesAbstract {
     public abstract Inet4Address getInet4Address();
 
     public abstract Inet6Address getInet6Address();
+
+    public abstract InetSocketAddress getInetSocketAddress();
 
 }

@@ -35,7 +35,6 @@ public class DiverseJavaTypes {
     private Iterable<String> iterable;
     private CompletableFuture<String> completableFuture;
     private Future<String> future;
-    private Class<?> clazz;
     private Stream<Integer> streamInteger;
     private PriorityQueue<Integer> priorityQueueInteger;
     private Iterator<Boolean> iteratorBoolean;
@@ -58,7 +57,6 @@ public class DiverseJavaTypes {
             Iterable<String> iterable,
             CompletableFuture<String> completableFuture,
             Future<String> future,
-            Class<?> clazz,
             Stream<Integer> streamInteger,
             PriorityQueue<Integer> priorityQueueInteger,
             Iterator<Boolean> iteratorBoolean,
@@ -81,7 +79,6 @@ public class DiverseJavaTypes {
                 iterable,
                 completableFuture,
                 future,
-                clazz,
                 streamInteger,
                 priorityQueueInteger,
                 iteratorBoolean,

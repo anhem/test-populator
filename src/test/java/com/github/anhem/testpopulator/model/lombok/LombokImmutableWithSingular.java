@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
@@ -34,7 +33,6 @@ public class LombokImmutableWithSingular {
     boolean primitiveBooleanValue;
     Boolean booleanValue;
     BigDecimal bigDecimal;
-    UUID uuid;
     Optional<Integer> optionalInteger;
     Optional<String> optionalString;
     Charset charset;
@@ -133,7 +131,6 @@ public class LombokImmutableWithSingular {
     Stack<String> stack;
     Integer[] arrayOfIntegerObjects;
     Long[] arrayOfLongObjects;
-    File file;
     Path path;
     URL url;
     URI uri;
@@ -141,5 +138,6 @@ public class LombokImmutableWithSingular {
     InetAddress inetAddress;
     Inet4Address inet4Address;
     Inet6Address inet6Address;
+    InetSocketAddress inetSocketAddress;
 
 }

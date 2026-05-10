@@ -92,7 +92,6 @@ public class ObjectFactoryImpl implements ObjectFactory {
         stringSuppliers.put(Inet6Address.class, object -> String.format("(Inet6Address) toInetAddress(\"%s\")", ((Inet6Address) object).getHostAddress()));
         stringSuppliers.put(InetSocketAddress.class, object -> String.format("new InetSocketAddress(toInetAddress(\"%s\"), %d)", ((InetSocketAddress) object).getAddress().getHostAddress(), ((InetSocketAddress) object).getPort()));
         stringSuppliers.put(CharSequence.class, object -> String.format("\"%s\"", object));
-        stringSuppliers.put(Class.class, object -> String.format("%s.class", ((Class<?>) object).getSimpleName()));
     }
 
     private final PopulateConfig populateConfig;

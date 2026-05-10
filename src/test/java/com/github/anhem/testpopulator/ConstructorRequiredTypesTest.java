@@ -1,26 +1,25 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.model.java.ComplexTypes;
+import com.github.anhem.testpopulator.model.java.ConstructorRequiredTypes;
 import org.junit.jupiter.api.Test;
 
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.RECURSIVE_ASSERTION_CONFIGURATION;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ComplexTypesTest {
+public class ConstructorRequiredTypesTest {
 
     @Test
-    void canPopulateComplexTypes() {
+    void canPopulateConstructorRequiredTypes() {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .objectFactoryEnabled(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
-        ComplexTypes complexTypes = populateFactory.populate(ComplexTypes.class);
+        ConstructorRequiredTypes result = populateFactory.populate(ConstructorRequiredTypes.class);
 
-        assertThat(complexTypes).hasNoNullFieldsOrProperties();
-        assertThat(complexTypes).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION).hasNoNullFields();
-        assertGeneratedCode(ComplexTypes.class, complexTypes, populateConfig);
+        assertThat(result).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION).hasNoNullFields();
+        assertGeneratedCode(ConstructorRequiredTypes.class, result, populateConfig);
     }
 }

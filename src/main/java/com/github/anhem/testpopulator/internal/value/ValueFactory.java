@@ -7,7 +7,6 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.util.PopulateUtil;
 import com.github.anhem.testpopulator.internal.util.RandomUtil;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
@@ -46,6 +45,7 @@ public class ValueFactory {
     private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();
     private static final LocalDate LOCAL_DATE = LOCAL_DATE_TIME.toLocalDate();
     private static final LocalTime LOCAL_TIME = LOCAL_DATE_TIME.toLocalTime();
+    private static final Date DATE = Date.from(INSTANT);
     private static final URL URL = PopulateUtil.toUrl("http://example.com");
     private static final URI URI = java.net.URI.create("http://example.com");
     private static final String STRING = "string";
@@ -64,6 +64,9 @@ public class ValueFactory {
     private static final OffsetTime OFFSET_TIME = ZONED_DATE_TIME.toOffsetDateTime().toOffsetTime();
     private static final Duration DURATION = Duration.ofDays(1);
     private static final Period PERIOD = Period.ofDays(1);
+    private static final java.sql.Date SQL_DATE = java.sql.Date.valueOf(LOCAL_DATE);
+    private static final Time SQL_TIME = Time.valueOf(LOCAL_TIME);
+    private static final Timestamp SQL_TIMESTAMP = Timestamp.from(INSTANT);
     private static final Currency CURRENCY = Currency.getInstance("XTS");
     private static final Locale LOCALE = Locale.ROOT;
     private static final ZoneId ZONE_ID = ZoneId.of("UTC");
@@ -73,7 +76,6 @@ public class ValueFactory {
     private static final MonthDay MONTH_DAY = MonthDay.of(1, 1);
     private static final Month MONTH = Month.JANUARY;
     private static final DayOfWeek DAY_OF_WEEK = DayOfWeek.MONDAY;
-    private static final File FILE = new File("test-file");
     private static final Path PATH = Paths.get("test-path");
     private static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final ByteBuffer BYTE_BUFFER = ByteBuffer.wrap(new byte[]{1, 2, 3});
@@ -81,7 +83,6 @@ public class ValueFactory {
     private static final Inet4Address INET4_ADDRESS = (Inet4Address) PopulateUtil.toInetAddress("127.0.0.1");
     private static final Inet6Address INET6_ADDRESS = (Inet6Address) PopulateUtil.toInetAddress("::1");
     private static final InetSocketAddress INET_SOCKET_ADDRESS = new InetSocketAddress(INET_ADDRESS, 8080);
-    private static final Class<?> CLAZZ = Object.class;
 
     private final boolean setRandomValues;
     private final Map<Class<?>, TypeSupplier<?>> classTypeSuppliers;
@@ -146,7 +147,6 @@ public class ValueFactory {
         typeSuppliers.put(MonthDay.class, this::getMonthDay);
         typeSuppliers.put(Month.class, this::getMonth);
         typeSuppliers.put(DayOfWeek.class, this::getDayOfWeek);
-        typeSuppliers.put(File.class, this::getFile);
         typeSuppliers.put(Path.class, this::getPath);
         typeSuppliers.put(URL.class, this::getUrl);
         typeSuppliers.put(URI.class, this::getUri);
@@ -162,8 +162,6 @@ public class ValueFactory {
         typeSuppliers.put(Inet4Address.class, this::getInet4Address);
         typeSuppliers.put(Inet6Address.class, this::getInet6Address);
         typeSuppliers.put(InetSocketAddress.class, this::getInetSocketAddress);
-        typeSuppliers.put(Class.class, this::getClazz);
-        typeSuppliers.put(Object.class, Object::new);
         typeSuppliers.putAll(classOverrides);
         return typeSuppliers;
     }
@@ -185,9 +183,11 @@ public class ValueFactory {
             }
         }
 
-        return Optional.ofNullable(classTypeSuppliers.get(clazz))
-                .map(supplier -> (T) supplier.create())
-                .orElseThrow(() -> new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName())));
+        if (classTypeSuppliers.containsKey(clazz)) {
+            return (T) classTypeSuppliers.get(clazz).create();
+        }
+
+        throw new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
     public boolean hasType(Class<?> clazz) {
@@ -196,6 +196,10 @@ public class ValueFactory {
 
     public boolean hasOverridePopulateName(String name, Class<?> clazz) {
         return nameTypeSuppliers.containsKey(OverrideTarget.of(name, clazz));
+    }
+
+    Set<Class<?>> getRegisteredTypes() {
+        return classTypeSuppliers.keySet();
     }
 
     private <T> T getEnum(Class<T> clazz) {
@@ -250,7 +254,7 @@ public class ValueFactory {
     }
 
     private Date getDate() {
-        return setRandomValues ? Date.from(getRandomLocalDateTime().atZone(ZoneId.systemDefault()).toInstant()) : Date.from(INSTANT);
+        return setRandomValues ? Date.from(getRandomLocalDateTime().atZone(ZoneId.systemDefault()).toInstant()) : DATE;
     }
 
     private LocalDate getLocalDate() {
@@ -294,15 +298,15 @@ public class ValueFactory {
     }
 
     private java.sql.Date getSqlDate() {
-        return setRandomValues ? java.sql.Date.valueOf(getLocalDate()) : java.sql.Date.valueOf(LOCAL_DATE);
+        return setRandomValues ? java.sql.Date.valueOf(getLocalDate()) : SQL_DATE;
     }
 
     private Time getSqlTime() {
-        return setRandomValues ? Time.valueOf(getRandomLocalTime()) : Time.valueOf(LOCAL_TIME);
+        return setRandomValues ? Time.valueOf(getRandomLocalTime()) : SQL_TIME;
     }
 
     private Timestamp getSqlTimestamp() {
-        return setRandomValues ? Timestamp.from(getInstant()) : Timestamp.from(INSTANT);
+        return setRandomValues ? Timestamp.from(getInstant()) : SQL_TIMESTAMP;
     }
 
     private Currency getCurrency() {
@@ -343,10 +347,6 @@ public class ValueFactory {
 
     private DayOfWeek getDayOfWeek() {
         return setRandomValues ? getRandomEnum(DayOfWeek.class, false) : DAY_OF_WEEK;
-    }
-
-    private File getFile() {
-        return setRandomValues ? new File(getRandomString()) : FILE;
     }
 
     private Path getPath() {
@@ -422,9 +422,4 @@ public class ValueFactory {
     private InetSocketAddress getInetSocketAddress() {
         return setRandomValues ? new InetSocketAddress(getInetAddress(), getRandomInt(65535)) : INET_SOCKET_ADDRESS;
     }
-
-    private Class<?> getClazz() {
-        return CLAZZ;
-    }
-
 }

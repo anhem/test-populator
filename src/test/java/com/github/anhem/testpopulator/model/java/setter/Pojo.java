@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
@@ -37,7 +36,6 @@ public class Pojo {
     private boolean primitiveBooleanValue;
     private Boolean booleanValue;
     private BigDecimal bigDecimal;
-    private UUID uuid;
     private Optional<Integer> optionalInteger;
     private Optional<String> optionalString;
     private Charset charset;
@@ -124,7 +122,6 @@ public class Pojo {
     private Stack<String> stack;
     private Integer[] arrayOfIntegerObjects;
     private Long[] arrayOfLongObjects;
-    private File file;
     private Path path;
     private URL url;
     private URI uri;
@@ -132,5 +129,6 @@ public class Pojo {
     private InetAddress inetAddress;
     private Inet4Address inet4Address;
     private Inet6Address inet6Address;
+    private InetSocketAddress inetSocketAddress;
 
 }
