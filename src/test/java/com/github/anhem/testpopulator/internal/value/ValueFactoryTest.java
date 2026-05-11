@@ -21,34 +21,60 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ValueFactoryTest {
 
-    private static final List<Class<?>> CLASSES_TO_IGNORE = List.of(
+    /**
+     * This list contains classes that are registered in {@link ValueFactory} but should be ignored
+     * by the {@code onlyBaseTypesAreRegisteredInValueFactory} test.
+     * <p>
+     * The test ensures that only "Atomic Leaf" types are handled by {@link ValueFactory}. It identifies
+     * candidates for refactoring by looking for registered classes that have public constructors
+     * (which could theoretically be handled by the structural {@code ConstructorPopulator}).
+     * <p>
+     * Classes are added to this list for the following reasons:
+     * <ul>
+     *     <li><b>Infinite Recursion:</b> Primitives and their wrappers (Integer, String) must be handled
+     *     atomically to avoid recursive calls to their own constructors.</li>
+     *     <li><b>Domain Consistency:</b> Date and Time types are kept atomic so that global overrides
+     *     for basic types (like Long or Integer) don't unintentionally break the "Time Domain".</li>
+     *     <li><b>Validation & Factories:</b> Types like URL, URI, and BitSet require valid data or
+     *     specific factory logic that the standard recursive engine cannot guarantee.</li>
+     *     <li><b>Recursion Traps:</b> Complex JDK types like Exceptions or InetSocketAddress contain
+     *     circular references (e.g., Throwable.cause) or strict validation (e.g., port ranges) that
+     *     crash the standard population strategies.</li>
+     * </ul>
+     */
+    private static final List<Class<?>> ATOMIC_TYPES_WITH_CONSTRUCTORS = List.of(
+            // Atomic Values & Primitives (Registered as leaf values)
+            Boolean.class,
+            Byte.class,
+            Character.class,
+            Double.class,
+            Float.class,
+            Integer.class,
+            Long.class,
+            Short.class,
             String.class,
-            CharSequence.class,
+            UUID.class,
             BigInteger.class,
             BigDecimal.class,
+
+            // Date & Time (Legacy and SQL types)
             Date.class,
             java.sql.Date.class,
             Time.class,
             Timestamp.class,
-            UUID.class,
-            Calendar.class,
+
+            // System, IO & Metadata
+            java.net.URL.class,
+            java.net.URI.class,
+            Locale.class,
             BitSet.class,
+
+            // Structured Types (Handled by Populator or have complex constructors)
+            InetSocketAddress.class,
             Throwable.class,
             Exception.class,
             RuntimeException.class,
-            Error.class,
-            InetSocketAddress.class,
-            Boolean.class,
-            Character.class,
-            Byte.class,
-            Short.class,
-            Integer.class,
-            Long.class,
-            Float.class,
-            Double.class,
-            java.net.URL.class,
-            java.net.URI.class,
-            Locale.class
+            Error.class
     );
 
     private ValueFactory valueFactory;
@@ -96,7 +122,7 @@ class ValueFactoryTest {
 
         List<Class<?>> typesThatCouldBeSolvedByConstructorStrategy = registeredTypes.stream()
                 .filter(clazz -> !clazz.isPrimitive())
-                .filter(clazz -> !CLASSES_TO_IGNORE.contains(clazz))
+                .filter(clazz -> !ATOMIC_TYPES_WITH_CONSTRUCTORS.contains(clazz))
                 .filter(clazz -> Arrays.stream(clazz.getConstructors())
                         .anyMatch(constructor -> Modifier.isPublic(constructor.getModifiers()) && constructor.getParameterCount() > 0))
                 .collect(Collectors.toList());
