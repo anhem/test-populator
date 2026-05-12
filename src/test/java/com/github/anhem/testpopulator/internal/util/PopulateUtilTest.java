@@ -45,7 +45,7 @@ class PopulateUtilTest {
     void getDeclaredFieldsReturnsAllDeclaredFields() {
         List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class, DEFAULT_POPULATE_CONFIG.getBlacklistedFields());
 
-        assertThat(declaredFields).isNotEmpty().hasSize(20);
+        assertThat(declaredFields).isNotEmpty().hasSize(108);
         List<String> fieldNames = declaredFields.stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());
@@ -74,6 +74,16 @@ class PopulateUtilTest {
     }
 
     @Test
+    void isSortedSetReturnsTrue() {
+        assertThat(isSortedSet(SortedSet.class)).isTrue();
+    }
+
+    @Test
+    void isNavigableSetReturnsTrue() {
+        assertThat(isNavigableSet(NavigableSet.class)).isTrue();
+    }
+
+    @Test
     void isMapReturnsFalse() {
         assertThat(isMap(String.class)).isFalse();
     }
@@ -81,6 +91,26 @@ class PopulateUtilTest {
     @Test
     void isMapReturnsTrue() {
         assertThat(isMap(Map.class)).isTrue();
+    }
+
+    @Test
+    void isSortedMapReturnsTrue() {
+        assertThat(isSortedMap(SortedMap.class)).isTrue();
+    }
+
+    @Test
+    void isNavigableMapReturnsTrue() {
+        assertThat(isNavigableMap(NavigableMap.class)).isTrue();
+    }
+
+    @Test
+    void isDequeReturnsTrue() {
+        assertThat(isDeque(Deque.class)).isTrue();
+    }
+
+    @Test
+    void isQueueReturnsTrue() {
+        assertThat(isQueue(Queue.class)).isTrue();
     }
 
     @Test

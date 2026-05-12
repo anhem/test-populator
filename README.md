@@ -146,7 +146,49 @@ PopulateConfig populateConfig = PopulateConfig.builder()
         .build();
 ```
 
-Instead of a lambda, you can also implement the `OverridePopulate` interface for more complex cases.
+Instead of a lambda, you can also implement the `OverridePopulate` interface for more complex cases. This is particularly useful when using the experimental **Java Code Generation** feature, as it allows you to define helper methods and their required imports that will be included in the generated source code.
+
+```java
+PopulateConfig populateConfig = PopulateConfig.builder()
+        .addOverride(URL.class, new OverridePopulate<URL>() {
+            @Override
+            public URL create() {
+                // Implementation for runtime population
+                try {
+                    return new URL("http://example.com");
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public String createCode() {
+                // String used in generated code to call the helper method below
+                return "toUrl(\"http://example.com\")";
+            }
+
+            @Override
+            public Set<String> createMethods() {
+                // Custom helper method definition to be added to the generated class
+                return Set.of(
+                    "\tprivate static java.net.URL toUrl(String url) {\n" +
+                    "\t\ttry {\n" +
+                    "\t\t\treturn new java.net.URL(url);\n" +
+                    "\t\t} catch (java.net.MalformedURLException e) {\n" +
+                    "\t\t\tthrow new RuntimeException(e);\n" +
+                    "\t\t}\n" +
+                    "\t}"
+                );
+            }
+
+            @Override
+            public Set<String> createImports() {
+                // Additional imports required for the generated class
+                return Set.of("java.net.URL", "java.net.MalformedURLException");
+            }
+        })
+        .build();
+```
 
 #### `nameOverrides`
 

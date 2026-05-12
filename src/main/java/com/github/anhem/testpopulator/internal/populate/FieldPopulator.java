@@ -7,7 +7,7 @@ import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
@@ -34,7 +34,7 @@ public class FieldPopulator implements PopulatingStrategy {
                                 CollectionCarrier<Object> collectionCarrier = classCarrier.toCollectionCarrier(
                                         field.getType(),
                                         field.getName(),
-                                        ((ParameterizedType) field.getGenericType()).getActualTypeArguments()
+                                        toArgumentTypes(field.getGenericType(), field.getType()).toArray(new Type[0])
                                 );
                                 field.set(objectOfClass, populator.populate(collectionCarrier));
                             } else {

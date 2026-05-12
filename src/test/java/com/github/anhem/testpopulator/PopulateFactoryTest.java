@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.ConstructorType.LARGEST;
+import static com.github.anhem.testpopulator.testutil.AssertTestUtil.RECURSIVE_ASSERTION_CONFIGURATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -38,7 +39,8 @@ class PopulateFactoryTest {
             Fields.class, //FIELD
             Users.class, //STATIC_METHOD
             MyUUID.class, //override populate
-            MultipleStaticMethods.class //STATIC_METHOD
+            MultipleStaticMethods.class, //STATIC_METHOD
+            Pojo.class //SETTER
     );
 
     @Test
@@ -132,6 +134,7 @@ class PopulateFactoryTest {
     private <T> void assertPopulatedObject(T object) {
         assertThat(object).isNotNull();
         assertThat(object).hasNoNullFieldsOrProperties();
-        assertThat(object).usingRecursiveAssertion().hasNoNullFields();
+        assertThat(object).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
+                .hasNoNullFields();
     }
 }

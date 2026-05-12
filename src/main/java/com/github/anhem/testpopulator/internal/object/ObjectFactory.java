@@ -18,6 +18,8 @@ public interface ObjectFactory {
 
     void setOf();
 
+    <T> void enumSet(Class<T> clazz, Class<?> enumClazz);
+
     <T> void list(Class<T> clazz);
 
     void listOf();
@@ -26,9 +28,23 @@ public interface ObjectFactory {
 
     void mapOf();
 
+    <T> void enumMap(Class<T> clazz, Class<?> enumClazz);
+
     <T> void mapEntry(Class<T> clazz);
 
+    void optional();
+
     <T> void array(Class<T> clazz);
+
+    <T> void stream(Class<T> clazz);
+
+    <T> void iterator(Class<T> clazz);
+
+    <T> void iterable(Class<T> clazz);
+
+    <T> void scanner(Class<T> clazz);
+
+    <T> void future(Class<T> clazz);
 
     <T> void value(T value, Class<T> clazz, String name);
 

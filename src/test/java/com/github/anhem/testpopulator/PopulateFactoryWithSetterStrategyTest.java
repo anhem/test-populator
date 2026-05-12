@@ -259,7 +259,7 @@ class PopulateFactoryWithSetterStrategyTest {
             }
 
             @Override
-            public String createString() {
+            public String createCode() {
                 return "List.of(\"foo\", \"bar\")";
             }
         };
