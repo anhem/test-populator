@@ -1,7 +1,4 @@
-package com.github.anhem.testpopulator.internal.object.builder;
-
-import com.github.anhem.testpopulator.internal.object.BuildType;
-import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
+package com.github.anhem.testpopulator.internal.object;
 
 import java.util.Collections;
 import java.util.List;
@@ -55,49 +52,12 @@ public class ContainerObjectBuilder extends ObjectBuilder {
         return getBuildType() == BuildType.MUTATOR && getParent() != null ? getParent().getName() : getName();
     }
 
-    public static class Builder {
-        private Class<?> clazz;
-        private String name;
-        private BuildType buildType;
+    public static class Builder extends BaseBuilder<Builder> {
         private String template;
-        private boolean useFullyQualifiedName;
-        private int expectedChildren;
-        private boolean parameterized;
         private String referencedClassName;
-        private Class<?>[] referencedClasses = new Class<?>[0];
-
-        public Builder clazz(Class<?> clazz) {
-            this.clazz = clazz;
-            return this;
-        }
-
-        public Builder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder buildType(BuildType buildType) {
-            this.buildType = buildType;
-            return this;
-        }
 
         public Builder template(String template) {
             this.template = template;
-            return this;
-        }
-
-        public Builder useFullyQualifiedName(boolean useFullyQualifiedName) {
-            this.useFullyQualifiedName = useFullyQualifiedName;
-            return this;
-        }
-
-        public Builder expectedChildren(int expectedChildren) {
-            this.expectedChildren = expectedChildren;
-            return this;
-        }
-
-        public Builder parameterized(boolean parameterized) {
-            this.parameterized = parameterized;
             return this;
         }
 
@@ -106,11 +66,7 @@ public class ContainerObjectBuilder extends ObjectBuilder {
             return this;
         }
 
-        public Builder referencedClasses(Class<?>... referencedClasses) {
-            this.referencedClasses = referencedClasses;
-            return this;
-        }
-
+        @Override
         public ContainerObjectBuilder build() {
             return new ContainerObjectBuilder(this);
         }

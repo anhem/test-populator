@@ -1,6 +1,5 @@
-package com.github.anhem.testpopulator.internal.object.builder;
+package com.github.anhem.testpopulator.internal.object;
 
-import com.github.anhem.testpopulator.internal.object.BuildType;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

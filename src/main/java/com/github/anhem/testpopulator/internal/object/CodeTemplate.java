@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal.object.builder;
+package com.github.anhem.testpopulator.internal.object;
 
 public enum CodeTemplate {
     CONSTRUCTOR("%1$s %2$s %4$s = new %2$s(%7$s);"),

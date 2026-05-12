@@ -4,10 +4,6 @@ import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
-import com.github.anhem.testpopulator.internal.object.builder.CodeTemplate;
-import com.github.anhem.testpopulator.internal.object.builder.ContainerObjectBuilder;
-import com.github.anhem.testpopulator.internal.object.builder.MethodBuilder;
-import com.github.anhem.testpopulator.internal.object.builder.TemplateObjectBuilder;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -111,85 +107,51 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void constructor(Class<T> clazz, int expectedChildren) {
-        TemplateObjectBuilder constructorBuilder = TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(CONSTRUCTOR)
+        setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
                 .codeTemplate(CodeTemplate.CONSTRUCTOR)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(expectedChildren)
-                .build();
-        setNextObjectBuilder(constructorBuilder);
+                .build());
     }
 
     @Override
     public <T> void setter(Class<T> clazz, int expectedChildren) {
-        setNextObjectBuilder(ContainerObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(SETTER)
+        setNextObjectBuilder(containerBuilder(clazz, SETTER, expectedChildren)
                 .template(CodeTemplate.SETTER.getFormat())
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(expectedChildren)
                 .build());
     }
 
     @Override
     public <T> void mutator(Class<T> clazz, int expectedChildren) {
-        setNextObjectBuilder(ContainerObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(MUTATOR)
-                .expectedChildren(expectedChildren)
+        setNextObjectBuilder(containerBuilder(clazz, MUTATOR, expectedChildren)
                 .build());
     }
 
     @Override
     public <T> void builder(Class<T> clazz, int expectedChildren, String builderMethodName, String buildMethodName) {
-        TemplateObjectBuilder builderObjectBuilder = TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(BUILDER)
+        setNextObjectBuilder(templateBuilder(clazz, BUILDER, expectedChildren)
                 .codeTemplate(CodeTemplate.BUILDER)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(expectedChildren)
                 .methodName(builderMethodName)
                 .buildMethodName(buildMethodName)
-                .build();
-        setNextObjectBuilder(builderObjectBuilder);
+                .build());
     }
 
     @Override
     public void method(String methodName, int expectedChildren) {
         setNextObjectBuilder(new MethodBuilder(methodName, expectedChildren));
-        if (expectedChildren == 0) {
-            setPreviousObjectBuilder();
-        }
     }
 
     @Override
     public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
-        TemplateObjectBuilder staticMethodBuilder = TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(STATIC_METHOD)
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, expectedChildren)
                 .codeTemplate(CodeTemplate.STATIC_METHOD)
-                .expectedChildren(expectedChildren)
                 .factoryClassName(clazz.getSimpleName())
                 .methodName(methodName)
-                .build();
-        setNextObjectBuilder(staticMethodBuilder);
+                .build());
     }
 
     @Override
     public <T> void set(Class<T> clazz) {
-        setNextObjectBuilder(ContainerObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(SET)
+        setNextObjectBuilder(containerBuilder(clazz, SET, 1)
                 .template(CodeTemplate.TYPED_COLLECTION.getFormat())
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .parameterized(true)
                 .build());
         method("add", 1);
@@ -197,13 +159,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public void setOf() {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(Set.class)
-                .name(getName(Set.class))
-                .buildType(SET)
+        setNextObjectBuilder(templateBuilder(Set.class, SET, 1)
                 .codeTemplate(CodeTemplate.IMMUTABLE)
-                .useFullyQualifiedName(useFullyQualifiedName(Set.class, classNames))
-                .expectedChildren(1)
                 .parameterized(true)
                 .factoryClassName(Set.class.getSimpleName())
                 .methodName("of")
@@ -213,13 +170,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void enumSet(Class<T> clazz, Class<?> enumClazz) {
-        setNextObjectBuilder(ContainerObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(ENUM_SET)
+        setNextObjectBuilder(containerBuilder(clazz, ENUM_SET, 1)
                 .template(CodeTemplate.ENUM_SET.getFormat())
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .parameterized(true)
                 .referencedClassName(enumClazz.getSimpleName())
                 .referencedClasses(enumClazz)
@@ -229,13 +181,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void list(Class<T> clazz) {
-        setNextObjectBuilder(ContainerObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(LIST)
+        setNextObjectBuilder(containerBuilder(clazz, LIST, 1)
                 .template(CodeTemplate.TYPED_COLLECTION.getFormat())
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .parameterized(true)
                 .build());
         method("add", 1);
@@ -243,13 +190,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public void listOf() {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(List.class)
-                .name(getName(List.class))
-                .buildType(LIST)
+        setNextObjectBuilder(templateBuilder(List.class, LIST, 1)
                 .codeTemplate(CodeTemplate.IMMUTABLE)
-                .useFullyQualifiedName(useFullyQualifiedName(List.class, classNames))
-                .expectedChildren(1)
                 .parameterized(true)
                 .factoryClassName(List.class.getSimpleName())
                 .methodName("of")
@@ -261,13 +203,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public <T> void map(Class<T> clazz) {
         boolean parameterized = !clazz.equals(Properties.class);
         CodeTemplate codeTemplate = parameterized ? CodeTemplate.TYPED_COLLECTION : CodeTemplate.COLLECTION;
-        setNextObjectBuilder(ContainerObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(MAP)
+        setNextObjectBuilder(containerBuilder(clazz, MAP, 1)
                 .template(codeTemplate.getFormat())
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .parameterized(parameterized)
                 .build());
         method("put", 2);
@@ -275,13 +212,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public void mapOf() {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(Map.class)
-                .name(getName(Map.class))
-                .buildType(MAP)
+        setNextObjectBuilder(templateBuilder(Map.class, MAP, 2)
                 .codeTemplate(CodeTemplate.IMMUTABLE)
-                .useFullyQualifiedName(useFullyQualifiedName(Map.class, classNames))
-                .expectedChildren(2)
                 .parameterized(true)
                 .factoryClassName(Map.class.getSimpleName())
                 .methodName("of")
@@ -293,13 +225,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public <T> void enumMap(Class<T> clazz, Class<?> enumClazz) {
         boolean parameterized = !clazz.equals(Properties.class);
         CodeTemplate codeTemplate = parameterized ? CodeTemplate.ENUM_MAP : CodeTemplate.COLLECTION;
-        setNextObjectBuilder(ContainerObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(ENUM_MAP)
+        setNextObjectBuilder(containerBuilder(clazz, ENUM_MAP, 1)
                 .template(codeTemplate.getFormat())
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .parameterized(parameterized)
                 .referencedClassName(enumClazz.getSimpleName())
                 .referencedClasses(enumClazz)
@@ -309,13 +236,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void mapEntry(Class<T> clazz) {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(STATIC_METHOD)
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 2)
                 .codeTemplate(CodeTemplate.MAP_ENTRY)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(2)
                 .parameterized(true)
                 .factoryClassName(AbstractMap.class.getSimpleName())
                 .referencedClasses(AbstractMap.class)
@@ -324,13 +246,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public void optional() {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(Optional.class)
-                .name(getName(Optional.class))
-                .buildType(STATIC_METHOD)
+        setNextObjectBuilder(templateBuilder(Optional.class, STATIC_METHOD, 1)
                 .codeTemplate(CodeTemplate.OPTIONAL)
-                .useFullyQualifiedName(useFullyQualifiedName(Optional.class, classNames))
-                .expectedChildren(1)
                 .parameterized(true)
                 .factoryClassName(Optional.class.getSimpleName())
                 .methodName("ofNullable")
@@ -340,24 +257,14 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void array(Class<T> clazz) {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(ARRAY)
+        setNextObjectBuilder(templateBuilder(clazz, ARRAY, 1)
                 .codeTemplate(CodeTemplate.ARRAY)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .build());
     }
 
     @Override
     public <T> void stream(Class<T> clazz) {
-        TemplateObjectBuilder.Builder streamBuilder = TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(STATIC_METHOD)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
+        TemplateObjectBuilder.Builder streamBuilder = templateBuilder(clazz, STATIC_METHOD, 1)
                 .methodName("of");
 
         if (clazz.equals(IntStream.class)) {
@@ -374,13 +281,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void iterator(Class<T> clazz) {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(STATIC_METHOD)
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 1)
                 .codeTemplate(CodeTemplate.ITERATOR)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .parameterized(true)
                 .factoryClassName(Stream.class.getSimpleName())
                 .methodName("of")
@@ -390,13 +292,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void iterable(Class<T> clazz) {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(STATIC_METHOD)
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 1)
                 .codeTemplate(CodeTemplate.ITERABLE)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .parameterized(true)
                 .factoryClassName(Stream.class.getSimpleName())
                 .methodName("of")
@@ -406,13 +303,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void scanner(Class<T> clazz) {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(STATIC_METHOD)
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 1)
                 .codeTemplate(CodeTemplate.SCANNER)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .factoryClassName(Scanner.class.getSimpleName())
                 .referencedClasses(Scanner.class)
                 .build());
@@ -420,13 +312,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void future(Class<T> clazz) {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(STATIC_METHOD)
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 1)
                 .codeTemplate(CodeTemplate.FUTURE)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(1)
                 .parameterized(true)
                 .factoryClassName(CompletableFuture.class.getSimpleName())
                 .methodName("completedFuture")
@@ -436,39 +323,28 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void value(T value, Class<T> clazz, String name) {
-        boolean useFullyQualifiedName = useFullyQualifiedName(clazz, classNames);
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(VALUE)
+        TemplateObjectBuilder objectBuilder = templateBuilder(clazz, VALUE, 0)
                 .codeTemplate(CodeTemplate.VALUE)
-                .useFullyQualifiedName(useFullyQualifiedName)
-                .expectedChildren(0)
-                .build());
-        String stringValue = toStringValue(value, clazz, name);
-        if (useFullyQualifiedName) {
+                .build();
+        String stringValue = toStringValue(value, clazz, name, objectBuilder);
+        if (objectBuilder.isUseFullyQualifiedName()) {
             if (stringValue.startsWith(NEW_PREFIX)) {
                 stringValue = String.format("%s%s.%s", NEW_PREFIX, clazz.getPackageName(), stringValue.replace(NEW_PREFIX, ""));
             } else {
                 stringValue = String.format("%s.%s", clazz.getPackageName(), stringValue);
             }
         }
-        currentObjectBuilder.setValue(stringValue);
-        setPreviousObjectBuilder();
+        objectBuilder.setValue(stringValue);
+        setNextObjectBuilder(objectBuilder);
     }
 
     @Override
     public <T> void nullValue(Class<T> clazz) {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .clazz(clazz)
-                .name(getName(clazz))
-                .buildType(VALUE)
+        TemplateObjectBuilder objectBuilder = templateBuilder(clazz, VALUE, 0)
                 .codeTemplate(CodeTemplate.VALUE)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(0)
-                .build());
-        currentObjectBuilder.setValue(NULL);
-        setPreviousObjectBuilder();
+                .build();
+        objectBuilder.setValue(NULL);
+        setNextObjectBuilder(objectBuilder);
     }
 
     @Override
@@ -499,7 +375,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .orElse(null);
     }
 
-    private String toStringValue(Object object, Class<?> clazz, String name) {
+    private String toStringValue(Object object, Class<?> clazz, String name, ObjectBuilder objectBuilder) {
         if (object.getClass().isEnum()) {
             return object.toString();
         }
@@ -508,13 +384,13 @@ public class ObjectFactoryImpl implements ObjectFactory {
             OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
             OverridePopulate<?> nameOverride = populateConfig.getNameOverrides().get(overrideTarget);
             if (nameOverride != null && isCreateCodeOverridden(nameOverride)) {
-                return applyOverride(nameOverride);
+                return applyOverride(nameOverride, objectBuilder);
             }
         }
 
         OverridePopulate<?> classOverride = populateConfig.getClassOverrides().get(clazz);
         if (classOverride != null && isCreateCodeOverridden(classOverride)) {
-            return applyOverride(classOverride);
+            return applyOverride(classOverride, objectBuilder);
         }
 
         Function<Object, String> stringSupplier = stringSuppliers.get(clazz);
@@ -540,10 +416,10 @@ public class ObjectFactoryImpl implements ObjectFactory {
         throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
-    private String applyOverride(OverridePopulate<?> overridePopulate) {
-        currentObjectBuilder.addMethods(overridePopulate.createMethods());
-        currentObjectBuilder.addImports(overridePopulate.createImports());
-        currentObjectBuilder.addStaticImports(overridePopulate.createStaticImports());
+    private String applyOverride(OverridePopulate<?> overridePopulate, ObjectBuilder objectBuilder) {
+        objectBuilder.addMethods(overridePopulate.createMethods());
+        objectBuilder.addImports(overridePopulate.createImports());
+        objectBuilder.addStaticImports(overridePopulate.createStaticImports());
         return overridePopulate.createCode();
     }
 
@@ -555,6 +431,24 @@ public class ObjectFactoryImpl implements ObjectFactory {
         }
     }
 
+    private TemplateObjectBuilder.Builder templateBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
+        return TemplateObjectBuilder.builder()
+                .clazz(clazz)
+                .name(getName(clazz))
+                .buildType(buildType)
+                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
+                .expectedChildren(expectedChildren);
+    }
+
+    private ContainerObjectBuilder.Builder containerBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
+        return ContainerObjectBuilder.builder()
+                .clazz(clazz)
+                .name(getName(clazz))
+                .buildType(buildType)
+                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
+                .expectedChildren(expectedChildren);
+    }
+
     private void setNextObjectBuilder(ObjectBuilder objectBuilder) {
         if (currentObjectBuilder == null) {
             currentObjectBuilder = objectBuilder;
@@ -562,6 +456,9 @@ public class ObjectFactoryImpl implements ObjectFactory {
             currentObjectBuilder.addChild(objectBuilder);
             objectBuilder.setParent(currentObjectBuilder);
             currentObjectBuilder = objectBuilder;
+        }
+        if (currentObjectBuilder.hasAllChildren()) {
+            setPreviousObjectBuilder();
         }
     }
 

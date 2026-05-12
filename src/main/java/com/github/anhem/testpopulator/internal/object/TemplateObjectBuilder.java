@@ -1,7 +1,4 @@
-package com.github.anhem.testpopulator.internal.object.builder;
-
-import com.github.anhem.testpopulator.internal.object.BuildType;
-import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
+package com.github.anhem.testpopulator.internal.object;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,53 +75,16 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         ).collect(Collectors.toList());
     }
 
-    public static class Builder {
-        private Class<?> clazz;
-        private String name;
-        private BuildType buildType;
+    public static class Builder extends BaseBuilder<Builder> {
         private CodeTemplate codeTemplate;
-        private boolean useFullyQualifiedName;
-        private int expectedChildren;
-        private boolean parameterized;
         private String factoryClassName;
         private String methodName;
         private boolean skipIfNull;
         private boolean clearArgsIfNullChild;
         private String buildMethodName;
-        private Class<?>[] referencedClasses = new Class<?>[0];
-
-        public Builder clazz(Class<?> clazz) {
-            this.clazz = clazz;
-            return this;
-        }
-
-        public Builder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder buildType(BuildType buildType) {
-            this.buildType = buildType;
-            return this;
-        }
 
         public Builder codeTemplate(CodeTemplate codeTemplate) {
             this.codeTemplate = codeTemplate;
-            return this;
-        }
-
-        public Builder useFullyQualifiedName(boolean useFullyQualifiedName) {
-            this.useFullyQualifiedName = useFullyQualifiedName;
-            return this;
-        }
-
-        public Builder expectedChildren(int expectedChildren) {
-            this.expectedChildren = expectedChildren;
-            return this;
-        }
-
-        public Builder parameterized(boolean parameterized) {
-            this.parameterized = parameterized;
             return this;
         }
 
@@ -153,11 +113,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
             return this;
         }
 
-        public Builder referencedClasses(Class<?>... referencedClasses) {
-            this.referencedClasses = referencedClasses;
-            return this;
-        }
-
+        @Override
         public TemplateObjectBuilder build() {
             return new TemplateObjectBuilder(this);
         }

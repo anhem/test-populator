@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal.object.builder;
+package com.github.anhem.testpopulator.internal.object;
 
 import org.junit.jupiter.api.Test;
 

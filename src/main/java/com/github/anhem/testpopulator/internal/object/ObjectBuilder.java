@@ -16,6 +16,8 @@ public abstract class ObjectBuilder {
     private final BuildType buildType;
     private final boolean useFullyQualifiedName;
     private final List<ObjectBuilder> children = new ArrayList<>();
+    private final List<ObjectBuilder> argumentChildren = new ArrayList<>();
+    private final List<ObjectBuilder> methodChildren = new ArrayList<>();
     private final Set<Class<?>> referencedClasses = new HashSet<>();
     private final Set<String> extraMethods = new HashSet<>();
     private final Set<String> extraImports = new HashSet<>();
@@ -51,15 +53,12 @@ public abstract class ObjectBuilder {
     }
 
     public List<String> build() {
-        List<ObjectBuilder> argumentChildren = getArgumentChildren();
-        List<ObjectBuilder> methodChildren = getMethodChildren();
-
         Stream<String> dependencies = concatenate(
                 buildChildren(argumentChildren),
                 buildChildren(methodChildren)
         );
 
-        Stream<String> methodBlock = parent != null && parent.getMethodChildren().contains(this) ? Stream.empty() : buildMethodBlock(methodChildren);
+        Stream<String> methodBlock = parent != null && parent.methodChildren.contains(this) ? Stream.empty() : buildMethodBlock(methodChildren);
 
         return concatenate(
                 dependencies,
@@ -69,15 +68,11 @@ public abstract class ObjectBuilder {
     }
 
     protected List<ObjectBuilder> getArgumentChildren() {
-        return children.stream()
-                .filter(child -> child.getBuildType() != BuildType.MUTATOR && child.getBuildType() != BuildType.METHOD)
-                .collect(java.util.stream.Collectors.toList());
+        return argumentChildren;
     }
 
     protected List<ObjectBuilder> getMethodChildren() {
-        return children.stream()
-                .filter(child -> child.getBuildType() == BuildType.MUTATOR || child.getBuildType() == BuildType.METHOD)
-                .collect(java.util.stream.Collectors.toList());
+        return methodChildren;
     }
 
     protected abstract Stream<String> getInstantiationLine(List<ObjectBuilder> argumentChildren);
@@ -96,8 +91,8 @@ public abstract class ObjectBuilder {
     protected Stream<String> createMethods(List<ObjectBuilder> methodChildren) {
         return methodChildren.stream()
                 .flatMap(child -> {
-                    if (!child.getMethodChildren().isEmpty()) {
-                        return child.createMethods(child.getMethodChildren());
+                    if (!child.methodChildren.isEmpty()) {
+                        return child.createMethods(child.methodChildren);
                     }
                     return Stream.of(String.format("%s.%s(%s);", getMethodTargetName(), child.getName(), child.buildArguments()));
                 });
@@ -109,6 +104,11 @@ public abstract class ObjectBuilder {
 
     public void addChild(ObjectBuilder child) {
         children.add(child);
+        if (child.getBuildType() == BuildType.MUTATOR || child.getBuildType() == BuildType.METHOD) {
+            methodChildren.add(child);
+        } else {
+            argumentChildren.add(child);
+        }
     }
 
     public List<ObjectBuilder> getChildren() {

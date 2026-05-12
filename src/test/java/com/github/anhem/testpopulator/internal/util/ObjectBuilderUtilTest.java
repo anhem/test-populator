@@ -1,10 +1,6 @@
 package com.github.anhem.testpopulator.internal.util;
 
-import com.github.anhem.testpopulator.internal.object.BuildType;
-import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
-import com.github.anhem.testpopulator.internal.object.builder.ContainerObjectBuilder;
-import com.github.anhem.testpopulator.internal.object.builder.MethodBuilder;
-import com.github.anhem.testpopulator.internal.object.builder.TemplateObjectBuilder;
+import com.github.anhem.testpopulator.internal.object.*;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.constructor.NestedCollections;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;

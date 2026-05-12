@@ -1,6 +1,5 @@
-package com.github.anhem.testpopulator.internal.object.builder;
+package com.github.anhem.testpopulator.internal.object;
 
-import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
 import java.util.List;
 import java.util.stream.Stream;
 
