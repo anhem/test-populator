@@ -4,6 +4,10 @@ import com.github.anhem.testpopulator.internal.object.BuildType;
 import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
 
 import java.lang.reflect.Modifier;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -28,31 +32,48 @@ public class ObjectBuilderUtil {
     }
 
     public static void addImport(Class<?> clazz, Object value, boolean useFullyQualifiedName, Set<String> imports, Set<String> staticImports) {
-        if (clazz != null && !clazz.isPrimitive() && !useFullyQualifiedName && !clazz.getName().startsWith("java.lang.")) {
+        if (clazz == null || useFullyQualifiedName) {
+            return;
+        }
+        if (clazz.isArray()) {
+            addImport(clazz.getComponentType(), value, useFullyQualifiedName, imports, staticImports);
+            return;
+        }
+        if (!clazz.isPrimitive() && !clazz.getName().startsWith("java.lang.")) {
+            String className = clazz.getName().replace('$', '.');
             if (isMapEntry(clazz)) {
-                staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
+                staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName().replace('$', '.'), clazz.getSimpleName()));
                 imports.add("java.util.AbstractMap");
             }
             if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
+                String enclosingClassName = clazz.getEnclosingClass().getName().replace('$', '.');
                 if (clazz.isEnum()) {
-                    staticImports.add(String.format("%s.%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName(), value));
+                    if (value != null) {
+                        staticImports.add(String.format("%s.%s.%s", enclosingClassName, clazz.getSimpleName(), value));
+                    } else {
+                        imports.add(className);
+                    }
                 } else {
-                    staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName(), clazz.getSimpleName()));
+                    staticImports.add(String.format("%s.%s", enclosingClassName, clazz.getSimpleName()));
                 }
             } else if (clazz.isEnum()) {
-                staticImports.add(String.format("%s.%s", clazz.getName(), value));
+                if (value != null) {
+                    staticImports.add(String.format("%s.%s", className, value));
+                } else {
+                    imports.add(className);
+                }
             } else {
-                imports.add(clazz.getName());
+                imports.add(className);
             }
         }
     }
 
     public static boolean isBasicValue(ObjectBuilder objectBuilder) {
-        return Objects.requireNonNull(objectBuilder.getBuildType()) == BuildType.VALUE && (isJavaBaseClass(objectBuilder.getClazz()) || objectBuilder.getClazz().isEnum());
+        return objectBuilder.getBuildType() == BuildType.VALUE && (isJavaBaseClass(objectBuilder.getClazz()) || objectBuilder.getClazz().isEnum());
     }
 
     public static Stream<String> endBuilder(String buildMethodName) {
-        return Stream.of(String.format(".%s();", buildMethodName));
+        return Stream.of(String.format("    .%s();", buildMethodName));
     }
 
     public static Stream<String> startStaticBlock() {
@@ -69,7 +90,7 @@ public class ObjectBuilderUtil {
     }
 
     public static boolean collectionHasNullValues(ObjectBuilder objectBuilder) {
-        if (List.of(LIST, SET, MAP).contains(objectBuilder.getBuildType())) {
+        if (List.of(LIST, SET, ENUM_SET, MAP, ENUM_MAP).contains(objectBuilder.getBuildType())) {
             return objectBuilder.getChildren().stream()
                     .map(ObjectBuilder::getChildren)
                     .flatMap(Collection::stream)
@@ -89,8 +110,40 @@ public class ObjectBuilderUtil {
         return false;
     }
 
+    public static String getHelperMethod(Class<?> clazz) {
+        if (clazz != null && clazz.equals(java.net.URL.class)) {
+            return String.join(System.lineSeparator(),
+                    "\tprivate static java.net.URL toUrl(String url) {",
+                    "\t\ttry {",
+                    "\t\t\treturn new java.net.URL(url);",
+                    "\t\t} catch (java.net.MalformedURLException e) {",
+                    "\t\t\tthrow new RuntimeException(e);",
+                    "\t\t}",
+                    "\t}");
+        }
+        if (clazz != null && (clazz.equals(InetAddress.class) || clazz.equals(Inet4Address.class) || clazz.equals(Inet6Address.class) || clazz.equals(InetSocketAddress.class))) {
+            return String.join(System.lineSeparator(),
+                    "\tprivate static java.net.InetAddress toInetAddress(String host) {",
+                    "\t\ttry {",
+                    "\t\t\treturn java.net.InetAddress.getByName(host);",
+                    "\t\t} catch (java.net.UnknownHostException e) {",
+                    "\t\t\tthrow new RuntimeException(e);",
+                    "\t\t}",
+                    "\t}");
+        }
+        return null;
+    }
+
     private static boolean requiresImport(Class<?> clazz) {
         return !"java.lang".equals(clazz.getPackageName());
+    }
+
+    public static String formatBytes(byte[] bytes) {
+        StringJoiner joiner = new StringJoiner(", ");
+        for (byte b : bytes) {
+            joiner.add(String.format("(byte) %d", b));
+        }
+        return joiner.toString();
     }
 
 }

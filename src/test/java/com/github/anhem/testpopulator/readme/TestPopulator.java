@@ -26,7 +26,7 @@ public class TestPopulator {
         //Only necessary if ObjectFactory is used, can be ignored otherwise. ObjectFactory is not enabled by default.
         //This provides ObjectFactory with a string used to generate Java code for MyUUID.
         @Override
-        public String createString() {
+        public String createCode() {
             return "new MyUUID(java.util.UUID.fromString(\"156585fd-4fe5-4ed4-8d59-d8d70d8b96f5\").toString())";
         }
     }

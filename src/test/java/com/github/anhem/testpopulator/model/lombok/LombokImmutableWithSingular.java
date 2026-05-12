@@ -5,14 +5,17 @@ import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.*;
 
 @Value
 @Builder
@@ -27,20 +30,68 @@ public class LombokImmutableWithSingular {
     Long longValue;
     double primitiveDoubleValue;
     Double doubleValue;
+    boolean primitiveBooleanValue;
+    Boolean booleanValue;
+    BigDecimal bigDecimal;
+    Optional<Integer> optionalInteger;
+    Optional<String> optionalString;
+    Charset charset;
+    Calendar calendar;
     LocalDate localDate;
     LocalDateTime localDateTime;
+    ZonedDateTime zonedDateTime;
+    Instant instant;
     @Singular
     List<String> listOfStrings;
     @Singular
+    List<ArbitraryEnum> listOfEnums;
+    @Singular
     Set<String> setOfStrings;
+    EnumSet<ArbitraryEnum> enumSet;
+    BitSet bitSet;
     @Singular("setOfIntegerOverride")
     Set<Integer> setOfIntegers;
+    Queue<String> queue;
+    Deque<String> deque;
+    @Singular("sortedSet")
+    SortedSet<String> sortedSet;
+    @Singular("navigableSet")
+    NavigableSet<String> navigableSet;
     @Singular
     Map<Integer, String> mapOfIntegersToStrings;
     @Singular
     Map<String, Integer> mapOfStringsToIntegers;
+    @Singular
+    Map<String, ArbitraryEnum> mapOfStringsToEnums;
+    EnumMap<ArbitraryEnum, String> enumMap;
+    @Singular("sortedMap")
+    SortedMap<String, Integer> sortedMap;
+    @Singular("navigableMap")
+    NavigableMap<String, Integer> navigableMap;
+    ConcurrentMap<String, String> concurrentMap;
+    ConcurrentNavigableMap<String, String> concurrentNavigableMap;
+    ConcurrentSkipListMap<String, String> concurrentSkipListMap;
+    CopyOnWriteArrayList<String> copyOnWriteArrayList;
+    CopyOnWriteArraySet<String> copyOnWriteArraySet;
+    ConcurrentSkipListSet<String> concurrentSkipListSet;
+    TreeMap<String, String> treeMap;
+    TreeSet<String> treeSet;
     ArbitraryEnum arbitraryEnum;
     String[] arrayOfStrings;
+    byte[] arrayOfBytes;
+    char[] arrayOfChars;
+    int[] arrayOfInts;
+    long[] arrayOfLongs;
+    float[] arrayOfFloats;
+    double[] arrayOfDoubles;
+    short[] arrayOfShorts;
+    boolean[] arrayOfBooleans;
+    ArrayList<String> arrayList;
+    LinkedList<String> linkedList;
+    HashMap<String, String> hashMap;
+    LinkedHashMap<String, String> linkedHashMap;
+    HashSet<String> hashSet;
+    LinkedHashSet<String> linkedHashSet;
     Date date;
     Byte byteValue;
     byte primitiveByteValue;
@@ -57,4 +108,36 @@ public class LombokImmutableWithSingular {
     java.sql.Date sqlDate;
     Time sqlTime;
     Timestamp sqlTimestamp;
+    Currency currency;
+    Locale locale;
+    TimeZone timeZone;
+    ZoneId zoneId;
+    ZoneOffset zoneOffset;
+    Year year;
+    YearMonth yearMonth;
+    MonthDay monthDay;
+    Month month;
+    DayOfWeek dayOfWeek;
+    Map.Entry<String, String> mapEntry;
+    Properties properties;
+    Hashtable<String, Integer> hashtable;
+    Vector<String> vector;
+    Map<String, List<String>> nestedMap;
+    List<List<String>> nestedList;
+    Set<Set<String>> nestedSet;
+    Map<String, Map<Integer, String>> nestedMap2;
+    Map<String, Optional<String>> mapOfOptionals;
+    List<Map.Entry<String, Integer>> listOfEntries;
+    Stack<String> stack;
+    Integer[] arrayOfIntegerObjects;
+    Long[] arrayOfLongObjects;
+    Path path;
+    URL url;
+    URI uri;
+    ByteBuffer byteBuffer;
+    InetAddress inetAddress;
+    Inet4Address inet4Address;
+    Inet6Address inet6Address;
+    InetSocketAddress inetSocketAddress;
+
 }

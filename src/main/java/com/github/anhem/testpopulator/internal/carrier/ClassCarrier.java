@@ -89,6 +89,18 @@ public class ClassCarrier<T> extends Carrier {
         );
     }
 
+    @SuppressWarnings("unchecked")
+    public <V> CollectionCarrier<V> toCollectionCarrier(Class<V> clazz) {
+        return new CollectionCarrier<>(
+                clazz,
+                name,
+                toArgumentTypes(null, clazz).toArray(new Type[0]),
+                objectFactory,
+                visited,
+                populateConfig
+        );
+    }
+
     public boolean addVisited() {
         if (visited.contains(clazz.getName())) {
             return false;

@@ -53,6 +53,6 @@ class ReadMeTest {
 
         Throwable cause = assertThrows(PopulateException.class, () -> populateFactory.populate(MyClass2.class)).getCause();
         assertThat(cause.getClass()).isEqualTo(ObjectException.class);
-        assertThat(cause.getMessage()).isEqualTo(String.format("createString() is not implemented for class %s", MyUUID.class.getName()));
+        assertThat(cause.getMessage()).isEqualTo(String.format("createCode() is not implemented for class %s", MyUUID.class.getName()));
     }
 }
