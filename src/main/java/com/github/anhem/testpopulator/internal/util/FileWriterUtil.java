@@ -87,7 +87,7 @@ public class FileWriterUtil {
             } else if (s.startsWith(PSF)) {
                 writeLine(path, String.format("\t%s", s));
             } else {
-                writeLine(path, String.format("\t%s", s));
+                writeLine(path, String.format("\t\t%s", s));
             }
         });
     }
