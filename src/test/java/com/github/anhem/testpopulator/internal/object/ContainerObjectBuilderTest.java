@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.anhem.testpopulator.internal.object.BuildType.LIST;
-import static com.github.anhem.testpopulator.internal.object.BuildType.SETTER;
+import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ContainerObjectBuilderTest {
@@ -25,7 +24,11 @@ class ContainerObjectBuilderTest {
                 .expectedChildren(1)
                 .parameterized(true)
                 .build();
-        MethodBuilder method = new MethodBuilder("add", 1);
+        TemplateObjectBuilder method = TemplateObjectBuilder.builder()
+                .name("add")
+                .buildType(METHOD)
+                .expectedChildren(1)
+                .build();
         TemplateObjectBuilder val = TemplateObjectBuilder.builder()
                 .clazz(String.class)
                 .name("string_0")
@@ -57,7 +60,11 @@ class ContainerObjectBuilderTest {
                 .expectedChildren(1)
                 .parameterized(true)
                 .build();
-        MethodBuilder method = new MethodBuilder("add", 1);
+        TemplateObjectBuilder method = TemplateObjectBuilder.builder()
+                .name("add")
+                .buildType(METHOD)
+                .expectedChildren(1)
+                .build();
         TemplateObjectBuilder val = TemplateObjectBuilder.builder()
                 .clazz(String.class)
                 .name("string_0")
@@ -84,7 +91,11 @@ class ContainerObjectBuilderTest {
                 .expectedChildren(1)
                 .parameterized(false)
                 .build();
-        MethodBuilder method = new MethodBuilder("setFoo", 1);
+        TemplateObjectBuilder method = TemplateObjectBuilder.builder()
+                .name("setFoo")
+                .buildType(METHOD)
+                .expectedChildren(1)
+                .build();
         TemplateObjectBuilder val = TemplateObjectBuilder.builder()
                 .clazz(String.class)
                 .name("string_0")

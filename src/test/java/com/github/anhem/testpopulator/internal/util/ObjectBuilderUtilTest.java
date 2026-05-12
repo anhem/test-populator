@@ -1,6 +1,9 @@
 package com.github.anhem.testpopulator.internal.util;
 
-import com.github.anhem.testpopulator.internal.object.*;
+import com.github.anhem.testpopulator.internal.object.BuildType;
+import com.github.anhem.testpopulator.internal.object.ContainerObjectBuilder;
+import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
+import com.github.anhem.testpopulator.internal.object.TemplateObjectBuilder;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.constructor.NestedCollections;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
@@ -9,8 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.internal.object.BuildType.LIST;
-import static com.github.anhem.testpopulator.internal.object.BuildType.VALUE;
+import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.NULL;
 import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -136,7 +138,11 @@ class ObjectBuilderUtilTest {
                 .expectedChildren(1)
                 .parameterized(true)
                 .build();
-        ObjectBuilder addMethod = new MethodBuilder("add", 1);
+        ObjectBuilder addMethod = TemplateObjectBuilder.builder()
+                .name("add")
+                .buildType(METHOD)
+                .expectedChildren(1)
+                .build();
         ObjectBuilder string = TemplateObjectBuilder.builder()
                 .clazz(String.class)
                 .name("string_0")
@@ -160,7 +166,11 @@ class ObjectBuilderUtilTest {
                 .expectedChildren(1)
                 .parameterized(true)
                 .build();
-        ObjectBuilder addMethod = new MethodBuilder("add", 1);
+        ObjectBuilder addMethod = TemplateObjectBuilder.builder()
+                .name("add")
+                .buildType(METHOD)
+                .expectedChildren(1)
+                .build();
         ObjectBuilder string = TemplateObjectBuilder.builder()
                 .clazz(String.class)
                 .name("string_0")

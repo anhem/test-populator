@@ -62,7 +62,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public void method(String methodName, int expectedChildren) {
-        setNextObjectBuilder(new MethodBuilder(methodName, expectedChildren));
+        setNextObjectBuilder(TemplateObjectBuilder.builder()
+                .name(methodName)
+                .buildType(METHOD)
+                .expectedChildren(expectedChildren)
+                .build());
     }
 
     @Override

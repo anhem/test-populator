@@ -102,6 +102,26 @@ class TemplateObjectBuilderTest {
     }
 
     @Test
+    void buildMethod() {
+        TemplateObjectBuilder builder = TemplateObjectBuilder.builder()
+                .name("setFoo")
+                .buildType(BuildType.METHOD)
+                .expectedChildren(1)
+                .build();
+        TemplateObjectBuilder val = TemplateObjectBuilder.builder()
+                .clazz(String.class)
+                .name("string_0")
+                .expectedChildren(0)
+                .build();
+        val.setValue("\"bar\"");
+        builder.addChild(val);
+
+        List<String> result = builder.build();
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     void buildFluentBuilder() {
         TemplateObjectBuilder builder = TemplateObjectBuilder.builder()
                 .clazz(Object.class)
@@ -112,7 +132,11 @@ class TemplateObjectBuilderTest {
                 .methodName("builder")
                 .buildMethodName("build")
                 .build();
-        MethodBuilder method = new MethodBuilder("name", 1);
+        TemplateObjectBuilder method = TemplateObjectBuilder.builder()
+                .name("name")
+                .buildType(BuildType.METHOD)
+                .expectedChildren(1)
+                .build();
         TemplateObjectBuilder val = TemplateObjectBuilder.builder()
                 .clazz(String.class)
                 .name("string_0")
