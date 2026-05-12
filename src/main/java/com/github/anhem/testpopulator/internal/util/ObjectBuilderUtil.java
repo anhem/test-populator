@@ -8,10 +8,7 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
@@ -139,6 +136,14 @@ public class ObjectBuilderUtil {
 
     private static boolean requiresImport(Class<?> clazz) {
         return !"java.lang".equals(clazz.getPackageName());
+    }
+
+    public static String formatBytes(byte[] bytes) {
+        StringJoiner joiner = new StringJoiner(", ");
+        for (byte b : bytes) {
+            joiner.add(String.format("(byte) %d", b));
+        }
+        return joiner.toString();
     }
 
 }
