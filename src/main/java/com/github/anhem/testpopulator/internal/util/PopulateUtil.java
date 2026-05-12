@@ -18,7 +18,6 @@ import static java.util.Comparator.comparingInt;
 public class PopulateUtil {
 
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
-    private static final String JAVA_BASE = "java.base";
     public static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
 
     private PopulateUtil() {
@@ -167,7 +166,7 @@ public class PopulateUtil {
     }
 
     public static <T> boolean isJavaBaseClass(Class<T> clazz) {
-        return clazz.getModule() != null && JAVA_BASE.equals(clazz.getModule().getName());
+        return clazz.getPackageName().startsWith("java.") || clazz.getPackageName().startsWith("javax.");
     }
 
     static boolean isDeclaringJavaBaseClass(Method method) {

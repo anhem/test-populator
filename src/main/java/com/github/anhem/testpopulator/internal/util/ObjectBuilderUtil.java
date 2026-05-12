@@ -8,7 +8,10 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
@@ -69,11 +72,11 @@ public class ObjectBuilderUtil {
     }
 
     public static boolean isBasicValue(ObjectBuilder objectBuilder) {
-        return Objects.requireNonNull(objectBuilder.getBuildType()) == BuildType.VALUE && (isJavaBaseClass(objectBuilder.getClazz()) || objectBuilder.getClazz().isEnum());
+        return objectBuilder.getBuildType() == BuildType.VALUE && (isJavaBaseClass(objectBuilder.getClazz()) || objectBuilder.getClazz().isEnum());
     }
 
     public static Stream<String> endBuilder(String buildMethodName) {
-        return Stream.of(String.format(".%s();", buildMethodName));
+        return Stream.of(String.format("    .%s();", buildMethodName));
     }
 
     public static Stream<String> startStaticBlock() {

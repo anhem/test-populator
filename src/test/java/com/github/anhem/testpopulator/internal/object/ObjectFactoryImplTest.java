@@ -78,9 +78,9 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
                 "public static final MyClass myClass_0 = MyClass.builder()",
-                ".string(\"myString\")",
-                ".integer(1)",
-                ".build();"
+                "    .string(\"myString\")",
+                "    .integer(1)",
+                "    .build();"
         ));
     }
 

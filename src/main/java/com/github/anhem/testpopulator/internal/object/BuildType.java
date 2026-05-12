@@ -8,43 +8,10 @@ public enum BuildType {
     METHOD,
     STATIC_METHOD,
     SET,
-    SET_OF,
     ENUM_SET,
     LIST,
-    LIST_OF,
     MAP,
-    MAP_OF,
     ENUM_MAP,
-    MAP_ENTRY,
     ARRAY,
-    OPTIONAL,
-    STREAM,
-    ITERATOR,
-    ITERABLE,
-    SCANNER,
-    FUTURE,
-    VALUE;
-
-    public boolean isParameterizedType() {
-        switch (this) {
-            case SET:
-            case SET_OF:
-            case ENUM_SET:
-            case LIST:
-            case LIST_OF:
-            case MAP:
-            case MAP_OF:
-            case ENUM_MAP:
-            case MAP_ENTRY:
-            case OPTIONAL:
-            case STREAM:
-            case ITERATOR:
-            case ITERABLE:
-            case SCANNER:
-            case FUTURE:
-                return true;
-            default:
-                return false;
-        }
-    }
+    VALUE
 }
