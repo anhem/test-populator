@@ -59,6 +59,7 @@ public class MultipleStaticMethods {
     }
 
     public static MultipleStaticMethods fromInputStream(InputStream stream) {
+        // stream is intentionally unused to test simplest method selection
         return new MultipleStaticMethods(0, "from-stream", 0.0, LIST, MAP, NOW, UUID);
     }
 
@@ -71,12 +72,15 @@ public class MultipleStaticMethods {
     }
 
     public static String getFactorySchema(int id) {
+        // id is intentionally unused to test static method selection
         return "id:int, name:String, value:double";
     }
 
     public void updateValue(double newValue) {
+        // intentionally empty to test non-static method ignore
     }
 
     private static void internalHelper(int id) {
+        // id is intentionally unused and method is empty to test private method ignore
     }
 }

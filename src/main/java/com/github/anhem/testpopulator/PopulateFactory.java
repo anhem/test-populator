@@ -58,7 +58,7 @@ public class PopulateFactory {
      * @param <T>       type of object to return
      * @return object of clazz
      */
-    public <T> T populate(Class<T> clazz, Map<?, OverridePopulate<?>> overrides) {
+    public <T, K> T populate(Class<T> clazz, Map<K, OverridePopulate<?>> overrides) {
         Map<Class<?>, OverridePopulate<?>> classOverrides = new HashMap<>();
         Map<OverrideTarget, OverridePopulate<?>> nameOverrides = new HashMap<>();
         overrides.forEach((k, v) -> {
@@ -66,6 +66,8 @@ public class PopulateFactory {
                 classOverrides.put((Class<?>) k, v);
             } else if (k instanceof OverrideTarget) {
                 nameOverrides.put((OverrideTarget) k, v);
+            } else if (k instanceof String) {
+                nameOverrides.put(OverrideTarget.of((String) k, Object.class), v);
             }
         });
         return populate(clazz, classOverrides, nameOverrides);

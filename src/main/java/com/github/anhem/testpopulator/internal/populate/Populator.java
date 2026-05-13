@@ -7,7 +7,6 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
-import com.github.anhem.testpopulator.internal.value.StaticMethodPopulator;
 import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import java.lang.reflect.Array;
