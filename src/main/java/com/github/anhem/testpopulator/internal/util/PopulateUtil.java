@@ -1,10 +1,11 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.Strategy;
-import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
-
+import com.github.anhem.testpopulator.exception.PopulateException;
 import java.lang.reflect.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -161,10 +162,6 @@ public class PopulateUtil {
                 isFuture(clazz);
     }
 
-    public static <T> boolean isCollectionCarrier(ClassCarrier<T> classCarrier) {
-        return classCarrier instanceof CollectionCarrier;
-    }
-
     public static <T> boolean isJavaBaseClass(Class<T> clazz) {
         return clazz.getPackageName().startsWith("java.") || clazz.getPackageName().startsWith("javax.");
     }
@@ -202,7 +199,7 @@ public class PopulateUtil {
             }
         } catch (NoSuchMethodException ignored) {
         }
-        throw new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName()));
+        throw new PopulateException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName()));
     }
 
     static boolean isBlackListed(Method method, Set<String> blacklistedMethods) {
@@ -233,9 +230,9 @@ public class PopulateUtil {
 
     public static java.net.URL toUrl(String url) {
         try {
-            return new java.net.URL(url);
-        } catch (java.net.MalformedURLException e) {
-            throw new RuntimeException(e);
+            return new URI(url).toURL();
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new PopulateException(e);
         }
     }
 
@@ -243,16 +240,8 @@ public class PopulateUtil {
         try {
             return java.net.InetAddress.getByName(host);
         } catch (java.net.UnknownHostException e) {
-            throw new RuntimeException(e);
+            throw new PopulateException(e);
         }
-    }
-
-    public static <T> boolean hasConstructors(CollectionCarrier<T> collectionCarrier) {
-        return collectionCarrier.getClazz().getConstructors().length > 0;
-    }
-
-    public static <T> boolean alreadyVisited(ClassCarrier<T> classCarrier, boolean nullOnCircularDependency) {
-        return nullOnCircularDependency && !isJavaBaseClass(classCarrier.getClazz()) && !classCarrier.addVisited();
     }
 
     static <T> boolean hasConstructorWithoutArguments(Class<T> clazz, boolean canAccessNonPublicConstructor) {

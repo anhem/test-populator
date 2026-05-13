@@ -9,4 +9,8 @@ public class PopulateException extends RuntimeException {
     public PopulateException(String message, Exception e) {
         super(message, e);
     }
+
+    public PopulateException(Throwable cause) {
+        super(cause);
+    }
 }

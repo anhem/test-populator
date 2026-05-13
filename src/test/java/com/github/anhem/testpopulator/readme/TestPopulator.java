@@ -8,10 +8,10 @@ import com.github.anhem.testpopulator.readme.model.MyUUID;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public class TestPopulator {
+class TestPopulator {
 
     //static method accessible everywhere in our tests
-    public static <T> T populate(Class<T> clazz) {
+    static <T> T populate(Class<T> clazz) {
         return populateFactory.populate(clazz);
     }
 

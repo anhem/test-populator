@@ -27,11 +27,11 @@ public abstract class ObjectBuilder {
     private ObjectBuilder parent;
     private String value;
 
-    public ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
         this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false);
     }
 
-    public ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized) {
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized) {
         this.clazz = clazz;
         this.name = name;
         this.buildType = buildType;
@@ -173,7 +173,7 @@ public abstract class ObjectBuilder {
 
     private void getImports(Set<String> imports, Set<String> staticImports) {
         addImport(getClazz(), value, isUseFullyQualifiedName(), imports, staticImports);
-        referencedClasses.forEach(clazz -> addImport(clazz, null, isUseFullyQualifiedName(), imports, staticImports));
+        referencedClasses.forEach(c -> addImport(c, null, isUseFullyQualifiedName(), imports, staticImports));
         imports.addAll(extraImports);
         staticImports.addAll(extraStaticImports);
         children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));

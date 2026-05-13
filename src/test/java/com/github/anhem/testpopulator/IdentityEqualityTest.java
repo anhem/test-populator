@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IdentityEqualityTest {
+class IdentityEqualityTest {
 
     private PopulateFactory populateFactory;
 
@@ -21,8 +21,7 @@ public class IdentityEqualityTest {
     void canPopulateIdentityEqualityPojo() {
         IdentityEqualityPojo identityEqualityPojo = populateFactory.populate(IdentityEqualityPojo.class);
 
-        assertThat(identityEqualityPojo).isNotNull();
-        assertThat(identityEqualityPojo).hasNoNullFieldsOrProperties();
+        assertThat(identityEqualityPojo).isNotNull().hasNoNullFieldsOrProperties();
         assertThat(identityEqualityPojo.getThrowable()).isNotNull();
         assertThat(identityEqualityPojo.getException()).isNotNull();
         assertThat(identityEqualityPojo.getRuntimeException()).isNotNull();

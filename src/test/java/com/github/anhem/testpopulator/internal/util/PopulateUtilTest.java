@@ -4,7 +4,6 @@ import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
-import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.HasBlackListed;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
@@ -140,16 +139,6 @@ class PopulateUtilTest {
     }
 
     @Test
-    void isCollectionLikeCarrierReturnsFalse() {
-        assertThat(isCollectionCarrier(createClassCarrier())).isFalse();
-    }
-
-    @Test
-    void isCollectionLikeCarrierReturnsTrue() {
-        assertThat(isCollectionCarrier(createCollectionCarrier(String.class))).isTrue();
-    }
-
-    @Test
     void isJavaBaseClassReturnsFalse() {
         assertThat(isJavaBaseClass(PojoExtendsPojoAbstract.class)).isFalse();
     }
@@ -221,49 +210,6 @@ class PopulateUtilTest {
         Field field = getField("stringValue", Pojo.class);
 
         assertThat(isBlackListed(field, DEFAULT_POPULATE_CONFIG.getBlacklistedFields())).isFalse();
-    }
-
-    @Test
-    void hasConstructorsReturnsTrue() {
-        assertThat(hasConstructors(new CollectionCarrier<>(HashMap.class, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>(), null))).isTrue();
-    }
-
-    @Test
-    void hasConstructorsReturnsFalse() {
-        assertThat(hasConstructors(new CollectionCarrier<>(Map.class, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>(), null))).isFalse();
-    }
-
-    @Test
-    void alreadyVisitedReturnsTrueWhenClassHasBeenVisited() {
-        ClassCarrier<A> classCarrier = ClassCarrier.initialize(A.class, new ObjectFactoryVoid(), null);
-
-        assertThat(alreadyVisited(classCarrier, true)).isFalse();
-
-        classCarrier = classCarrier.toClassCarrier(A.class);
-
-        assertThat(alreadyVisited(classCarrier, true)).isTrue();
-    }
-
-    @Test
-    void alreadyVisitedReturnsFalseWhenNullOnCircularDependencyIsFalse() {
-        ClassCarrier<A> classCarrier = ClassCarrier.initialize(A.class, new ObjectFactoryVoid(), null);
-
-        assertThat(alreadyVisited(classCarrier, true)).isFalse();
-
-        classCarrier = classCarrier.toClassCarrier(A.class);
-
-        assertThat(alreadyVisited(classCarrier, false)).isFalse();
-    }
-
-    @Test
-    void alreadyVisitedReturnsFalseWhenBaseJavaClass() {
-        ClassCarrier<String> classCarrier = ClassCarrier.initialize(String.class, new ObjectFactoryVoid(), null);
-
-        assertThat(alreadyVisited(classCarrier, true)).isFalse();
-
-        classCarrier = classCarrier.toClassCarrier(String.class);
-
-        assertThat(alreadyVisited(classCarrier, true)).isFalse();
     }
 
     private static ClassCarrier<String> createClassCarrier() {

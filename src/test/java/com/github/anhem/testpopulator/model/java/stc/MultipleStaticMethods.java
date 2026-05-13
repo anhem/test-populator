@@ -54,11 +54,12 @@ public class MultipleStaticMethods {
         return new MultipleStaticMethods(0, "from-timestamp", 0.0, LIST, MAP, timestamp, UUID);
     }
 
-    public static MultipleStaticMethods fromCsvRecord(String[] record) {
-        return new MultipleStaticMethods(0, record[0], 0.0, LIST, MAP, NOW, UUID);
+    public static MultipleStaticMethods fromCsvRecord(String[] csvRecord) {
+        return new MultipleStaticMethods(0, csvRecord[0], 0.0, LIST, MAP, NOW, UUID);
     }
 
     public static MultipleStaticMethods fromInputStream(InputStream stream) {
+        // stream is intentionally unused to test simplest method selection
         return new MultipleStaticMethods(0, "from-stream", 0.0, LIST, MAP, NOW, UUID);
     }
 
@@ -71,12 +72,15 @@ public class MultipleStaticMethods {
     }
 
     public static String getFactorySchema(int id) {
+        // id is intentionally unused to test static method selection
         return "id:int, name:String, value:double";
     }
 
     public void updateValue(double newValue) {
+        // intentionally empty to test non-static method ignore
     }
 
     private static void internalHelper(int id) {
+        // id is intentionally unused and method is empty to test private method ignore
     }
 }
