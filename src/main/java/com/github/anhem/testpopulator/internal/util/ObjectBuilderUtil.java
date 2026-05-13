@@ -17,6 +17,7 @@ import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isMapEnt
 
 public class ObjectBuilderUtil {
 
+    private static final String FORMAT_DOT = "%s.%s";
     static final String STATIC_BLOCK_START = "static {";
     static final String STATIC_BLOCK_END = "}";
 
@@ -42,23 +43,23 @@ public class ObjectBuilderUtil {
         if (!clazz.isPrimitive() && !clazz.getName().startsWith("java.lang.")) {
             String className = clazz.getName().replace('$', '.');
             if (isMapEntry(clazz)) {
-                staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName().replace('$', '.'), clazz.getSimpleName()));
+                staticImports.add(String.format(FORMAT_DOT, clazz.getEnclosingClass().getName().replace('$', '.'), clazz.getSimpleName()));
                 imports.add("java.util.AbstractMap");
             }
             if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
                 String enclosingClassName = clazz.getEnclosingClass().getName().replace('$', '.');
                 if (clazz.isEnum()) {
                     if (value != null) {
-                        staticImports.add(String.format("%s.%s.%s", enclosingClassName, clazz.getSimpleName(), value));
+                        staticImports.add(String.format(FORMAT_DOT, String.format(FORMAT_DOT, enclosingClassName, clazz.getSimpleName()), value));
                     } else {
                         imports.add(className);
                     }
                 } else {
-                    staticImports.add(String.format("%s.%s", enclosingClassName, clazz.getSimpleName()));
+                    staticImports.add(String.format(FORMAT_DOT, enclosingClassName, clazz.getSimpleName()));
                 }
             } else if (clazz.isEnum()) {
                 if (value != null) {
-                    staticImports.add(String.format("%s.%s", className, value));
+                    staticImports.add(String.format(FORMAT_DOT, className, value));
                 } else {
                     imports.add(className);
                 }

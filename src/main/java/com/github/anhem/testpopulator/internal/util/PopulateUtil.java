@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.Strategy;
+import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 
@@ -202,7 +203,7 @@ public class PopulateUtil {
             }
         } catch (NoSuchMethodException ignored) {
         }
-        throw new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName()));
+        throw new PopulateException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName()));
     }
 
     static boolean isBlackListed(Method method, Set<String> blacklistedMethods) {
@@ -235,7 +236,7 @@ public class PopulateUtil {
         try {
             return new java.net.URL(url);
         } catch (java.net.MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new PopulateException(e);
         }
     }
 
@@ -243,7 +244,7 @@ public class PopulateUtil {
         try {
             return java.net.InetAddress.getByName(host);
         } catch (java.net.UnknownHostException e) {
-            throw new RuntimeException(e);
+            throw new PopulateException(e);
         }
     }
 
