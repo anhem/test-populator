@@ -54,8 +54,8 @@ public class MultipleStaticMethods {
         return new MultipleStaticMethods(0, "from-timestamp", 0.0, LIST, MAP, timestamp, UUID);
     }
 
-    public static MultipleStaticMethods fromCsvRecord(String[] record) {
-        return new MultipleStaticMethods(0, record[0], 0.0, LIST, MAP, NOW, UUID);
+    public static MultipleStaticMethods fromCsvRecord(String[] csvRecord) {
+        return new MultipleStaticMethods(0, csvRecord[0], 0.0, LIST, MAP, NOW, UUID);
     }
 
     public static MultipleStaticMethods fromInputStream(InputStream stream) {

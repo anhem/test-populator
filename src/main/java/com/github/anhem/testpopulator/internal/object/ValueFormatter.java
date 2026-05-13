@@ -19,6 +19,9 @@ public class ValueFormatter {
 
     private static final Map<Class<?>, Function<Object, String>> stringSuppliers = new HashMap<>();
 
+    private ValueFormatter() {
+    }
+
     static {
         stringSuppliers.put(Integer.class, Object::toString);
         stringSuppliers.put(int.class, Object::toString);

@@ -68,7 +68,7 @@ public class CollectionPopulator implements PopulatingStrategy {
                 return (T) populateMap(classCarrier, populator, createEnumMap(enumClass));
             }
         }
-        if (hasConstructors(classCarrier)) {
+        if (classCarrier.hasConstructors()) {
             classCarrier.getObjectFactory().map(clazz);
             Map<Object, Object> map = (Map<Object, Object>) clazz.getConstructor().newInstance();
             return (T) populateMap(classCarrier, populator, map);
@@ -99,7 +99,7 @@ public class CollectionPopulator implements PopulatingStrategy {
                 return (T) populateCollection(classCarrier, populator, createEnumSet(enumClass));
             }
         }
-        if (hasConstructors(classCarrier)) {
+        if (classCarrier.hasConstructors()) {
             classCarrier.getObjectFactory().set(clazz);
             Set<Object> set = (Set<Object>) clazz.getConstructor().newInstance();
             return (T) populateCollection(classCarrier, populator, set);
@@ -125,7 +125,7 @@ public class CollectionPopulator implements PopulatingStrategy {
     @SuppressWarnings("unchecked")
     private <T> T populateForCollection(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<T> clazz = classCarrier.getClazz();
-        if (hasConstructors(classCarrier)) {
+        if (classCarrier.hasConstructors()) {
             classCarrier.getObjectFactory().list(clazz);
             Collection<Object> collection = (Collection<Object>) clazz.getConstructor().newInstance();
             return (T) populateCollection(classCarrier, populator, collection);

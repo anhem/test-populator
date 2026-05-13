@@ -2,9 +2,6 @@ package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
-import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
-
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
@@ -162,10 +159,6 @@ public class PopulateUtil {
                 isFuture(clazz);
     }
 
-    public static <T> boolean isCollectionCarrier(ClassCarrier<T> classCarrier) {
-        return classCarrier instanceof CollectionCarrier;
-    }
-
     public static <T> boolean isJavaBaseClass(Class<T> clazz) {
         return clazz.getPackageName().startsWith("java.") || clazz.getPackageName().startsWith("javax.");
     }
@@ -246,14 +239,6 @@ public class PopulateUtil {
         } catch (java.net.UnknownHostException e) {
             throw new PopulateException(e);
         }
-    }
-
-    public static <T> boolean hasConstructors(CollectionCarrier<T> collectionCarrier) {
-        return collectionCarrier.getClazz().getConstructors().length > 0;
-    }
-
-    public static <T> boolean alreadyVisited(ClassCarrier<T> classCarrier, boolean nullOnCircularDependency) {
-        return nullOnCircularDependency && !isJavaBaseClass(classCarrier.getClazz()) && !classCarrier.addVisited();
     }
 
     static <T> boolean hasConstructorWithoutArguments(Class<T> clazz, boolean canAccessNonPublicConstructor) {

@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isJavaBaseClass;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.toArgumentTypes;
 
 public class ClassCarrier<T> extends Carrier {
@@ -99,6 +100,14 @@ public class ClassCarrier<T> extends Carrier {
                 visited,
                 populateConfig
         );
+    }
+
+    public boolean alreadyVisited() {
+        return populateConfig.isNullOnCircularDependency() && !isJavaBaseClass(clazz) && !addVisited();
+    }
+
+    public boolean hasConstructors() {
+        return clazz.getConstructors().length > 0;
     }
 
     public boolean addVisited() {
