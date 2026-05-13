@@ -32,15 +32,15 @@ public class PopulateConfig {
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
 
     public static class PopulateConfigBuilder {
-        private Set<String> blacklistedMethods = new HashSet<>();
-        private Set<String> blacklistedFields = new HashSet<>();
-        private List<Strategy> strategyOrder = new ArrayList<>();
+        private Set<String> blacklistedMethods = null;
+        private Set<String> blacklistedFields = null;
+        private List<Strategy> strategyOrder = null;
         private Map<Class<?>, OverridePopulate<?>> classOverrides = new HashMap<>();
         private Map<OverrideTarget, OverridePopulate<?>> nameOverrides = new HashMap<>();
         private BuilderPattern builderPattern;
         private Boolean randomValues;
         private Boolean accessNonPublicConstructors;
-        private Set<String> setterPrefixes = new HashSet<>();
+        private Set<String> setterPrefixes = null;
         private Boolean objectFactoryEnabled;
         private Boolean nullOnCircularDependency;
         private ConstructorType constructorType;
@@ -76,6 +76,9 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder addBlacklistedMethods(Collection<String> blacklistedMethods) {
+            if (this.blacklistedMethods == null) {
+                this.blacklistedMethods = new HashSet<>();
+            }
             this.blacklistedMethods.addAll(blacklistedMethods);
             return this;
         }
@@ -118,6 +121,9 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder addBlacklistedFields(Collection<String> blacklistedFields) {
+            if (this.blacklistedFields == null) {
+                this.blacklistedFields = new HashSet<>();
+            }
             this.blacklistedFields.addAll(blacklistedFields);
             return this;
         }
@@ -139,18 +145,14 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder reorderStrategies(Strategy... strategyOrder) {
-            List<Strategy> newOrder = Arrays.asList(strategyOrder);
-            if (!new HashSet<>(this.strategyOrder).containsAll(newOrder)) {
-                List<Strategy> missing = newOrder.stream()
-                        .filter(s -> !this.strategyOrder.contains(s))
-                        .collect(Collectors.toList());
-                throw new IllegalArgumentException("Cannot reorder strategies that have not been configured: " + missing);
-            }
-            this.strategyOrder = new ArrayList<>(newOrder);
+            this.strategyOrder = new ArrayList<>(Arrays.asList(strategyOrder));
             return this;
         }
 
         private void addStrategyOrder(Strategy strategy) {
+            if (this.strategyOrder == null) {
+                this.strategyOrder = new ArrayList<>();
+            }
             if (!this.strategyOrder.contains(strategy)) {
                 this.strategyOrder = concat(this.strategyOrder, strategy);
             }
@@ -228,7 +230,7 @@ public class PopulateConfig {
         /**
          * Different builders behave slightly different. The builderPattern sets which one to use.
          *
-         * @param builderPattern supports LOMBOK or IMMUTABLES
+         * @param builderPattern supports LOMBOK, IMMUTABLES or PROTOBUF
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder builderPattern(BuilderPattern builderPattern) {
@@ -286,6 +288,9 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder addSetterPrefixes(Collection<String> setterPrefixes) {
+            if (this.setterPrefixes == null) {
+                this.setterPrefixes = new HashSet<>();
+            }
             this.setterPrefixes.addAll(setterPrefixes);
             return this;
         }
@@ -325,8 +330,8 @@ public class PopulateConfig {
 
         /**
          * Set what constructor is preferred when creating objects using MUTATOR strategy.
-         * SMALLEST will attempt to pick a constructor with at least one parameter and fall back on NO_ARG if none is found.
-         * @param constructorType NO_ARG, SMALLEST, LARGEST
+         * SMALLEST will attempt to pick a constructor with at least one parameter and fall back on NO_ARGS if none is found.
+         * @param constructorType NO_ARGS, SMALLEST, LARGEST
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder constructorType(ConstructorType constructorType) {
@@ -336,7 +341,7 @@ public class PopulateConfig {
 
         /**
          *  Set the name of the builder method used when creating objects using BUILDER strategy.
-         *  This option will be ignored for LOMBOK and IMMUTABLES.
+         *  This option will be ignored for LOMBOK, IMMUTABLES and PROTOBUF.
          * @param builderMethod a string representation of the method name
          * @return PopulateConfigBuilder
          */
@@ -347,7 +352,7 @@ public class PopulateConfig {
 
         /**
          *  Set the name of the build method used when creating objects using BUILDER strategy.
-         *  This option will be ignored for LOMBOK and IMMUTABLES.
+         *  This option will be ignored for LOMBOK, IMMUTABLES and PROTOBUF.
          * @param buildMethod a string representation of the method name
          * @return PopulateConfigBuilder
          */
@@ -601,7 +606,7 @@ public class PopulateConfig {
     }
 
     private static <T extends Collection<?>> T collectionOrDefault(T collection, T defaultCollection) {
-        return collection == null || collection.isEmpty() ? defaultCollection : collection;
+        return collection == null ? defaultCollection : collection;
     }
 
     @Override
