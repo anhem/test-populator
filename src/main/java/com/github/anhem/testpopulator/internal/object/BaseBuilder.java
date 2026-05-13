@@ -2,13 +2,13 @@ package com.github.anhem.testpopulator.internal.object;
 
 @SuppressWarnings("unchecked")
 public abstract class BaseBuilder<B extends BaseBuilder<B>> {
-    public Class<?> clazz;
-    public String name;
-    public BuildType buildType;
-    public boolean useFullyQualifiedName;
-    public int expectedChildren;
-    public boolean parameterized;
-    public Class<?>[] referencedClasses = new Class<?>[0];
+    protected Class<?> clazz;
+    protected String name;
+    protected BuildType buildType;
+    protected boolean useFullyQualifiedName;
+    protected int expectedChildren;
+    protected boolean parameterized;
+    protected Class<?>[] referencedClasses = new Class<?>[0];
 
     public B clazz(Class<?> clazz) {
         this.clazz = clazz;
