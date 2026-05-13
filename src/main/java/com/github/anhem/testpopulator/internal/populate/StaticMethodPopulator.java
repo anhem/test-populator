@@ -1,11 +1,9 @@
-package com.github.anhem.testpopulator.internal.value;
+package com.github.anhem.testpopulator.internal.populate;
 
 import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.populate.PopulatingStrategy;
-import com.github.anhem.testpopulator.internal.populate.Populator;
 
 import java.lang.reflect.Method;
 import java.util.stream.Stream;

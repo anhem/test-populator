@@ -116,14 +116,12 @@ class PopulateConfigTest {
     }
 
     @Test
-    void reorderStrategiesThrowsExceptionIfStrategyNotConfigured() {
-        PopulateConfig.PopulateConfigBuilder builder = PopulateConfig.builder()
-                .constructorStrategy()
-                .and();
+    void reorderStrategiesOnFreshBuilderWorks() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .reorderStrategies(SETTER, CONSTRUCTOR)
+                .build();
 
-        assertThatThrownBy(() -> builder.reorderStrategies(SETTER, CONSTRUCTOR))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Cannot reorder strategies that have not been configured: [SETTER]");
+        assertThat(populateConfig.getStrategyOrder()).containsExactly(SETTER, CONSTRUCTOR);
     }
 
     @Test
@@ -349,6 +347,33 @@ class PopulateConfigTest {
                 .build();
 
         assertThat(populateConfig.getStrategyOrder()).containsExactly(SETTER);
+    }
+
+    @Test
+    void canSetEmptyBlacklistedMethods() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .setBlacklistedMethods(List.of())
+                .build();
+
+        assertThat(populateConfig.getBlacklistedMethods()).isEmpty();
+    }
+
+    @Test
+    void canSetEmptyBlacklistedFields() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .setBlacklistedFields(List.of())
+                .build();
+
+        assertThat(populateConfig.getBlacklistedFields()).isEmpty();
+    }
+
+    @Test
+    void canSetEmptySetterPrefixes() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .setSetterPrefixes(List.of())
+                .build();
+
+        assertThat(populateConfig.getSetterPrefixes()).isEmpty();
     }
 
     private static void assertEqual(PopulateConfig populateConfig, PopulateConfig expectedPopulateConfig) {

@@ -8,7 +8,7 @@ import static com.github.anhem.testpopulator.testutil.AssertTestUtil.RECURSIVE_A
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class StaticMethodRequiredTypesTest {
+class StaticMethodRequiredTypesTest {
 
     @Test
     void canPopulateStaticMethodRequiredTypes() {

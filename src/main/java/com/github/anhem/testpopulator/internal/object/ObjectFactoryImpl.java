@@ -198,11 +198,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .methodName("of");
 
         if (clazz.equals(IntStream.class)) {
-            streamBuilder.codeTemplate(CodeTemplate.INT_STREAM).factoryClassName(IntStream.class.getSimpleName()).referencedClasses(IntStream.class);
+            streamBuilder.codeTemplate(CodeTemplate.NUMBER_STREAM).factoryClassName(IntStream.class.getSimpleName()).referencedClasses(IntStream.class);
         } else if (clazz.equals(LongStream.class)) {
-            streamBuilder.codeTemplate(CodeTemplate.LONG_STREAM).factoryClassName(LongStream.class.getSimpleName()).referencedClasses(LongStream.class);
+            streamBuilder.codeTemplate(CodeTemplate.NUMBER_STREAM).factoryClassName(LongStream.class.getSimpleName()).referencedClasses(LongStream.class);
         } else if (clazz.equals(DoubleStream.class)) {
-            streamBuilder.codeTemplate(CodeTemplate.DOUBLE_STREAM).factoryClassName(DoubleStream.class.getSimpleName()).referencedClasses(DoubleStream.class);
+            streamBuilder.codeTemplate(CodeTemplate.NUMBER_STREAM).factoryClassName(DoubleStream.class.getSimpleName()).referencedClasses(DoubleStream.class);
         } else {
             streamBuilder.codeTemplate(CodeTemplate.STREAM).parameterized(true).factoryClassName(Stream.class.getSimpleName()).referencedClasses(Stream.class);
         }

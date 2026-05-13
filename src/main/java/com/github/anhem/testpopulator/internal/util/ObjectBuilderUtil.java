@@ -17,6 +17,11 @@ import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isMapEnt
 
 public class ObjectBuilderUtil {
 
+    private static final String QUALIFIED_NAME_FORMAT = "%s.%s";
+    private static final String TRY_START = "\t\ttry {";
+    private static final String THROW_RUNTIME_EXCEPTION = "\t\t\tthrow new RuntimeException(e);";
+    private static final String BLOCK_END = "\t\t}";
+    private static final String METHOD_END = "\t}";
     static final String STATIC_BLOCK_START = "static {";
     static final String STATIC_BLOCK_END = "}";
 
@@ -36,35 +41,28 @@ public class ObjectBuilderUtil {
             return;
         }
         if (clazz.isArray()) {
-            addImport(clazz.getComponentType(), value, useFullyQualifiedName, imports, staticImports);
+            addImport(clazz.getComponentType(), value, false, imports, staticImports);
             return;
         }
-        if (!clazz.isPrimitive() && !clazz.getName().startsWith("java.lang.")) {
-            String className = clazz.getName().replace('$', '.');
-            if (isMapEntry(clazz)) {
-                staticImports.add(String.format("%s.%s", clazz.getEnclosingClass().getName().replace('$', '.'), clazz.getSimpleName()));
-                imports.add("java.util.AbstractMap");
-            }
-            if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
-                String enclosingClassName = clazz.getEnclosingClass().getName().replace('$', '.');
-                if (clazz.isEnum()) {
-                    if (value != null) {
-                        staticImports.add(String.format("%s.%s.%s", enclosingClassName, clazz.getSimpleName(), value));
-                    } else {
-                        imports.add(className);
-                    }
-                } else {
-                    staticImports.add(String.format("%s.%s", enclosingClassName, clazz.getSimpleName()));
-                }
-            } else if (clazz.isEnum()) {
-                if (value != null) {
-                    staticImports.add(String.format("%s.%s", className, value));
-                } else {
-                    imports.add(className);
-                }
+        if (clazz.isPrimitive() || clazz.getName().startsWith("java.lang.")) {
+            return;
+        }
+        if (clazz.isEnum()) {
+            String className = clazz.getCanonicalName();
+            if (value != null) {
+                staticImports.add(String.format(QUALIFIED_NAME_FORMAT, className, value));
             } else {
                 imports.add(className);
             }
+        }
+        else if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
+            staticImports.add(String.format(QUALIFIED_NAME_FORMAT, clazz.getEnclosingClass().getCanonicalName(), clazz.getSimpleName()));
+            if (isMapEntry(clazz)) {
+                imports.add("java.util.AbstractMap");
+            }
+        }
+        else {
+            imports.add(clazz.getCanonicalName());
         }
     }
 
@@ -114,22 +112,22 @@ public class ObjectBuilderUtil {
         if (clazz != null && clazz.equals(java.net.URL.class)) {
             return String.join(System.lineSeparator(),
                     "\tprivate static java.net.URL toUrl(String url) {",
-                    "\t\ttry {",
+                    TRY_START,
                     "\t\t\treturn new java.net.URL(url);",
                     "\t\t} catch (java.net.MalformedURLException e) {",
-                    "\t\t\tthrow new RuntimeException(e);",
-                    "\t\t}",
-                    "\t}");
+                    THROW_RUNTIME_EXCEPTION,
+                    BLOCK_END,
+                    METHOD_END);
         }
         if (clazz != null && (clazz.equals(InetAddress.class) || clazz.equals(Inet4Address.class) || clazz.equals(Inet6Address.class) || clazz.equals(InetSocketAddress.class))) {
             return String.join(System.lineSeparator(),
                     "\tprivate static java.net.InetAddress toInetAddress(String host) {",
-                    "\t\ttry {",
+                    TRY_START,
                     "\t\t\treturn java.net.InetAddress.getByName(host);",
                     "\t\t} catch (java.net.UnknownHostException e) {",
-                    "\t\t\tthrow new RuntimeException(e);",
-                    "\t\t}",
-                    "\t}");
+                    THROW_RUNTIME_EXCEPTION,
+                    BLOCK_END,
+                    METHOD_END);
         }
         return null;
     }

@@ -7,7 +7,6 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
-import com.github.anhem.testpopulator.internal.value.StaticMethodPopulator;
 import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import java.lang.reflect.Array;
@@ -44,15 +43,16 @@ public class Populator {
         if (valueFactory.hasType(clazz, classCarrier.getName())) {
             return createValue(classCarrier);
         }
-        if (alreadyVisited(classCarrier, classCarrier.getPopulateConfig().isNullOnCircularDependency())) {
+        if (classCarrier.alreadyVisited()) {
             return createNullValue(classCarrier);
         }
         if (clazz.isArray()) {
             return populateForArray(classCarrier);
         }
-        if (isCollectionCarrier(classCarrier)) {
+        if (classCarrier instanceof CollectionCarrier) {
             return collectionPopulator.populate(classCarrier, this);
         }
+
         if (isProtobufByteString(clazz, classCarrier.getPopulateConfig())) {
             return staticMethodPopulator.populate(classCarrier, this, MethodType.SIMPLEST);
         }
@@ -78,7 +78,7 @@ public class Populator {
         Class<?> componentType = classCarrier.getClazz().getComponentType();
         classCarrier.getObjectFactory().array(componentType);
         Object value;
-        if (isCollectionCarrier(classCarrier)) {
+        if (classCarrier instanceof CollectionCarrier) {
             CollectionCarrier<T> collectionCarrier = (CollectionCarrier<T>) classCarrier;
             value = continuePopulateWithType(collectionCarrier.toTypeCarrier(collectionCarrier.getArgumentTypes().get(0)));
         } else {

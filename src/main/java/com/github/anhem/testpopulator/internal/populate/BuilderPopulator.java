@@ -23,6 +23,8 @@ import static java.lang.String.format;
 
 public class BuilderPopulator extends MethodPopulator implements PopulatingStrategy {
 
+    private static final String STRATEGY_WITH_PATTERN = "%s (%s)";
+
     @Override
     public <T> T populate(ClassCarrier<T> classCarrier, Populator populator) {
         switch (classCarrier.getPopulateConfig().getBuilderPattern()) {
@@ -57,7 +59,7 @@ public class BuilderPopulator extends MethodPopulator implements PopulatingStrat
             setAccessible(buildMethod, builderObject);
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, LOMBOK)), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format(STRATEGY_WITH_PATTERN, BUILDER, LOMBOK)), e);
         }
     }
 
@@ -73,7 +75,7 @@ public class BuilderPopulator extends MethodPopulator implements PopulatingStrat
             Method buildMethod = builderObject.getClass().getDeclaredMethod(populateConfig.getBuildMethod());
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, classCarrier.getClazz().getName(), format("%s (%s)", BUILDER, IMMUTABLES)), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, classCarrier.getClazz().getName(), format(STRATEGY_WITH_PATTERN, BUILDER, IMMUTABLES)), e);
         }
     }
 
@@ -89,7 +91,7 @@ public class BuilderPopulator extends MethodPopulator implements PopulatingStrat
             Method buildMethod = builderObject.getClass().getDeclaredMethod(populateConfig.getBuildMethod());
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format("%s (%s)", BUILDER, CUSTOM)), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), format(STRATEGY_WITH_PATTERN, BUILDER, CUSTOM)), e);
         }
     }
 
@@ -105,7 +107,7 @@ public class BuilderPopulator extends MethodPopulator implements PopulatingStrat
             Method buildMethod = builderObject.getClass().getDeclaredMethod(populateConfig.getBuildMethod());
             return (T) buildMethod.invoke(builderObject);
         } catch (Exception e) {
-            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, classCarrier.getClazz().getName(), format("%s (%s)", BUILDER, PROTOBUF)), e);
+            throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, classCarrier.getClazz().getName(), format(STRATEGY_WITH_PATTERN, BUILDER, PROTOBUF)), e);
         }
     }
 }
