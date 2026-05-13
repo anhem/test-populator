@@ -41,35 +41,28 @@ public class ObjectBuilderUtil {
             return;
         }
         if (clazz.isArray()) {
-            addImport(clazz.getComponentType(), value, useFullyQualifiedName, imports, staticImports);
+            addImport(clazz.getComponentType(), value, false, imports, staticImports);
             return;
         }
-        if (!clazz.isPrimitive() && !clazz.getName().startsWith("java.lang.")) {
-            String className = clazz.getName().replace('$', '.');
-            if (isMapEntry(clazz)) {
-                staticImports.add(String.format(QUALIFIED_NAME_FORMAT, clazz.getEnclosingClass().getCanonicalName(), clazz.getSimpleName()));
-                imports.add("java.util.AbstractMap");
-            }
-            if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
-                String enclosingClassName = clazz.getEnclosingClass().getCanonicalName();
-                if (clazz.isEnum()) {
-                    if (value != null) {
-                        staticImports.add(String.format(QUALIFIED_NAME_FORMAT, String.format(QUALIFIED_NAME_FORMAT, enclosingClassName, clazz.getSimpleName()), value));
-                    } else {
-                        imports.add(className);
-                    }
-                } else {
-                    staticImports.add(String.format(QUALIFIED_NAME_FORMAT, enclosingClassName, clazz.getSimpleName()));
-                }
-            } else if (clazz.isEnum()) {
-                if (value != null) {
-                    staticImports.add(String.format(QUALIFIED_NAME_FORMAT, className, value));
-                } else {
-                    imports.add(className);
-                }
+        if (clazz.isPrimitive() || clazz.getName().startsWith("java.lang.")) {
+            return;
+        }
+        if (clazz.isEnum()) {
+            String className = clazz.getCanonicalName();
+            if (value != null) {
+                staticImports.add(String.format(QUALIFIED_NAME_FORMAT, className, value));
             } else {
                 imports.add(className);
             }
+        }
+        else if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
+            staticImports.add(String.format(QUALIFIED_NAME_FORMAT, clazz.getEnclosingClass().getCanonicalName(), clazz.getSimpleName()));
+            if (isMapEntry(clazz)) {
+                imports.add("java.util.AbstractMap");
+            }
+        }
+        else {
+            imports.add(clazz.getCanonicalName());
         }
     }
 

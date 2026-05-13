@@ -173,7 +173,7 @@ public abstract class ObjectBuilder {
 
     private void getImports(Set<String> imports, Set<String> staticImports) {
         addImport(getClazz(), value, isUseFullyQualifiedName(), imports, staticImports);
-        referencedClasses.forEach(clazz -> addImport(clazz, null, isUseFullyQualifiedName(), imports, staticImports));
+        referencedClasses.forEach(c -> addImport(c, null, isUseFullyQualifiedName(), imports, staticImports));
         imports.addAll(extraImports);
         staticImports.addAll(extraStaticImports);
         children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));

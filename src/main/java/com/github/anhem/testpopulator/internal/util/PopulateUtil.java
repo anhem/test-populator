@@ -3,6 +3,9 @@ package com.github.anhem.testpopulator.internal.util;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import java.lang.reflect.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -227,8 +230,8 @@ public class PopulateUtil {
 
     public static java.net.URL toUrl(String url) {
         try {
-            return new java.net.URL(url);
-        } catch (java.net.MalformedURLException e) {
+            return new URI(url).toURL();
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new PopulateException(e);
         }
     }

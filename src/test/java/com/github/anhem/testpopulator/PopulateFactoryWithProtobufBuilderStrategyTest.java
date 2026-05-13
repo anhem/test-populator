@@ -17,7 +17,7 @@ import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PopulateFactoryWithProtobufBuilderStrategyTest {
+class PopulateFactoryWithProtobufBuilderStrategyTest {
 
     private PopulateConfig populateConfig;
     private PopulateFactory populateFactory;
@@ -109,7 +109,7 @@ public class PopulateFactoryWithProtobufBuilderStrategyTest {
         return value;
     }
 
-    public static <T> void assertRandomlyPopulatedValues(T value1, T value2) {
+    static <T> void assertRandomlyPopulatedValues(T value1, T value2) {
         assertThat(value1).isNotNull();
         assertThat(value2).isNotNull();
         assertThat(value1).hasNoNullFieldsOrProperties();
