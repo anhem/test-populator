@@ -34,20 +34,42 @@ public class ConstructorPopulator implements PopulatingStrategy {
     protected <T> T populateUsingConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         int parameterCount = constructor.getParameterCount();
         classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), parameterCount);
-        if (classCarrier.getPopulateConfig().isKotlinSupport() && isKotlinConstructor(constructor)) {
-            int maskCount = (parameterCount - 2) / 32 + 1;
-            int realParameterCount = parameterCount - maskCount - 1;
-            Object[] arguments = IntStream.range(0, realParameterCount).mapToObj(i -> populateArgument(constructor, classCarrier, populator, i)).toArray();
-            Object[] masks = IntStream.range(0, maskCount).mapToObj(i -> 0).toArray();
-            Object[] allArguments = Stream.concat(Arrays.stream(arguments), Stream.concat(Arrays.stream(masks), Stream.of((Object) null))).toArray();
 
-            Arrays.stream(masks).forEach(mask -> classCarrier.getObjectFactory().value((Integer) mask, int.class, null));
-            classCarrier.getObjectFactory().nullValue(constructor.getParameterTypes()[parameterCount - 1]);
-            return constructor.newInstance(allArguments);
-        } else {
-            Object[] arguments = IntStream.range(0, parameterCount).mapToObj(i -> populateArgument(constructor, classCarrier, populator, i)).toArray();
-            return constructor.newInstance(arguments);
-        }
+        Object[] arguments = isKotlinSupportEnabled(classCarrier, constructor) ?
+                populateKotlinArguments(constructor, classCarrier, populator) :
+                populateArguments(constructor, classCarrier, populator, parameterCount);
+
+        return constructor.newInstance(arguments);
+    }
+
+    private <T> boolean isKotlinSupportEnabled(ClassCarrier<T> classCarrier, Constructor<T> constructor) {
+        return classCarrier.getPopulateConfig().isKotlinSupport() && isKotlinConstructor(constructor);
+    }
+
+    private <T> Object[] populateArguments(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator, int parameterCount) {
+        return IntStream.range(0, parameterCount)
+                .mapToObj(i -> populateArgument(constructor, classCarrier, populator, i))
+                .toArray();
+    }
+
+    private <T> Object[] populateKotlinArguments(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator) {
+        int parameterCount = constructor.getParameterCount();
+        int maskCount = (parameterCount - 2) / 32 + 1;
+        int realParameterCount = parameterCount - maskCount - 1;
+
+        Object[] arguments = IntStream.range(0, realParameterCount)
+                .mapToObj(i -> populateArgument(constructor, classCarrier, populator, i))
+                .toArray();
+
+        Object[] masks = IntStream.range(0, maskCount)
+                .mapToObj(i -> 0)
+                .peek(mask -> classCarrier.getObjectFactory().value((Integer) mask, int.class, null))
+                .toArray();
+
+        classCarrier.getObjectFactory().nullValue(constructor.getParameterTypes()[parameterCount - 1]);
+
+        return Stream.concat(Arrays.stream(arguments), Stream.concat(Arrays.stream(masks), Stream.of((Object) null)))
+                .toArray();
     }
 
     private <T> Object populateArgument(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator, int i) {

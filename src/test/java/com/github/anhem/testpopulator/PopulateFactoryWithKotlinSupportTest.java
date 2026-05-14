@@ -3,7 +3,7 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
 import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass.InnerClass;
-import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass.LargeKotlinLikeClass;
+import com.github.anhem.testpopulator.model.kotlin.LargeKotlinLikeClass;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
