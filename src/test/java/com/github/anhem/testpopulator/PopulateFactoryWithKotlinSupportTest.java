@@ -43,9 +43,9 @@ class PopulateFactoryWithKotlinSupportTest {
     @Test
     void canPopulateKotlinLikeClassUsingConstructorStrategy() {
         populateConfig = PopulateConfig.builder()
+                .kotlinSupport(true)
                 .constructorStrategy()
-                    .kotlinSupport(true)
-                    .and()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 

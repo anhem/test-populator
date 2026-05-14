@@ -711,11 +711,6 @@ public class PopulateConfig {
         ConstructorStrategyBuilder(PopulateConfigBuilder parent) {
             super(parent);
         }
-
-        public ConstructorStrategyBuilder kotlinSupport(boolean kotlinSupport) {
-            parent.kotlinSupport(kotlinSupport);
-            return this;
-        }
     }
 
     /**
