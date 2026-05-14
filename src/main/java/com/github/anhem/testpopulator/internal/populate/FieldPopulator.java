@@ -12,6 +12,7 @@ import java.lang.reflect.Type;
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_SET_FIELD;
+import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isKotlinDelegate;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static java.lang.String.format;
 
@@ -27,6 +28,7 @@ public class FieldPopulator implements PopulatingStrategy {
             T objectOfClass = constructor.newInstance();
             getDeclaredFields(clazz, populateConfig.getBlacklistedFields()).stream()
                     .filter(field -> !Modifier.isFinal(field.getModifiers()))
+                    .filter(field -> !isKotlinDelegate(field, populateConfig.isKotlinSupport()))
                     .forEach(field -> {
                         try {
                             setAccessible(field, objectOfClass);

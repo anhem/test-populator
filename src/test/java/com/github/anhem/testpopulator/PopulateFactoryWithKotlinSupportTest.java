@@ -1,15 +1,15 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.model.kotlin.JavaClassWithKotlinField;
-import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
-import com.github.anhem.testpopulator.model.kotlin.LargeKotlinLikeClass;
+import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.model.kotlin.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.RECURSIVE_ASSERTION_CONFIGURATION;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryWithKotlinSupportTest {
 
@@ -19,7 +19,10 @@ class PopulateFactoryWithKotlinSupportTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .kotlinSupport(true)
+                .kotlinSupport()
+                .and()
+                .constructorStrategy()
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -42,13 +45,6 @@ class PopulateFactoryWithKotlinSupportTest {
 
     @Test
     void canPopulateKotlinLikeClassUsingConstructorStrategy() {
-        populateConfig = PopulateConfig.builder()
-                .kotlinSupport(true)
-                .constructorStrategy()
-                .and()
-                .build();
-        populateFactory = new PopulateFactory(populateConfig);
-
         KotlinLikeClass result = populateFactory.populate(KotlinLikeClass.class);
 
         assertThat(result).isNotNull();
@@ -57,8 +53,9 @@ class PopulateFactoryWithKotlinSupportTest {
 
     @Test
     void usesKotlinDefaultValuesWhenConfigured() {
-        populateConfig = PopulateConfig.builder()
-                .kotlinSupport(true, true)
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport()
+                .useDefaultValues()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 
@@ -68,6 +65,78 @@ class PopulateFactoryWithKotlinSupportTest {
         assertThat(result.getValue()).isEqualTo("default_value");
         assertThat(result.getId()).isNotZero();
         assertThat(result.getInnerClass()).isNotNull();
+    }
+
+    @Test
+    void canPopulateInternalPropertyUsingSetterStrategy() {
+        populateConfig = populateConfig.toBuilder()
+                .clearStrategies()
+                .setterStrategy()
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        KotlinLikeWithInternalProperty result = populateFactory.populate(KotlinLikeWithInternalProperty.class);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getMyProp()).isNotEqualTo("initial");
+    }
+
+    @Test
+    void canPopulateKotlinCompanion() {
+        populateConfig = populateConfig.toBuilder()
+                .clearStrategies()
+                .staticMethodStrategy()
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        KotlinLikeWithCompanion result = populateFactory.populate(KotlinLikeWithCompanion.class);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getValue()).isNotNull();
+    }
+
+    @Test
+    void ignoresDelegateFieldWhenKotlinSupportIsEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .clearStrategies()
+                .fieldStrategy()
+                .and()
+                .objectFactoryEnabled(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        KotlinLikeWithComplexDelegate result = populateFactory.populate(KotlinLikeWithComplexDelegate.class);
+
+        assertThat(result).isNotNull();
+        // Since it's ignored, it should still have its initial value
+        // (or at least the population didn't crash)
+        assertThat(result.getMyProp$delegate()).isNotNull();
+        assertThat(result.getMyProp$delegate().getValue()).isEqualTo("initial");
+    }
+
+    @Test
+    void canPopulateKotlinSingleton() {
+        KotlinLikeSingleton result = populateFactory.populate(KotlinLikeSingleton.class);
+
+        assertThat(result).isSameAs(KotlinLikeSingleton.INSTANCE);
+    }
+
+    @Test
+    void cannotPopulateKotlinSingletonWhenKotlinSupportIsDisabled() {
+        populateConfig = PopulateConfig.builder().build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        assertThatThrownBy(() -> populateFactory.populate(KotlinLikeSingleton.class))
+                .isInstanceOf(PopulateException.class)
+                .hasMessageContaining("No matching strategy found");
+    }
+
+    @Test
+    void canPopulateKotlinSingletonWithGeneratedCode() {
+        KotlinLikeSingleton result = populateFactory.populate(KotlinLikeSingleton.class);
+
+        assertThat(result).isSameAs(KotlinLikeSingleton.INSTANCE);
+        assertGeneratedCode(result, populateConfig);
     }
 
     private <T> void populateAndAssertWithGeneratedCode(Class<T> clazz) {

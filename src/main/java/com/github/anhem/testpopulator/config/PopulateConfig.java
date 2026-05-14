@@ -397,7 +397,18 @@ public class PopulateConfig {
          * @return PopulateConfigBuilder
          */
         public PopulateConfigBuilder kotlinSupport(boolean kotlinSupport, boolean useKotlinDefaultValues) {
-            this.kotlinSupport = kotlinSupport;
+            kotlinSupport(kotlinSupport);
+            this.useKotlinDefaultValues = useKotlinDefaultValues;
+            return this;
+        }
+
+        /**
+         * Configure Kotlin support options
+         *
+         * @param useKotlinDefaultValues true/false
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder useKotlinDefaultValues(boolean useKotlinDefaultValues) {
             this.useKotlinDefaultValues = useKotlinDefaultValues;
             return this;
         }
@@ -464,6 +475,16 @@ public class PopulateConfig {
         public StaticMethodStrategyBuilder staticMethodStrategy() {
             addStrategyOrder(STATIC_METHOD);
             return new StaticMethodStrategyBuilder(this);
+        }
+
+        /**
+         * Configure Kotlin support options
+         *
+         * @return builder for Kotlin support configuration
+         */
+        public KotlinStrategyBuilder kotlinSupport() {
+            this.kotlinSupport = true;
+            return new KotlinStrategyBuilder(this);
         }
 
         /**
@@ -627,8 +648,9 @@ public class PopulateConfig {
                 .constructorType(constructorType)
                 .builderMethod(builderMethod)
                 .buildMethod(buildMethod)
-                .methodType(methodType)
-                .kotlinSupport(kotlinSupport);
+                .methodType(methodType);
+        populateConfigBuilder.kotlinSupport = kotlinSupport;
+        populateConfigBuilder.useKotlinDefaultValues = useKotlinDefaultValues;
         populateConfigBuilder.strategyOrder = new ArrayList<>(strategyOrder);
         return populateConfigBuilder;
     }
@@ -669,6 +691,7 @@ public class PopulateConfig {
                 ", buildMethod='" + buildMethod + '\'' +
                 ", methodType=" + methodType +
                 ", kotlinSupport=" + kotlinSupport +
+                ", useKotlinDefaultValues=" + useKotlinDefaultValues +
                 '}';
     }
 
@@ -824,6 +847,26 @@ public class PopulateConfig {
 
         public StaticMethodStrategyBuilder methodType(MethodType type) {
             parent.methodType(type);
+            return this;
+        }
+    }
+
+    /**
+     * Builder for Kotlin strategy configuration
+     */
+    public static class KotlinStrategyBuilder extends StrategyBuilder {
+
+        KotlinStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        /**
+         * Use Kotlin default values when populating
+         *
+         * @return KotlinStrategyBuilder
+         */
+        public KotlinStrategyBuilder useDefaultValues() {
+            parent.useKotlinDefaultValues = true;
             return this;
         }
     }
