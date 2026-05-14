@@ -106,14 +106,21 @@ MyClass myClass = populateFactory.populate(MyClass.class);
 
 Defines the order of strategies to try when creating an object. If the first strategy fails, it moves to the next.
 
-* **Default**: `CONSTRUCTOR`, `SETTER`, `STATIC_METHOD`
-* **Available Strategies**:
-    * `CONSTRUCTOR`: Uses the constructor with the most parameters.
-    * `SETTER`: Uses a no-arg constructor, then calls standard setter methods (e.g., `setName()`).
-    * `MUTATOR`: Uses a constructor, then calls any state-changing methods (including fluent setters like `withName()`).
-    * `FIELD`: Uses a no-arg constructor and populates fields directly using reflection.
-    * `BUILDER`: Uses a builder pattern (e.g., from Lombok or Immutables).
-    * `STATIC_METHOD`: Uses a public static factory method to create an instance.
+*   **Default**: `CONSTRUCTOR`, `SETTER`, `STATIC_METHOD`
+*   **Available Strategies**:
+    *   `CONSTRUCTOR`: Uses the constructor with the most parameters.
+    *   `SETTER`: Uses a no-arg constructor, then calls standard setter methods (e.g., `setName()`).
+    *   `MUTATOR`: Uses a constructor, then calls any state-changing methods (including fluent setters like `withName()`).
+    *   `FIELD`: Uses a no-arg constructor and populates fields directly using reflection.
+    *   `BUILDER`: Uses a builder pattern (e.g., from Lombok or Immutables).
+    *   `STATIC_METHOD`: Uses a public static factory method to create an instance.
+
+> [!TIP]
+> **Strategy Best Practices**: While you can customize the `strategyOrder`, it is highly recommended to at least include `CONSTRUCTOR` and `STATIC_METHOD` (included in the defaults). 
+> 
+> Many strategies (like `SETTER` and `FIELD`) require a **no-arg constructor** to instantiate the object. If a class (or any of its nested dependencies) only has parameterized constructors or static factory methods, population will fail if the corresponding strategies are disabled.
+>
+> For a detailed look at how restrictive strategy configurations can lead to failures, see [StrategyFailureTest.java](src/test/java/com/github/anhem/testpopulator/readme/StrategyFailureTest.java).
 
 #### `randomValues`
 
