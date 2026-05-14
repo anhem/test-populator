@@ -290,72 +290,33 @@ public class TestPopulator {
 
 **Usage in a test:**
 
-```java
-// Now you can easily populate any object with your custom rules
-MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
-```
+## Technical Insights
 
-### Per-Execution Overrides
+Test-Populator is built on a few core architectural principles that ensure its flexibility and reliability:
 
-While `PopulateConfig` is great for defining global rules for your project, you might sometimes need to override those rules for a specific test case. 
-`PopulateFactory` provides methods to pass additional overrides directly when calling `populate()`. These local overrides take precedence over any globally configured ones.
+*   **Recursive Strategy-Based Engine**: The library uses a depth-first traversal of the object graph. For each type, it evaluates a pluggable chain of strategies (Constructor, Builder, Setter, etc.) to find the most suitable instantiation method.
+*   **Immutable Context (Carriers)**: All state during the recursive population is passed through immutable "Carriers". This ensures that the population process is deterministic and free of side effects across different branches of the object tree.
+*   **Decoupled Code Generation**: The experimental Java code generation feature is fully decoupled from the population logic. It "records" the population steps via a notification interface, allowing the library to build the object in memory while simultaneously constructing a mirror tree of `ObjectBuilder` nodes for code output.
+*   **Round-Trip Validation**: The library's own test suite uses a unique "compile-and-run" strategy for its generated code. It writes the generated Java source to a file, compiles it on the fly, instantiates the resulting class, and performs a recursive comparison against the original object to ensure 100% behavioral parity.
 
-You can provide multiple overrides using a map:
+## Thread Safety
 
-```java
-Map<Class<?>, OverridePopulate<?>> localOverrides = Map.of(
-    String.class, () -> "localValue",
-    Integer.class, () -> 42
-);
+Test-Populator is designed to be **thread-safe** and can be used concurrently in multi-threaded test environments.
 
-MyClass myClass = populateFactory.populate(MyClass.class, localOverrides);
-```
+*   **`PopulateFactory` is stateless**: A single factory instance can be safely shared across multiple threads.
+*   **Immutable Configuration**: `PopulateConfig` is effectively immutable after construction.
+*   **Thread-Confined Recursion**: Each call to `populate()` creates its own localized context (Carriers and ObjectFactory), ensuring no shared state between concurrent requests.
+*   **Safe Randomization**: The internal random data generation uses `java.security.SecureRandom`, which is thread-safe.
 
-Or a single override using a convenience method:
+You can confidently use a single `PopulateFactory` instance as a singleton or static constant across your entire test suite.
 
-```java
-MyClass myClass = populateFactory.populate(MyClass.class, String.class, () -> "localValue");
-```
+## Building from Source
 
-You can also provide name-based overrides:
+### Prerequisites
+- JDK 11 or higher
+- Maven 3.6.3 or higher
 
-```java
-MyClass myClass = populateFactory.populate(MyClass.class, "stringValue", String.class, () -> "localValue");
-```
-
-### "Full Coverage" Setup
-
-This example shows a configuration designed to handle a wide variety of class structures by enabling almost all features.
-
-```java
-private static final PopulateConfig FULL_CONFIG = PopulateConfig.builder()
-        // Try all strategies, starting with the most specific (BUILDER)
-        .builderStrategy()
-            // Specify the builder pattern to use
-            .pattern(LOMBOK)
-            .and()
-        .setterStrategy()
-            // For the SETTER strategy, consider any void method with one arg a setter
-            .setPrefixes("")
-            .and()
-        .mutatorStrategy()
-            // For the MUTATOR strategy, prefer the constructor with the most arguments
-            .constructorType(LARGEST)
-            .and()
-        .constructorStrategy()
-            .and()
-        .staticMethodStrategy()
-            // For STATIC_METHOD strategy, prioritizes method with simple parameter types
-            .methodType(MethodType.SIMPLEST)
-            .and()
-        .fieldStrategy()
-            .and()
-        .reorderStrategies(BUILDER, CONSTRUCTOR, SETTER) // Explicitly set or reorder strategies
-        // Use random values for broader test coverage
-        .randomValues(true)
-        // Allow access to private constructors if no public ones are suitable
-        .accessNonPublicConstructors(true)
-        // Prevent infinite loops with circular dependencies
-        .nullOnCircularDependency(true)
-        .build();
-```
+### Commands
+- **Build and Install**: `mvn clean install`
+- **Run Tests**: `mvn test`
+- **Check Coverage**: `mvn -Psonar clean test jacoco:report` (Reports generated in `target/site/jacoco/`)
