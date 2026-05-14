@@ -144,4 +144,16 @@ class PopulateFactoryWithObjectFactoryAndOverridesTest {
         );
         assertGeneratedCode(result, populateConfig);
     }
+
+    @Test
+    void pojoWithKotlinSupportEnabled() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .kotlinSupport(true)
+                .objectFactoryEnabled(true)
+                .build();
+        PopulateFactory populateFactory = new PopulateFactory(populateConfig);
+        Pojo result = populateFactory.populate(Pojo.class);
+        assertThat(result).isNotNull();
+        assertGeneratedCode(result, populateConfig);
+    }
 }

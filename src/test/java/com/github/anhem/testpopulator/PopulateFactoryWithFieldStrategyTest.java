@@ -201,4 +201,14 @@ class PopulateFactoryWithFieldStrategyTest {
 
         return value;
     }
+
+    @Test
+    void fieldsWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        Fields value = populateFactory.populate(Fields.class);
+        assertThat(value).isNotNull();
+    }
 }

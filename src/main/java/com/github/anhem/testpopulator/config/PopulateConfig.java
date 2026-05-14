@@ -30,6 +30,7 @@ public class PopulateConfig {
     public static final String PROTOBUF_BUILDER_METHOD = "newBuilder";
     public static final String DEFAULT_BUILD_METHOD = "build";
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
+    public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
 
     public static class PopulateConfigBuilder {
         private Set<String> blacklistedMethods = null;
@@ -47,6 +48,7 @@ public class PopulateConfig {
         private String builderMethod;
         private String buildMethod;
         private MethodType methodType;
+        private Boolean kotlinSupport;
 
         /**
          * Set blacklisted methods, replacing existing ones.
@@ -375,6 +377,17 @@ public class PopulateConfig {
         }
 
         /**
+         * Enable support for Kotlin classes. This allows populating Kotlin classes with default values.
+         *
+         * @param kotlinSupport true/false
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder kotlinSupport(boolean kotlinSupport) {
+            this.kotlinSupport = kotlinSupport;
+            return this;
+        }
+
+        /**
          * Clear existing strategy order. This is useful when modifying an existing configuration via toBuilder().
          *
          * @return PopulateConfigBuilder
@@ -477,6 +490,7 @@ public class PopulateConfig {
     private final String builderMethod;
     private final String buildMethod;
     private final MethodType methodType;
+    private final boolean kotlinSupport;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
         this.blacklistedMethods = collectionOrDefault(populateConfigBuilder.blacklistedMethods, DEFAULT_BLACKLISTED_METHODS);
@@ -505,6 +519,7 @@ public class PopulateConfig {
                 this.buildMethod = DEFAULT_BUILD_METHOD;
         }
         this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
+        this.kotlinSupport = valueOrDefault(populateConfigBuilder.kotlinSupport, DEFAULT_KOTLIN_SUPPORT);
     }
 
     public Set<String> getBlacklistedMethods() {
@@ -567,6 +582,10 @@ public class PopulateConfig {
         return methodType;
     }
 
+    public boolean isKotlinSupport() {
+        return kotlinSupport;
+    }
+
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -587,7 +606,8 @@ public class PopulateConfig {
                 .constructorType(constructorType)
                 .builderMethod(builderMethod)
                 .buildMethod(buildMethod)
-                .methodType(methodType);
+                .methodType(methodType)
+                .kotlinSupport(kotlinSupport);
         populateConfigBuilder.strategyOrder = new ArrayList<>(strategyOrder);
         return populateConfigBuilder;
     }
@@ -627,6 +647,7 @@ public class PopulateConfig {
                 ", builderMethod='" + builderMethod + '\'' +
                 ", buildMethod='" + buildMethod + '\'' +
                 ", methodType=" + methodType +
+                ", kotlinSupport=" + kotlinSupport +
                 '}';
     }
 
@@ -689,6 +710,11 @@ public class PopulateConfig {
 
         ConstructorStrategyBuilder(PopulateConfigBuilder parent) {
             super(parent);
+        }
+
+        public ConstructorStrategyBuilder kotlinSupport(boolean kotlinSupport) {
+            parent.kotlinSupport(kotlinSupport);
+            return this;
         }
     }
 
