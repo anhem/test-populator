@@ -55,6 +55,21 @@ class PopulateFactoryWithKotlinSupportTest {
         assertThat(result).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION).hasNoNullFields();
     }
 
+    @Test
+    void usesKotlinDefaultValuesWhenConfigured() {
+        populateConfig = PopulateConfig.builder()
+                .kotlinSupport(true, true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        KotlinLikeClass result = populateFactory.populate(KotlinLikeClass.class);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getValue()).isEqualTo("default_value");
+        assertThat(result.getId()).isNotZero();
+        assertThat(result.getInnerClass()).isNotNull();
+    }
+
     private <T> void populateAndAssertWithGeneratedCode(Class<T> clazz) {
         T result = populateFactory.populate(clazz);
 

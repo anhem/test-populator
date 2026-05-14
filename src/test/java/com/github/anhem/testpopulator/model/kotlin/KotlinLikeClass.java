@@ -13,7 +13,7 @@ public class KotlinLikeClass {
     private final InnerClass innerClass;
 
     public KotlinLikeClass(String value, int id, InnerClass innerClass, int mask, DefaultConstructorMarker marker) {
-        this.value = value;
+        this.value = (mask & 1) != 0 ? "default_value" : value;
         this.id = id;
         this.innerClass = innerClass;
     }

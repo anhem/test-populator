@@ -56,14 +56,16 @@ public class ConstructorPopulator implements PopulatingStrategy {
         int parameterCount = constructor.getParameterCount();
         int maskCount = (parameterCount - 2) / 32 + 1;
         int realParameterCount = parameterCount - maskCount - 1;
+        boolean useKotlinDefaultValues = classCarrier.getPopulateConfig().isUseKotlinDefaultValues();
 
         Object[] arguments = IntStream.range(0, realParameterCount)
                 .mapToObj(i -> populateArgument(constructor, classCarrier, populator, i))
                 .toArray();
 
+        int maskValue = useKotlinDefaultValues ? -1 : 0;
         Object[] masks = IntStream.range(0, maskCount)
-                .mapToObj(i -> 0)
-                .peek(mask -> classCarrier.getObjectFactory().value((Integer) mask, int.class, null))
+                .mapToObj(i -> maskValue)
+                .peek(mask -> classCarrier.getObjectFactory().value(mask, int.class, null))
                 .toArray();
 
         classCarrier.getObjectFactory().nullValue(constructor.getParameterTypes()[parameterCount - 1]);

@@ -281,7 +281,15 @@ You can enable Kotlin support globally in your `PopulateConfig`:
 
 ```java
 PopulateConfig populateConfig = PopulateConfig.builder()
-        .kotlinSupport(true)
+        .kotlinSupport(true) // Enable Kotlin support, overrides defaults with test data
+        .build();
+```
+
+If you want to respect the default values defined in your Kotlin classes, you can pass a second boolean:
+
+```java
+PopulateConfig populateConfig = PopulateConfig.builder()
+        .kotlinSupport(true, true) // Enable Kotlin support and use Kotlin default values
         .build();
 ```
 
