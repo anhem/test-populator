@@ -20,6 +20,7 @@ public class PopulateUtil {
 
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
     public static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
+    public static final String KOTLIN_DEFAULT_CONSTRUCTOR_MARKER = "DefaultConstructorMarker";
 
     private PopulateUtil() {
     }
@@ -318,5 +319,10 @@ public class PopulateUtil {
         } else {
             return Modifier.isPublic(constructor.getModifiers());
         }
+    }
+
+    public static <T> boolean isKotlinConstructor(Constructor<T> constructor) {
+        Class<?>[] parameterTypes = constructor.getParameterTypes();
+        return parameterTypes.length > 0 && parameterTypes[parameterTypes.length - 1].getSimpleName().equals(KOTLIN_DEFAULT_CONSTRUCTOR_MARKER);
     }
 }

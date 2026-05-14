@@ -110,4 +110,14 @@ class PopulateFactoryWithStaticStrategyTest {
 
         return value;
     }
+
+    @Test
+    void userWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        User value = populateAndAssertWithGeneratedCode(User.class);
+        assertThat(value).isNotNull();
+    }
 }

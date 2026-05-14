@@ -288,4 +288,14 @@ class PopulateFactoryWithSetterStrategyTest {
 
         return value;
     }
+
+    @Test
+    void pojoWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        Pojo value = populateAndAssertWithGeneratedCode(Pojo.class);
+        assertThat(value).isNotNull();
+    }
 }

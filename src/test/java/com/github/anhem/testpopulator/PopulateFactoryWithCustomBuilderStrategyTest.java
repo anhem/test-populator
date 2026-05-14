@@ -133,4 +133,14 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
 
         return value;
     }
+
+    @Test
+    void customBuilderWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        CustomBuilder value = populateAndAssertWithGeneratedCode(CustomBuilder.class);
+        assertThat(value).isNotNull();
+    }
 }

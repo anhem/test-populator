@@ -109,6 +109,16 @@ class PopulateFactoryWithProtobufBuilderStrategyTest {
         return value;
     }
 
+    @Test
+    void personWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        Person value = populateAndAssertWithGeneratedCode(Person.class);
+        assertThat(value).isNotNull();
+    }
+
     static <T> void assertRandomlyPopulatedValues(T value1, T value2) {
         assertThat(value1).isNotNull();
         assertThat(value2).isNotNull();

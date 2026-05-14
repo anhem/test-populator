@@ -12,6 +12,7 @@ import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import com.github.anhem.testpopulator.model.java.setter.PojoExtendsPojoAbstract;
 import com.github.anhem.testpopulator.model.java.setter.PojoExtendsPojoExtendsPojoAbstract;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
+import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -210,6 +211,16 @@ class PopulateUtilTest {
         Field field = getField("stringValue", Pojo.class);
 
         assertThat(isBlackListed(field, DEFAULT_POPULATE_CONFIG.getBlacklistedFields())).isFalse();
+    }
+
+    @Test
+    void isKotlinConstructorReturnsFalse() throws NoSuchMethodException {
+        assertThat(isKotlinConstructor(Pojo.class.getConstructor())).isFalse();
+    }
+
+    @Test
+    void isKotlinConstructorReturnsTrue() throws NoSuchMethodException {
+        assertThat(isKotlinConstructor(KotlinLikeClass.class.getDeclaredConstructors()[0])).isTrue();
     }
 
     private static ClassCarrier<String> createClassCarrier() {
