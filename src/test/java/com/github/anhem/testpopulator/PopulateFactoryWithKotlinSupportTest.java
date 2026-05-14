@@ -1,11 +1,10 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
+import com.github.anhem.testpopulator.model.kotlin.JavaClassWithKotlinField;
 import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
-import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass.InnerClass;
 import com.github.anhem.testpopulator.model.kotlin.LargeKotlinLikeClass;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.RECURSIVE_ASSERTION_CONFIGURATION;
@@ -14,71 +13,53 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateFactoryWithKotlinSupportTest {
 
-    @Getter
-    @AllArgsConstructor
-    public static class JavaClassWithKotlinField {
-        private final KotlinLikeClass kotlinLikeClass;
-        private final InnerClass innerClass;
+    private PopulateConfig populateConfig;
+    private PopulateFactory populateFactory;
+
+    @BeforeEach
+    void setUp() {
+        populateConfig = PopulateConfig.builder()
+                .kotlinSupport(true)
+                .objectFactoryEnabled(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
     }
 
     @Test
     void canPopulateKotlinLikeClass() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .kotlinSupport(true)
-                .objectFactoryEnabled(true)
-                .build();
-        PopulateFactory populateFactory = new PopulateFactory(populateConfig);
-
-        KotlinLikeClass result = populateFactory.populate(KotlinLikeClass.class);
-
-        assertThat(result).isNotNull();
-        assertThat(result).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION).hasNoNullFields();
-        assertGeneratedCode(result, populateConfig);
+        populateAndAssertWithGeneratedCode(KotlinLikeClass.class);
     }
 
     @Test
     void canPopulateLargeKotlinLikeClass() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .kotlinSupport(true)
-                .objectFactoryEnabled(true)
-                .build();
-        PopulateFactory populateFactory = new PopulateFactory(populateConfig);
-
-        LargeKotlinLikeClass result = populateFactory.populate(LargeKotlinLikeClass.class);
-
-        assertThat(result).isNotNull();
-        assertThat(result).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION).hasNoNullFields();
-        assertGeneratedCode(result, populateConfig);
+        populateAndAssertWithGeneratedCode(LargeKotlinLikeClass.class);
     }
 
     @Test
     void canPopulateRegularJavaClassWithKotlinLikeClassField() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
-                .kotlinSupport(true)
-                .objectFactoryEnabled(true)
-                .build();
-        PopulateFactory populateFactory = new PopulateFactory(populateConfig);
-
-        JavaClassWithKotlinField result = populateFactory.populate(JavaClassWithKotlinField.class);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getKotlinLikeClass()).isNotNull();
-        assertThat(result.getKotlinLikeClass()).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION).hasNoNullFields();
-        assertGeneratedCode(result, populateConfig);
+        populateAndAssertWithGeneratedCode(JavaClassWithKotlinField.class);
     }
 
     @Test
     void canPopulateKotlinLikeClassUsingConstructorStrategy() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder()
                 .constructorStrategy()
                     .kotlinSupport(true)
                     .and()
                 .build();
-        PopulateFactory populateFactory = new PopulateFactory(populateConfig);
+        populateFactory = new PopulateFactory(populateConfig);
 
         KotlinLikeClass result = populateFactory.populate(KotlinLikeClass.class);
 
         assertThat(result).isNotNull();
         assertThat(result).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION).hasNoNullFields();
+    }
+
+    private <T> void populateAndAssertWithGeneratedCode(Class<T> clazz) {
+        T result = populateFactory.populate(clazz);
+
+        assertThat(result).isNotNull();
+        assertThat(result).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION).hasNoNullFields();
+        assertGeneratedCode(result, populateConfig);
     }
 }
