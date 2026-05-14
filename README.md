@@ -121,6 +121,8 @@ Defines the order of strategies to try when creating an object. If the first str
 > Many strategies (like `SETTER` and `FIELD`) require a **no-arg constructor** to instantiate the object. If a class (or any of its nested dependencies) only has parameterized constructors or static factory methods, population will fail if the corresponding strategies are disabled.
 >
 > For a detailed look at how restrictive strategy configurations can lead to failures, see [StrategyFailureTest.java](src/test/java/com/github/anhem/testpopulator/readme/StrategyFailureTest.java).
+>
+> **Why Order Matters**: If multiple strategies match a class, the first one in the `strategyOrder` is used. If that strategy fails (e.g., it picks a constructor whose arguments cannot be populated), the entire population for that object fails—it does **not** fall back to the next strategy in the list. Reordering can be useful if you prefer one instantiation method over another or if one matches but is problematic. See [StrategyOrderTest.java](src/test/java/com/github/anhem/testpopulator/readme/StrategyOrderTest.java) for an example of how reordering can resolve population failures.
 
 #### `randomValues`
 
