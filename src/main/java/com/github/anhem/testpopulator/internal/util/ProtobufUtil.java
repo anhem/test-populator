@@ -125,6 +125,10 @@ public class ProtobufUtil {
     }
 
     public static boolean isProtobufAndHasNullArgument(PopulateConfig populateConfig, Object[] args) {
-        return populateConfig.getBuilderPattern() == PROTOBUF && Arrays.stream(args).anyMatch(Objects::isNull);
+        return isProtobuf(populateConfig) && Arrays.stream(args).anyMatch(Objects::isNull);
+    }
+
+    public static boolean isProtobuf(PopulateConfig populateConfig) {
+        return populateConfig.getBuilderPattern() == PROTOBUF;
     }
 }
