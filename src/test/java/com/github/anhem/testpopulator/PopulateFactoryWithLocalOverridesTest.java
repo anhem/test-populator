@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
+import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import com.github.anhem.testpopulator.readme.model.MyUUID;
 import org.junit.jupiter.api.Test;
 
@@ -97,5 +98,15 @@ class PopulateFactoryWithLocalOverridesTest {
                 String.class, () -> overrides.get(String.class),
                 Integer.class, () -> overrides.get(Integer.class)
         ))).isEqualTo(overrides.get(Integer.class));
+    }
+
+    @Test
+    void pojoWithKotlinSupportEnabled() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .kotlinSupport(true)
+                .build();
+        PopulateFactory populateFactory = new PopulateFactory(populateConfig);
+        Pojo value = populateFactory.populate(Pojo.class);
+        assertThat(value).isNotNull();
     }
 }

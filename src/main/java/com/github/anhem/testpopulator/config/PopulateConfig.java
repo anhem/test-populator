@@ -30,6 +30,8 @@ public class PopulateConfig {
     public static final String PROTOBUF_BUILDER_METHOD = "newBuilder";
     public static final String DEFAULT_BUILD_METHOD = "build";
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
+    public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
+    public static final boolean DEFAULT_USE_KOTLIN_DEFAULT_VALUES = false;
 
     public static class PopulateConfigBuilder {
         private Set<String> blacklistedMethods = null;
@@ -47,6 +49,8 @@ public class PopulateConfig {
         private String builderMethod;
         private String buildMethod;
         private MethodType methodType;
+        private Boolean kotlinSupport;
+        private Boolean useKotlinDefaultValues;
 
         /**
          * Set blacklisted methods, replacing existing ones.
@@ -375,6 +379,41 @@ public class PopulateConfig {
         }
 
         /**
+         * Enable support for Kotlin classes. This allows populating Kotlin classes with default values.
+         *
+         * @param kotlinSupport true/false
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder kotlinSupport(boolean kotlinSupport) {
+            this.kotlinSupport = kotlinSupport;
+            return this;
+        }
+
+        /**
+         * Enable support for Kotlin classes and configure whether to use Kotlin default values.
+         *
+         * @param kotlinSupport          true/false
+         * @param useKotlinDefaultValues true/false
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder kotlinSupport(boolean kotlinSupport, boolean useKotlinDefaultValues) {
+            kotlinSupport(kotlinSupport);
+            this.useKotlinDefaultValues = useKotlinDefaultValues;
+            return this;
+        }
+
+        /**
+         * Configure Kotlin support options
+         *
+         * @param useKotlinDefaultValues true/false
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder useKotlinDefaultValues(boolean useKotlinDefaultValues) {
+            this.useKotlinDefaultValues = useKotlinDefaultValues;
+            return this;
+        }
+
+        /**
          * Clear existing strategy order. This is useful when modifying an existing configuration via toBuilder().
          *
          * @return PopulateConfigBuilder
@@ -439,6 +478,16 @@ public class PopulateConfig {
         }
 
         /**
+         * Configure Kotlin support options
+         *
+         * @return builder for Kotlin support configuration
+         */
+        public KotlinStrategyBuilder kotlinSupport() {
+            this.kotlinSupport = true;
+            return new KotlinStrategyBuilder(this);
+        }
+
+        /**
          * Build and validate a configuration
          * @return built PopulateConfig
          */
@@ -477,6 +526,8 @@ public class PopulateConfig {
     private final String builderMethod;
     private final String buildMethod;
     private final MethodType methodType;
+    private final boolean kotlinSupport;
+    private final boolean useKotlinDefaultValues;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
         this.blacklistedMethods = collectionOrDefault(populateConfigBuilder.blacklistedMethods, DEFAULT_BLACKLISTED_METHODS);
@@ -505,6 +556,8 @@ public class PopulateConfig {
                 this.buildMethod = DEFAULT_BUILD_METHOD;
         }
         this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
+        this.kotlinSupport = valueOrDefault(populateConfigBuilder.kotlinSupport, DEFAULT_KOTLIN_SUPPORT);
+        this.useKotlinDefaultValues = valueOrDefault(populateConfigBuilder.useKotlinDefaultValues, DEFAULT_USE_KOTLIN_DEFAULT_VALUES);
     }
 
     public Set<String> getBlacklistedMethods() {
@@ -567,6 +620,14 @@ public class PopulateConfig {
         return methodType;
     }
 
+    public boolean isKotlinSupport() {
+        return kotlinSupport;
+    }
+
+    public boolean isUseKotlinDefaultValues() {
+        return useKotlinDefaultValues;
+    }
+
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -588,6 +649,8 @@ public class PopulateConfig {
                 .builderMethod(builderMethod)
                 .buildMethod(buildMethod)
                 .methodType(methodType);
+        populateConfigBuilder.kotlinSupport = kotlinSupport;
+        populateConfigBuilder.useKotlinDefaultValues = useKotlinDefaultValues;
         populateConfigBuilder.strategyOrder = new ArrayList<>(strategyOrder);
         return populateConfigBuilder;
     }
@@ -627,6 +690,8 @@ public class PopulateConfig {
                 ", builderMethod='" + builderMethod + '\'' +
                 ", buildMethod='" + buildMethod + '\'' +
                 ", methodType=" + methodType +
+                ", kotlinSupport=" + kotlinSupport +
+                ", useKotlinDefaultValues=" + useKotlinDefaultValues +
                 '}';
     }
 
@@ -782,6 +847,26 @@ public class PopulateConfig {
 
         public StaticMethodStrategyBuilder methodType(MethodType type) {
             parent.methodType(type);
+            return this;
+        }
+    }
+
+    /**
+     * Builder for Kotlin strategy configuration
+     */
+    public static class KotlinStrategyBuilder extends StrategyBuilder {
+
+        KotlinStrategyBuilder(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        /**
+         * Use Kotlin default values when populating
+         *
+         * @return KotlinStrategyBuilder
+         */
+        public KotlinStrategyBuilder useDefaultValues() {
+            parent.useKotlinDefaultValues = true;
             return this;
         }
     }

@@ -4,6 +4,7 @@ import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
+import com.github.anhem.testpopulator.internal.util.KotlinUtil;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -308,6 +309,10 @@ public class ObjectFactoryImpl implements ObjectFactory {
     private String toStringValue(Object object, Class<?> clazz, String name, ObjectBuilder objectBuilder) {
         if (object.getClass().isEnum()) {
             return object.toString();
+        }
+
+        if (KotlinUtil.isKotlinSingleton(clazz, populateConfig.isKotlinSupport())) {
+            return String.format("%s.INSTANCE", clazz.getSimpleName());
         }
 
         if (name != null) {

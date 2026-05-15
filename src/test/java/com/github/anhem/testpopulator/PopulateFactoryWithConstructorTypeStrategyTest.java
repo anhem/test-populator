@@ -225,4 +225,14 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
 
         return value;
     }
+
+    @Test
+    void allArgsConstructorWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        AllArgsConstructor value = populateAndAssertWithGeneratedCode(AllArgsConstructor.class);
+        assertThat(value).isNotNull();
+    }
 }

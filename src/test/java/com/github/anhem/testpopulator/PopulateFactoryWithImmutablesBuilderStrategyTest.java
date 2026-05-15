@@ -158,4 +158,13 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
         return value;
     }
 
+    @Test
+    void immutablesWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        ImmutablesInterface value = populateAndAssertWithGeneratedCode(ImmutablesInterface.class);
+        assertThat(value).isNotNull();
+    }
 }

@@ -40,6 +40,10 @@ public class StaticMethodUtil {
                 .filter(method -> isMatchingStaticMethod(method, clazz))
                 .sorted(Comparator.comparing(Method::getName))
                 .collect(Collectors.toList());
+        return selectMethod(methodType, methods);
+    }
+
+    static Method selectMethod(MethodType methodType, List<Method> methods) {
         switch (methodType) {
             case LARGEST:
                 return methods.stream().max(PARAMETER_COUNT_COMPARATOR).orElseThrow();
@@ -59,7 +63,7 @@ public class StaticMethodUtil {
                 !hasSelfReferencingParameter(method, clazz);
     }
 
-    private static boolean hasSelfReferencingParameter(Method method, Class<?> clazz) {
+    static boolean hasSelfReferencingParameter(Method method, Class<?> clazz) {
         for (Type paramType : method.getGenericParameterTypes()) {
             if (isOrContainsType(paramType, clazz)) {
                 return true;

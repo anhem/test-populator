@@ -211,4 +211,14 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
 
         return value;
     }
+
+    @Test
+    void lombokImmutableWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        LombokImmutable value = populateAndAssertWithGeneratedCode(LombokImmutable.class);
+        assertThat(value).isNotNull();
+    }
 }

@@ -10,6 +10,7 @@ import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.internal.util.BuilderUtil.isMatchingBuilderStrategy;
+import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isMatchingKotlinSingletonOrCompanion;
 import static com.github.anhem.testpopulator.internal.util.MutatorUtil.isMatchingMutatorStrategy;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufByteString;
@@ -28,6 +29,7 @@ public class Populator {
     private final MutatorPopulator mutatorPopulator = new MutatorPopulator(constructorPopulator);
     private final BuilderPopulator builderPopulator = new BuilderPopulator();
     private final StaticMethodPopulator staticMethodPopulator = new StaticMethodPopulator();
+    private final KotlinPopulator kotlinPopulator = new KotlinPopulator();
 
     public Populator(ValueFactory valueFactory) {
         this.valueFactory = valueFactory;
@@ -52,6 +54,9 @@ public class Populator {
         }
         if (isCollectionLike(clazz)) {
             return populate(classCarrier.toCollectionCarrier(clazz));
+        }
+        if (isMatchingKotlinSingletonOrCompanion(clazz, classCarrier.getPopulateConfig().isKotlinSupport())) {
+            return kotlinPopulator.populate(classCarrier, this);
         }
         return populateWithStrategies(classCarrier);
     }

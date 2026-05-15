@@ -33,4 +33,17 @@ class PopulateFactoryWithNamedOverrideTest {
 
         assertThat(pojo.getStringValue()).isEqualTo(classOverrideValue);
     }
+
+    @Test
+    void nameOverrideWithKotlinSupportEnabled() {
+        PopulateConfig config = PopulateConfig.builder()
+                .kotlinSupport(true)
+                .addOverride("setStringValue", String.class, () -> "overridden")
+                .build();
+        PopulateFactory factory = new PopulateFactory(config);
+
+        Pojo pojo = factory.populate(Pojo.class);
+
+        assertThat(pojo.getStringValue()).isEqualTo("overridden");
+    }
 }
