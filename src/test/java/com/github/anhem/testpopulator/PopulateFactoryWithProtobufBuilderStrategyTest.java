@@ -3,6 +3,9 @@ package com.github.anhem.testpopulator;
 import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.proto.complex.UserProfile;
+import com.github.anhem.testpopulator.model.proto.scenarios.CollisionScenarios;
+import com.github.anhem.testpopulator.model.proto.scenarios.EnumScenarios;
+import com.github.anhem.testpopulator.model.proto.scenarios.Scenarios;
 import com.github.anhem.testpopulator.model.proto.simple.Person;
 import com.github.anhem.testpopulator.model.proto.wrappers.Wrappers;
 import com.google.protobuf.ByteString;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.PROTOBUF;
 import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
+import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -85,6 +89,31 @@ class PopulateFactoryWithProtobufBuilderStrategyTest {
     }
 
     @Test
+    void scenarios() {
+        populateConfig = populateConfig.toBuilder()
+                .nullOnCircularDependency(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        Scenarios value1 = populateAndAssertWithGeneratedCode(Scenarios.class);
+        Scenarios value2 = populateAndAssertWithGeneratedCode(Scenarios.class);
+        assertRandomlyPopulatedValues(value1, value2);
+    }
+
+    @Test
+    void enumScenarios() {
+        EnumScenarios value1 = populateAndAssertWithGeneratedCode(EnumScenarios.class);
+        EnumScenarios value2 = populateAndAssertWithGeneratedCode(EnumScenarios.class);
+        assertRandomlyPopulatedValues(value1, value2);
+    }
+
+    @Test
+    void collisionScenarios() {
+        CollisionScenarios value1 = populateAndAssertWithGeneratedCode(CollisionScenarios.class);
+        CollisionScenarios value2 = populateAndAssertWithGeneratedCode(CollisionScenarios.class);
+        assertRandomlyPopulatedValues(value1, value2);
+    }
+
+    @Test
     void canPopulateBasedOnCustomName() {
         String name = "myCustomName";
         populateConfig = populateConfig.toBuilder()
@@ -115,16 +144,9 @@ class PopulateFactoryWithProtobufBuilderStrategyTest {
                 .kotlinSupport(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        Person value = populateAndAssertWithGeneratedCode(Person.class);
-        assertThat(value).isNotNull();
+        Person value1 = populateAndAssertWithGeneratedCode(Person.class);
+        Person value2 = populateAndAssertWithGeneratedCode(Person.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
-    static <T> void assertRandomlyPopulatedValues(T value1, T value2) {
-        assertThat(value1).isNotNull();
-        assertThat(value2).isNotNull();
-        assertThat(value1).hasNoNullFieldsOrProperties();
-        assertThat(value2).hasNoNullFieldsOrProperties();
-        assertThat(value1).isNotEqualTo(value2);
-        assertThat(value1).usingRecursiveAssertion().isNotEqualTo(value2);
-    }
 }

@@ -24,6 +24,7 @@ public abstract class ObjectBuilder {
     private final Set<String> extraStaticImports = new HashSet<>();
     private final int expectedChildren;
     private final boolean parameterized;
+    private boolean skipNullMethods;
     private ObjectBuilder parent;
     private String value;
 
@@ -38,6 +39,10 @@ public abstract class ObjectBuilder {
         this.useFullyQualifiedName = useFullyQualifiedName;
         this.expectedChildren = expectedChildren;
         this.parameterized = parameterized;
+    }
+
+    public void setSkipNullMethods(boolean skipNullMethods) {
+        this.skipNullMethods = skipNullMethods;
     }
 
     public Class<?> getClazz() {
@@ -196,9 +201,15 @@ public abstract class ObjectBuilder {
                 .map(ObjectBuilder::build)
                 .flatMap(Collection::stream);
     }
-
     public boolean isNullValue() {
         return value != null && value.equals(NULL);
+    }
+
+    public boolean anyArgumentIsNull() {
+        if (buildType == BuildType.VALUE) {
+            return isNullValue();
+        }
+        return argumentChildren.stream().anyMatch(ObjectBuilder::anyArgumentIsNull);
     }
 
     protected String getClassName() {
@@ -207,6 +218,7 @@ public abstract class ObjectBuilder {
 
     protected Stream<String> createMethods() {
         return children.stream()
+                .filter(child -> !skipNullMethods || !child.anyArgumentIsNull())
                 .map(child -> {
                     if (buildType == BuildType.BUILDER) {
                         return String.format("    .%s(%s)", child.getName(), child.buildArguments());
@@ -214,6 +226,7 @@ public abstract class ObjectBuilder {
                     return String.format("%s.%s(%s);", name, child.getName(), child.buildArguments());
                 });
     }
+
 
     public String buildArguments() {
         if (children.isEmpty()) {

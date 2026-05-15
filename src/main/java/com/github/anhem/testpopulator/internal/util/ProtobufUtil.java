@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,7 @@ public class ProtobufUtil {
                 .filter(method -> isChainable(method, clazz))
                 .filter(PopulateUtil::hasAtLeastOneParameter)
                 .filter(ProtobufUtil::isValidMutator)
+                .filter(method -> !method.getName().endsWith(BUILDER_PARAM_SUFFIX))
                 .filter(method -> !hasBuilderParameter(method))
                 .filter(method -> !isSetUnknownFields(method))
                 .collect(Collectors.toList());
@@ -120,5 +122,9 @@ public class ProtobufUtil {
             return methodNames.contains(regularMethodName);
         }
         return false;
+    }
+
+    public static boolean isProtobufAndHasNullArgument(PopulateConfig populateConfig, Object[] args) {
+        return populateConfig.getBuilderPattern() == PROTOBUF && Arrays.stream(args).anyMatch(Objects::isNull);
     }
 }

@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package com.github.anhem.testpopulator.model.proto.scenarios;
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+option java_multiple_files = true;
+option java_package = "com.github.anhem.testpopulator.model.proto.scenarios";
+
+message Scenarios {
+  string id = 1;
+  
+  message DeeplyNested {
+    message Level1 {
+      message Level2 {
+        message Level3 {
+          string value = 1;
+        }
+        Level3 level3 = 1;
+      }
+      Level2 level2 = 1;
+    }
+    Level1 level1 = 1;
+  }
+  DeeplyNested deep = 2;
+
+  message ComplexOneOf {
+    oneof choice {
+      string string_val = 1;
+      int32 int_val = 2;
+      bool bool_val = 3;
+      DeeplyNested nested_val = 4;
+    }
+  }
+  ComplexOneOf oneof_group = 3;
+
+  message MapsAndCollections {
+    map<string, string> string_map = 1;
+    map<int32, ComplexOneOf> message_map = 2;
+    repeated string tags = 3;
+    repeated ComplexOneOf objects = 4;
+  }
+  MapsAndCollections maps = 4;
+
+  message SpecialTypes {
+    google.protobuf.StringValue wrapper_string = 1;
+    google.protobuf.BytesValue wrapper_bytes = 2;
+    google.protobuf.Timestamp timestamp = 3;
+    google.protobuf.Struct struct = 4;
+    bytes raw_bytes = 5;
+    google.protobuf.Duration duration = 6;
+    google.protobuf.Any any = 7;
+    google.protobuf.Empty empty = 8;
+    google.protobuf.FieldMask field_mask = 9;
+    google.protobuf.Value value = 10;
+    google.protobuf.ListValue list_value = 11;
+  }
+  SpecialTypes special = 5;
+
+  message Recursive {
+    string name = 1;
+    Recursive child = 2;
+  }
+  Recursive circular = 6;
+
+  message OptionalFields {
+    optional string opt_string = 1;
+    optional int32 opt_int32 = 2;
+    optional Scenarios opt_nested = 3;
+  }
+  OptionalFields optionals = 7;
+
+  message MultiOneOf {
+    oneof first {
+      string a = 1;
+      int32 b = 2;
+    }
+    oneof second {
+      string c = 3;
+      int32 d = 4;
+    }
+  }
+  MultiOneOf multi_oneof = 8;
+
+  message RecursiveMap {
+    map<string, RecursiveMap> children = 1;
+  }
+  RecursiveMap recursive_map = 9;
+
+  message RecursiveList {
+    repeated RecursiveList elements = 1;
+  }
+  RecursiveList recursive_list = 10;
+}
+
+message EnumScenarios {
+  enum MyEnum {
+    DEFAULT = 0;
+    VALUE_1 = 1;
+    VALUE_2 = 2;
+  }
+  MyEnum single_enum = 1;
+  repeated MyEnum repeated_enum = 2;
+  map<int32, MyEnum> enum_map = 3;
+}
+
+message CollisionScenarios {
+  message StringMessage {
+    string value = 1;
+  }
+  StringMessage string_message = 1;
+
+  message ListMessage {
+    repeated string values = 1;
+  }
+  ListMessage list_message = 2;
+
+  message NestedBuilder {
+    string name = 1;
+  }
+  NestedBuilder nested_builder = 3;
+}
