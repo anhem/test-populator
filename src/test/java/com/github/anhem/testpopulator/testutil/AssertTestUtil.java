@@ -4,7 +4,6 @@ import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.circular.B;
 import com.github.anhem.testpopulator.model.circular.C;
 import com.github.anhem.testpopulator.model.circular.D;
-
 import org.assertj.core.api.recursive.assertion.DefaultRecursiveAssertionIntrospectionStrategy;
 import org.assertj.core.api.recursive.assertion.RecursiveAssertionConfiguration;
 import org.assertj.core.api.recursive.assertion.RecursiveAssertionNode;
@@ -22,6 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AssertTestUtil {
 
+    private static final String PROTOBUF_MESSAGE_CLASS = "com.google.protobuf.MessageLite";
+    private static final String PROTOBUF_PACKAGE = "com.google.protobuf";
+
     public static final RecursiveAssertionConfiguration RECURSIVE_ASSERTION_CONFIGURATION = RecursiveAssertionConfiguration.builder()
             .withIntrospectionStrategy(new TypeIgnoringIntrospectionStrategy())
             .build();
@@ -29,12 +31,14 @@ public class AssertTestUtil {
     public static <T> void assertRandomlyPopulatedValues(T value1, T value2) {
         assertThat(value1).isNotNull();
         assertThat(value2).isNotNull();
-        assertThat(value1).hasNoNullFieldsOrProperties();
-        assertThat(value2).hasNoNullFieldsOrProperties();
-        assertThat(value1).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
-                .hasNoNullFields();
-        assertThat(value2).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
-                .hasNoNullFields();
+        if (!isProtobufMessage(value1)) {
+            assertThat(value1).hasNoNullFieldsOrProperties();
+            assertThat(value2).hasNoNullFieldsOrProperties();
+            assertThat(value1).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
+                    .hasNoNullFields();
+            assertThat(value2).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
+                    .hasNoNullFields();
+        }
         assertThat(value1).isNotEqualTo(value2);
         assertThat(value1).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
                 .isNotEqualTo(value2);
@@ -43,18 +47,29 @@ public class AssertTestUtil {
     public static <T> void assertRandomlyPopulatedValues(T value1, T value2, String... ignoringFields) {
         assertThat(value1).isNotNull();
         assertThat(value2).isNotNull();
-        assertThat(value1).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
-        assertThat(value2).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
-        assertThat(value1).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
-                .ignoringFields(ignoringFields)
-                .hasNoNullFields();
-        assertThat(value2).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
-                .ignoringFields(ignoringFields)
-                .hasNoNullFields();
+        if (!isProtobufMessage(value1)) {
+            assertThat(value1).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
+            assertThat(value2).hasNoNullFieldsOrPropertiesExcept(ignoringFields);
+            assertThat(value1).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
+                    .ignoringFields(ignoringFields)
+                    .hasNoNullFields();
+            assertThat(value2).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
+                    .ignoringFields(ignoringFields)
+                    .hasNoNullFields();
+        }
         assertThat(value1).isNotEqualTo(value2);
         assertThat(value1).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
                 .ignoringFields(ignoringFields)
                 .isNotEqualTo(value2);
+    }
+
+    private static boolean isProtobufMessage(Object obj) {
+        try {
+            Class<?> protobufClass = Class.forName(PROTOBUF_MESSAGE_CLASS);
+            return protobufClass.isInstance(obj);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     public static void assertRandomlyPopulatedValues(String value1, String value2) {
@@ -132,6 +147,7 @@ public class AssertTestUtil {
         @Override
         public List<RecursiveAssertionNode> getChildNodesOf(Object node) {
             return super.getChildNodesOf(node).stream()
+                    .filter(childNode -> childNode.type != null && !childNode.type.getName().startsWith(PROTOBUF_PACKAGE))
                     .filter(childNode -> IGNORED_TYPES.stream().noneMatch(ignoredType -> ignoredType.isAssignableFrom(childNode.type)))
                     .collect(Collectors.toList());
         }

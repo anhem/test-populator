@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
@@ -381,6 +382,9 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private void setNextObjectBuilder(ObjectBuilder objectBuilder) {
+        if (populateConfig.getBuilderPattern() == BuilderPattern.PROTOBUF) {
+            objectBuilder.setSkipNullMethods(true);
+        }
         if (currentObjectBuilder != null) {
             currentObjectBuilder.addChild(objectBuilder);
             objectBuilder.setParent(currentObjectBuilder);

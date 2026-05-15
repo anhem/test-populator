@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CALL_METHOD;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isCollectionLike;
+import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufAndHasNullArgument;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufByteString;
 import static java.lang.String.format;
 
@@ -17,7 +18,7 @@ public abstract class MethodPopulator {
         String methodName = method.getName();
         try {
             classCarrier.getObjectFactory().method(methodName, method.getParameters().length);
-            method.invoke(objectOfClass, Stream.of(method.getParameters())
+            Object[] args = Stream.of(method.getParameters())
                     .map(parameter -> {
                         if (isProtobufByteString(parameter, classCarrier.getPopulateConfig())) {
                             return populator.populate(classCarrier.toClassCarrier(parameter, methodName));
@@ -27,7 +28,11 @@ public abstract class MethodPopulator {
                         } else {
                             return populator.populate(classCarrier.toClassCarrier(parameter, methodName));
                         }
-                    }).toArray());
+                    }).toArray();
+            if (isProtobufAndHasNullArgument(classCarrier.getPopulateConfig(), args)) {
+                return;
+            }
+            method.invoke(objectOfClass, args);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CALL_METHOD, methodName, objectOfClass.getClass().getName()), e);
         }
