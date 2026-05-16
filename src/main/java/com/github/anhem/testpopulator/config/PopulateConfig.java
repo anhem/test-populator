@@ -1,5 +1,7 @@
 package com.github.anhem.testpopulator.config;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,6 +32,7 @@ public class PopulateConfig {
     public static final String PROTOBUF_BUILDER_METHOD = "newBuilder";
     public static final String DEFAULT_BUILD_METHOD = "build";
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
+    public static final String DEFAULT_OBJECT_FACTORY_PATH = resolveDefaultObjectFactoryPath();
     public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
     public static final boolean DEFAULT_USE_KOTLIN_DEFAULT_VALUES = false;
 
@@ -48,6 +51,7 @@ public class PopulateConfig {
         private ConstructorType constructorType;
         private String builderMethod;
         private String buildMethod;
+        private String objectFactoryPath;
         private MethodType methodType;
         private Boolean kotlinSupport;
         private Boolean useKotlinDefaultValues;
@@ -454,6 +458,28 @@ public class PopulateConfig {
         }
 
         /**
+         * Set the path where the ObjectFactory should write generated Java source files.
+         *
+         * @param objectFactoryPath path to write generated files to
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder objectFactoryPath(String objectFactoryPath) {
+            this.objectFactoryPath = objectFactoryPath;
+            return this;
+        }
+
+        /**
+         * Configure Object factory options
+         *
+         * @param enabled true/false
+         * @return configuration for Object factory
+         */
+        public ObjectFactoryConfig objectFactory(boolean enabled) {
+            this.objectFactoryEnabled = enabled;
+            return new ObjectFactoryConfig(this);
+        }
+
+        /**
          * Build and validate a configuration
          * @return built PopulateConfig
          */
@@ -477,6 +503,23 @@ public class PopulateConfig {
         return new PopulateConfigBuilder();
     }
 
+    private static String resolveDefaultObjectFactoryPath() {
+        String userDir = System.getProperty("user.dir");
+        if (userDir != null) {
+            Path path = Path.of(userDir);
+            while (path != null) {
+                if (Files.exists(path.resolve("pom.xml"))) {
+                    return "target/generated-test-sources/test-populator";
+                }
+                if (Files.exists(path.resolve("build.gradle")) || Files.exists(path.resolve("build.gradle.kts"))) {
+                    return "build/generated-test-sources/test-populator";
+                }
+                path = path.getParent();
+            }
+        }
+        return "target/generated-test-sources/test-populator";
+    }
+
     private final Set<String> blacklistedMethods;
     private final Set<String> blacklistedFields;
     private final List<Strategy> strategyOrder;
@@ -491,6 +534,7 @@ public class PopulateConfig {
     private final ConstructorType constructorType;
     private final String builderMethod;
     private final String buildMethod;
+    private final String objectFactoryPath;
     private final MethodType methodType;
     private final boolean kotlinSupport;
     private final boolean useKotlinDefaultValues;
@@ -521,6 +565,7 @@ public class PopulateConfig {
                 this.builderMethod = DEFAULT_BUILDER_METHOD;
                 this.buildMethod = DEFAULT_BUILD_METHOD;
         }
+        this.objectFactoryPath = valueOrDefault(populateConfigBuilder.objectFactoryPath, DEFAULT_OBJECT_FACTORY_PATH);
         this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
         this.kotlinSupport = valueOrDefault(populateConfigBuilder.kotlinSupport, DEFAULT_KOTLIN_SUPPORT);
         this.useKotlinDefaultValues = valueOrDefault(populateConfigBuilder.useKotlinDefaultValues, DEFAULT_USE_KOTLIN_DEFAULT_VALUES);
@@ -586,6 +631,10 @@ public class PopulateConfig {
         return methodType;
     }
 
+    public String getObjectFactoryPath() {
+        return objectFactoryPath;
+    }
+
     public boolean isKotlinSupport() {
         return kotlinSupport;
     }
@@ -614,6 +663,7 @@ public class PopulateConfig {
                 .constructorType(constructorType)
                 .builderMethod(builderMethod)
                 .buildMethod(buildMethod)
+                .objectFactoryPath(objectFactoryPath)
                 .methodType(methodType);
         populateConfigBuilder.kotlinSupport = kotlinSupport;
         populateConfigBuilder.useKotlinDefaultValues = useKotlinDefaultValues;
@@ -834,6 +884,27 @@ public class PopulateConfig {
          */
         public KotlinSupport defaultValues(boolean defaultValues) {
             parent.useKotlinDefaultValues = defaultValues;
+            return this;
+        }
+    }
+
+    /**
+     * Configuration for Object factory
+     */
+    public static class ObjectFactoryConfig extends SubBuilder {
+
+        ObjectFactoryConfig(PopulateConfigBuilder parent) {
+            super(parent);
+        }
+
+        /**
+         * Set the path where the ObjectFactory should write generated Java source files.
+         *
+         * @param path path to write generated files to
+         * @return ObjectFactoryConfig
+         */
+        public ObjectFactoryConfig path(String path) {
+            parent.objectFactoryPath(path);
             return this;
         }
     }

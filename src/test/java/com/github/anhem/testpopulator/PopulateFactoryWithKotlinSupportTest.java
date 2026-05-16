@@ -140,6 +140,11 @@ class PopulateFactoryWithKotlinSupportTest {
         assertGeneratedCode(result, populateConfig);
     }
 
+    @Test
+    void canPopulateKotlinLikeClassWithGenerics() {
+        populateAndAssertWithGeneratedCode(KotlinLikeWithGenerics.class);
+    }
+
     private <T> void populateAndAssertWithGeneratedCode(Class<T> clazz) {
         T result = populateFactory.populate(clazz);
 

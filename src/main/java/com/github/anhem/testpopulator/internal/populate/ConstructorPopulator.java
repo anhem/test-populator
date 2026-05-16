@@ -62,8 +62,10 @@ public class ConstructorPopulator implements PopulatingStrategy {
         int maskCount = (parameterCount - 2) / 32 + 1;
         int realParameterCount = parameterCount - maskCount - 1;
         boolean useKotlinDefaultValues = classCarrier.getPopulateConfig().isUseKotlinDefaultValues();
+        Constructor<T> primaryConstructor = findPrimaryConstructor(constructor, realParameterCount);
+
         Object[] arguments = IntStream.range(0, realParameterCount)
-                .mapToObj(i -> populateArgument(constructor, classCarrier, populator, i))
+                .mapToObj(i -> populateArgument(primaryConstructor, classCarrier, populator, i))
                 .toArray();
         int maskValue = useKotlinDefaultValues ? -1 : 0;
         Object[] masks = IntStream.range(0, maskCount)
@@ -73,5 +75,13 @@ public class ConstructorPopulator implements PopulatingStrategy {
         classCarrier.getObjectFactory().nullValue(constructor.getParameterTypes()[parameterCount - 1]);
         return Stream.concat(Arrays.stream(arguments), Stream.concat(Arrays.stream(masks), Stream.of((Object) null)))
                 .toArray();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Constructor<T> findPrimaryConstructor(Constructor<T> syntheticConstructor, int realParameterCount) {
+        return (Constructor<T>) Arrays.stream(syntheticConstructor.getDeclaringClass().getDeclaredConstructors())
+                .filter(c -> c.getParameterCount() == realParameterCount)
+                .findFirst()
+                .orElse(syntheticConstructor);
     }
 }

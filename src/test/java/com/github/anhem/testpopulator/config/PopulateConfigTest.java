@@ -376,6 +376,18 @@ class PopulateConfigTest {
         assertThat(populateConfig.getSetterPrefixes()).isEmpty();
     }
 
+    @Test
+    void objectFactoryConfigWorks() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .objectFactory(true)
+                .path("custom/path")
+                .and()
+                .build();
+
+        assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
+        assertThat(populateConfig.getObjectFactoryPath()).isEqualTo("custom/path");
+    }
+
     private static void assertEqual(PopulateConfig populateConfig, PopulateConfig expectedPopulateConfig) {
         assertThat(populateConfig)
                 .usingRecursiveComparison()

@@ -20,9 +20,6 @@ import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.STA
 
 public class FileWriterUtil {
 
-    static final String TARGET = "target/generated-test-sources/test-populator";
-    private static final String PATH = TARGET + "/%s/%s_%s.java";
-
     private FileWriterUtil() {
     }
 
@@ -31,7 +28,7 @@ public class FileWriterUtil {
     }
 
     public static Path getPath(String packageName, String className, PopulateConfig populateConfig) {
-        return Paths.get(String.format(PATH, toPackagePath(packageName), className, encode(populateConfig)));
+        return Paths.get(populateConfig.getObjectFactoryPath(), toPackagePath(packageName), String.format("%s_%s.java", className, encode(populateConfig)));
     }
 
     public static void createOrOverwriteFile(Path path) {
