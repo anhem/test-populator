@@ -362,6 +362,13 @@ Map<Object, OverridePopulate<?>> mixedOverrides = Map.of(
     OverrideTarget.of("email", String.class), () -> "test@example.com"
 );
 MyClass obj = factory.populate(MyClass.class, mixedOverrides);
+
+// 4. Using alternating varargs (Most concise)
+MyClass obj = factory.populate(
+    MyClass.class,
+    Integer.class, () -> 42,
+    OverrideTarget.of("email", String.class), () -> "test@example.com"
+);
 ```
 
 ### Global Setup for a Project
@@ -472,6 +479,10 @@ object TestPopulator {
     inline fun <reified T> populate(name: String, clazz: Class<*>, noinline overridePopulate: () -> Any?): T {
         return populateFactory.populate(T::class.java, name, clazz, overridePopulate)
     }
+    // With multiple overrides using a Map: populate<MyClass>(mapOf(String::class.java to { "local-value" }))
+    inline fun <reified T> populate(overrides: Map<*, OverridePopulate<*>>): T {
+        return populateFactory.populate(T::class.java, overrides)
+    }
 }
 ```
 
@@ -488,11 +499,11 @@ class MyServiceTest {
         // 2. Class-based override using lambda
         val admin: User = TestPopulator.populate<User, String> { "ADMIN" }
 
-        // 3. Multiple overrides using the DSL (recommended)
-        val customUser: User = TestPopulator.populate {
-            it.override(AccountId::class.java) { AccountId(1) }
-            it.override("email", String::class.java) { "test@example.com" }
-        }
+        // 3. Multiple overrides using a Map
+        val customUser: User = TestPopulator.populate(mapOf(
+            AccountId::class.java to OverridePopulate { AccountId(1) },
+            OverrideTarget.of("email", String::class.java) to OverridePopulate { "test@example.com" }
+        ))
     }
 }
 ```

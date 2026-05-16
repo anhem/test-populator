@@ -115,6 +115,22 @@ class PopulateFactoryTest {
     }
 
     @Test
+    void canPopulateWithVarargsOverrides() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        Integer localInt = 123;
+        String localString = "local";
+
+        Pojo pojo = populateFactory.populate(
+                Pojo.class,
+                Integer.class, (OverridePopulate<Integer>) () -> localInt,
+                OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> localString
+        );
+
+        assertThat(pojo.getIntegerValue()).isEqualTo(localInt);
+        assertThat(pojo.getStringValue()).isEqualTo(localString);
+    }
+
+    @Test
     void canPopulateWithClassOverride() {
         PopulateFactory populateFactory = new PopulateFactory();
         String overrideValue = "overridden";
