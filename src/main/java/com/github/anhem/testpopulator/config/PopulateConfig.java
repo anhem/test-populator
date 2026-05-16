@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator.config;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,7 +33,7 @@ public class PopulateConfig {
     public static final String PROTOBUF_BUILDER_METHOD = "newBuilder";
     public static final String DEFAULT_BUILD_METHOD = "build";
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
-    public static final String DEFAULT_OBJECT_FACTORY_PATH = resolveDefaultObjectFactoryPath();
+    public static final String DEFAULT_OBJECT_FACTORY_PATH = resolveDefaultObjectFactoryPath().toString();
     public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
     public static final boolean DEFAULT_USE_KOTLIN_DEFAULT_VALUES = false;
 
@@ -503,21 +504,11 @@ public class PopulateConfig {
         return new PopulateConfigBuilder();
     }
 
-    private static String resolveDefaultObjectFactoryPath() {
-        String userDir = System.getProperty("user.dir");
-        if (userDir != null) {
-            Path path = Path.of(userDir);
-            while (path != null) {
-                if (Files.exists(path.resolve("pom.xml"))) {
-                    return "target/generated-test-sources/test-populator";
-                }
-                if (Files.exists(path.resolve("build.gradle")) || Files.exists(path.resolve("build.gradle.kts"))) {
-                    return "build/generated-test-sources/test-populator";
-                }
-                path = path.getParent();
-            }
+    private static Path resolveDefaultObjectFactoryPath() {
+        if (Files.exists(Paths.get("build.gradle")) || Files.exists(Paths.get("build.gradle.kts"))) {
+            return Paths.get("build/generated-test-sources/test-populator");
         }
-        return "target/generated-test-sources/test-populator";
+        return Paths.get("target/generated-test-sources/test-populator");
     }
 
     private final Set<String> blacklistedMethods;
