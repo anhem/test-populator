@@ -67,31 +67,11 @@ public class PopulateFactory {
                 classOverrides.put((Class<?>) k, v);
             } else if (k instanceof OverrideTarget) {
                 nameOverrides.put((OverrideTarget) k, v);
+            } else {
+                throw new IllegalArgumentException(String.format("Unsupported key type in overrides: %s. Only Class and OverrideTarget are supported.", k.getClass().getName()));
             }
         });
         return populate(clazz, classOverrides, nameOverrides);
-    }
-
-    /**
-     * Call to create a fully populated object from a class with additional overrides for this execution.
-     * Overrides are provided as alternating key-value pairs (key, value, key, value...).
-     * Keys can be of type {@link Class} or {@link OverrideTarget}.
-     * Values must be of type {@link OverridePopulate}.
-     *
-     * @param clazz     Class that should be populated
-     * @param overrides alternating key-value pairs of overrides
-     * @param <T>       type of object to return
-     * @return object of clazz
-     */
-    public <T> T populate(Class<T> clazz, Object... overrides) {
-        if (overrides.length % 2 != 0) {
-            throw new IllegalArgumentException("Overrides must be provided as alternating key-value pairs (key, value, key, value...)");
-        }
-        Map<Object, OverridePopulate<?>> overridesMap = new HashMap<>();
-        for (int i = 0; i < overrides.length; i += 2) {
-            overridesMap.put(overrides[i], (OverridePopulate<?>) overrides[i + 1]);
-        }
-        return populate(clazz, overridesMap);
     }
 
     /**

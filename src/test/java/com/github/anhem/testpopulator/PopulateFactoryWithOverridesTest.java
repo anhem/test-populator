@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateFactoryWithOverridesTest {
 
@@ -114,6 +115,16 @@ class PopulateFactoryWithOverridesTest {
 
         assertThat(pojo.getIntegerValue()).isEqualTo(localInt);
         assertThat(pojo.getStringValue()).isEqualTo(localString);
+    }
+
+    @Test
+    void throwsExceptionOnUnsupportedOverrideKeyType() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        Map<Object, OverridePopulate<?>> overrides = Map.of("unsupportedKey", () -> "value");
+
+        assertThatThrownBy(() -> populateFactory.populate(String.class, overrides))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Unsupported key type in overrides: java.lang.String. Only Class and OverrideTarget are supported.");
     }
 
     @Test
