@@ -29,6 +29,7 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedMethods()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.getBlacklistedFields()).isNotEmpty();
         assertThat(DEFAULT_POPULATE_CONFIG.isObjectFactoryEnabled()).isFalse();
+        assertThat(DEFAULT_POPULATE_CONFIG.getObjectFactoryPath()).isNull();
         assertThat(DEFAULT_POPULATE_CONFIG.isNullOnCircularDependency()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.getMethodType()).isEqualTo(MethodType.LARGEST);
         assertEqual(DEFAULT_POPULATE_CONFIG.toBuilder().build(), DEFAULT_POPULATE_CONFIG);
@@ -386,6 +387,16 @@ class PopulateConfigTest {
 
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getObjectFactoryPath()).isEqualTo("custom/path");
+    }
+
+    @Test
+    void objectFactoryPathIsNullWhenDisabled() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .objectFactory(false)
+                .build();
+
+        assertThat(populateConfig.isObjectFactoryEnabled()).isFalse();
+        assertThat(populateConfig.getObjectFactoryPath()).isNull();
     }
 
     private static void assertEqual(PopulateConfig populateConfig, PopulateConfig expectedPopulateConfig) {

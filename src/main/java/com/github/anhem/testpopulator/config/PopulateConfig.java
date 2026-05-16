@@ -555,7 +555,9 @@ public class PopulateConfig {
                 this.builderMethod = DEFAULT_BUILDER_METHOD;
                 this.buildMethod = DEFAULT_BUILD_METHOD;
         }
-        this.objectFactoryPath = valueOrDefault(populateConfigBuilder.objectFactoryPath, resolveDefaultObjectFactoryPath().toString());
+        this.objectFactoryPath = this.objectFactoryEnabled ?
+                valueOrDefault(populateConfigBuilder.objectFactoryPath, resolveDefaultObjectFactoryPath().toString()) :
+                null;
         this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
         this.kotlinSupport = valueOrDefault(populateConfigBuilder.kotlinSupport, DEFAULT_KOTLIN_SUPPORT);
         this.useKotlinDefaultValues = valueOrDefault(populateConfigBuilder.useKotlinDefaultValues, DEFAULT_USE_KOTLIN_DEFAULT_VALUES);
