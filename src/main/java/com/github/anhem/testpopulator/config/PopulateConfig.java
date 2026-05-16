@@ -33,7 +33,6 @@ public class PopulateConfig {
     public static final String PROTOBUF_BUILDER_METHOD = "newBuilder";
     public static final String DEFAULT_BUILD_METHOD = "build";
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
-    public static final String DEFAULT_OBJECT_FACTORY_PATH = resolveDefaultObjectFactoryPath().toString();
     public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
     public static final boolean DEFAULT_USE_KOTLIN_DEFAULT_VALUES = false;
 
@@ -556,7 +555,7 @@ public class PopulateConfig {
                 this.builderMethod = DEFAULT_BUILDER_METHOD;
                 this.buildMethod = DEFAULT_BUILD_METHOD;
         }
-        this.objectFactoryPath = valueOrDefault(populateConfigBuilder.objectFactoryPath, DEFAULT_OBJECT_FACTORY_PATH);
+        this.objectFactoryPath = valueOrDefault(populateConfigBuilder.objectFactoryPath, resolveDefaultObjectFactoryPath().toString());
         this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
         this.kotlinSupport = valueOrDefault(populateConfigBuilder.kotlinSupport, DEFAULT_KOTLIN_SUPPORT);
         this.useKotlinDefaultValues = valueOrDefault(populateConfigBuilder.useKotlinDefaultValues, DEFAULT_USE_KOTLIN_DEFAULT_VALUES);
