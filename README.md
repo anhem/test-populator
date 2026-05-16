@@ -112,7 +112,7 @@ Defines the order of strategies to try when creating an object. If the first str
     *   `CONSTRUCTOR`: Uses the constructor with the most parameters.
     *   `SETTER`: Uses a no-arg constructor, then calls standard setter methods (e.g., `setName()`).
     *   `MUTATOR`: Uses a constructor, then calls any state-changing methods (including fluent setters like `withName()`).
-    *   `FIELD`: Uses a no-arg constructor and populates fields directly using reflection.
+    *   `FIELD`: Uses a no-arg constructor and populates fields directly using reflection. (Note: Not compatible with experimental Java Code Generation).
     *   `BUILDER`: Uses a builder pattern (e.g., from Lombok or Immutables).
     *   `STATIC_METHOD`: Uses a public static factory method to create an instance.
 
@@ -240,8 +240,8 @@ Allows the library to use private or protected constructors.
 *   **For `BUILDER` strategy**:
 
     * `pattern`: Specifies which builder library to use. Options are `CUSTOM`, `LOMBOK`, `IMMUTABLES`, `PROTOBUF`. Default is `CUSTOM`. Configure via `.builderStrategy().pattern(...)`.
-    * `method`: The name of the method that creates the builder instance (e.g., `"builder"`). Used for `CUSTOM` pattern. Configure via `.builderStrategy().method(...)`.
-    * `buildMethod`: The name of the method that builds the final object (e.g., `"build"`). Used for `CUSTOM` pattern. Configure via `.builderStrategy().buildMethod(...)`.
+    * `method`: The name of the method that creates the builder instance (e.g., `"builder"`). Used for `CUSTOM` and `LOMBOK` patterns. Configure via `.builderStrategy().method(...)`.
+    * `buildMethod`: The name of the method that builds the final object (e.g., `"build"`). Used for `CUSTOM` and `LOMBOK` patterns. Configure via `.builderStrategy().buildMethod(...)`.
 
 *   **For `MUTATOR` strategy**:
 
@@ -257,7 +257,7 @@ Allows the library to use private or protected constructors.
 * `blacklistedMethods` / `blacklistedFields`: A list of method or field names to skip during population. Useful for avoiding code coverage
   instrumentation fields like `$jacocoInit`.
 * `objectFactoryEnabled` (Experimental): If `true`, generates Java source code for the populated object in the
-  `target/generated-test-sources/test-populator/` directory (automatically adjusted for Gradle). 
+  `target/generated-test-sources/test-populator/` directory (automatically adjusted to `build/` for Gradle). 
   Configure via `.objectFactory(true).path("custom/path")`.
   **Note**: This will not work if the `FIELD` strategy or `accessNonPublicConstructors` is
   enabled.
