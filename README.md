@@ -337,7 +337,7 @@ MyClass obj = factory.populate(MyClass.class, String.class, () -> "local-value")
 MyClass obj = factory.populate(MyClass.class, "myField", String.class, () -> "local-value");
 ```
 
-#### Multiple Overrides (Map-based)
+#### Multiple Overrides
 
 If you already have a set of overrides in maps, you can pass them directly:
 
