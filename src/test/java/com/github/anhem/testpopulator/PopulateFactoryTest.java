@@ -2,6 +2,7 @@ package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.MethodType;
 import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
@@ -75,7 +76,7 @@ class PopulateFactoryTest {
     }
 
     @Test
-    void canPopulateWithMapOverrides() {
+    void canPopulateWithClassOverridesMap() {
         PopulateFactory populateFactory = new PopulateFactory();
         String overrideValue = "overridden";
         Map<Class<?>, OverridePopulate<?>> overrides = Map.of(String.class, () -> overrideValue);
@@ -83,6 +84,34 @@ class PopulateFactoryTest {
         String result = populateFactory.populate(String.class, overrides);
 
         assertThat(result).isEqualTo(overrideValue);
+    }
+
+    @Test
+    void canPopulateWithNameOverridesMap() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        String overrideValue = "overridden";
+        Map<OverrideTarget, OverridePopulate<?>> overrides = Map.of(OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> overrideValue);
+
+        Pojo pojo = populateFactory.populate(Pojo.class, overrides);
+
+        assertThat(pojo.getStringValue()).isEqualTo(overrideValue);
+    }
+
+    @Test
+    void canPopulateWithMixedOverridesMap() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        Integer localInt = 123;
+        String localString = "local";
+
+        Map<Object, OverridePopulate<?>> overrides = Map.of(
+                Integer.class, (OverridePopulate<Integer>) () -> localInt,
+                OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> localString
+        );
+
+        Pojo pojo = populateFactory.populate(Pojo.class, overrides);
+
+        assertThat(pojo.getIntegerValue()).isEqualTo(localInt);
+        assertThat(pojo.getStringValue()).isEqualTo(localString);
     }
 
     @Test

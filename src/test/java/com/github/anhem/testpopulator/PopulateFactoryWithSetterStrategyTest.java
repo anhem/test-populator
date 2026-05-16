@@ -263,7 +263,7 @@ class PopulateFactoryWithSetterStrategyTest {
                 return "List.of(\"foo\", \"bar\")";
             }
         };
-        Pojo pojo = populateFactory.populate(Pojo.class, Map.of(OverrideTarget.of("setListOfStrings", List.class), listOverride));
+        Pojo pojo = populateFactory.populate(Pojo.class, "setListOfStrings", List.class, (OverridePopulate) listOverride);
 
         assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }
@@ -274,21 +274,42 @@ class PopulateFactoryWithSetterStrategyTest {
         String stringValue = "fixed-string";
         Integer intValue = 99;
 
-        Map<Object, OverridePopulate<?>> overrides = Map.of(
-                // Path 1: Class override
-                Integer.class, (OverridePopulate<Integer>) () -> intValue,
-                // Path 2: OverrideTarget override (precise)
+        Map<Class<?>, OverridePopulate<?>> classOverrides = Map.of(
+                Integer.class, (OverridePopulate<Integer>) () -> intValue
+        );
+        Map<OverrideTarget, OverridePopulate<?>> nameOverrides = Map.of(
                 OverrideTarget.of("setLocalDate", LocalDate.class), (OverridePopulate<LocalDate>) () -> localDate,
-                // Path 3: Another OverrideTarget (precise)
                 OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> stringValue
         );
 
-        Pojo pojo = populateFactory.populate(Pojo.class, overrides);
+        Pojo pojo = populateFactory.populate(Pojo.class, classOverrides, nameOverrides);
 
         assertThat(pojo.getIntegerValue()).isEqualTo(intValue);
         assertThat(pojo.getLocalDate()).isEqualTo(localDate);
         assertThat(pojo.getStringValue()).isEqualTo(stringValue);
         assertThat(pojo.getListOfStrings()).isNotNull().isNotEmpty(); // Check that non-overridden fields are still populated
+    }
+
+    @Test
+    void canPopulateWithOverrides() {
+        LocalDate localDate = LocalDate.of(2000, 1, 1);
+        String stringValue = "fixed-string";
+        Integer intValue = 99;
+
+        Map<Class<?>, OverridePopulate<?>> classOverrides = Map.of(
+                Integer.class, (OverridePopulate<Integer>) () -> intValue
+        );
+        Map<OverrideTarget, OverridePopulate<?>> nameOverrides = Map.of(
+                OverrideTarget.of("setLocalDate", LocalDate.class), (OverridePopulate<LocalDate>) () -> localDate,
+                OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> stringValue
+        );
+
+        Pojo pojo = populateFactory.populate(Pojo.class, classOverrides, nameOverrides);
+
+        assertThat(pojo.getIntegerValue()).isEqualTo(intValue);
+        assertThat(pojo.getLocalDate()).isEqualTo(localDate);
+        assertThat(pojo.getStringValue()).isEqualTo(stringValue);
+        assertThat(pojo.getListOfStrings()).isNotNull().isNotEmpty();
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {

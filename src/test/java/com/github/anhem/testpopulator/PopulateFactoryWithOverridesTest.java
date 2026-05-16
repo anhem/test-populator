@@ -1,18 +1,20 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import com.github.anhem.testpopulator.readme.model.MyUUID;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PopulateFactoryWithLocalOverridesTest {
+class PopulateFactoryWithOverridesTest {
 
     @Test
     void localOverrideTakesPrecedenceOverGlobalConfig() {
@@ -24,12 +26,12 @@ class PopulateFactoryWithLocalOverridesTest {
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
         assertThat(populateFactory.populate(String.class)).isEqualTo(globalValue);
-        assertThat(populateFactory.populate(String.class, Map.of(String.class, () -> localValue))).isEqualTo(localValue);
+        assertThat(populateFactory.populate(String.class, String.class, () -> localValue)).isEqualTo(localValue);
         assertThat(populateFactory.populate(String.class)).isEqualTo(globalValue);
     }
 
     @Test
-    void globalAndLocalOverridesAreMerged() {
+    void globalAndOverridesAreMerged() {
         String globalString = "globalString";
         Integer localInteger = 999;
         PopulateConfig populateConfig = PopulateConfig.builder()
@@ -37,7 +39,7 @@ class PopulateFactoryWithLocalOverridesTest {
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
-        AllArgsConstructor result = populateFactory.populate(AllArgsConstructor.class, Map.of(Integer.class, () -> localInteger));
+        AllArgsConstructor result = populateFactory.populate(AllArgsConstructor.class, Integer.class, () -> localInteger);
 
         assertThat(result.getStringValue()).isEqualTo(globalString);
         assertThat(result.getIntegerValue()).isEqualTo(localInteger);
@@ -73,31 +75,45 @@ class PopulateFactoryWithLocalOverridesTest {
     }
 
     @Test
-    void emptyLocalOverridesMap() {
+    void emptyOverridesMap() {
         PopulateFactory populateFactory = new PopulateFactory();
 
-        assertThat(populateFactory.populate(String.class, Map.of())).isNotNull();
+        assertThat(populateFactory.populate(String.class, Collections.emptyMap(), Collections.emptyMap())).isNotNull();
     }
 
     @Test
-    void multipleLocalOverrides() {
+    void multipleOverrides() {
         PopulateConfig populateConfig = PopulateConfig.builder().build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
-        Map<Class<?>, Object> overrides = Map.of(
-                String.class, "localString",
-                Integer.class, 123
+        String localString = "localString";
+        Integer localInteger = 123;
+
+        Map<Object, OverridePopulate<?>> overrides = Map.of(
+                String.class, () -> localString,
+                Integer.class, () -> localInteger
         );
 
-        assertThat(populateFactory.populate(String.class, Map.of(
-                String.class, () -> overrides.get(String.class),
-                Integer.class, () -> overrides.get(Integer.class)
-        ))).isEqualTo(overrides.get(String.class));
+        assertThat(populateFactory.populate(String.class, overrides)).isEqualTo(localString);
 
-        assertThat(populateFactory.populate(Integer.class, Map.of(
-                String.class, () -> overrides.get(String.class),
-                Integer.class, () -> overrides.get(Integer.class)
-        ))).isEqualTo(overrides.get(Integer.class));
+        assertThat(populateFactory.populate(Integer.class, overrides)).isEqualTo(localInteger);
+    }
+
+    @Test
+    void mixedOverrides() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        Integer localInt = 123;
+        String localString = "local";
+
+        Map<Object, OverridePopulate<?>> overrides = Map.of(
+                Integer.class, () -> localInt,
+                OverrideTarget.of("setStringValue", String.class), () -> localString
+        );
+
+        Pojo pojo = populateFactory.populate(Pojo.class, overrides);
+
+        assertThat(pojo.getIntegerValue()).isEqualTo(localInt);
+        assertThat(pojo.getStringValue()).isEqualTo(localString);
     }
 
     @Test

@@ -339,20 +339,29 @@ MyClass obj = factory.populate(MyClass.class, "myField", String.class, () -> "lo
 
 #### Multiple Overrides (Map-based)
 
-For multiple overrides, pass a `Map`. The map keys can be of type `Class` or `OverrideTarget`.
+If you already have a set of overrides in maps, you can pass them directly:
 
 ```java
 PopulateFactory factory = new PopulateFactory();
 
-Map<Object, OverridePopulate<?>> overrides = Map.of(
-    // 1. Class-based override
-    Integer.class, (OverridePopulate<Integer>) () -> 42,
-    
-    // 2. Name-based override (targets any field/parameter named 'email' of type String)
-    OverrideTarget.of("email", String.class), (OverridePopulate<String>) () -> "test@example.com"
+// 1. Map of Class overrides
+Map<Class<?>, OverridePopulate<?>> classOverrides = Map.of(
+    Integer.class, () -> 42
 );
+MyClass obj = factory.populate(MyClass.class, classOverrides);
 
-MyClass obj = factory.populate(MyClass.class, overrides);
+// 2. Map of Name overrides
+Map<OverrideTarget, OverridePopulate<?>> nameOverrides = Map.of(
+    OverrideTarget.of("email", String.class), () -> "test@example.com"
+);
+MyClass obj = factory.populate(MyClass.class, nameOverrides);
+
+// 3. Both types of overrides in the same map
+Map<Object, OverridePopulate<?>> mixedOverrides = Map.of(
+    Integer.class, () -> 42,
+    OverrideTarget.of("email", String.class), () -> "test@example.com"
+);
+MyClass obj = factory.populate(MyClass.class, mixedOverrides);
 ```
 
 ### Global Setup for a Project
@@ -463,11 +472,6 @@ object TestPopulator {
     inline fun <reified T> populate(name: String, clazz: Class<*>, noinline overridePopulate: () -> Any?): T {
         return populateFactory.populate(T::class.java, name, clazz, overridePopulate)
     }
-
-    // With multiple overrides
-    inline fun <reified T> populate(overrides: Map<Any, OverridePopulate<*>>): T {
-        return populateFactory.populate(T::class.java, overrides)
-    }
 }
 ```
 
@@ -484,9 +488,10 @@ class MyServiceTest {
         // 2. Class-based override using lambda
         val admin: User = TestPopulator.populate<User, String> { "ADMIN" }
 
-        // 3. Precise name and type override
-        val customEmail: User = TestPopulator.populate("email", String::class.java) { 
-            "test@example.com" 
+        // 3. Multiple overrides using the DSL (recommended)
+        val customUser: User = TestPopulator.populate {
+            it.override(AccountId::class.java) { AccountId(1) }
+            it.override("email", String::class.java) { "test@example.com" }
         }
     }
 }

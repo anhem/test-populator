@@ -47,18 +47,19 @@ public class PopulateFactory {
      * @return object of clazz
      */
     public <T> T populate(Class<T> clazz) {
-        return populate(clazz, Collections.emptyMap());
+        return populate(clazz, Collections.emptyMap(), Collections.emptyMap());
     }
 
     /**
-     * Call to create a fully populated object from a class with additional overrides for this execution
+     * Call to create a fully populated object from a class with additional overrides for this execution.
+     * The map keys can be of type {@link Class} or {@link OverrideTarget}.
      *
      * @param clazz     Class that should be populated
-     * @param overrides additional overrides that take precedence over overrides in PopulateConfig. Can be Map&lt;Class, OverridePopulate&gt;, Map&lt;String, OverridePopulate&gt; or Map&lt;OverrideTarget, OverridePopulate&gt;
+     * @param overrides additional overrides that take precedence over overrides in PopulateConfig
      * @param <T>       type of object to return
      * @return object of clazz
      */
-    public <T, K> T populate(Class<T> clazz, Map<K, OverridePopulate<?>> overrides) {
+    public <T> T populate(Class<T> clazz, Map<?, OverridePopulate<?>> overrides) {
         Map<Class<?>, OverridePopulate<?>> classOverrides = new HashMap<>();
         Map<OverrideTarget, OverridePopulate<?>> nameOverrides = new HashMap<>();
         overrides.forEach((k, v) -> {
@@ -72,28 +73,6 @@ public class PopulateFactory {
     }
 
     /**
-     * Call to create a fully populated object from a class with additional overrides for this execution
-     *
-     * @param clazz          Class that should be populated
-     * @param classOverrides additional overrides that take precedence over overrides in PopulateConfig
-     * @param nameOverrides  additional overrides that take precedence over overrides in PopulateConfig
-     * @param <T>            type of object to return
-     * @return object of clazz
-     */
-    public <T> T populate(Class<T> clazz, Map<Class<?>, OverridePopulate<?>> classOverrides, Map<OverrideTarget, OverridePopulate<?>> nameOverrides) {
-        boolean noOverrides = classOverrides.isEmpty() && nameOverrides.isEmpty();
-        PopulateConfig config = noOverrides ? populateConfig : populateConfig.toBuilder()
-                                                               .addClassOverrides(classOverrides)
-                                                               .addNameOverrides(nameOverrides)
-                                                               .build();
-        Populator p = noOverrides ? populator : new Populator(createValueFactory(config));
-        ObjectFactory objectFactory = config.isObjectFactoryEnabled() ? new ObjectFactoryImpl(config) : new ObjectFactoryVoid();
-        T result = p.populate(initialize(clazz, objectFactory, config));
-        objectFactory.writeToFile();
-        return result;
-    }
-
-    /**
      * Call to create a fully populated object from a class with an additional override for this execution
      *
      * @param clazz            Class that should be populated
@@ -104,7 +83,7 @@ public class PopulateFactory {
      * @return object of clazz
      */
     public <T, U> T populate(Class<T> clazz, Class<U> overrideClass, OverridePopulate<U> overridePopulate) {
-        return populate(clazz, Map.of(overrideClass, overridePopulate));
+        return populate(clazz, Map.of(overrideClass, overridePopulate), Collections.emptyMap());
     }
 
     /**
@@ -128,5 +107,27 @@ public class PopulateFactory {
                 populateConfig.getNameOverrides(),
                 populateConfig.getBuilderPattern()
         );
+    }
+
+    /**
+     * Call to create a fully populated object from a class with additional overrides for this execution
+     *
+     * @param clazz          Class that should be populated
+     * @param classOverrides additional overrides that take precedence over overrides in PopulateConfig
+     * @param nameOverrides  additional overrides that take precedence over overrides in PopulateConfig
+     * @param <T>            type of object to return
+     * @return object of clazz
+     */
+    public <T> T populate(Class<T> clazz, Map<Class<?>, OverridePopulate<?>> classOverrides, Map<OverrideTarget, OverridePopulate<?>> nameOverrides) {
+        boolean noOverrides = classOverrides.isEmpty() && nameOverrides.isEmpty();
+        PopulateConfig config = noOverrides ? populateConfig : populateConfig.toBuilder()
+                .addClassOverrides(classOverrides)
+                .addNameOverrides(nameOverrides)
+                .build();
+        Populator p = noOverrides ? populator : new Populator(createValueFactory(config));
+        ObjectFactory objectFactory = config.isObjectFactoryEnabled() ? new ObjectFactoryImpl(config) : new ObjectFactoryVoid();
+        T result = p.populate(initialize(clazz, objectFactory, config));
+        objectFactory.writeToFile();
+        return result;
     }
 }
