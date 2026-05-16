@@ -321,21 +321,49 @@ MyClass myClass = new PopulateFactory().populate(MyClass.class);
 
 ### One-off Overrides (Local Overrides)
 
-You can provide additional overrides for a specific `populate` call. These take precedence over any global configuration.
+You can provide additional overrides for a specific `populate` call. These take precedence over any global configuration. This is useful for testing edge cases or specific scenarios without changing the factory's global state.
+
+#### Single Overrides (Convenience Methods)
+
+If you only need a single override, you can use these convenience methods:
 
 ```java
 PopulateFactory factory = new PopulateFactory();
 
 // 1. Override a specific class for this call only
-MyClass obj = factory.populate(MyClass.class, Map.of(String.class, () -> "local-value"));
+MyClass obj = factory.populate(MyClass.class, String.class, () -> "local-value");
 
 // 2. Override a specific field by name and type
-MyClass obj = factory.populate(MyClass.class, Map.of(OverrideTarget.of("myField", String.class), () -> "local-value"));
+MyClass obj = factory.populate(MyClass.class, "myField", String.class, () -> "local-value");
 ```
+
+#### Multiple Overrides (Map-based)
+
+For multiple overrides, pass a `Map`. The map keys can be of type `Class`, `String`, or `OverrideTarget`.
+
+```java
+PopulateFactory factory = new PopulateFactory();
+
+Map<Object, OverridePopulate<?>> overrides = Map.of(
+    // 1. Class-based override
+    Integer.class, (OverridePopulate<Integer>) () -> 42,
+    
+    // 2. Name-based override (targets any field/parameter named 'email' of type String)
+    OverrideTarget.of("email", String.class), (OverridePopulate<String>) () -> "test@example.com",
+    
+    // 3. Simple name-based override (targets any field/parameter named 'status' regardless of type)
+    "status", (OverridePopulate<String>) () -> "ACTIVE"
+);
+
+MyClass obj = factory.populate(MyClass.class, overrides);
+```
+
+> [!NOTE]
+> When using a `String` as a map key, it is treated as an `OverrideTarget.of(name, Object.class)`, meaning it will match any field or parameter with that name, regardless of its actual class.
 
 ### Global Setup for a Project
 
-It's often useful to create a static helper class with a shared configuration for your entire test suite.
+It's often useful to create a static helper class with a shared configuration for your entire test suite. This makes it easy to access the population logic from any test while keeping your configuration centralized.
 
 ```java
 public class TestPopulator {
@@ -351,14 +379,59 @@ public class TestPopulator {
     // 2. Create a single factory instance
     private static final PopulateFactory POPULATE_FACTORY = new PopulateFactory(POPULATE_CONFIG);
 
-    // 3. Create a static helper method for easy access in tests
+    // 3. Create static helper methods for easy access in tests
+    
+    // Basic population
     public static <T> T populate(Class<T> clazz) {
         return POPULATE_FACTORY.populate(clazz);
+    }
+    
+    // With a single class override
+    public static <T, U> T populate(Class<T> clazz, Class<U> overrideClass, OverridePopulate<U> overridePopulate) {
+        return POPULATE_FACTORY.populate(clazz, overrideClass, overridePopulate);
+    }
+
+    // With a single name and type override
+    public static <T> T populate(Class<T> clazz, String overrideName, Class<?> overrideClass, OverridePopulate<?> overridePopulate) {
+        return POPULATE_FACTORY.populate(clazz, overrideName, overrideClass, overridePopulate);
+    }
+
+    // With multiple overrides
+    public static <T, K> T populate(Class<T> clazz, Map<K, OverridePopulate<?>> overrides) {
+        return POPULATE_FACTORY.populate(clazz, overrides);
     }
 }
 ```
 
 **Usage in a test:**
+
+```java
+import static com.your.project.TestPopulator.populate;
+
+class MyServiceTest {
+
+    @Test
+    void testSomething() {
+        // Basic usage - uses the global configuration from TestPopulator
+        MyClass myClass = populate(MyClass.class);
+        
+        // One-off override for this specific test
+        MyClass myClassWithTestEmail = populate(
+            MyClass.class, 
+            "email", 
+            String.class, 
+            () -> "test-email@example.com"
+        );
+
+        // Using multiple overrides at once
+        Map<Object, OverridePopulate<?>> overrides = Map.of(
+            Integer.class, (OverridePopulate<Integer>) () -> 99,
+            "status", (OverridePopulate<String>) () -> "OVERRIDDEN"
+        );
+        MyClass myClassWithMultipleOverrides = populate(MyClass.class, overrides);
+    }
+}
+```
 
 ## Technical Insights
 
