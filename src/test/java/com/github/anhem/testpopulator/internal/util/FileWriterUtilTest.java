@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.util;
 
+import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.object.ObjectResult;
 import org.junit.jupiter.api.Test;
 
@@ -39,9 +40,10 @@ class FileWriterUtilTest {
 
     @Test
     void getPathReturnsPathBuiltFromObjectResultAndPopulateConfig() {
-        Path path = FileWriterUtil.getPath(OBJECT_RESULT, DEFAULT_POPULATE_CONFIG);
+        PopulateConfig populateConfig = DEFAULT_POPULATE_CONFIG.toBuilder().objectFactory(true).build();
+        Path path = FileWriterUtil.getPath(OBJECT_RESULT, populateConfig);
 
-        assertThat(path).hasToString(String.format("%s/%s/%s_%s.java", DEFAULT_POPULATE_CONFIG.getObjectFactoryPath(), toPackagePath(this.getClass().getPackageName()), this.getClass().getName(), encode(DEFAULT_POPULATE_CONFIG)));
+        assertThat(path).hasToString(String.format("%s/%s/%s_%s.java", populateConfig.getObjectFactoryPath(), toPackagePath(this.getClass().getPackageName()), this.getClass().getName(), encode(populateConfig)));
     }
 
     @Test
