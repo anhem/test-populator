@@ -51,7 +51,7 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
         this.populateConfig = populateConfig.toBuilder()
                 .clearStrategies()
                 .builderStrategy()
-                .method("newBuilder")
+                .builderMethod("newBuilder")
                 .buildMethod("done")
                 .and()
                 .build();

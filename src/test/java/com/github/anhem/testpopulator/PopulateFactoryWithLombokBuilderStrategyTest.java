@@ -5,10 +5,7 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
-import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
-import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
-import com.github.anhem.testpopulator.model.lombok.LombokImmutableWithSingular;
-import com.github.anhem.testpopulator.model.lombok.LombokOddImmutable;
+import com.github.anhem.testpopulator.model.lombok.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -220,5 +217,18 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         populateFactory = new PopulateFactory(populateConfig);
         LombokImmutable value = populateAndAssertWithGeneratedCode(LombokImmutable.class);
         assertThat(value).isNotNull();
+    }
+
+    @Test
+    void lombokWithCustomNames() {
+        populateConfig = populateConfig.toBuilder()
+                .builderStrategy()
+                .builderMethod("customBuilder")
+                .buildMethod("customBuild")
+                .and()
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        populateAndAssertWithGeneratedCode(LombokWithCustomNames.class);
     }
 }

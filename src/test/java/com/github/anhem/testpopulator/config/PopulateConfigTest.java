@@ -104,7 +104,7 @@ class PopulateConfigTest {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .builderStrategy()
                     .pattern(CUSTOM)
-                    .method("create")
+                    .builderMethod("create")
                     .buildMethod("finish")
                     .and()
                 .build();

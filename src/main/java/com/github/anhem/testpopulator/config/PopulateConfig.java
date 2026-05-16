@@ -542,19 +542,8 @@ public class PopulateConfig {
         this.objectFactoryEnabled = valueOrDefault(populateConfigBuilder.objectFactoryEnabled, DEFAULT_OBJECT_FACTORY_ENABLED);
         this.nullOnCircularDependency = valueOrDefault(populateConfigBuilder.nullOnCircularDependency, DEFAULT_NULL_ON_CIRCULAR_DEPENDENCY);
         this.constructorType = valueOrDefault(populateConfigBuilder.constructorType, DEFAULT_CONSTRUCTOR_TYPE);
-        switch (this.builderPattern) {
-            case PROTOBUF:
-                this.builderMethod = PROTOBUF_BUILDER_METHOD;
-                this.buildMethod = DEFAULT_BUILD_METHOD;
-                break;
-            case CUSTOM:
-                this.builderMethod = valueOrDefault(populateConfigBuilder.builderMethod, DEFAULT_BUILDER_METHOD);
-                this.buildMethod = valueOrDefault(populateConfigBuilder.buildMethod, DEFAULT_BUILD_METHOD);
-                break;
-            default:
-                this.builderMethod = DEFAULT_BUILDER_METHOD;
-                this.buildMethod = DEFAULT_BUILD_METHOD;
-        }
+        this.builderMethod = valueOrDefault(populateConfigBuilder.builderMethod, getDefaultBuilderMethod(this.builderPattern));
+        this.buildMethod = valueOrDefault(populateConfigBuilder.buildMethod, DEFAULT_BUILD_METHOD);
         this.objectFactoryPath = this.objectFactoryEnabled ?
                 valueOrDefault(populateConfigBuilder.objectFactoryPath, resolveDefaultObjectFactoryPath().toString()) :
                 null;
@@ -680,6 +669,10 @@ public class PopulateConfig {
         return collection == null ? defaultCollection : collection;
     }
 
+    private String getDefaultBuilderMethod(BuilderPattern builderPattern) {
+        return builderPattern == BuilderPattern.PROTOBUF ? PROTOBUF_BUILDER_METHOD : DEFAULT_BUILDER_METHOD;
+    }
+
     @Override
     public String toString() {
         return "PopulateConfig{" +
@@ -744,7 +737,7 @@ public class PopulateConfig {
             return this;
         }
 
-        public BuilderConfig method(String builderMethod) {
+        public BuilderConfig builderMethod(String builderMethod) {
             parent.builderMethod(builderMethod);
             return this;
         }
