@@ -339,7 +339,7 @@ MyClass obj = factory.populate(MyClass.class, "myField", String.class, () -> "lo
 
 #### Multiple Overrides (Map-based)
 
-For multiple overrides, pass a `Map`. The map keys can be of type `Class`, `String`, or `OverrideTarget`.
+For multiple overrides, pass a `Map`. The map keys can be of type `Class` or `OverrideTarget`.
 
 ```java
 PopulateFactory factory = new PopulateFactory();
@@ -349,17 +349,11 @@ Map<Object, OverridePopulate<?>> overrides = Map.of(
     Integer.class, (OverridePopulate<Integer>) () -> 42,
     
     // 2. Name-based override (targets any field/parameter named 'email' of type String)
-    OverrideTarget.of("email", String.class), (OverridePopulate<String>) () -> "test@example.com",
-    
-    // 3. Simple name-based override (targets any field/parameter named 'status' regardless of type)
-    "status", (OverridePopulate<String>) () -> "ACTIVE"
+    OverrideTarget.of("email", String.class), (OverridePopulate<String>) () -> "test@example.com"
 );
 
 MyClass obj = factory.populate(MyClass.class, overrides);
 ```
-
-> [!NOTE]
-> When using a `String` as a map key, it is treated as an `OverrideTarget.of(name, Object.class)`, meaning it will match any field or parameter with that name, regardless of its actual class.
 
 ### Global Setup for a Project
 
@@ -429,6 +423,71 @@ class MyServiceTest {
             "status", (OverridePopulate<String>) () -> "OVERRIDDEN"
         );
         MyClass myClassWithMultipleOverrides = populate(MyClass.class, overrides);
+    }
+}
+```
+
+#### Kotlin Example
+
+For Kotlin projects, you can create a singleton `object` and leverage **reified type parameters** to create an even cleaner API.
+
+```kotlin
+object TestPopulator {
+
+    // 1. Define the configuration
+    private val populateConfig = PopulateConfig.builder()
+        .kotlinSupport(true)
+            .defaultValues(true)
+            .and()
+        .addOverride(MyUUID::class.java) { MyUUID(UUID.randomUUID().toString()) }
+        .build()
+
+    // 2. Create the factory
+    // Use @PublishedApi internal so inline functions can access it
+    @PublishedApi
+    internal val populateFactory = PopulateFactory(populateConfig)
+
+    // 3. Create idiomatic Kotlin helper methods using 'inline' and 'reified'
+    
+    // Basic usage: populate<MyClass>()
+    inline fun <reified T> populate(): T {
+        return populateFactory.populate(T::class.java)
+    }
+
+    // With a single class override: populate<MyClass, String> { "local-value" }
+    inline fun <reified T, reified U> populate(noinline overridePopulate: () -> U): T {
+        return populateFactory.populate(T::class.java, U::class.java, overridePopulate)
+    }
+
+    // With a single name and type override: populate<MyClass>("email", String::class.java) { "test@example.com" }
+    inline fun <reified T> populate(name: String, clazz: Class<*>, noinline overridePopulate: () -> Any?): T {
+        return populateFactory.populate(T::class.java, name, clazz, overridePopulate)
+    }
+
+    // With multiple overrides
+    inline fun <reified T> populate(overrides: Map<Any, OverridePopulate<*>>): T {
+        return populateFactory.populate(T::class.java, overrides)
+    }
+}
+```
+
+**Usage in a Kotlin test:**
+
+```kotlin
+class MyServiceTest {
+
+    @Test
+    fun `test with different population styles`() {
+        // 1. Basic usage
+        val user: User = TestPopulator.populate()
+
+        // 2. Class-based override using lambda
+        val admin: User = TestPopulator.populate<User, String> { "ADMIN" }
+
+        // 3. Precise name and type override
+        val customEmail: User = TestPopulator.populate("email", String::class.java) { 
+            "test@example.com" 
+        }
     }
 }
 ```

@@ -268,6 +268,29 @@ class PopulateFactoryWithSetterStrategyTest {
         assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }
 
+    @Test
+    void canPopulateWithMultipleOverridesInSameCall() {
+        LocalDate localDate = LocalDate.of(2000, 1, 1);
+        String stringValue = "fixed-string";
+        Integer intValue = 99;
+
+        Map<Object, OverridePopulate<?>> overrides = Map.of(
+                // Path 1: Class override
+                Integer.class, (OverridePopulate<Integer>) () -> intValue,
+                // Path 2: OverrideTarget override (precise)
+                OverrideTarget.of("setLocalDate", LocalDate.class), (OverridePopulate<LocalDate>) () -> localDate,
+                // Path 3: Another OverrideTarget (precise)
+                OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> stringValue
+        );
+
+        Pojo pojo = populateFactory.populate(Pojo.class, overrides);
+
+        assertThat(pojo.getIntegerValue()).isEqualTo(intValue);
+        assertThat(pojo.getLocalDate()).isEqualTo(localDate);
+        assertThat(pojo.getStringValue()).isEqualTo(stringValue);
+        assertThat(pojo.getListOfStrings()).isNotNull().isNotEmpty(); // Check that non-overridden fields are still populated
+    }
+
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(SETTER);

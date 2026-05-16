@@ -66,8 +66,6 @@ public class PopulateFactory {
                 classOverrides.put((Class<?>) k, v);
             } else if (k instanceof OverrideTarget) {
                 nameOverrides.put((OverrideTarget) k, v);
-            } else if (k instanceof String) {
-                nameOverrides.put(OverrideTarget.of((String) k, Object.class), v);
             }
         });
         return populate(clazz, classOverrides, nameOverrides);
