@@ -38,6 +38,7 @@ class PopulateFactoryWithNamedOverrideTest {
     void nameOverrideWithKotlinSupportEnabled() {
         PopulateConfig config = PopulateConfig.builder()
                 .kotlinSupport(true)
+                .and()
                 .addOverride("setStringValue", String.class, () -> "overridden")
                 .build();
         PopulateFactory factory = new PopulateFactory(config);

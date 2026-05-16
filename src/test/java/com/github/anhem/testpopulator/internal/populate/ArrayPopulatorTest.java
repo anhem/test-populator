@@ -23,7 +23,7 @@ class ArrayPopulatorTest {
         arrayPopulator = new ArrayPopulator();
         PopulateConfig config = PopulateConfig.builder().build();
         ValueFactory valueFactory = new ValueFactory(
-                config.useRandomValues(),
+                config.isRandomValues(),
                 config.getClassOverrides(),
                 config.getNameOverrides(),
                 config.getBuilderPattern()

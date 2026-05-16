@@ -125,7 +125,7 @@ public class PopulateFactory {
 
     private static ValueFactory createValueFactory(PopulateConfig populateConfig) {
         return new ValueFactory(
-                populateConfig.useRandomValues(),
+                populateConfig.isRandomValues(),
                 populateConfig.getClassOverrides(),
                 populateConfig.getNameOverrides(),
                 populateConfig.getBuilderPattern()

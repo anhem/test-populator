@@ -22,7 +22,7 @@ public class SetterPopulator extends MethodPopulator implements PopulatingStrate
         PopulateConfig populateConfig = classCarrier.getPopulateConfig();
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
-            setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
+            setAccessible(constructor, populateConfig.isAccessNonPublicConstructors());
             T objectOfClass = constructor.newInstance();
             List<Method> methods = getSetterMethods(clazz, populateConfig.getBlacklistedMethods(), populateConfig.getSetterPrefixes());
             classCarrier.getObjectFactory().setter(clazz, methods.size());

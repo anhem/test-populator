@@ -382,35 +382,11 @@ public class PopulateConfig {
          * Enable support for Kotlin classes. This allows populating Kotlin classes with default values.
          *
          * @param kotlinSupport true/false
-         * @return PopulateConfigBuilder
+         * @return configuration for Kotlin support
          */
-        public PopulateConfigBuilder kotlinSupport(boolean kotlinSupport) {
+        public KotlinSupport kotlinSupport(boolean kotlinSupport) {
             this.kotlinSupport = kotlinSupport;
-            return this;
-        }
-
-        /**
-         * Enable support for Kotlin classes and configure whether to use Kotlin default values.
-         *
-         * @param kotlinSupport          true/false
-         * @param useKotlinDefaultValues true/false
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder kotlinSupport(boolean kotlinSupport, boolean useKotlinDefaultValues) {
-            kotlinSupport(kotlinSupport);
-            this.useKotlinDefaultValues = useKotlinDefaultValues;
-            return this;
-        }
-
-        /**
-         * Configure Kotlin support options
-         *
-         * @param useKotlinDefaultValues true/false
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder useKotlinDefaultValues(boolean useKotlinDefaultValues) {
-            this.useKotlinDefaultValues = useKotlinDefaultValues;
-            return this;
+            return new KotlinSupport(this);
         }
 
         /**
@@ -425,66 +401,56 @@ public class PopulateConfig {
 
         /**
          * Configure BUILDER strategy options
-         * @return builder for BUILDER strategy configuration
+         * @return configuration for BUILDER strategy
          */
-        public BuilderStrategyBuilder builderStrategy() {
+        public BuilderConfig builderStrategy() {
             addStrategyOrder(BUILDER);
-            return new BuilderStrategyBuilder(this);
+            return new BuilderConfig(this);
         }
 
         /**
          * Configure CONSTRUCTOR strategy options
-         * @return builder for CONSTRUCTOR strategy configuration
+         * @return configuration for CONSTRUCTOR strategy
          */
-        public ConstructorStrategyBuilder constructorStrategy() {
+        public ConstructorConfig constructorStrategy() {
             addStrategyOrder(CONSTRUCTOR);
-            return new ConstructorStrategyBuilder(this);
+            return new ConstructorConfig(this);
         }
 
         /**
          * Configure FIELD strategy options
-         * @return builder for FIELD strategy configuration
+         * @return configuration for FIELD strategy
          */
-        public FieldStrategyBuilder fieldStrategy() {
+        public FieldConfig fieldStrategy() {
             addStrategyOrder(FIELD);
-            return new FieldStrategyBuilder(this);
+            return new FieldConfig(this);
         }
 
         /**
          * Configure SETTER strategy options
-         * @return builder for SETTER strategy configuration
+         * @return configuration for SETTER strategy
          */
-        public SetterStrategyBuilder setterStrategy() {
+        public SetterConfig setterStrategy() {
             addStrategyOrder(SETTER);
-            return new SetterStrategyBuilder(this);
+            return new SetterConfig(this);
         }
 
         /**
          * Configure MUTATOR strategy options
-         * @return builder for MUTATOR strategy configuration
+         * @return configuration for MUTATOR strategy
          */
-        public MutatorStrategyBuilder mutatorStrategy() {
+        public MutatorConfig mutatorStrategy() {
             addStrategyOrder(MUTATOR);
-            return new MutatorStrategyBuilder(this);
+            return new MutatorConfig(this);
         }
 
         /**
          * Configure STATIC_METHOD strategy options
-         * @return builder for STATIC_METHOD strategy configuration
+         * @return configuration for STATIC_METHOD strategy
          */
-        public StaticMethodStrategyBuilder staticMethodStrategy() {
+        public StaticMethodConfig staticMethodStrategy() {
             addStrategyOrder(STATIC_METHOD);
-            return new StaticMethodStrategyBuilder(this);
-        }
-
-        /**
-         * Configure Kotlin support options
-         *
-         * @return builder for Kotlin support configuration
-         */
-        public KotlinStrategyBuilder kotlinSupport() {
-            this.kotlinSupport = true;
-            return new KotlinStrategyBuilder(this);
+            return new StaticMethodConfig(this);
         }
 
         /**
@@ -584,11 +550,11 @@ public class PopulateConfig {
         return builderPattern;
     }
 
-    public boolean useRandomValues() {
+    public boolean isRandomValues() {
         return randomValues;
     }
 
-    public boolean canAccessNonPublicConstructors() {
+    public boolean isAccessNonPublicConstructors() {
         return accessNonPublicConstructors;
     }
 
@@ -696,12 +662,12 @@ public class PopulateConfig {
     }
 
     /**
-     * Base builder for strategy configuration
+     * Base for nested configuration blocks
      */
-    public abstract static class StrategyBuilder {
+    public abstract static class SubBuilder {
         protected final PopulateConfigBuilder parent;
 
-        StrategyBuilder(PopulateConfigBuilder parent) {
+        SubBuilder(PopulateConfigBuilder parent) {
             this.parent = parent;
         }
 
@@ -723,56 +689,56 @@ public class PopulateConfig {
     }
 
     /**
-     * Builder for BUILDER strategy configuration
+     * Configuration for BUILDER strategy
      */
-    public static class BuilderStrategyBuilder extends StrategyBuilder {
+    public static class BuilderConfig extends SubBuilder {
 
-        BuilderStrategyBuilder(PopulateConfigBuilder parent) {
+        BuilderConfig(PopulateConfigBuilder parent) {
             super(parent);
         }
 
-        public BuilderStrategyBuilder pattern(BuilderPattern pattern) {
+        public BuilderConfig pattern(BuilderPattern pattern) {
             parent.builderPattern(pattern);
             return this;
         }
 
-        public BuilderStrategyBuilder method(String builderMethod) {
+        public BuilderConfig method(String builderMethod) {
             parent.builderMethod(builderMethod);
             return this;
         }
 
-        public BuilderStrategyBuilder buildMethod(String buildMethod) {
+        public BuilderConfig buildMethod(String buildMethod) {
             parent.buildMethod(buildMethod);
             return this;
         }
     }
 
     /**
-     * Builder for CONSTRUCTOR strategy configuration
+     * Configuration for CONSTRUCTOR strategy
      */
-    public static class ConstructorStrategyBuilder extends StrategyBuilder {
+    public static class ConstructorConfig extends SubBuilder {
 
-        ConstructorStrategyBuilder(PopulateConfigBuilder parent) {
+        ConstructorConfig(PopulateConfigBuilder parent) {
             super(parent);
         }
     }
 
     /**
-     * Builder for FIELD strategy configuration
+     * Configuration for FIELD strategy
      */
-    public static class FieldStrategyBuilder extends StrategyBuilder {
+    public static class FieldConfig extends SubBuilder {
 
-        FieldStrategyBuilder(PopulateConfigBuilder parent) {
+        FieldConfig(PopulateConfigBuilder parent) {
             super(parent);
         }
     }
 
     /**
-     * Builder for SETTER strategy configuration
+     * Configuration for SETTER strategy
      */
-    public static class SetterStrategyBuilder extends StrategyBuilder {
+    public static class SetterConfig extends SubBuilder {
 
-        SetterStrategyBuilder(PopulateConfigBuilder parent) {
+        SetterConfig(PopulateConfigBuilder parent) {
             super(parent);
         }
 
@@ -780,9 +746,9 @@ public class PopulateConfig {
          * Set setter prefixes, replacing existing ones.
          *
          * @param prefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
-         * @return SetterStrategyBuilder
+         * @return SetterConfig
          */
-        public SetterStrategyBuilder setPrefixes(Collection<String> prefixes) {
+        public SetterConfig setPrefixes(Collection<String> prefixes) {
             parent.setSetterPrefixes(prefixes);
             return this;
         }
@@ -791,9 +757,9 @@ public class PopulateConfig {
          * Set setter prefixes, replacing existing ones.
          *
          * @param prefixes prefixes for methods that work in a similar way as a regular setter method.
-         * @return SetterStrategyBuilder
+         * @return SetterConfig
          */
-        public SetterStrategyBuilder setPrefixes(String... prefixes) {
+        public SetterConfig setPrefixes(String... prefixes) {
             parent.setSetterPrefixes(prefixes);
             return this;
         }
@@ -802,9 +768,9 @@ public class PopulateConfig {
          * Add setter prefixes to existing ones.
          *
          * @param prefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
-         * @return SetterStrategyBuilder
+         * @return SetterConfig
          */
-        public SetterStrategyBuilder addPrefixes(Collection<String> prefixes) {
+        public SetterConfig addPrefixes(Collection<String> prefixes) {
             parent.addSetterPrefixes(prefixes);
             return this;
         }
@@ -813,60 +779,61 @@ public class PopulateConfig {
          * Add setter prefixes to existing ones.
          *
          * @param prefixes prefixes for methods that work in a similar way as a regular setter method.
-         * @return SetterStrategyBuilder
+         * @return SetterConfig
          */
-        public SetterStrategyBuilder addPrefixes(String... prefixes) {
+        public SetterConfig addPrefixes(String... prefixes) {
             parent.addSetterPrefixes(prefixes);
             return this;
         }
     }
 
     /**
-     * Builder for MUTATOR strategy configuration
+     * Configuration for MUTATOR strategy
      */
-    public static class MutatorStrategyBuilder extends StrategyBuilder {
+    public static class MutatorConfig extends SubBuilder {
 
-        MutatorStrategyBuilder(PopulateConfigBuilder parent) {
+        MutatorConfig(PopulateConfigBuilder parent) {
             super(parent);
         }
 
-        public MutatorStrategyBuilder constructorType(ConstructorType type) {
+        public MutatorConfig constructorType(ConstructorType type) {
             parent.constructorType(type);
             return this;
         }
     }
 
     /**
-     * Builder for STATIC_METHOD strategy configuration
+     * Configuration for STATIC_METHOD strategy
      */
-    public static class StaticMethodStrategyBuilder extends StrategyBuilder {
+    public static class StaticMethodConfig extends SubBuilder {
 
-        StaticMethodStrategyBuilder(PopulateConfigBuilder parent) {
+        StaticMethodConfig(PopulateConfigBuilder parent) {
             super(parent);
         }
 
-        public StaticMethodStrategyBuilder methodType(MethodType type) {
+        public StaticMethodConfig methodType(MethodType type) {
             parent.methodType(type);
             return this;
         }
     }
 
     /**
-     * Builder for Kotlin strategy configuration
+     * Configuration for Kotlin support
      */
-    public static class KotlinStrategyBuilder extends StrategyBuilder {
+    public static class KotlinSupport extends SubBuilder {
 
-        KotlinStrategyBuilder(PopulateConfigBuilder parent) {
+        KotlinSupport(PopulateConfigBuilder parent) {
             super(parent);
         }
 
         /**
          * Use Kotlin default values when populating
          *
-         * @return KotlinStrategyBuilder
+         * @param defaultValues true/false
+         * @return KotlinSupport
          */
-        public KotlinStrategyBuilder useDefaultValues() {
-            parent.useKotlinDefaultValues = true;
+        public KotlinSupport defaultValues(boolean defaultValues) {
+            parent.useKotlinDefaultValues = defaultValues;
             return this;
         }
     }

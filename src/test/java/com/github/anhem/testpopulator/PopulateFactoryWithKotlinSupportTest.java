@@ -19,7 +19,7 @@ class PopulateFactoryWithKotlinSupportTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .kotlinSupport()
+                .kotlinSupport(true)
                 .and()
                 .constructorStrategy()
                 .and()
@@ -54,8 +54,9 @@ class PopulateFactoryWithKotlinSupportTest {
     @Test
     void usesKotlinDefaultValuesWhenConfigured() {
         populateConfig = populateConfig.toBuilder()
-                .kotlinSupport()
-                .useDefaultValues()
+                .kotlinSupport(true)
+                .defaultValues(true)
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 

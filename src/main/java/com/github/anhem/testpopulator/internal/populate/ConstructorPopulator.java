@@ -24,8 +24,8 @@ public class ConstructorPopulator implements PopulatingStrategy {
         Class<T> clazz = classCarrier.getClazz();
         PopulateConfig populateConfig = classCarrier.getPopulateConfig();
         try {
-            Constructor<T> constructor = getLargestConstructor(clazz, populateConfig.canAccessNonPublicConstructors());
-            setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
+            Constructor<T> constructor = getLargestConstructor(clazz, populateConfig.isAccessNonPublicConstructors());
+            setAccessible(constructor, populateConfig.isAccessNonPublicConstructors());
             return populateUsingConstructor(constructor, classCarrier, populator);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), CONSTRUCTOR), e);

@@ -76,16 +76,16 @@ public class Populator {
         Class<T> clazz = classCarrier.getClazz();
         PopulateConfig populateConfig = classCarrier.getPopulateConfig();
         for (Strategy strategy : populateConfig.getStrategyOrder()) {
-            if (isMatchingConstructorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
+            if (isMatchingConstructorStrategy(strategy, clazz, populateConfig.isAccessNonPublicConstructors())) {
                 return constructorPopulator.populate(classCarrier, this);
             }
-            if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefixes(), populateConfig.canAccessNonPublicConstructors())) {
+            if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefixes(), populateConfig.isAccessNonPublicConstructors())) {
                 return setterPopulator.populate(classCarrier, this);
             }
-            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors(), populateConfig.getConstructorType())) {
+            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.isAccessNonPublicConstructors(), populateConfig.getConstructorType())) {
                 return mutatorPopulator.populate(classCarrier, this);
             }
-            if (isMatchingFieldStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
+            if (isMatchingFieldStrategy(strategy, clazz, populateConfig.isAccessNonPublicConstructors())) {
                 return fieldPopulator.populate(classCarrier, this);
             }
             if (isMatchingBuilderStrategy(strategy, clazz, populateConfig.getBuilderPattern(), populateConfig.getBuilderMethod())) {
