@@ -102,6 +102,16 @@ public class PopulateConfig {
         }
 
         /**
+         * Clear blacklisted methods.
+         *
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder clearBlacklistedMethods() {
+            this.blacklistedMethods = new HashSet<>();
+            return this;
+        }
+
+        /**
          * Set blacklist fields, replacing existing ones.
          *
          * @param blacklistedFields name of fields to ignore
@@ -144,6 +154,16 @@ public class PopulateConfig {
          */
         public PopulateConfigBuilder addBlacklistedFields(String... blacklistedFields) {
             return addBlacklistedFields(Arrays.asList(blacklistedFields));
+        }
+
+        /**
+         * Clear blacklisted fields.
+         *
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder clearBlacklistedFields() {
+            this.blacklistedFields = new HashSet<>();
+            return this;
         }
 
         /**
@@ -236,6 +256,35 @@ public class PopulateConfig {
         }
 
         /**
+         * Clear all class overrides.
+         *
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder clearClassOverrides() {
+            this.classOverrides = new HashMap<>();
+            return this;
+        }
+
+        /**
+         * Clear all name overrides.
+         *
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder clearNameOverrides() {
+            this.nameOverrides = new HashMap<>();
+            return this;
+        }
+
+        /**
+         * Clear all overrides (both class and name).
+         *
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder clearOverrides() {
+            return clearClassOverrides().clearNameOverrides();
+        }
+
+        /**
          * Different builders behave slightly different. The builderPattern sets which one to use.
          *
          * @param builderPattern supports LOMBOK, IMMUTABLES or PROTOBUF
@@ -311,6 +360,16 @@ public class PopulateConfig {
          */
         public PopulateConfigBuilder addSetterPrefixes(String... setterPrefixes) {
             return addSetterPrefixes(Arrays.asList(setterPrefixes));
+        }
+
+        /**
+         * Clear setter prefixes.
+         *
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder clearSetterPrefixes() {
+            this.setterPrefixes = new HashSet<>();
+            return this;
         }
 
         /**
@@ -818,6 +877,16 @@ public class PopulateConfig {
          */
         public SetterConfig addPrefixes(String... prefixes) {
             parent.addSetterPrefixes(prefixes);
+            return this;
+        }
+
+        /**
+         * Clear setter prefixes.
+         *
+         * @return SetterConfig
+         */
+        public SetterConfig clearPrefixes() {
+            parent.clearSetterPrefixes();
             return this;
         }
     }

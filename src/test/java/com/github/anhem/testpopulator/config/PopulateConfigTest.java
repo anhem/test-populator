@@ -399,6 +399,30 @@ class PopulateConfigTest {
         assertThat(populateConfig.getObjectFactoryPath()).isNull();
     }
 
+    @Test
+    void testClearMethods() {
+        PopulateConfig baseConfig = PopulateConfig.builder()
+                .addBlacklistedMethods("m1")
+                .addBlacklistedFields("f1")
+                .addOverride(String.class, () -> "v1")
+                .addOverride("target", Integer.class, () -> 1)
+                .setterStrategy().addPrefixes("p1").and()
+                .build();
+
+        PopulateConfig clearedConfig = baseConfig.toBuilder()
+                .clearBlacklistedMethods()
+                .clearBlacklistedFields()
+                .clearOverrides()
+                .setterStrategy().clearPrefixes().and()
+                .build();
+
+        assertThat(clearedConfig.getBlacklistedMethods()).isEmpty();
+        assertThat(clearedConfig.getBlacklistedFields()).isEmpty();
+        assertThat(clearedConfig.getClassOverrides()).isEmpty();
+        assertThat(clearedConfig.getNameOverrides()).isEmpty();
+        assertThat(clearedConfig.getSetterPrefixes()).isEmpty();
+    }
+
     private static void assertEqual(PopulateConfig populateConfig, PopulateConfig expectedPopulateConfig) {
         assertThat(populateConfig)
                 .usingRecursiveComparison()
