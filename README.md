@@ -4,8 +4,24 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=anhem_test-populator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=anhem_test-populator)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://central.sonatype.com/artifact/com.github.anhem/test-populator/)
 [![OpenJDK](https://img.shields.io/badge/OpenJDK-11-brightgreen)](https://github.com/anhem/test-populator/blob/main/pom.xml#L26)
+[![Changelog](https://img.shields.io/badge/changelog-v1.0.0-blue)](CHANGELOG.md)
 
 Test-Populator is a Java library that automatically creates and populates objects with fixed or random data, simplifying the creation of test data.
+
+## Table of Contents
+
+- [Why Use Test-Populator?](#why-use-test-populator)
+- [Key Features](#key-features)
+- [Configuration](#configuration)
+  - [Main Configuration Options](#main-configuration-options)
+  - [Strategy-Specific Options](#strategy-specific-options)
+  - [Other Options](#other-options)
+- [Kotlin Support](#kotlin-support)
+- [Usage Examples](#usage-examples)
+- [Technical Insights](#technical-insights)
+- [Thread Safety](#thread-safety)
+- [Building from Source](#building-from-source)
+- [Changelog](#changelog)
 
 -----
 
@@ -566,3 +582,7 @@ You can confidently use a single `PopulateFactory` instance as a singleton or st
 - **Build and Install**: `mvn clean install`
 - **Run Tests**: `mvn test`
 - **Check Coverage**: `mvn -Psonar clean test jacoco:report` (Reports generated in `target/site/jacoco/`)
+
+## Changelog
+
+For a detailed list of changes and migration guides, please see the [CHANGELOG.md](CHANGELOG.md).
