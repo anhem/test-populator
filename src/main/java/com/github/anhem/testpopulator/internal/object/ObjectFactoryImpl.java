@@ -1,17 +1,16 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
+import com.github.anhem.testpopulator.internal.util.KotlinUtil;
+import com.github.anhem.testpopulator.internal.util.ProtobufUtil;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.nio.file.Path;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.*;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.*;
 
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.NULL;
@@ -21,37 +20,7 @@ import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.use
 public class ObjectFactoryImpl implements ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
-
     private static final String NEW_PREFIX = "new ";
-    private static final Map<Class<?>, Function<Object, String>> stringSuppliers = new HashMap<>();
-
-    static {
-        stringSuppliers.put(Integer.class, Object::toString);
-        stringSuppliers.put(Long.class, object -> object + "L");
-        stringSuppliers.put(Double.class, Object::toString);
-        stringSuppliers.put(Boolean.class, Object::toString);
-        stringSuppliers.put(BigDecimal.class, object -> String.format("BigDecimal.valueOf(%d)", ((BigDecimal) object).intValue()));
-        stringSuppliers.put(String.class, object -> "\"" + object + "\"");
-        stringSuppliers.put(Character.class, object -> "'" + object + "'");
-        stringSuppliers.put(LocalDate.class, object -> String.format("LocalDate.parse(\"%s\")", object));
-        stringSuppliers.put(LocalDateTime.class, object -> String.format("LocalDateTime.parse(\"%s\")", object));
-        stringSuppliers.put(ZonedDateTime.class, object -> String.format("ZonedDateTime.parse(\"%s\")", object));
-        stringSuppliers.put(Instant.class, object -> String.format("Instant.parse(\"%s\")", object));
-        stringSuppliers.put(Date.class, object -> String.format("new Date(%sL)", ((Date) object).getTime()));
-        stringSuppliers.put(UUID.class, object -> String.format("UUID.fromString(\"%s\")", object));
-        stringSuppliers.put(Byte.class, object -> String.format("Byte.parseByte(\"%s\")", object));
-        stringSuppliers.put(Short.class, object -> String.format("Short.parseShort(\"%s\")", object));
-        stringSuppliers.put(Float.class, object -> object + "f");
-        stringSuppliers.put(LocalTime.class, object -> String.format("LocalTime.parse(\"%s\")", object));
-        stringSuppliers.put(BigInteger.class, object -> String.format("BigInteger.valueOf(%d)", ((BigInteger) object).intValue()));
-        stringSuppliers.put(OffsetDateTime.class, object -> String.format("OffsetDateTime.parse(\"%s\")", object));
-        stringSuppliers.put(OffsetTime.class, object -> String.format("OffsetTime.parse(\"%s\")", object));
-        stringSuppliers.put(Duration.class, object -> String.format("Duration.ofSeconds(%d)", ((Duration) object).getSeconds()));
-        stringSuppliers.put(Period.class, object -> String.format("Period.ofDays(%d)", ((Period) object).getDays()));
-        stringSuppliers.put(java.sql.Date.class, object -> String.format("Date.valueOf(\"%s\")", object.toString()));
-        stringSuppliers.put(Time.class, object -> String.format("Time.valueOf(\"%s\")", object.toString()));
-        stringSuppliers.put(Timestamp.class, object -> String.format("Timestamp.valueOf(\"%s\")", object.toString()));
-    }
 
     private final PopulateConfig populateConfig;
     private final Map<String, Integer> classNameCounters;
@@ -66,110 +35,248 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void constructor(Class<T> clazz, int expectedChildren) {
-        setNextObjectBuilder(clazz, CONSTRUCTOR, expectedChildren);
+        setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
+                .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                .build());
     }
 
     @Override
     public <T> void setter(Class<T> clazz, int expectedChildren) {
-        setNextObjectBuilder(clazz, SETTER, expectedChildren);
+        setNextObjectBuilder(containerBuilder(clazz, SETTER, expectedChildren)
+                .template(CodeTemplate.SETTER.getFormat())
+                .build());
     }
 
     @Override
     public <T> void mutator(Class<T> clazz, int expectedChildren) {
-        setNextObjectBuilder(clazz, MUTATOR, expectedChildren);
+        setNextObjectBuilder(containerBuilder(clazz, MUTATOR, expectedChildren)
+                .build());
     }
 
     @Override
     public <T> void builder(Class<T> clazz, int expectedChildren, String builderMethodName, String buildMethodName) {
-        boolean useFullyQualifiedName = useFullyQualifiedName(clazz, classNames);
-        if (currentObjectBuilder == null) {
-            currentObjectBuilder = new BuilderObjectBuilder(clazz, getName(clazz), useFullyQualifiedName, expectedChildren, builderMethodName, buildMethodName);
-        } else {
-            setNextObjectBuilder(new BuilderObjectBuilder(clazz, getName(clazz), useFullyQualifiedName, expectedChildren, builderMethodName, buildMethodName));
-        }
+        setNextObjectBuilder(templateBuilder(clazz, BUILDER, expectedChildren)
+                .codeTemplate(CodeTemplate.BUILDER)
+                .methodName(builderMethodName)
+                .buildMethodName(buildMethodName)
+                .build());
     }
 
     @Override
     public void method(String methodName, int expectedChildren) {
-        setNextObjectBuilder(new MethodObjectBuilder(methodName, expectedChildren));
-        if (expectedChildren == 0) {
-            setPreviousObjectBuilder();
-        }
+        setNextObjectBuilder(TemplateObjectBuilder.builder()
+                .name(methodName)
+                .buildType(METHOD)
+                .expectedChildren(expectedChildren)
+                .build());
     }
 
     @Override
     public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
-        if (currentObjectBuilder == null) {
-            currentObjectBuilder = new StaticMethodObjectBuilder(clazz, getName(clazz), methodName, expectedChildren);
-        } else {
-            setNextObjectBuilder(new StaticMethodObjectBuilder(clazz, getName(clazz), methodName, expectedChildren));
-        }
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, expectedChildren)
+                .codeTemplate(CodeTemplate.STATIC_METHOD)
+                .factoryClassName(clazz.getSimpleName())
+                .methodName(methodName)
+                .build());
     }
 
     @Override
     public <T> void set(Class<T> clazz) {
-        setNextObjectBuilder(clazz, SET, 1);
+        setNextObjectBuilder(containerBuilder(clazz, SET, 1)
+                .template(CodeTemplate.TYPED_COLLECTION.getFormat())
+                .parameterized(true)
+                .build());
         method("add", 1);
     }
 
     @Override
     public void setOf() {
-        setNextObjectBuilder(Set.class, SET_OF, 1);
+        setNextObjectBuilder(templateBuilder(Set.class, SET, 1)
+                .codeTemplate(CodeTemplate.IMMUTABLE)
+                .parameterized(true)
+                .factoryClassName(Set.class.getSimpleName())
+                .methodName("of")
+                .clearArgsIfNullChild(true)
+                .build());
+    }
+
+    @Override
+    public <T> void enumSet(Class<T> clazz, Class<?> enumClazz) {
+        setNextObjectBuilder(containerBuilder(clazz, ENUM_SET, 1)
+                .template(CodeTemplate.ENUM_SET.getFormat())
+                .parameterized(true)
+                .referencedClassName(enumClazz.getSimpleName())
+                .referencedClasses(enumClazz)
+                .build());
+        method("add", 1);
     }
 
     @Override
     public <T> void list(Class<T> clazz) {
-        setNextObjectBuilder(clazz, LIST, 1);
+        setNextObjectBuilder(containerBuilder(clazz, LIST, 1)
+                .template(CodeTemplate.TYPED_COLLECTION.getFormat())
+                .parameterized(true)
+                .build());
         method("add", 1);
     }
 
     @Override
     public void listOf() {
-        setNextObjectBuilder(List.class, LIST_OF, 1);
+        setNextObjectBuilder(templateBuilder(List.class, LIST, 1)
+                .codeTemplate(CodeTemplate.IMMUTABLE)
+                .parameterized(true)
+                .factoryClassName(List.class.getSimpleName())
+                .methodName("of")
+                .clearArgsIfNullChild(true)
+                .build());
     }
 
     @Override
     public <T> void map(Class<T> clazz) {
-        setNextObjectBuilder(clazz, MAP, 1);
+        boolean parameterized = !clazz.equals(Properties.class);
+        CodeTemplate codeTemplate = parameterized ? CodeTemplate.TYPED_COLLECTION : CodeTemplate.COLLECTION;
+        setNextObjectBuilder(containerBuilder(clazz, MAP, 1)
+                .template(codeTemplate.getFormat())
+                .parameterized(parameterized)
+                .build());
         method("put", 2);
     }
 
     @Override
     public void mapOf() {
-        setNextObjectBuilder(Map.class, MAP_OF, 2);
+        setNextObjectBuilder(templateBuilder(Map.class, MAP, 2)
+                .codeTemplate(CodeTemplate.IMMUTABLE)
+                .parameterized(true)
+                .factoryClassName(Map.class.getSimpleName())
+                .methodName("of")
+                .clearArgsIfNullChild(true)
+                .build());
+    }
+
+    @Override
+    public <T> void enumMap(Class<T> clazz, Class<?> enumClazz) {
+        boolean parameterized = !clazz.equals(Properties.class);
+        CodeTemplate codeTemplate = parameterized ? CodeTemplate.ENUM_MAP : CodeTemplate.COLLECTION;
+        setNextObjectBuilder(containerBuilder(clazz, ENUM_MAP, 1)
+                .template(codeTemplate.getFormat())
+                .parameterized(parameterized)
+                .referencedClassName(enumClazz.getSimpleName())
+                .referencedClasses(enumClazz)
+                .build());
+        method("put", 2);
     }
 
     @Override
     public <T> void mapEntry(Class<T> clazz) {
-        setNextObjectBuilder(clazz, MAP_ENTRY, 2);
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 2)
+                .codeTemplate(CodeTemplate.MAP_ENTRY)
+                .parameterized(true)
+                .factoryClassName(AbstractMap.class.getSimpleName())
+                .referencedClasses(AbstractMap.class)
+                .build());
+    }
+
+    @Override
+    public void optional() {
+        setNextObjectBuilder(templateBuilder(Optional.class, STATIC_METHOD, 1)
+                .codeTemplate(CodeTemplate.OPTIONAL)
+                .parameterized(true)
+                .factoryClassName(Optional.class.getSimpleName())
+                .methodName("ofNullable")
+                .referencedClasses(Optional.class)
+                .build());
     }
 
     @Override
     public <T> void array(Class<T> clazz) {
-        setNextObjectBuilder(clazz, ARRAY, 1);
+        setNextObjectBuilder(templateBuilder(clazz, ARRAY, 1)
+                .codeTemplate(CodeTemplate.ARRAY)
+                .build());
     }
 
     @Override
-    public <T> void value(T value) {
-        setNextObjectBuilder(value.getClass(), VALUE, 0);
-        String stringValue = toStringValue(value);
-        if (currentObjectBuilder.isUseFullyQualifiedName()) {
-            if (stringValue.startsWith(NEW_PREFIX)) {
-                currentObjectBuilder.setValue(String.format("%s%s.%s", NEW_PREFIX, currentObjectBuilder.getClazz().getPackageName(), stringValue.replace(NEW_PREFIX, "")));
-            } else {
-                currentObjectBuilder.setValue(String.format("%s.%s", currentObjectBuilder.getClazz().getPackageName(), stringValue));
-            }
+    public <T> void stream(Class<T> clazz) {
+        TemplateObjectBuilder.Builder streamBuilder = templateBuilder(clazz, STATIC_METHOD, 1)
+                .methodName("of");
+
+        if (clazz.equals(IntStream.class)) {
+            streamBuilder.codeTemplate(CodeTemplate.NUMBER_STREAM).factoryClassName(IntStream.class.getSimpleName()).referencedClasses(IntStream.class);
+        } else if (clazz.equals(LongStream.class)) {
+            streamBuilder.codeTemplate(CodeTemplate.NUMBER_STREAM).factoryClassName(LongStream.class.getSimpleName()).referencedClasses(LongStream.class);
+        } else if (clazz.equals(DoubleStream.class)) {
+            streamBuilder.codeTemplate(CodeTemplate.NUMBER_STREAM).factoryClassName(DoubleStream.class.getSimpleName()).referencedClasses(DoubleStream.class);
         } else {
-            currentObjectBuilder.setValue(stringValue);
+            streamBuilder.codeTemplate(CodeTemplate.STREAM).parameterized(true).factoryClassName(Stream.class.getSimpleName()).referencedClasses(Stream.class);
         }
-        setPreviousObjectBuilder();
+        setNextObjectBuilder(streamBuilder.build());
+    }
+
+    @Override
+    public <T> void iterator(Class<T> clazz) {
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 1)
+                .codeTemplate(CodeTemplate.ITERATOR)
+                .parameterized(true)
+                .factoryClassName(Stream.class.getSimpleName())
+                .methodName("of")
+                .referencedClasses(Stream.class, Objects.class)
+                .build());
+    }
+
+    @Override
+    public <T> void iterable(Class<T> clazz) {
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 1)
+                .codeTemplate(CodeTemplate.ITERABLE)
+                .parameterized(true)
+                .factoryClassName(Stream.class.getSimpleName())
+                .methodName("of")
+                .referencedClasses(Stream.class, Objects.class, Collectors.class)
+                .build());
+    }
+
+    @Override
+    public <T> void scanner(Class<T> clazz) {
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 1)
+                .codeTemplate(CodeTemplate.SCANNER)
+                .factoryClassName(Scanner.class.getSimpleName())
+                .referencedClasses(Scanner.class)
+                .build());
+    }
+
+    @Override
+    public <T> void future(Class<T> clazz) {
+        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, 1)
+                .codeTemplate(CodeTemplate.FUTURE)
+                .parameterized(true)
+                .factoryClassName(CompletableFuture.class.getSimpleName())
+                .methodName("completedFuture")
+                .referencedClasses(CompletableFuture.class)
+                .build());
+    }
+
+    @Override
+    public <T> void value(T value, Class<T> clazz, String name) {
+        TemplateObjectBuilder objectBuilder = templateBuilder(clazz, VALUE, 0)
+                .codeTemplate(CodeTemplate.VALUE)
+                .build();
+        String stringValue = toStringValue(value, clazz, name, objectBuilder);
+        if (objectBuilder.isUseFullyQualifiedName()) {
+            if (stringValue.startsWith(NEW_PREFIX)) {
+                stringValue = String.format("%s%s.%s", NEW_PREFIX, clazz.getPackageName(), stringValue.replace(NEW_PREFIX, ""));
+            } else {
+                stringValue = String.format("%s.%s", clazz.getPackageName(), stringValue);
+            }
+        }
+        objectBuilder.setValue(stringValue);
+        setNextObjectBuilder(objectBuilder);
     }
 
     @Override
     public <T> void nullValue(Class<T> clazz) {
-        setNextObjectBuilder(clazz, VALUE, 0);
-        currentObjectBuilder.setValue(NULL);
-        setPreviousObjectBuilder();
+        TemplateObjectBuilder objectBuilder = templateBuilder(clazz, VALUE, 0)
+                .codeTemplate(CodeTemplate.VALUE)
+                .build();
+        objectBuilder.setValue(NULL);
+        setNextObjectBuilder(objectBuilder);
     }
 
     @Override
@@ -189,6 +296,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
             writeStaticImports(objectResult, path);
             writeStartClass(objectResult, path, populateConfig);
             writeObjects(objectResult, path);
+            writeMethods(objectResult, path);
             writeEndClass(path);
         }
     }
@@ -199,34 +307,92 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .orElse(null);
     }
 
-    private String toStringValue(Object object) {
-        Class<?> clazz = object.getClass();
-        if (clazz.isEnum()) {
+    private String toStringValue(Object object, Class<?> clazz, String name, ObjectBuilder objectBuilder) {
+        if (object.getClass().isEnum()) {
             return object.toString();
         }
 
-        return Optional.ofNullable(stringSuppliers.get(clazz))
-                .map(supplier -> supplier.apply(object))
-                .orElseGet(() -> populateConfig.getOverridePopulate().getOrDefault(object.getClass(), () -> {
-                    throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
-                }).createString());
+        if (KotlinUtil.isKotlinSingleton(clazz, populateConfig.isKotlinSupport())) {
+            return String.format("%s.INSTANCE", clazz.getSimpleName());
+        }
+
+        if (name != null) {
+            OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
+            OverridePopulate<?> nameOverride = populateConfig.getNameOverrides().get(overrideTarget);
+            if (nameOverride != null && isCreateCodeOverridden(nameOverride)) {
+                return applyOverride(nameOverride, objectBuilder);
+            }
+        }
+
+        OverridePopulate<?> classOverride = populateConfig.getClassOverrides().get(clazz);
+        if (classOverride != null && isCreateCodeOverridden(classOverride)) {
+            return applyOverride(classOverride, objectBuilder);
+        }
+
+        String formattedValue = ValueFormatter.format(object, clazz);
+        if (formattedValue != null) {
+            return formattedValue;
+        }
+
+        if (name != null) {
+            OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
+            if (populateConfig.getNameOverrides().containsKey(overrideTarget)) {
+                return populateConfig.getNameOverrides().get(overrideTarget).createCode();
+            }
+        }
+
+        if (classOverride != null) {
+            return classOverride.createCode();
+        }
+
+        throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
-    private void setNextObjectBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
-        boolean useFullyQualifiedName = useFullyQualifiedName(clazz, classNames);
-        if (currentObjectBuilder == null) {
-            currentObjectBuilder = new BuildTypeObjectBuilder(clazz, getName(clazz), buildType, useFullyQualifiedName, expectedChildren);
-        } else if (buildType == MUTATOR) {
-            setNextObjectBuilder(new BuildTypeObjectBuilder(clazz, currentObjectBuilder.getName(), buildType, useFullyQualifiedName, expectedChildren));
-        } else {
-            setNextObjectBuilder(new BuildTypeObjectBuilder(clazz, getName(clazz), buildType, useFullyQualifiedName, expectedChildren));
+    private String applyOverride(OverridePopulate<?> overridePopulate, ObjectBuilder objectBuilder) {
+        objectBuilder.addMethods(overridePopulate.createMethods());
+        objectBuilder.addImports(overridePopulate.createImports());
+        objectBuilder.addStaticImports(overridePopulate.createStaticImports());
+        return overridePopulate.createCode();
+    }
+
+    private boolean isCreateCodeOverridden(OverridePopulate<?> overridePopulate) {
+        try {
+            return !overridePopulate.getClass().getMethod("createCode").getDeclaringClass().equals(OverridePopulate.class);
+        } catch (NoSuchMethodException e) {
+            return false;
         }
     }
 
+    private TemplateObjectBuilder.Builder templateBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
+        return TemplateObjectBuilder.builder()
+                .clazz(clazz)
+                .name(getName(clazz))
+                .buildType(buildType)
+                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
+                .expectedChildren(expectedChildren);
+    }
+
+    private ContainerObjectBuilder.Builder containerBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
+        return ContainerObjectBuilder.builder()
+                .clazz(clazz)
+                .name(getName(clazz))
+                .buildType(buildType)
+                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
+                .expectedChildren(expectedChildren);
+    }
+
     private void setNextObjectBuilder(ObjectBuilder objectBuilder) {
-        currentObjectBuilder.addChild(objectBuilder);
-        objectBuilder.setParent(currentObjectBuilder);
+        if (ProtobufUtil.isProtobuf(populateConfig)) {
+            objectBuilder.setSkipNullMethods(true);
+        }
+        if (currentObjectBuilder != null) {
+            currentObjectBuilder.addChild(objectBuilder);
+            objectBuilder.setParent(currentObjectBuilder);
+        }
         currentObjectBuilder = objectBuilder;
+        if (currentObjectBuilder.hasAllChildren()) {
+            setPreviousObjectBuilder();
+        }
     }
 
     private void setPreviousObjectBuilder() {
@@ -236,10 +402,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private String getName(Class<?> clazz) {
-        int classCounter = classNameCounters.computeIfAbsent(clazz.getSimpleName(), k -> 0);
         String simpleName = clazz.getSimpleName();
+        String key = clazz.getSimpleName().toLowerCase();
+        int classCounter = classNameCounters.computeIfAbsent(key, k -> 0);
         String name = String.format("%s_%d", Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1), classCounter);
-        classNameCounters.put(clazz.getSimpleName(), ++classCounter);
+        classNameCounters.put(key, ++classCounter);
         return name;
     }
 }

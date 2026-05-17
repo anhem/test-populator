@@ -46,13 +46,13 @@ class ReadMeTest {
         OverridePopulate<MyUUID> myUUIDOverridePopulate = () -> new MyUUID(UUID.randomUUID().toString());
         PopulateFactory populateFactory = new PopulateFactory(
                 PopulateConfig.builder()
-                        .overridePopulate(MyUUID.class, myUUIDOverridePopulate)
+                        .addOverride(MyUUID.class, myUUIDOverridePopulate)
                         .objectFactoryEnabled(true)
                         .build()
         );
 
         Throwable cause = assertThrows(PopulateException.class, () -> populateFactory.populate(MyClass2.class)).getCause();
         assertThat(cause.getClass()).isEqualTo(ObjectException.class);
-        assertThat(cause.getMessage()).isEqualTo(String.format("createString() is not implemented for class %s", MyUUID.class.getName()));
+        assertThat(cause.getMessage()).isEqualTo(String.format("createCode() is not implemented for class %s", MyUUID.class.getName()));
     }
 }

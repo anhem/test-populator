@@ -44,6 +44,11 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public <T> void enumSet(Class<T> clazz, Class<?> enumClazz) {
+        //ignored
+    }
+
+    @Override
     public <T> void list(Class<T> clazz) {
         //ignored
     }
@@ -64,7 +69,17 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public <T> void enumMap(Class<T> clazz, Class<?> enumClazz) {
+        //ignored
+    }
+
+    @Override
     public <T> void mapEntry(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public void optional() {
         //ignored
     }
 
@@ -74,7 +89,32 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
-    public <T> void value(T value) {
+    public <T> void stream(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public <T> void iterator(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public <T> void iterable(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public <T> void scanner(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public <T> void future(Class<T> clazz) {
+        //ignored
+    }
+
+    @Override
+    public <T> void value(T value, Class<T> clazz, String name) {
         //ignored
     }
 

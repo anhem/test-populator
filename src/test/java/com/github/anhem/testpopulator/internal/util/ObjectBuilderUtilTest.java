@@ -1,9 +1,9 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.internal.object.BuildType;
-import com.github.anhem.testpopulator.internal.object.BuildTypeObjectBuilder;
-import com.github.anhem.testpopulator.internal.object.MethodObjectBuilder;
+import com.github.anhem.testpopulator.internal.object.ContainerObjectBuilder;
 import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
+import com.github.anhem.testpopulator.internal.object.TemplateObjectBuilder;
 import com.github.anhem.testpopulator.model.java.ArbitraryEnum;
 import com.github.anhem.testpopulator.model.java.constructor.NestedCollections;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.NULL;
 import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,22 +69,44 @@ class ObjectBuilderUtilTest {
 
     @Test
     void isBasicValueReturnsFalse() {
-        assertThat(isBasicValue(new BuildTypeObjectBuilder(Pojo.class, "pojo_0", BuildType.VALUE, false, 0))).isFalse();
+        assertThat(isBasicValue(TemplateObjectBuilder.builder()
+                .clazz(Pojo.class)
+                .name("pojo_0")
+                .buildType(BuildType.CONSTRUCTOR)
+                .expectedChildren(0)
+                .skipIfNull(true)
+                .build())).isFalse();
     }
 
     @Test
     void isBasicValueReturnsTrueWhenBuildTypeIsValueAndClassIsJavaBaseClass() {
-        assertThat(isBasicValue(new BuildTypeObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0))).isTrue();
+        ObjectBuilder string = TemplateObjectBuilder.builder()
+                .clazz(String.class)
+                .name("string_0")
+                .buildType(VALUE)
+                .expectedChildren(0)
+                .skipIfNull(true)
+                .build();
+        string.setValue("\"string_0\"");
+        assertThat(isBasicValue(string)).isTrue();
     }
 
     @Test
     void isBasicValueReturnsTrueWhenBuildTypeIsValueAndClassIsEnum() {
-        assertThat(isBasicValue(new BuildTypeObjectBuilder(ArbitraryEnum.class, "arbitraryEnum_0", BuildType.VALUE, false, 0))).isTrue();
+        ObjectBuilder arbitraryEnum = TemplateObjectBuilder.builder()
+                .clazz(ArbitraryEnum.class)
+                .name("arbitraryEnum_0")
+                .buildType(VALUE)
+                .expectedChildren(0)
+                .skipIfNull(true)
+                .build();
+        arbitraryEnum.setValue("A");
+        assertThat(isBasicValue(arbitraryEnum)).isTrue();
     }
 
     @Test
     void endBuilderReturnsStreamOfString() {
-        assertThat(endBuilder("build")).hasSize(1).contains(".build();");
+        assertThat(endBuilder("build")).hasSize(1).contains("    .build();");
     }
 
     @Test
@@ -108,9 +131,25 @@ class ObjectBuilderUtilTest {
 
     @Test
     void collectionHasNullValuesReturnsTrueWhenObjectBuilderIsListAndWithoutChildren() {
-        ObjectBuilder objectBuilder = new BuildTypeObjectBuilder(ArrayList.class, "arrayList_0", BuildType.LIST, false, 1);
-        ObjectBuilder addMethod = new MethodObjectBuilder("add", 1);
-        ObjectBuilder string = new BuildTypeObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0);
+        ObjectBuilder objectBuilder = ContainerObjectBuilder.builder()
+                .clazz(ArrayList.class)
+                .name("arrayList_0")
+                .buildType(LIST)
+                .expectedChildren(1)
+                .parameterized(true)
+                .build();
+        ObjectBuilder addMethod = TemplateObjectBuilder.builder()
+                .name("add")
+                .buildType(METHOD)
+                .expectedChildren(1)
+                .build();
+        ObjectBuilder string = TemplateObjectBuilder.builder()
+                .clazz(String.class)
+                .name("string_0")
+                .buildType(VALUE)
+                .expectedChildren(0)
+                .skipIfNull(true)
+                .build();
         string.setValue(NULL);
         addMethod.addChild(string);
         objectBuilder.addChild(addMethod);
@@ -120,9 +159,25 @@ class ObjectBuilderUtilTest {
 
     @Test
     void collectionHasNullValuesReturnsFalseWhenObjectBuilderIsListAndWithChildren() {
-        ObjectBuilder objectBuilder = new BuildTypeObjectBuilder(ArrayList.class, "arrayList_0", BuildType.LIST, false, 1);
-        ObjectBuilder addMethod = new MethodObjectBuilder("add", 1);
-        ObjectBuilder string = new BuildTypeObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0);
+        ObjectBuilder objectBuilder = ContainerObjectBuilder.builder()
+                .clazz(ArrayList.class)
+                .name("arrayList_0")
+                .buildType(LIST)
+                .expectedChildren(1)
+                .parameterized(true)
+                .build();
+        ObjectBuilder addMethod = TemplateObjectBuilder.builder()
+                .name("add")
+                .buildType(METHOD)
+                .expectedChildren(1)
+                .build();
+        ObjectBuilder string = TemplateObjectBuilder.builder()
+                .clazz(String.class)
+                .name("string_0")
+                .buildType(VALUE)
+                .expectedChildren(0)
+                .skipIfNull(true)
+                .build();
         string.setValue("abc123");
         addMethod.addChild(string);
         objectBuilder.addChild(addMethod);
@@ -132,7 +187,14 @@ class ObjectBuilderUtilTest {
 
     @Test
     void collectionHasNullValuesReturnsFalseWhenObjectBuilderIsNotCollection() {
-        ObjectBuilder string = new BuildTypeObjectBuilder(String.class, "string_0", BuildType.VALUE, false, 0);
+        ObjectBuilder string = TemplateObjectBuilder.builder()
+                .clazz(String.class)
+                .name("string_0")
+                .buildType(VALUE)
+                .expectedChildren(0)
+                .skipIfNull(true)
+                .build();
+        string.setValue("\"string_0\"");
 
         assertThat(collectionHasNullValues(string)).isFalse();
     }

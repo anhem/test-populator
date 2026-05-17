@@ -15,7 +15,7 @@ import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGe
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
-class PopulateFactoryWithOverridePopulateTest {
+class PopulateFactoryWithClassOverrideTest {
 
     private PopulateFactory populateFactory;
     private PopulateConfig populateConfig;
@@ -23,9 +23,9 @@ class PopulateFactoryWithOverridePopulateTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .overridePopulate(MyUUID.class, new MyUUIDOverridePopulate())
-                .overridePopulate(Integer.class, () -> -1)
-                .overridePopulate(ZonedDateTime.class, ZonedDateTime::now)
+                .addOverride(MyUUID.class, new MyUUIDOverridePopulate())
+                .addOverride(Integer.class, () -> -1)
+                .addOverride(ZonedDateTime.class, ZonedDateTime::now)
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

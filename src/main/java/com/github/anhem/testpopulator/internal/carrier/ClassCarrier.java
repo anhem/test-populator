@@ -8,35 +8,106 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isJavaBaseClass;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.toArgumentTypes;
+
 public class ClassCarrier<T> extends Carrier {
 
     private final Class<T> clazz;
+    private final String name;
 
-    public ClassCarrier(Class<T> clazz, ObjectFactory objectFactory, List<String> visited, PopulateConfig populateConfig) {
+    public ClassCarrier(
+            Class<T> clazz,
+            ObjectFactory objectFactory,
+            List<String> visited,
+            PopulateConfig populateConfig
+    ) {
+        this(clazz, null, objectFactory, visited, populateConfig);
+    }
+
+    public ClassCarrier(
+            Class<T> clazz,
+            String name,
+            ObjectFactory objectFactory,
+            List<String> visited,
+            PopulateConfig populateConfig
+    ) {
         super(objectFactory, visited, populateConfig);
         this.clazz = clazz;
+        this.name = name;
     }
 
     public Class<T> getClazz() {
         return clazz;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public <V> ClassCarrier<V> toClassCarrier(Class<V> clazz) {
-        return new ClassCarrier<>(clazz, objectFactory, new ArrayList<>(visited), populateConfig);
+        return new ClassCarrier<>(clazz, name, objectFactory, new ArrayList<>(visited), populateConfig);
+    }
+
+    public <V> ClassCarrier<V> toClassCarrier(Class<V> clazz, String name) {
+        return new ClassCarrier<>(clazz, name, objectFactory, new ArrayList<>(visited), populateConfig);
     }
 
     @SuppressWarnings("unchecked")
     public <V> ClassCarrier<V> toClassCarrier(Parameter parameter) {
-        return (ClassCarrier<V>) new ClassCarrier<>(parameter.getType(), objectFactory, new ArrayList<>(visited), populateConfig);
+        return (ClassCarrier<V>) new ClassCarrier<>(
+                parameter.getType(),
+                parameter.getName(),
+                objectFactory,
+                new ArrayList<>(visited),
+                populateConfig
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    public <V> ClassCarrier<V> toClassCarrier(Parameter parameter, String name) {
+        return (ClassCarrier<V>) new ClassCarrier<>(parameter.getType(), name, objectFactory, new ArrayList<>(visited), populateConfig);
     }
 
     public TypeCarrier toTypeCarrier(Type type) {
-        return new TypeCarrier(type, objectFactory, visited, populateConfig);
+        return new TypeCarrier(type, name, objectFactory, visited, populateConfig);
     }
 
     @SuppressWarnings("unchecked")
     public <V> CollectionCarrier<V> toCollectionCarrier(Parameter parameter) {
         return new CollectionCarrier<>((Class<V>) parameter.getType(), parameter, objectFactory, visited, populateConfig);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <V> CollectionCarrier<V> toCollectionCarrier(Parameter parameter, String name) {
+        return new CollectionCarrier<>(
+                (Class<V>) parameter.getType(),
+                name,
+                toArgumentTypes(parameter).toArray(new Type[0]),
+                objectFactory,
+                visited,
+                populateConfig
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    public <V> CollectionCarrier<V> toCollectionCarrier(Class<V> clazz) {
+        return new CollectionCarrier<>(
+                clazz,
+                name,
+                toArgumentTypes(null, clazz).toArray(new Type[0]),
+                objectFactory,
+                visited,
+                populateConfig
+        );
+    }
+
+    public boolean alreadyVisited() {
+        return populateConfig.isNullOnCircularDependency() && !isJavaBaseClass(clazz) && !addVisited();
+    }
+
+    public boolean hasConstructors() {
+        return clazz.getConstructors().length > 0;
     }
 
     public boolean addVisited() {

@@ -1,11 +1,14 @@
 package com.github.anhem.testpopulator;
 
 import com.github.anhem.testpopulator.config.MethodType;
+import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructorExtendsAllArgsConstructorAbstract;
 import com.github.anhem.testpopulator.model.java.field.Fields;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithConstructor;
+import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import com.github.anhem.testpopulator.model.java.setter.PojoWithMultipleCustomSetters;
 import com.github.anhem.testpopulator.model.java.stc.MultipleStaticMethods;
@@ -17,11 +20,12 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.ConstructorType.LARGEST;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.testutil.AssertTestUtil.RECURSIVE_ASSERTION_CONFIGURATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -36,7 +40,8 @@ class PopulateFactoryTest {
             Fields.class, //FIELD
             Users.class, //STATIC_METHOD
             MyUUID.class, //override populate
-            MultipleStaticMethods.class //STATIC_METHOD
+            MultipleStaticMethods.class, //STATIC_METHOD
+            Pojo.class //SETTER
     );
 
     @Test
@@ -70,24 +75,95 @@ class PopulateFactoryTest {
                 .hasMessageContaining("No matching strategy found");
     }
 
+    @Test
+    void canPopulateWithClassOverridesMap() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        String overrideValue = "overridden";
+        Map<Class<?>, OverridePopulate<?>> overrides = Map.of(String.class, () -> overrideValue);
+
+        String result = populateFactory.populate(String.class, overrides);
+
+        assertThat(result).isEqualTo(overrideValue);
+    }
+
+    @Test
+    void canPopulateWithNameOverridesMap() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        String overrideValue = "overridden";
+        Map<OverrideTarget, OverridePopulate<?>> overrides = Map.of(OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> overrideValue);
+
+        Pojo pojo = populateFactory.populate(Pojo.class, overrides);
+
+        assertThat(pojo.getStringValue()).isEqualTo(overrideValue);
+    }
+
+    @Test
+    void canPopulateWithMixedOverridesMap() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        Integer localInt = 123;
+        String localString = "local";
+
+        Map<Object, OverridePopulate<?>> overrides = Map.of(
+                Integer.class, (OverridePopulate<Integer>) () -> localInt,
+                OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> localString
+        );
+
+        Pojo pojo = populateFactory.populate(Pojo.class, overrides);
+
+        assertThat(pojo.getIntegerValue()).isEqualTo(localInt);
+        assertThat(pojo.getStringValue()).isEqualTo(localString);
+    }
+
+    @Test
+    void canPopulateWithClassOverride() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        String overrideValue = "overridden";
+
+        String result = populateFactory.populate(String.class, String.class, () -> overrideValue);
+
+        assertThat(result).isEqualTo(overrideValue);
+    }
+
+    @Test
+    void canPopulateWithNameAndClassOverride() {
+        PopulateFactory populateFactory = new PopulateFactory();
+        String overrideValue = "overridden";
+
+        Pojo pojo = populateFactory.populate(Pojo.class, "setStringValue", String.class, () -> overrideValue);
+
+        assertThat(pojo.getStringValue()).isEqualTo(overrideValue);
+    }
+
     private static PopulateConfig createFullyConfiguredPopulateConfig() {
         return PopulateConfig.builder()
-                .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD))
-                .builderPattern(LOMBOK)
+                .builderStrategy()
+                .pattern(LOMBOK)
+                .and()
+                .setterStrategy()
+                .setPrefixes("")
+                .and()
+                .mutatorStrategy()
+                .constructorType(LARGEST)
+                .and()
+                .constructorStrategy()
+                .and()
+                .staticMethodStrategy()
+                .methodType(MethodType.SIMPLEST)
+                .and()
+                .fieldStrategy()
+                .and()
                 .randomValues(true)
-                .addSetterPrefix("")
                 .accessNonPublicConstructors(true)
-                .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+                .addOverride(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
                 .objectFactoryEnabled(false)
                 .nullOnCircularDependency(true)
-                .constructorType(LARGEST)
-                .methodType(MethodType.SIMPLEST)
                 .build();
     }
 
     private <T> void assertPopulatedObject(T object) {
         assertThat(object).isNotNull();
         assertThat(object).hasNoNullFieldsOrProperties();
-        assertThat(object).usingRecursiveAssertion().hasNoNullFields();
+        assertThat(object).usingRecursiveAssertion(RECURSIVE_ASSERTION_CONFIGURATION)
+                .hasNoNullFields();
     }
 }

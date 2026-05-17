@@ -21,7 +21,8 @@ class PopulateFactoryWithStaticStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(STATIC_METHOD))
+                .staticMethodStrategy()
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -74,9 +75,10 @@ class PopulateFactoryWithStaticStrategyTest {
     @Test
     void multipleStaticMethodsWithSimplestMethodType() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(STATIC_METHOD))
-                .objectFactoryEnabled(true)
+                .staticMethodStrategy()
                 .methodType(MethodType.SIMPLEST)
+                .and()
+                .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         MultipleStaticMethods value1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
@@ -87,9 +89,10 @@ class PopulateFactoryWithStaticStrategyTest {
     @Test
     void multipleStaticMethodsWithSmallestMethodType() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(STATIC_METHOD))
-                .objectFactoryEnabled(true)
+                .staticMethodStrategy()
                 .methodType(MethodType.SMALLEST)
+                .and()
+                .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         MultipleStaticMethods value1 = populateAndAssertWithGeneratedCode(MultipleStaticMethods.class);
@@ -106,5 +109,15 @@ class PopulateFactoryWithStaticStrategyTest {
         assertGeneratedCode(value, populateConfig);
 
         return value;
+    }
+
+    @Test
+    void userWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        User value = populateAndAssertWithGeneratedCode(User.class);
+        assertThat(value).isNotNull();
     }
 }

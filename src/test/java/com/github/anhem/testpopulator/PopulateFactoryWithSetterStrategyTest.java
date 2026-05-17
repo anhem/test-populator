@@ -1,17 +1,22 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
+import com.github.anhem.testpopulator.model.java.NamedDates;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.setter.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.SETTER;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
@@ -29,7 +34,8 @@ class PopulateFactoryWithSetterStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(SETTER))
+                .setterStrategy()
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -87,7 +93,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("with")
+                .addSetterPrefixes("with")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -98,7 +104,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithBlankSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("")
+                .addSetterPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -109,10 +115,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("set")
-                .addSetterPrefix("with")
-                .addSetterPrefix("also")
-                .addSetterPrefix("as")
+                .addSetterPrefixes("set", "with", "also", "as")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -123,7 +126,7 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSettersUsingBlankSetter() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("")
+                .addSetterPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -188,14 +191,24 @@ class PopulateFactoryWithSetterStrategyTest {
     void setterIsUsedWhenClassOnlySupportsSetterAndOtherStrategiesAreAvailable() {
         Class<Pojo> clazz = Pojo.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR))
+                .clearStrategies()
+                .builderStrategy()
+                .and()
+                .constructorStrategy()
+                .and()
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, SETTER))
+                .clearStrategies()
+                .builderStrategy()
+                .and()
+                .constructorStrategy()
+                .and()
+                .setterStrategy()
+                .and()
                 .builderPattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -209,6 +222,94 @@ class PopulateFactoryWithSetterStrategyTest {
         DateAndTimeMix value1 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
         DateAndTimeMix value2 = populateAndAssertWithGeneratedCode(DateAndTimeMix.class);
         assertRandomlyPopulatedValues(value1, value2);
+    }
+
+    @Test
+    void canPopulateDatesBasedOnNames() {
+        NamedDates namedDates = populateAndAssertWithGeneratedCode(NamedDates.class);
+
+        assertThat(namedDates.getFromDate()).isNotNull();
+        assertThat(namedDates.getToDate()).isNotNull();
+        assertThat(namedDates.getStartDateTime()).isNotNull();
+        assertThat(namedDates.getEndDateTime()).isNotNull();
+        assertThat(namedDates.getPreviousDate()).isNotNull();
+        assertThat(namedDates.getNextDate()).isNotNull();
+    }
+
+    @Test
+    void canPopulateBasedOnCustomName() {
+        LocalDate localDate = LocalDate.of(2000, 1, 1);
+        populateConfig = populateConfig.toBuilder()
+                .addOverride("setFromDate", LocalDate.class, () -> localDate)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        NamedDates namedDates = populateAndAssertWithGeneratedCode(NamedDates.class);
+
+        assertThat(namedDates.getFromDate()).isEqualTo(localDate);
+        assertThat(namedDates.getToDate()).isNotEqualTo(localDate);
+    }
+
+    @Test
+    void canOverrideCollectionByName() {
+        OverridePopulate<List<String>> listOverride = new OverridePopulate<>() {
+            @Override
+            public List<String> create() {
+                return List.of("foo", "bar");
+            }
+
+            @Override
+            public String createCode() {
+                return "List.of(\"foo\", \"bar\")";
+            }
+        };
+        Pojo pojo = populateFactory.populate(Pojo.class, "setListOfStrings", List.class, (OverridePopulate) listOverride);
+
+        assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
+    }
+
+    @Test
+    void canPopulateWithMultipleOverridesInSameCall() {
+        LocalDate localDate = LocalDate.of(2000, 1, 1);
+        String stringValue = "fixed-string";
+        Integer intValue = 99;
+
+        Map<Class<?>, OverridePopulate<?>> classOverrides = Map.of(
+                Integer.class, (OverridePopulate<Integer>) () -> intValue
+        );
+        Map<OverrideTarget, OverridePopulate<?>> nameOverrides = Map.of(
+                OverrideTarget.of("setLocalDate", LocalDate.class), (OverridePopulate<LocalDate>) () -> localDate,
+                OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> stringValue
+        );
+
+        Pojo pojo = populateFactory.populate(Pojo.class, classOverrides, nameOverrides);
+
+        assertThat(pojo.getIntegerValue()).isEqualTo(intValue);
+        assertThat(pojo.getLocalDate()).isEqualTo(localDate);
+        assertThat(pojo.getStringValue()).isEqualTo(stringValue);
+        assertThat(pojo.getListOfStrings()).isNotNull().isNotEmpty(); // Check that non-overridden fields are still populated
+    }
+
+    @Test
+    void canPopulateWithOverrides() {
+        LocalDate localDate = LocalDate.of(2000, 1, 1);
+        String stringValue = "fixed-string";
+        Integer intValue = 99;
+
+        Map<Class<?>, OverridePopulate<?>> classOverrides = Map.of(
+                Integer.class, (OverridePopulate<Integer>) () -> intValue
+        );
+        Map<OverrideTarget, OverridePopulate<?>> nameOverrides = Map.of(
+                OverrideTarget.of("setLocalDate", LocalDate.class), (OverridePopulate<LocalDate>) () -> localDate,
+                OverrideTarget.of("setStringValue", String.class), (OverridePopulate<String>) () -> stringValue
+        );
+
+        Pojo pojo = populateFactory.populate(Pojo.class, classOverrides, nameOverrides);
+
+        assertThat(pojo.getIntegerValue()).isEqualTo(intValue);
+        assertThat(pojo.getLocalDate()).isEqualTo(localDate);
+        assertThat(pojo.getStringValue()).isEqualTo(stringValue);
+        assertThat(pojo.getListOfStrings()).isNotNull().isNotEmpty();
     }
 
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
@@ -230,5 +331,15 @@ class PopulateFactoryWithSetterStrategyTest {
         assertThat(value).isInstanceOf(clazz);
 
         return value;
+    }
+
+    @Test
+    void pojoWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        Pojo value = populateAndAssertWithGeneratedCode(Pojo.class);
+        assertThat(value).isNotNull();
     }
 }

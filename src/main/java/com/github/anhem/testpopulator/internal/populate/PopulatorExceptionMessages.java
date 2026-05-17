@@ -8,7 +8,8 @@ public class PopulatorExceptionMessages {
     public static final String FAILED_TO_CALL_METHOD = "Failed to call method '%s' in object of class '%s'";
     public static final String FAILED_TO_CREATE_OBJECT = "Failed to create object of '%s' using '%s' strategy";
     public static final String FAILED_TO_CREATE_COLLECTION = "Failed to create and populate collection '%s'";
-    public static final String FAILED_TO_CALL_STATIC_METHOD = "Failed to call static method '%s' of class '%s'";
+    public static final String FAILED_TO_CALL_STATIC_METHOD = "Failed to call static method '%s' in '%s'";
+    public static final String FAILED_TO_POPULATE_KOTLIN_TYPE = "Failed to populate Kotlin type '%s'";
 
     private PopulatorExceptionMessages() {
 

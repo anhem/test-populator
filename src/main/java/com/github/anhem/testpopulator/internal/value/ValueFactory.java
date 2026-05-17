@@ -2,11 +2,19 @@ package com.github.anhem.testpopulator.internal.value;
 
 import com.github.anhem.testpopulator.config.BuilderPattern;
 import com.github.anhem.testpopulator.config.OverridePopulate;
+import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.exception.PopulateException;
+import com.github.anhem.testpopulator.internal.util.PopulateUtil;
 import com.github.anhem.testpopulator.internal.util.RandomUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
@@ -15,13 +23,31 @@ import java.util.*;
 import static com.github.anhem.testpopulator.internal.util.RandomUtil.*;
 
 public class ValueFactory {
+
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
+
+    private static final List<Currency> AVAILABLE_CURRENCIES = new ArrayList<>(Currency.getAvailableCurrencies());
+    private static final Locale[] AVAILABLE_LOCALES = Arrays.stream(Locale.getAvailableLocales())
+            .filter(l -> l.equals(Locale.forLanguageTag(l.toLanguageTag())))
+            .toArray(Locale[]::new);
+    private static final String[] AVAILABLE_TIMEZONE_IDS = TimeZone.getAvailableIDs();
+    private static final List<String> AVAILABLE_ZONE_IDS = new ArrayList<>(ZoneId.getAvailableZoneIds());
+    private static final List<Charset> AVAILABLE_CHARSETS = List.of(
+            StandardCharsets.UTF_8,
+            StandardCharsets.US_ASCII,
+            StandardCharsets.ISO_8859_1,
+            StandardCharsets.UTF_16,
+            StandardCharsets.UTF_16BE,
+            StandardCharsets.UTF_16LE
+    );
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0, 0, 0);
     private static final ZonedDateTime ZONED_DATE_TIME = LOCAL_DATE_TIME.atZone(ZoneId.of("UTC"));
     private static final Instant INSTANT = ZONED_DATE_TIME.toInstant();
     private static final LocalDate LOCAL_DATE = LOCAL_DATE_TIME.toLocalDate();
     private static final LocalTime LOCAL_TIME = LOCAL_DATE_TIME.toLocalTime();
     private static final Date DATE = Date.from(INSTANT);
+    private static final URL URL = PopulateUtil.toUrl("http://example.com");
+    private static final URI URI = java.net.URI.create("http://example.com");
     private static final String STRING = "string";
     private static final Boolean BOOLEAN = Boolean.TRUE;
     private static final Long LONG = 1L;
@@ -41,70 +67,137 @@ public class ValueFactory {
     private static final java.sql.Date SQL_DATE = java.sql.Date.valueOf(LOCAL_DATE);
     private static final Time SQL_TIME = Time.valueOf(LOCAL_TIME);
     private static final Timestamp SQL_TIMESTAMP = Timestamp.from(INSTANT);
-
+    private static final Currency CURRENCY = Currency.getInstance("XTS");
+    private static final Locale LOCALE = Locale.ROOT;
+    private static final ZoneId ZONE_ID = ZoneId.of("UTC");
+    private static final ZoneOffset ZONE_OFFSET = ZoneOffset.UTC;
+    private static final Year YEAR = Year.of(1970);
+    private static final YearMonth YEAR_MONTH = YearMonth.of(1970, 1);
+    private static final MonthDay MONTH_DAY = MonthDay.of(1, 1);
+    private static final Month MONTH = Month.JANUARY;
+    private static final DayOfWeek DAY_OF_WEEK = DayOfWeek.MONDAY;
+    private static final Path PATH = Paths.get("test-path");
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
+    private static final ByteBuffer BYTE_BUFFER = ByteBuffer.wrap(new byte[]{1, 2, 3});
+    private static final InetAddress INET_ADDRESS = PopulateUtil.toInetAddress("127.0.0.1");
+    private static final Inet4Address INET4_ADDRESS = (Inet4Address) PopulateUtil.toInetAddress("127.0.0.1");
+    private static final Inet6Address INET6_ADDRESS = (Inet6Address) PopulateUtil.toInetAddress("::1");
+    private static final InetSocketAddress INET_SOCKET_ADDRESS = new InetSocketAddress(INET_ADDRESS, 8080);
 
     private final boolean setRandomValues;
-    private final Map<Class<?>, TypeSupplier<?>> typeSuppliers;
+    private final Map<Class<?>, TypeSupplier<?>> classTypeSuppliers;
+    private final Map<OverrideTarget, TypeSupplier<?>> nameTypeSuppliers;
     private final BuilderPattern builderPattern;
 
-    public ValueFactory(boolean setRandomValues, Map<Class<?>, OverridePopulate<?>> overridePopulates, BuilderPattern builderPattern) {
+    public ValueFactory(
+            boolean setRandomValues,
+            Map<Class<?>, OverridePopulate<?>> classOverrides,
+            Map<OverrideTarget, OverridePopulate<?>> nameOverrides,
+            BuilderPattern builderPattern
+    ) {
         this.setRandomValues = setRandomValues;
-        this.typeSuppliers = getDefaultTypeSuppliers();
-        this.typeSuppliers.putAll(overridePopulates);
+        this.classTypeSuppliers = setClassTypeSuppliers(classOverrides);
+        this.nameTypeSuppliers = new HashMap<>(nameOverrides);
         this.builderPattern = builderPattern;
     }
 
-    private Map<Class<?>, TypeSupplier<?>> getDefaultTypeSuppliers() {
-        Map<Class<?>, TypeSupplier<?>> typeSuppliers = new HashMap<>();
-        typeSuppliers.put(Integer.class, this::getInteger);
-        typeSuppliers.put(int.class, this::getInteger);
-        typeSuppliers.put(Long.class, this::getLong);
-        typeSuppliers.put(long.class, this::getLong);
-        typeSuppliers.put(Double.class, this::getDouble);
-        typeSuppliers.put(double.class, this::getDouble);
-        typeSuppliers.put(Short.class, this::getShort);
-        typeSuppliers.put(short.class, this::getShort);
-        typeSuppliers.put(Float.class, this::getFloat);
-        typeSuppliers.put(float.class, this::getFloat);
-        typeSuppliers.put(Boolean.class, this::getBoolean);
-        typeSuppliers.put(boolean.class, this::getBoolean);
-        typeSuppliers.put(BigDecimal.class, this::getBigDecimal);
-        typeSuppliers.put(BigInteger.class, this::getBigInteger);
-        typeSuppliers.put(String.class, this::getString);
-        typeSuppliers.put(LocalDate.class, this::getLocalDate);
-        typeSuppliers.put(LocalTime.class, this::getLocalTime);
-        typeSuppliers.put(LocalDateTime.class, this::getLocalDateTime);
-        typeSuppliers.put(OffsetTime.class, this::getOffsetTime);
-        typeSuppliers.put(OffsetDateTime.class, this::getOffsetDateTime);
-        typeSuppliers.put(ZonedDateTime.class, this::getZonedDateTime);
-        typeSuppliers.put(Instant.class, this::getInstant);
-        typeSuppliers.put(Duration.class, this::getDuration);
-        typeSuppliers.put(Period.class, this::getPeriod);
-        typeSuppliers.put(Date.class, this::getDate);
-        typeSuppliers.put(java.sql.Date.class, this::getSqlDate);
-        typeSuppliers.put(Time.class, this::getSqlTime);
-        typeSuppliers.put(Timestamp.class, this::getSqlTimestamp);
-        typeSuppliers.put(Character.class, this::getChar);
-        typeSuppliers.put(char.class, this::getChar);
-        typeSuppliers.put(UUID.class, this::getUUID);
-        typeSuppliers.put(byte.class, this::getByte);
-        typeSuppliers.put(Byte.class, this::getByte);
-        return typeSuppliers;
+    private Map<Class<?>, TypeSupplier<?>> setClassTypeSuppliers(Map<Class<?>, OverridePopulate<?>> classOverrides) {
+        Map<Class<?>, TypeSupplier<?>> suppliers = new HashMap<>();
+        suppliers.put(Integer.class, this::getInteger);
+        suppliers.put(int.class, this::getInteger);
+        suppliers.put(Long.class, this::getLong);
+        suppliers.put(long.class, this::getLong);
+        suppliers.put(Double.class, this::getDouble);
+        suppliers.put(double.class, this::getDouble);
+        suppliers.put(Short.class, this::getShort);
+        suppliers.put(short.class, this::getShort);
+        suppliers.put(Float.class, this::getFloat);
+        suppliers.put(float.class, this::getFloat);
+        suppliers.put(Boolean.class, this::getBoolean);
+        suppliers.put(boolean.class, this::getBoolean);
+        suppliers.put(BigDecimal.class, this::getBigDecimal);
+        suppliers.put(BigInteger.class, this::getBigInteger);
+        suppliers.put(String.class, this::getString);
+        suppliers.put(CharSequence.class, this::getString);
+        suppliers.put(LocalDate.class, this::getLocalDate);
+        suppliers.put(LocalTime.class, this::getLocalTime);
+        suppliers.put(LocalDateTime.class, this::getLocalDateTime);
+        suppliers.put(OffsetTime.class, this::getOffsetTime);
+        suppliers.put(OffsetDateTime.class, this::getOffsetDateTime);
+        suppliers.put(ZonedDateTime.class, this::getZonedDateTime);
+        suppliers.put(Instant.class, this::getInstant);
+        suppliers.put(Duration.class, this::getDuration);
+        suppliers.put(Period.class, this::getPeriod);
+        suppliers.put(Date.class, this::getDate);
+        suppliers.put(java.sql.Date.class, this::getSqlDate);
+        suppliers.put(Time.class, this::getSqlTime);
+        suppliers.put(Timestamp.class, this::getSqlTimestamp);
+        suppliers.put(Character.class, this::getChar);
+        suppliers.put(char.class, this::getChar);
+        suppliers.put(UUID.class, this::getUUID);
+        suppliers.put(byte.class, this::getByte);
+        suppliers.put(Byte.class, this::getByte);
+        suppliers.put(Currency.class, this::getCurrency);
+        suppliers.put(Locale.class, this::getLocale);
+        suppliers.put(TimeZone.class, this::getTimeZone);
+        suppliers.put(ZoneId.class, this::getZoneId);
+        suppliers.put(ZoneOffset.class, this::getZoneOffset);
+        suppliers.put(Year.class, this::getYear);
+        suppliers.put(YearMonth.class, this::getYearMonth);
+        suppliers.put(MonthDay.class, this::getMonthDay);
+        suppliers.put(Month.class, this::getMonth);
+        suppliers.put(DayOfWeek.class, this::getDayOfWeek);
+        suppliers.put(Path.class, this::getPath);
+        suppliers.put(URL.class, this::getUrl);
+        suppliers.put(URI.class, this::getUri);
+        suppliers.put(Charset.class, this::getCharset);
+        suppliers.put(Calendar.class, this::getCalendar);
+        suppliers.put(BitSet.class, this::getBitSet);
+        suppliers.put(Throwable.class, this::getThrowable);
+        suppliers.put(Exception.class, this::getException);
+        suppliers.put(RuntimeException.class, this::getRuntimeException);
+        suppliers.put(Error.class, this::getError);
+        suppliers.put(ByteBuffer.class, this::getByteBuffer);
+        suppliers.put(InetAddress.class, this::getInetAddress);
+        suppliers.put(Inet4Address.class, this::getInet4Address);
+        suppliers.put(Inet6Address.class, this::getInet6Address);
+        suppliers.put(InetSocketAddress.class, this::getInetSocketAddress);
+        suppliers.putAll(classOverrides);
+        return suppliers;
+    }
+
+    public <T> T createValue(Class<T> clazz) {
+        return createValue(clazz, null);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T createValue(Class<T> clazz) {
+    public <T> T createValue(Class<T> clazz, String name) {
+        if (name != null) {
+            OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
+            if (nameTypeSuppliers.containsKey(overrideTarget)) {
+                return (T) nameTypeSuppliers.get(overrideTarget).create();
+            }
+        }
+
+        if (classTypeSuppliers.containsKey(clazz)) {
+            return (T) classTypeSuppliers.get(clazz).create();
+        }
+
         if (clazz.isEnum()) {
             return getEnum(clazz);
         }
 
-        return Optional.ofNullable(typeSuppliers.get(clazz))
-                .map(supplier -> (T) supplier.create())
-                .orElseThrow(() -> new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName())));
+        throw new PopulateException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
     }
 
-    public boolean hasType(Class<?> clazz) {
-        return clazz.isEnum() || typeSuppliers.containsKey(clazz);
+    public boolean hasType(Class<?> clazz, String name) {
+        return clazz.isEnum() ||
+                classTypeSuppliers.containsKey(clazz) ||
+                (name != null && nameTypeSuppliers.containsKey(OverrideTarget.of(name, clazz)));
+    }
+
+    Set<Class<?>> getRegisteredTypes() {
+        return classTypeSuppliers.keySet();
     }
 
     private <T> T getEnum(Class<T> clazz) {
@@ -214,4 +307,117 @@ public class ValueFactory {
         return setRandomValues ? Timestamp.from(getInstant()) : SQL_TIMESTAMP;
     }
 
+    private Currency getCurrency() {
+        return setRandomValues ? AVAILABLE_CURRENCIES.get(getRandomInt(AVAILABLE_CURRENCIES.size())) : CURRENCY;
+    }
+
+    private Locale getLocale() {
+        return setRandomValues ? AVAILABLE_LOCALES[getRandomInt(AVAILABLE_LOCALES.length)] : LOCALE;
+    }
+
+    private TimeZone getTimeZone() {
+        return setRandomValues ? TimeZone.getTimeZone(AVAILABLE_TIMEZONE_IDS[getRandomInt(AVAILABLE_TIMEZONE_IDS.length)]) : TimeZone.getTimeZone("UTC");
+    }
+
+    private ZoneId getZoneId() {
+        return setRandomValues ? ZoneId.of(AVAILABLE_ZONE_IDS.get(getRandomInt(AVAILABLE_ZONE_IDS.size()))) : ZONE_ID;
+    }
+
+    private ZoneOffset getZoneOffset() {
+        return setRandomValues ? ZoneOffset.ofHours(getRandomInt(37) - 18) : ZONE_OFFSET;
+    }
+
+    private Year getYear() {
+        return setRandomValues ? Year.from(getRandomLocalDate(5)) : YEAR;
+    }
+
+    private YearMonth getYearMonth() {
+        return setRandomValues ? YearMonth.from(getRandomLocalDate(5)) : YEAR_MONTH;
+    }
+
+    private MonthDay getMonthDay() {
+        return setRandomValues ? MonthDay.from(getRandomLocalDate(5)) : MONTH_DAY;
+    }
+
+    private Month getMonth() {
+        return setRandomValues ? getRandomEnum(Month.class, false) : MONTH;
+    }
+
+    private DayOfWeek getDayOfWeek() {
+        return setRandomValues ? getRandomEnum(DayOfWeek.class, false) : DAY_OF_WEEK;
+    }
+
+    private Path getPath() {
+        return setRandomValues ? Paths.get(getRandomString()) : PATH;
+    }
+
+    private URL getUrl() {
+        return setRandomValues ? PopulateUtil.toUrl("http://example.com/" + getRandomString()) : URL;
+    }
+
+    private URI getUri() {
+        return setRandomValues ? java.net.URI.create("http://example.com/" + getRandomString()) : URI;
+    }
+
+    private Charset getCharset() {
+        return setRandomValues ? AVAILABLE_CHARSETS.get(getRandomInt(AVAILABLE_CHARSETS.size())) : CHARSET;
+    }
+
+    private Calendar getCalendar() {
+        return setRandomValues ? new Calendar.Builder().setInstant(RandomUtil.getRandomLong()).build() : new GregorianCalendar(1970, Calendar.JANUARY, 1);
+    }
+
+    private BitSet getBitSet() {
+        return setRandomValues ? BitSet.valueOf(new long[]{RandomUtil.getRandomLong()}) : BitSet.valueOf(new long[]{1L});
+    }
+
+    private Throwable getThrowable() {
+        return new Throwable(getString());
+    }
+
+    private Exception getException() {
+        return new Exception(getString());
+    }
+
+    private RuntimeException getRuntimeException() {
+        return new RuntimeException(getString());
+    }
+
+    private Error getError() {
+        return new Error(getString());
+    }
+
+    private ByteBuffer getByteBuffer() {
+        return setRandomValues ? ByteBuffer.wrap(getRandomBytes(10)) : BYTE_BUFFER;
+    }
+
+    private InetAddress getInetAddress() {
+        return setRandomValues ? getInet4Address() : INET_ADDRESS;
+    }
+
+    private Inet4Address getInet4Address() {
+        if (setRandomValues) {
+            try {
+                return (Inet4Address) InetAddress.getByAddress(getRandomBytes(4));
+            } catch (UnknownHostException e) {
+                throw new PopulateException(e.getMessage(), e);
+            }
+        }
+        return INET4_ADDRESS;
+    }
+
+    private Inet6Address getInet6Address() {
+        if (setRandomValues) {
+            try {
+                return (Inet6Address) InetAddress.getByAddress(getRandomBytes(16));
+            } catch (UnknownHostException e) {
+                throw new PopulateException(e.getMessage(), e);
+            }
+        }
+        return INET6_ADDRESS;
+    }
+
+    private InetSocketAddress getInetSocketAddress() {
+        return setRandomValues ? new InetSocketAddress(getInetAddress(), getRandomInt(65535)) : INET_SOCKET_ADDRESS;
+    }
 }

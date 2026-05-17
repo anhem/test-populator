@@ -20,9 +20,6 @@ import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.STA
 
 public class FileWriterUtil {
 
-    static final String TARGET = "target/generated-test-sources/test-populator";
-    private static final String PATH = TARGET + "/%s/%s_%s.java";
-
     private FileWriterUtil() {
     }
 
@@ -31,7 +28,7 @@ public class FileWriterUtil {
     }
 
     public static Path getPath(String packageName, String className, PopulateConfig populateConfig) {
-        return Paths.get(String.format(PATH, toPackagePath(packageName), className, encode(populateConfig)));
+        return Paths.get(populateConfig.getObjectFactoryPath(), toPackagePath(packageName), String.format("%s_%s.java", className, encode(populateConfig)));
     }
 
     public static void createOrOverwriteFile(Path path) {
@@ -69,12 +66,21 @@ public class FileWriterUtil {
         writeLine(path, "}");
     }
 
+    public static void writeMethods(ObjectResult objectResult, Path path) {
+        if (!objectResult.getMethods().isEmpty()) {
+            writeLine(path, "");
+            objectResult.getMethods().stream()
+                    .sorted()
+                    .forEach(method -> writeLine(path, method));
+        }
+    }
+
     public static void writeObjects(ObjectResult objectResult, Path path) {
         objectResult.getObjects().forEach(s -> {
             if (s.startsWith(STATIC_BLOCK_START)) {
                 writeLine(path, String.format("%s\t%s", System.lineSeparator(), s));
             } else if (s.startsWith(STATIC_BLOCK_END)) {
-                writeLine(path, String.format("\t%s%s", s, System.lineSeparator()));
+                writeLine(path, String.format("\t%s", s));
             } else if (s.startsWith(PSF)) {
                 writeLine(path, String.format("\t%s", s));
             } else {

@@ -1,20 +1,18 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
-import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
-import com.github.anhem.testpopulator.model.lombok.LombokImmutableExtendsLombokAbstractImmutable;
-import com.github.anhem.testpopulator.model.lombok.LombokImmutableWithSingular;
-import com.github.anhem.testpopulator.model.lombok.LombokOddImmutable;
+import com.github.anhem.testpopulator.model.lombok.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.BUILDER;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
@@ -30,8 +28,9 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(BUILDER))
-                .builderPattern(LOMBOK)
+                .builderStrategy()
+                .pattern(LOMBOK)
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -142,19 +141,52 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     void builderIsUsedWhenClassOnlySupportsBuilderAndOtherStrategiesAreAvailable() {
         Class<LombokImmutable> clazz = LombokImmutable.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(SETTER, CONSTRUCTOR))
+                .clearStrategies()
+                .setterStrategy()
+                .and()
+                .constructorStrategy()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(SETTER, CONSTRUCTOR, BUILDER))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .setterStrategy()
+                .and()
+                .constructorStrategy()
+                .and()
+                .builderStrategy()
+                .pattern(LOMBOK)
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         LombokImmutable value1 = populateFactory.populate(clazz);
         LombokImmutable value2 = populateFactory.populate(clazz);
         assertRandomlyPopulatedValues(value1, value2);
+    }
+
+    @Test
+    void canOverrideCollectionByName() {
+        List<String> list = List.of("foo", "bar");
+        populateConfig = populateConfig.toBuilder()
+                .addOverride("listOfStrings", List.class, new OverridePopulate<>() {
+                    @Override
+                    public List<String> create() {
+                        return list;
+                    }
+
+                    @Override
+                    public String createCode() {
+                        return "List.of(\"foo\", \"bar\")";
+                    }
+                })
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        LombokImmutable lombokImmutable = populateAndAssertWithGeneratedCode(LombokImmutable.class);
+
+        assertThat(lombokImmutable.getListOfStrings()).isEqualTo(list);
     }
 
     private void assertObjectCanBeRebuilt(LombokImmutable lombokImmutable) {
@@ -175,5 +207,28 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
         assertGeneratedCode(value, populateConfig);
 
         return value;
+    }
+
+    @Test
+    void lombokImmutableWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        LombokImmutable value = populateAndAssertWithGeneratedCode(LombokImmutable.class);
+        assertThat(value).isNotNull();
+    }
+
+    @Test
+    void lombokWithCustomNames() {
+        populateConfig = populateConfig.toBuilder()
+                .builderStrategy()
+                .builderMethod("customBuilder")
+                .buildMethod("customBuild")
+                .and()
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        populateAndAssertWithGeneratedCode(LombokWithCustomNames.class);
     }
 }

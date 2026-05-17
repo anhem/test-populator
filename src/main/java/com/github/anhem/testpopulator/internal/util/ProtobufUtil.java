@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,12 +41,13 @@ public class ProtobufUtil {
         return populateConfig.getBuilderPattern().equals(PROTOBUF) && clazz.getName().equals(BYTE_STRING_NAME);
     }
 
-    public static <T> List<Method> getMethodsForProtobufBuilder(Class<T> clazz, List<String> blacklistedMethods) {
+    public static <T> List<Method> getMethodsForProtobufBuilder(Class<T> clazz, Set<String> blacklistedMethods) {
         List<Method> filteredMethods = getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(ProtobufUtil::isPublic)
                 .filter(method -> isChainable(method, clazz))
                 .filter(PopulateUtil::hasAtLeastOneParameter)
                 .filter(ProtobufUtil::isValidMutator)
+                .filter(method -> !method.getName().endsWith(BUILDER_PARAM_SUFFIX))
                 .filter(method -> !hasBuilderParameter(method))
                 .filter(method -> !isSetUnknownFields(method))
                 .collect(Collectors.toList());
@@ -120,5 +122,13 @@ public class ProtobufUtil {
             return methodNames.contains(regularMethodName);
         }
         return false;
+    }
+
+    public static boolean isProtobufAndHasNullArgument(PopulateConfig populateConfig, Object[] args) {
+        return isProtobuf(populateConfig) && Arrays.stream(args).anyMatch(Objects::isNull);
+    }
+
+    public static boolean isProtobuf(PopulateConfig populateConfig) {
+        return populateConfig.getBuilderPattern() == PROTOBUF;
     }
 }

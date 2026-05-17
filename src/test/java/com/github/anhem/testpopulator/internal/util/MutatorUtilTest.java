@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.ConstructorType;
+import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
@@ -12,7 +13,7 @@ import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
 import static com.github.anhem.testpopulator.internal.util.MutatorUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.NO_CONSTRUCTOR_FOUND;
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -33,7 +34,7 @@ class MutatorUtilTest {
 
     @Test
     void getMutatorMethodsReturnsMethods() {
-        assertThat(getMutatorMethods(Mutator.class, emptyList())).hasSize(8);
+        assertThat(getMutatorMethods(Mutator.class, emptySet())).hasSize(8);
     }
 
     @Test
@@ -41,8 +42,8 @@ class MutatorUtilTest {
         assertThat(getConstructor(MutatorWithMultipleConstructors.class, false, NO_ARGS).getParameterCount()).isZero();
         assertThat(getConstructor(Mutator.class, false, NO_ARGS).getParameterCount()).isZero();
         assertThat(getConstructor(PojoPrivateConstructor.class, true, NO_ARGS).getParameterCount()).isZero();
-        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, NO_ARGS).getParameterCount())
-                .isInstanceOf(RuntimeException.class)
+        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, NO_ARGS))
+                .isInstanceOf(PopulateException.class)
                 .hasMessage(String.format(NO_CONSTRUCTOR_FOUND, PojoPrivateConstructor.class.getName()));
     }
 
@@ -51,8 +52,8 @@ class MutatorUtilTest {
         assertThat(getConstructor(MutatorWithMultipleConstructors.class, false, LARGEST).getParameterCount()).isEqualTo(11);
         assertThat(getConstructor(Mutator.class, false, LARGEST).getParameterCount()).isZero();
         assertThat(getConstructor(PojoPrivateConstructor.class, true, LARGEST).getParameterCount()).isZero();
-        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, LARGEST).getParameterCount())
-                .isInstanceOf(RuntimeException.class)
+        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, LARGEST))
+                .isInstanceOf(PopulateException.class)
                 .hasMessage(String.format(NO_CONSTRUCTOR_FOUND, PojoPrivateConstructor.class.getName()));
     }
 
@@ -61,8 +62,8 @@ class MutatorUtilTest {
         assertThat(getConstructor(MutatorWithMultipleConstructors.class, false, SMALLEST).getParameterCount()).isEqualTo(1);
         assertThat(getConstructor(Mutator.class, false, SMALLEST).getParameterCount()).isZero();
         assertThat(getConstructor(PojoPrivateConstructor.class, true, SMALLEST).getParameterCount()).isZero();
-        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, SMALLEST).getParameterCount())
-                .isInstanceOf(RuntimeException.class)
+        assertThatThrownBy(() -> getConstructor(PojoPrivateConstructor.class, false, SMALLEST))
+                .isInstanceOf(PopulateException.class)
                 .hasMessage(String.format(NO_CONSTRUCTOR_FOUND, PojoPrivateConstructor.class.getName()));
     }
 

@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.util;
 
+import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.object.ObjectResult;
 import org.junit.jupiter.api.Test;
 
@@ -24,19 +25,25 @@ class FileWriterUtilTest {
             "arrayList0.add(\"A\")",
             "}"
     );
+    public static final Set<String> METHODS = Set.of(
+            "private static void myMethod() {",
+            "}"
+    );
     public static final ObjectResult OBJECT_RESULT = new ObjectResult(
             FileWriterUtilTest.class.getPackageName(),
             FileWriterUtilTest.class.getName(),
             IMPORTS,
             STATIC_IMPORTS,
-            OBJECTS
+            OBJECTS,
+            METHODS
     );
 
     @Test
     void getPathReturnsPathBuiltFromObjectResultAndPopulateConfig() {
-        Path path = FileWriterUtil.getPath(OBJECT_RESULT, DEFAULT_POPULATE_CONFIG);
+        PopulateConfig populateConfig = DEFAULT_POPULATE_CONFIG.toBuilder().objectFactory(true).build();
+        Path path = FileWriterUtil.getPath(OBJECT_RESULT, populateConfig);
 
-        assertThat(path).hasToString(String.format("%s/%s/%s_%s.java", TARGET, toPackagePath(this.getClass().getPackageName()), this.getClass().getName(), encode(DEFAULT_POPULATE_CONFIG)));
+        assertThat(path).hasToString(String.format("%s/%s/%s_%s.java", populateConfig.getObjectFactoryPath(), toPackagePath(this.getClass().getPackageName()), this.getClass().getName(), encode(populateConfig)));
     }
 
     @Test
@@ -104,6 +111,19 @@ class FileWriterUtilTest {
     }
 
     @Test
+    void writeMethodsAddsMethodsToFile() throws IOException {
+        Path path = getTempPath();
+
+        writeMethods(OBJECT_RESULT, path);
+
+        assertThat(readAllLines(path)).isEqualTo(List.of(
+                "",
+                "private static void myMethod() {",
+                "}"
+        ));
+    }
+
+    @Test
     void writeObjectsAddsObjectsToFile() throws IOException {
         Path path = getTempPath();
 
@@ -114,8 +134,7 @@ class FileWriterUtilTest {
                 "",
                 "	static {",
                 "		arrayList0.add(\"A\")",
-                "	}",
-                ""));
+                "	}"));
     }
 
     private static Path getTempPath() throws IOException {

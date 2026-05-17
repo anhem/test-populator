@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
 
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.config.Strategy.SETTER;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SetterUtilTest {
 
     private static final String SETTER_PREFIX = "set";
-    private static final List<String> SETTER_PREFIXES = List.of(SETTER_PREFIX);
+    private static final Set<String> SETTER_PREFIXES = Set.of(SETTER_PREFIX);
 
     @Test
     void isMatchingSetterStrategyReturnsTrue() {
@@ -40,7 +41,7 @@ class SetterUtilTest {
     void getSetterMethodsReturnsMethodsWhenRegularSetter() {
         List<Method> setterMethods = getSetterMethods(Pojo.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), SETTER_PREFIXES);
 
-        assertThat(setterMethods).isNotEmpty().hasSize(38);
+        assertThat(setterMethods).isNotEmpty().hasSize(106);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(SETTER_PREFIX));
         setterMethods.forEach(method -> assertThat(method.getReturnType()).isEqualTo(void.class));
     }
@@ -48,7 +49,7 @@ class SetterUtilTest {
     @Test
     void getSetterMethodsReturnsMethodsWhenCustomSetter() {
         String setterPrefix = "with";
-        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), List.of(setterPrefix));
+        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), Set.of(setterPrefix));
 
         assertThat(setterMethods).isNotEmpty().hasSize(17);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));
@@ -58,7 +59,7 @@ class SetterUtilTest {
     @Test
     void getSetterMethodsReturnsMethodsWhenBlankSetter() {
         String setterPrefix = "";
-        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), List.of(setterPrefix));
+        List<Method> setterMethods = getSetterMethods(PojoWithCustomSetters.class, DEFAULT_POPULATE_CONFIG.getBlacklistedMethods(), Set.of(setterPrefix));
 
         assertThat(setterMethods).isNotEmpty().hasSize(17);
         setterMethods.forEach(method -> assertThat(method.getName()).startsWith(setterPrefix));

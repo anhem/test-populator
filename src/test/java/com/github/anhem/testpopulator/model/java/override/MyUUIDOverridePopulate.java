@@ -12,7 +12,7 @@ public class MyUUIDOverridePopulate implements OverridePopulate<MyUUID> {
     }
 
     @Override
-    public String createString() {
+    public String createCode() {
         return String.format("new MyUUID(java.util.UUID.fromString(\"%s\").toString())", UUID);
     }
 }

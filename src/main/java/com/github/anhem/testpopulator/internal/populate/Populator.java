@@ -5,13 +5,12 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.value.StaticMethodPopulator;
+import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.value.ValueFactory;
-
-import java.lang.reflect.Array;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.internal.util.BuilderUtil.isMatchingBuilderStrategy;
+import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isMatchingKotlinSingletonOrCompanion;
 import static com.github.anhem.testpopulator.internal.util.MutatorUtil.isMatchingMutatorStrategy;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufByteString;
@@ -25,10 +24,12 @@ public class Populator {
     private final ConstructorPopulator constructorPopulator = new ConstructorPopulator();
     private final FieldPopulator fieldPopulator = new FieldPopulator();
     private final CollectionPopulator collectionPopulator = new CollectionPopulator();
+    private final ArrayPopulator arrayPopulator = new ArrayPopulator();
     private final SetterPopulator setterPopulator = new SetterPopulator();
     private final MutatorPopulator mutatorPopulator = new MutatorPopulator(constructorPopulator);
     private final BuilderPopulator builderPopulator = new BuilderPopulator();
     private final StaticMethodPopulator staticMethodPopulator = new StaticMethodPopulator();
+    private final KotlinPopulator kotlinPopulator = new KotlinPopulator();
 
     public Populator(ValueFactory valueFactory) {
         this.valueFactory = valueFactory;
@@ -36,24 +37,33 @@ public class Populator {
 
     public <T> T populate(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
-        if (valueFactory.hasType(clazz)) {
+        if (valueFactory.hasType(clazz, classCarrier.getName())) {
             return createValue(classCarrier);
         }
-        if (alreadyVisited(classCarrier, classCarrier.getPopulateConfig().isNullOnCircularDependency())) {
+        if (classCarrier.alreadyVisited()) {
             return createNullValue(classCarrier);
         }
-        if (isCollectionCarrier(classCarrier)) {
+        if (clazz.isArray()) {
+            return arrayPopulator.populate(classCarrier, this);
+        }
+        if (classCarrier instanceof CollectionCarrier) {
             return collectionPopulator.populate(classCarrier, this);
         }
-        if (clazz.isArray()) {
-            return populateForArray(classCarrier);
+        if (isProtobufByteString(clazz, classCarrier.getPopulateConfig())) {
+            return staticMethodPopulator.populate(classCarrier, this, MethodType.SIMPLEST);
+        }
+        if (isCollectionLike(clazz)) {
+            return populate(classCarrier.toCollectionCarrier(clazz));
+        }
+        if (isMatchingKotlinSingletonOrCompanion(clazz, classCarrier.getPopulateConfig().isKotlinSupport())) {
+            return kotlinPopulator.populate(classCarrier, this);
         }
         return populateWithStrategies(classCarrier);
     }
 
     private <T> T createValue(ClassCarrier<T> classCarrier) {
-        T value = valueFactory.createValue(classCarrier.getClazz());
-        classCarrier.getObjectFactory().value(value);
+        T value = valueFactory.createValue(classCarrier.getClazz(), classCarrier.getName());
+        classCarrier.getObjectFactory().value(value, classCarrier.getClazz(), classCarrier.getName());
         return value;
     }
 
@@ -62,30 +72,20 @@ public class Populator {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T populateForArray(ClassCarrier<T> classCarrier) {
-        Class<?> componentType = classCarrier.getClazz().getComponentType();
-        classCarrier.getObjectFactory().array(componentType);
-        Object value = populate(classCarrier.toClassCarrier(componentType));
-        Object array = Array.newInstance(componentType, 1);
-        Array.set(array, 0, value);
-        return (T) array;
-    }
-
     private <T> T populateWithStrategies(ClassCarrier<T> classCarrier) {
         Class<T> clazz = classCarrier.getClazz();
         PopulateConfig populateConfig = classCarrier.getPopulateConfig();
         for (Strategy strategy : populateConfig.getStrategyOrder()) {
-            if (isMatchingConstructorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
+            if (isMatchingConstructorStrategy(strategy, clazz, populateConfig.isAccessNonPublicConstructors())) {
                 return constructorPopulator.populate(classCarrier, this);
             }
-            if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefixes(), populateConfig.canAccessNonPublicConstructors())) {
+            if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefixes(), populateConfig.isAccessNonPublicConstructors())) {
                 return setterPopulator.populate(classCarrier, this);
             }
-            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors(), populateConfig.getConstructorType())) {
+            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.isAccessNonPublicConstructors(), populateConfig.getConstructorType())) {
                 return mutatorPopulator.populate(classCarrier, this);
             }
-            if (isMatchingFieldStrategy(strategy, clazz, populateConfig.canAccessNonPublicConstructors())) {
+            if (isMatchingFieldStrategy(strategy, clazz, populateConfig.isAccessNonPublicConstructors())) {
                 return fieldPopulator.populate(classCarrier, this);
             }
             if (isMatchingBuilderStrategy(strategy, clazz, populateConfig.getBuilderPattern(), populateConfig.getBuilderMethod())) {
@@ -94,9 +94,6 @@ public class Populator {
             if (isMatchingStaticMethodStrategy(strategy, clazz)) {
                 return staticMethodPopulator.populate(classCarrier, this);
             }
-        }
-        if (isProtobufByteString(clazz, populateConfig)) {
-            return staticMethodPopulator.populate(classCarrier, this, MethodType.SIMPLEST);
         }
         throw new PopulateException(format(NO_MATCHING_STRATEGY, clazz.getName(), populateConfig.getStrategyOrder()));
     }

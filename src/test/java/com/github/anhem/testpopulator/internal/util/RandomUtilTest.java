@@ -23,6 +23,36 @@ class RandomUtilTest {
     }
 
     @Test
+    void getRandomIntWithBoundIsDifferentEachTime() {
+        int random1 = getRandomInt(100);
+        int random2 = getRandomInt(100);
+        int retry = 0;
+        while (random1 == random2 && retry < 10) {
+            random2 = getRandomInt(100);
+            retry++;
+        }
+
+        assertThat(random1).isLessThan(100);
+        assertThat(random2).isLessThan(100);
+        assertThat(random1).isNotEqualTo(random2);
+    }
+
+    @Test
+    void getRandomIntWithRangeIsDifferentEachTime() {
+        int random1 = getRandomInt(10, 20);
+        int random2 = getRandomInt(10, 20);
+        int retry = 0;
+        while (random1 == random2 && retry < 10) {
+            random2 = getRandomInt(10, 20);
+            retry++;
+        }
+
+        assertThat(random1).isBetween(10, 20);
+        assertThat(random2).isBetween(10, 20);
+        assertThat(random1).isNotEqualTo(random2);
+    }
+
+    @Test
     void getRandomShortIsDifferentEachTime() {
         short random1 = getRandomShort();
         short random2 = getRandomShort();
@@ -80,6 +110,21 @@ class RandomUtilTest {
     }
 
     @Test
+    void getRandomLocalDateWithYearRangeIsWithinRange() {
+        int yearRange = 5;
+        LocalDate now = LocalDate.now();
+        LocalDate start = now.minusYears(yearRange);
+        LocalDate end = now.plusYears(yearRange);
+
+        LocalDate random1 = getRandomLocalDate(yearRange);
+        LocalDate random2 = getRandomLocalDate(yearRange);
+
+        assertThat(random1).isBetween(start, end);
+        assertThat(random2).isBetween(start, end);
+        assertThat(random1).isNotEqualTo(random2);
+    }
+
+    @Test
     void getRandomLocalDateTimeIsDifferentEachTime() {
         LocalDateTime random1 = getRandomLocalDateTime();
         LocalDateTime random2 = getRandomLocalDateTime();
@@ -123,6 +168,11 @@ class RandomUtilTest {
     void getRandomByteIsDifferentEachTime() {
         Byte random1 = getRandomByte();
         Byte random2 = getRandomByte();
+        int retry = 0;
+        while (random1.equals(random2) && retry < 10) {
+            random2 = getRandomByte();
+            retry++;
+        }
 
         assertThat(random1).isNotNull();
         assertThat(random2).isNotNull();

@@ -8,26 +8,10 @@ public enum BuildType {
     METHOD,
     STATIC_METHOD,
     SET,
-    SET_OF,
+    ENUM_SET,
     LIST,
-    LIST_OF,
     MAP,
-    MAP_OF,
-    MAP_ENTRY,
+    ENUM_MAP,
     ARRAY,
-    VALUE;
-
-    public boolean isParameterizedType() {
-        switch (this) {
-            case SET:
-            case SET_OF:
-            case LIST:
-            case LIST_OF:
-            case MAP:
-            case MAP_OF:
-                return true;
-            default:
-                return false;
-        }
-    }
+    VALUE
 }

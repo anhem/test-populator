@@ -1,11 +1,14 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.Strategy;
-import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
-
+import com.github.anhem.testpopulator.exception.PopulateException;
 import java.lang.reflect.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
@@ -16,24 +19,48 @@ import static java.util.Comparator.comparingInt;
 public class PopulateUtil {
 
     static final String MATCH_FIRST_CHARACTER_UPPERCASE = "\\p{Lu}.*";
-    private static final String JAVA_BASE = "java.base";
     public static final String NO_CONSTRUCTOR_FOUND = "Could not find public constructor for %s";
 
     private PopulateUtil() {
     }
 
     public static List<Type> toArgumentTypes(Parameter parameter) {
-        return Arrays.stream(((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments())
-                .map(type -> type instanceof WildcardType ? ((WildcardType) type).getUpperBounds()[0] : type)
-                .collect(Collectors.toList());
+        return toArgumentTypes(parameter.getParameterizedType(), parameter.getType());
     }
 
-    public static <T> List<Field> getDeclaredFields(Class<T> clazz, List<String> blacklistedFields) {
+    public static List<Type> toArgumentTypes(Type type, Class<?> clazz) {
+        if (type instanceof ParameterizedType) {
+            return Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
+                    .map(t -> t instanceof WildcardType ? ((WildcardType) t).getUpperBounds()[0] : t)
+                    .collect(Collectors.toList());
+        }
+        if (type instanceof GenericArrayType) {
+            return List.of(((GenericArrayType) type).getGenericComponentType());
+        }
+        if (clazz.equals(Properties.class)) {
+            return List.of(String.class, String.class);
+        }
+        if (isMap(clazz) || isMapEntry(clazz)) {
+            return List.of(Object.class, Object.class);
+        }
+        if (isScanner(clazz)) {
+            return List.of(String.class);
+        }
+        if (clazz.isArray()) {
+            return List.of(clazz.getComponentType());
+        }
+        if (isCollectionLike(clazz) || isStream(clazz) || isFuture(clazz)) {
+            return List.of(Object.class);
+        }
+        return Collections.emptyList();
+    }
+
+    public static <T> List<Field> getDeclaredFields(Class<T> clazz, Set<String> blacklistedFields) {
         List<Field> declaredFields = getAllDeclaredFields(clazz, new ArrayList<>());
         return removeUnwantedFields(declaredFields, blacklistedFields);
     }
 
-    public static <T> List<Method> getDeclaredMethods(Class<T> clazz, List<String> blacklistedMethods) {
+    public static <T> List<Method> getDeclaredMethods(Class<T> clazz, Set<String> blacklistedMethods) {
         List<Method> declaredMethods = getAllDeclaredMethods(clazz, new ArrayList<>());
         return removeUnwantedMethods(declaredMethods, blacklistedMethods);
     }
@@ -46,27 +73,97 @@ public class PopulateUtil {
         return Set.class.isAssignableFrom(clazz);
     }
 
+    public static <T> boolean isSortedSet(Class<T> clazz) {
+        return SortedSet.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isNavigableSet(Class<T> clazz) {
+        return NavigableSet.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isEnumSet(Class<T> clazz) {
+        return EnumSet.class.isAssignableFrom(clazz);
+    }
+
     public static <T> boolean isMap(Class<T> clazz) {
         return Map.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isSortedMap(Class<T> clazz) {
+        return SortedMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isNavigableMap(Class<T> clazz) {
+        return NavigableMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isEnumMap(Class<T> clazz) {
+        return EnumMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isConcurrentMap(Class<T> clazz) {
+        return ConcurrentMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isConcurrentNavigableMap(Class<T> clazz) {
+        return ConcurrentNavigableMap.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isDeque(Class<T> clazz) {
+        return Deque.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isQueue(Class<T> clazz) {
+        return Queue.class.isAssignableFrom(clazz);
     }
 
     public static <T> boolean isMapEntry(Class<T> clazz) {
         return Map.Entry.class.isAssignableFrom(clazz);
     }
 
+    public static <T> boolean isCollection(Class<T> clazz) {
+        return Collection.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isOptional(Class<T> clazz) {
+        return Optional.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isStream(Class<T> clazz) {
+        return java.util.stream.BaseStream.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isFuture(Class<T> clazz) {
+        return java.util.concurrent.Future.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isScanner(Class<T> clazz) {
+        return Scanner.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isIterator(Class<T> clazz) {
+        return Iterator.class.isAssignableFrom(clazz);
+    }
+
+    public static <T> boolean isIterable(Class<T> clazz) {
+        return Iterable.class.isAssignableFrom(clazz);
+    }
+
     public static <T> boolean isCollectionLike(Class<T> clazz) {
         return Collection.class.isAssignableFrom(clazz) ||
                 Map.class.isAssignableFrom(clazz) ||
-                Iterable.class.isAssignableFrom(clazz) ||
-                Map.Entry.class.isAssignableFrom(clazz);
-    }
-
-    public static <T> boolean isCollectionCarrier(ClassCarrier<T> classCarrier) {
-        return classCarrier instanceof CollectionCarrier;
+                Map.Entry.class.isAssignableFrom(clazz) ||
+                clazz.isArray() ||
+                isOptional(clazz) ||
+                isStream(clazz) ||
+                isIterable(clazz) ||
+                isIterator(clazz) ||
+                isScanner(clazz) ||
+                isFuture(clazz);
     }
 
     public static <T> boolean isJavaBaseClass(Class<T> clazz) {
-        return clazz.getModule() != null && JAVA_BASE.equals(clazz.getModule().getName());
+        return clazz.getPackageName().startsWith("java.") || clazz.getPackageName().startsWith("javax.");
     }
 
     static boolean isDeclaringJavaBaseClass(Method method) {
@@ -102,14 +199,14 @@ public class PopulateUtil {
             }
         } catch (NoSuchMethodException ignored) {
         }
-        throw new RuntimeException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName()));
+        throw new PopulateException(String.format(NO_CONSTRUCTOR_FOUND, clazz.getName()));
     }
 
-    static boolean isBlackListed(Method method, List<String> blacklistedMethods) {
+    static boolean isBlackListed(Method method, Set<String> blacklistedMethods) {
         return blacklistedMethods.contains(method.getName());
     }
 
-    static boolean isBlackListed(Field field, List<String> blacklistedFields) {
+    static boolean isBlackListed(Field field, Set<String> blacklistedFields) {
         return blacklistedFields.contains(field.getName());
     }
 
@@ -125,18 +222,26 @@ public class PopulateUtil {
         }
     }
 
-    public static <T> void setAccessible(Field field, T object) {
+    public static void setAccessible(Field field, Object object) {
         if (!field.canAccess(object)) {
             field.setAccessible(true);
         }
     }
 
-    public static <T> boolean hasConstructors(CollectionCarrier<T> collectionCarrier) {
-        return collectionCarrier.getClazz().getConstructors().length > 0;
+    public static java.net.URL toUrl(String url) {
+        try {
+            return new URI(url).toURL();
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new PopulateException(e);
+        }
     }
 
-    public static <T> boolean alreadyVisited(ClassCarrier<T> classCarrier, boolean nullOnCircularDependency) {
-        return nullOnCircularDependency && !isJavaBaseClass(classCarrier.getClazz()) && !classCarrier.addVisited();
+    public static java.net.InetAddress toInetAddress(String host) {
+        try {
+            return java.net.InetAddress.getByName(host);
+        } catch (java.net.UnknownHostException e) {
+            throw new PopulateException(e);
+        }
     }
 
     static <T> boolean hasConstructorWithoutArguments(Class<T> clazz, boolean canAccessNonPublicConstructor) {
@@ -171,13 +276,13 @@ public class PopulateUtil {
         return setterPrefix.isEmpty() ? "" : String.format("%s%s", setterPrefix, MATCH_FIRST_CHARACTER_UPPERCASE);
     }
 
-    private static List<Field> removeUnwantedFields(List<Field> declaredFields, List<String> blacklistedFields) {
+    private static List<Field> removeUnwantedFields(List<Field> declaredFields, Set<String> blacklistedFields) {
         return declaredFields.stream()
                 .filter(field -> !isBlackListed(field, blacklistedFields))
                 .collect(Collectors.toList());
     }
 
-    private static List<Method> removeUnwantedMethods(List<Method> declaredMethods, List<String> blacklistedMethods) {
+    private static List<Method> removeUnwantedMethods(List<Method> declaredMethods, Set<String> blacklistedMethods) {
         return declaredMethods.stream()
                 .filter(method -> {
                     if (isBlackListed(method, blacklistedMethods)) {

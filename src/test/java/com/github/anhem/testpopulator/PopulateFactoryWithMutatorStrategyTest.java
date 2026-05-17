@@ -13,11 +13,9 @@ import com.github.anhem.testpopulator.model.lombok.LombokImmutable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static com.github.anhem.testpopulator.config.BuilderPattern.LOMBOK;
 import static com.github.anhem.testpopulator.config.ConstructorType.*;
-import static com.github.anhem.testpopulator.config.Strategy.*;
+import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
@@ -35,7 +33,8 @@ class PopulateFactoryWithMutatorStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .strategyOrder(List.of(MUTATOR))
+                .mutatorStrategy()
+                .and()
                 .objectFactoryEnabled(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -117,7 +116,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void PojoWithMultipleCustomSettersUsingBlankSetter() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefix("")
+                .addSetterPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -182,15 +181,25 @@ class PopulateFactoryWithMutatorStrategyTest {
     void setterIsUsedWhenClassOnlySupportsSetterAndOtherStrategiesAreAvailable() {
         Class<Pojo> clazz = Pojo.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                .pattern(LOMBOK)
+                .and()
+                .constructorStrategy()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, MUTATOR))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                .pattern(LOMBOK)
+                .and()
+                .constructorStrategy()
+                .and()
+                .mutatorStrategy()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         Pojo value1 = populateFactory.populate(clazz);
@@ -209,15 +218,29 @@ class PopulateFactoryWithMutatorStrategyTest {
     void mutatorIsUsedWhenClassOnlyMutatorAndOtherStrategiesAreAvailable() {
         Class<Mutator> clazz = Mutator.class;
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, SETTER))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                .pattern(LOMBOK)
+                .and()
+                .constructorStrategy()
+                .and()
+                .setterStrategy()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
         populateConfig = populateConfig.toBuilder()
-                .strategyOrder(List.of(BUILDER, CONSTRUCTOR, SETTER, MUTATOR))
-                .builderPattern(LOMBOK)
+                .clearStrategies()
+                .builderStrategy()
+                .pattern(LOMBOK)
+                .and()
+                .constructorStrategy()
+                .and()
+                .setterStrategy()
+                .and()
+                .mutatorStrategy()
+                .and()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         Mutator value1 = populateFactory.populate(clazz);
@@ -314,7 +337,7 @@ class PopulateFactoryWithMutatorStrategyTest {
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
                 .objectFactoryEnabled(false)
-                .blacklistedMethods(List.of("from"))
+                .setBlacklistedMethods("from")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         ImmutableImmutablesAbstract value1 = populateAndAssert(ImmutableImmutablesAbstract.Builder.class).build();
@@ -341,5 +364,15 @@ class PopulateFactoryWithMutatorStrategyTest {
         assertThat(value).isInstanceOf(clazz);
 
         return value;
+    }
+
+    @Test
+    void pojoWithKotlinSupportEnabled() {
+        populateConfig = populateConfig.toBuilder()
+                .kotlinSupport(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        Pojo value = populateAndAssertWithGeneratedCode(Pojo.class);
+        assertThat(value).isNotNull();
     }
 }

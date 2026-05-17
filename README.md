@@ -67,6 +67,8 @@ MyClass{
   logic for specific types (like `UUID`), handle circular dependencies, and more.
 * **Builder Support**: Natively supports common builder patterns from libraries like **[Lombok](https://projectlombok.org/)**,
   **[Immutables](https://immutables.github.io/)**, and **[Protobuf](https://protobuf.dev/)**.
+* **Kotlin Support**: Natively supports populating Kotlin classes, including those that use **default parameter values**, by correctly handling
+  synthetic constructors without requiring any external Kotlin dependencies.
 * **Zero Runtime Dependencies:** Written in plain Java, this library is lightweight and has no external runtime dependencies, ensuring it won't
   introduce transitive dependency conflicts into your project.
 * **Java Code Generation (Experimental)**: Automatically generate the Java source code for the populated objects, which you can then save and reuse in
@@ -111,9 +113,26 @@ Defines the order of strategies to try when creating an object. If the first str
     * `CONSTRUCTOR`: Uses the constructor with the most parameters.
     * `SETTER`: Uses a no-arg constructor, then calls standard setter methods (e.g., `setName()`).
     * `MUTATOR`: Uses a constructor, then calls any state-changing methods (including fluent setters like `withName()`).
-    * `FIELD`: Uses a no-arg constructor and populates fields directly using reflection.
+    * `FIELD`: Uses a no-arg constructor and populates fields directly using reflection. (Note: Not compatible with experimental Java Code
+      Generation).
     * `BUILDER`: Uses a builder pattern (e.g., from Lombok or Immutables).
     * `STATIC_METHOD`: Uses a public static factory method to create an instance.
+
+> [!TIP]
+> **Strategy Best Practices**: While you can customize the `strategyOrder`, it is highly recommended to at least include `CONSTRUCTOR` and
+`STATIC_METHOD` (included in the defaults).
+>
+> Many strategies (like `SETTER` and `FIELD`) require a **no-arg constructor** to instantiate the object. If a class (or any of its nested
+> dependencies) only has parameterized constructors or static factory methods, population will fail if the corresponding strategies are disabled.
+>
+> For a detailed look at how restrictive strategy configurations can lead to failures,
+> see [StrategyFailureTest.java](src/test/java/com/github/anhem/testpopulator/readme/StrategyFailureTest.java).
+>
+> **Why Order Matters**: If multiple strategies match a class, the first one in the `strategyOrder` is used. If that strategy fails (e.g., it picks a
+> constructor whose arguments cannot be populated), the entire population for that object fails—it does **not** fall back to the next strategy in the
+> list. Reordering can be useful if you prefer one instantiation method over another or if one matches but is problematic.
+> See [StrategyOrderTest.java](src/test/java/com/github/anhem/testpopulator/readme/StrategyOrderTest.java) for an example of how reordering can resolve
+> population failures.
 
 #### `randomValues`
 
@@ -123,7 +142,7 @@ Controls whether data is random or fixed.
 * **Details**: When set to `false`, populating the same class twice will produce identical objects. Random values are generated within sensible
   ranges (e.g., dates are +/- 1 year from the current date).
 
-#### `overridePopulates`
+#### `classOverrides`
 
 Provides **custom logic** for creating instances of specific classes. This is essential when a class requires values with a specific format, or if you
 want to control the outcome for a specific class.
@@ -131,22 +150,86 @@ want to control the outcome for a specific class.
 For example, imagine a class `MyUUID` whose constructor takes a `String` but requires it to be a valid UUID. Test-Populator would normally provide a
 random string like `"fghjklmnpa"`, which would cause the `MyUUID` constructor to fail.
 
-`overridePopulates` lets you "teach" the library how to correctly create these objects.
+`classOverrides` lets you "teach" the library how to correctly create these objects.
 
 You can provide a lambda directly in the configuration:
 
 ```java
 PopulateConfig populateConfig = PopulateConfig.builder()
         // Solves the problem by providing a correctly formatted string for MyUUID
-        .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+        .addOverride(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
         // Also useful for setting specific values, like the current date
-        .overridePopulate(LocalDate.class, LocalDate::now)
+        .addOverride(LocalDate.class, LocalDate::now)
         // or setting all Strings to a random UUID
-        .overridePopulate(String.class, () -> UUID.randomUUID().toString())
+        .addOverride(String.class, () -> UUID.randomUUID().toString())
         .build();
 ```
 
-Instead of a lambda, you can also implement the `OverridePopulate` interface for more complex cases.
+Instead of a lambda, you can also implement the `OverridePopulate` interface for more complex cases. This is particularly useful when using the
+experimental **Java Code Generation** feature, as it allows you to define helper methods and their required imports that will be included in the
+generated source code.
+
+```java
+PopulateConfig populateConfig = PopulateConfig.builder()
+        .addOverride(URL.class, new OverridePopulate<URL>() {
+            @Override
+            public URL create() {
+                // Implementation for runtime population
+                try {
+                    return new URL("http://example.com");
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public String createCode() {
+                // String used in generated code to call the helper method below
+                return "toUrl(\"http://example.com\")";
+            }
+
+            @Override
+            public Set<String> createMethods() {
+                // Custom helper method definition to be added to the generated class
+                return Set.of(
+                        "\tprivate static java.net.URL toUrl(String url) {\n" +
+                                "\t\ttry {\n" +
+                                "\t\t\treturn new java.net.URL(url);\n" +
+                                "\t\t} catch (java.net.MalformedURLException e) {\n" +
+                                "\t\t\tthrow new RuntimeException(e);\n" +
+                                "\t\t}\n" +
+                                "\t}"
+                );
+            }
+
+            @Override
+            public Set<String> createImports() {
+                // Additional imports required for the generated class
+                return Set.of("java.net.URL", "java.net.MalformedURLException");
+            }
+        })
+        .build();
+```
+
+#### `nameOverrides`
+
+Similar to `classOverrides`, but allows you to provide custom logic based on the **name of the field or method parameter**, and its **expected class
+type**.
+
+This is particularly useful when you have multiple fields of the same type but want to assign them different values or if you want to target a
+specific field across multiple classes.
+
+```java
+PopulateConfig populateConfig = PopulateConfig.builder()
+        // Targets a field named 'fromDate' of type LocalDate
+        .addOverride("fromDate", LocalDate.class, () -> LocalDate.of(2021, 1, 1))
+        // Targets a setter method named 'setFromDate' of type LocalDate
+        .addOverride("setFromDate", LocalDate.class, () -> LocalDate.of(2021, 1, 1))
+        .build();
+```
+
+`nameOverrides` takes precedence over `classOverrides`. Name-based overrides are fully type-safe; an override is only applied if both the name and the
+expected type match exactly. If no match is found, the library falls back to class overrides or default population logic.
 
 #### `nullOnCircularDependency`
 
@@ -166,30 +249,85 @@ Allows the library to use private or protected constructors.
 
 * **For `SETTER` strategy**:
 
-    * `setterPrefixes`: A list of prefixes for setter methods. Default is `["set"]` (classic setter pattern). Use `[""]` to match any void method with one argument.
+    * `setPrefixes`: A list of prefixes for setter methods. Default is `["set"]` (classic setter pattern). Use `[""]` to match any void method with
+      one argument. Configure via `.setterStrategy().setPrefixes(...)`.
 
 * **For `BUILDER` strategy**:
 
-    * `builderPattern`: Specifies which builder library to use. Options are `CUSTOM`, `LOMBOK`, `IMMUTABLES`, `PROTOBUF`. Default is `CUSTOM`.
-    * `builderMethod`: The name of the method that creates the builder instance (e.g., `"builder"`). Used for `CUSTOM` pattern.
-    * `buildMethod`: The name of the method that builds the final object (e.g., `"build"`). Used for `CUSTOM` pattern.
+    * `pattern`: Specifies which builder library to use. Options are `CUSTOM`, `LOMBOK`, `IMMUTABLES`, `PROTOBUF`. Default is `CUSTOM`. Configure via
+      `.builderStrategy().pattern(...)`.
+    * `method`: The name of the method that creates the builder instance (e.g., `"builder"`). Used for `CUSTOM` and `LOMBOK` patterns. Configure via
+      `.builderStrategy().method(...)`.
+    * `buildMethod`: The name of the method that builds the final object (e.g., `"build"`). Used for `CUSTOM` and `LOMBOK` patterns. Configure via
+      `.builderStrategy().buildMethod(...)`.
 
 * **For `MUTATOR` strategy**:
 
-    * `constructorType`: The preferred constructor to use. Options are `NO_ARG`, `SMALLEST`, `LARGEST`. Default is `NO_ARG`.
+    * `constructorType`: The preferred constructor to use. Options are `NO_ARGS`, `SMALLEST`, `LARGEST`. Default is `NO_ARGS`. Configure via
+      `.mutatorStrategy().constructorType(...)`.
 
 * **For `STATIC_METHOD` strategy**:
 
     * `methodType`: The preferred static factory method to use. Options are `LARGEST` (most parameters), `SMALLEST` (fewest parameters), `SIMPLEST` (
-      prioritizes methods with simple parameter types). Default is `LARGEST`.
+      prioritizes methods with simple parameter types). Default is `LARGEST`. Configure via `.staticMethodStrategy().methodType(...)`.
 
 ### Other Options
 
 * `blacklistedMethods` / `blacklistedFields`: A list of method or field names to skip during population. Useful for avoiding code coverage
   instrumentation fields like `$jacocoInit`.
 * `objectFactoryEnabled` (Experimental): If `true`, generates Java source code for the populated object in the
-  `target/generated-test-sources/test-populator/` directory. **Note**: This will not work if the `FIELD` strategy or `accessNonPublicConstructors` is
+  `target/generated-test-sources/test-populator/` directory (automatically adjusted to `build/` for Gradle).
+  Configure via `.objectFactory(true).path("custom/path")`.
+  **Note**: This will not work if the `FIELD` strategy or `accessNonPublicConstructors` is
   enabled.
+* `kotlinSupport`: If `true`, enables support for Kotlin classes. This allows the library to correctly instantiate Kotlin
+  classes that use default parameter values by properly handling the synthetic constructors generated by the Kotlin
+  compiler. Enable via `.kotlinSupport(true)` or `.kotlinSupport(true).defaultValues(true)`.
+
+-----
+
+## Kotlin Support
+
+Test-Populator supports populating Kotlin classes, including those that leverage **default parameter values**.
+
+### Why it's needed
+
+When a Kotlin class defines default values for its constructor parameters, the Kotlin compiler generates a **synthetic constructor**. This constructor
+contains extra internal parameters (like bitmask integers and a marker class) used to determine which default values should be applied.
+
+Standard Java reflection cannot easily call these synthetic constructors with the correct arguments. When `kotlinSupport` is enabled, Test-Populator
+automatically detects these constructors and provides the necessary arguments to ensure the object is instantiated correctly with all parameters
+populated.
+
+### Enabling Kotlin Support
+
+You can enable Kotlin support globally in your `PopulateConfig`:
+
+```java
+PopulateConfig populateConfig = PopulateConfig.builder()
+        .kotlinSupport(true)
+        .defaultValues(true) // Optional: Enable to use Kotlin default values
+        .and()
+        .build();
+```
+
+### Example
+
+Given a Kotlin data class:
+
+```kotlin
+data class User(
+    val id: Int,
+    val name: String = "Default Name",
+    val email: String? = null
+)
+```
+
+With `kotlinSupport` enabled, Test-Populator will correctly populate this class, even though it uses default values.
+
+> [!NOTE]
+> Test-Populator achieves this **without any external Kotlin dependencies**. It uses pure Java reflection to handle the synthetic markers generated by
+> the Kotlin compiler.
 
 -----
 
@@ -204,9 +342,56 @@ For quick use with default settings, you can create a `PopulateFactory` directly
 MyClass myClass = new PopulateFactory().populate(MyClass.class);
 ```
 
+### One-off Overrides (Local Overrides)
+
+You can provide additional overrides for a specific `populate` call. These take precedence over any global configuration. This is useful for testing
+edge cases or specific scenarios without changing the factory's global state.
+
+#### Single Overrides (Convenience Methods)
+
+If you only need a single override, you can use these convenience methods:
+
+```java
+PopulateFactory factory = new PopulateFactory();
+
+// 1. Override a specific class for this call only
+MyClass obj = factory.populate(MyClass.class, String.class, () -> "local-value");
+
+// 2. Override a specific field by name and type
+MyClass obj = factory.populate(MyClass.class, "myField", String.class, () -> "local-value");
+```
+
+#### Multiple Overrides
+
+If you already have a set of overrides in maps, you can pass them directly:
+
+```java
+PopulateFactory factory = new PopulateFactory();
+
+// 1. Map of Class overrides
+Map<Class<?>, OverridePopulate<?>> classOverrides = Map.of(
+        Integer.class, () -> 42
+);
+MyClass obj = factory.populate(MyClass.class, classOverrides);
+
+// 2. Map of Name overrides
+Map<OverrideTarget, OverridePopulate<?>> nameOverrides = Map.of(
+        OverrideTarget.of("email", String.class), () -> "test@example.com"
+);
+MyClass obj = factory.populate(MyClass.class, nameOverrides);
+
+// 3. Both types of overrides in the same map
+Map<Object, OverridePopulate<?>> mixedOverrides = Map.of(
+        Integer.class, () -> 42,
+        OverrideTarget.of("email", String.class), () -> "test@example.com"
+);
+MyClass obj = factory.populate(MyClass.class, mixedOverrides);
+```
+
 ### Global Setup for a Project
 
-It's often useful to create a static helper class with a shared configuration for your entire test suite.
+It's often useful to create a static helper class with a shared configuration for your entire test suite. This makes it easy to access the population
+logic from any test while keeping your configuration centralized.
 
 ```java
 public class TestPopulator {
@@ -214,17 +399,34 @@ public class TestPopulator {
     // 1. Define the configuration once
     private static final PopulateConfig POPULATE_CONFIG = PopulateConfig.builder()
             // Provide custom logic for creating MyUUID objects
-            .overridePopulate(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
+            .addOverride(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
             // Always set LocalDate to the current date
-            .overridePopulate(LocalDate.class, LocalDate::now)
+            .addOverride(LocalDate.class, LocalDate::now)
             .build();
 
     // 2. Create a single factory instance
     private static final PopulateFactory POPULATE_FACTORY = new PopulateFactory(POPULATE_CONFIG);
 
-    // 3. Create a static helper method for easy access in tests
+    // 3. Create static helper methods for easy access in tests
+
+    // Basic population
     public static <T> T populate(Class<T> clazz) {
         return POPULATE_FACTORY.populate(clazz);
+    }
+
+    // With a single class override
+    public static <T, U> T populate(Class<T> clazz, Class<U> overrideClass, OverridePopulate<U> overridePopulate) {
+        return POPULATE_FACTORY.populate(clazz, overrideClass, overridePopulate);
+    }
+
+    // With a single name and type override
+    public static <T> T populate(Class<T> clazz, String overrideName, Class<?> overrideClass, OverridePopulate<?> overridePopulate) {
+        return POPULATE_FACTORY.populate(clazz, overrideName, overrideClass, overridePopulate);
+    }
+
+    // With multiple overrides using a Map
+    public static <T> T populate(Class<T> clazz, Map<?, OverridePopulate<?>> overrides) {
+        return POPULATE_FACTORY.populate(clazz, overrides);
     }
 }
 ```
@@ -232,31 +434,135 @@ public class TestPopulator {
 **Usage in a test:**
 
 ```java
-// Now you can easily populate any object with your custom rules
-MyClass2 myClass2 = TestPopulator.populate(MyClass2.class);
+import static com.your.project.TestPopulator.populate;
+
+class MyServiceTest {
+
+    @Test
+    void testSomething() {
+        // Basic usage - uses the global configuration from TestPopulator
+        MyClass myClass = populate(MyClass.class);
+
+        // One-off override for this specific test
+        MyClass myClassWithTestEmail = populate(
+                MyClass.class,
+                "email",
+                String.class,
+                () -> "test-email@example.com"
+        );
+
+        // Using multiple overrides at once
+        Map<Object, OverridePopulate<?>> overrides = Map.of(
+                Integer.class, () -> 99,
+                OverrideTarget.of("status", String.class), () -> "OVERRIDDEN"
+        );
+        MyClass myClassWithManyOverrides = populate(MyClass.class, overrides);
+    }
+}
 ```
 
-### "Full Coverage" Setup
+#### Kotlin Example
 
-This example shows a configuration designed to handle a wide variety of class structures by enabling almost all features.
+For Kotlin projects, you can create a singleton `object` and leverage **reified type parameters** to create an even cleaner API.
 
-```java
-private static final PopulateConfig FULL_CONFIG = PopulateConfig.builder()
-        // Try all strategies, starting with the most specific (BUILDER)
-        .strategyOrder(List.of(BUILDER, SETTER, MUTATOR, CONSTRUCTOR, STATIC_METHOD, FIELD))
-        // Specify the builder pattern to use
-        .builderPattern(LOMBOK)
-        // Use random values for broader test coverage
-        .randomValues(true)
-        // Allow access to private constructors if no public ones are suitable
-        .accessNonPublicConstructors(true)
-        // Prevent infinite loops with circular dependencies
-        .nullOnCircularDependency(true)
-        // For the MUTATOR strategy, prefer the constructor with the most arguments
-        .constructorType(LARGEST)
-        // For the SETTER strategy, consider any void method with one arg a setter
-        .setterPrefix("")
-        // For STATIC_METHOD strategy, prioritizes method with simple parameter types  
-        .methodType(MethodType.SIMPLEST)
-        .build();
+```kotlin
+object TestPopulator {
+
+    // 1. Define the configuration
+    private val populateConfig = PopulateConfig.builder()
+        .kotlinSupport(true)
+        .defaultValues(true)
+        .and()
+        .addOverride(MyUUID::class.java) { MyUUID(UUID.randomUUID().toString()) }
+        .build()
+
+    // 2. Create the factory
+    // Use @PublishedApi internal so inline functions can access it
+    @PublishedApi
+    internal val populateFactory = PopulateFactory(populateConfig)
+
+    // 3. Create idiomatic Kotlin helper methods using 'inline' and 'reified'
+
+    // Basic usage: populate<MyClass>()
+    inline fun <reified T> populate(): T {
+        return populateFactory.populate(T::class.java)
+    }
+
+    // With a single class override: populate<MyClass, String> { "local-value" }
+    inline fun <reified T, reified U> populate(noinline overridePopulate: () -> U): T {
+        return populateFactory.populate(T::class.java, U::class.java, overridePopulate)
+    }
+
+    // With a single name and type override: populate<MyClass>("email", String::class.java) { "test@example.com" }
+    inline fun <reified T> populate(name: String, clazz: Class<*>, noinline overridePopulate: () -> Any?): T {
+        return populateFactory.populate(T::class.java, name, clazz, overridePopulate)
+    }
+
+    // With multiple overrides using a Map: populate<MyClass>(mapOf(String::class.java to { "local-value" }))
+    inline fun <reified T> populate(overrides: Map<*, OverridePopulate<*>>): T {
+        return populateFactory.populate(T::class.java, overrides)
+    }
+}
 ```
+
+**Usage in a Kotlin test:**
+
+```kotlin
+class MyServiceTest {
+
+    @Test
+    fun `test with different population styles`() {
+        // 1. Basic usage
+        val user: User = TestPopulator.populate()
+
+        // 2. Class-based override using lambda
+        val admin: User = TestPopulator.populate<User, String> { "ADMIN" }
+
+        // 3. Multiple overrides using a Map
+        val customUser: User = TestPopulator.populate(mapOf(
+            AccountId::class.java to OverridePopulate { AccountId(1) },
+            OverrideTarget.of("email", String::class.java) to OverridePopulate { "test@example.com" }
+        ))
+    }
+}
+```
+
+## Technical Insights
+
+Test-Populator is built on a few core architectural principles that ensure its flexibility and reliability:
+
+* **Recursive Strategy-Based Engine**: The library uses a depth-first traversal of the object graph. For each type, it evaluates a pluggable chain of
+  strategies (Constructor, Builder, Setter, etc.) to find the most suitable instantiation method.
+* **Immutable Context (Carriers)**: All state during the recursive population is passed through immutable "Carriers". This ensures that the population
+  process is deterministic and free of side effects across different branches of the object tree.
+* **Decoupled Code Generation**: The experimental Java code generation feature is fully decoupled from the population logic. It "records" the
+  population steps via a notification interface, allowing the library to build the object in memory while simultaneously constructing a mirror tree of
+  `ObjectBuilder` nodes for code output.
+* **Round-Trip Validation**: The library's own test suite uses a unique "compile-and-run" strategy for its generated code. It writes the generated
+  Java source to a file, compiles it on the fly, instantiates the resulting class, and performs a recursive comparison against the original object to
+  ensure 100% behavioral parity.
+
+## Thread Safety
+
+Test-Populator is designed to be **thread-safe** and can be used concurrently in multi-threaded test environments.
+
+* **`PopulateFactory` is stateless**: A single factory instance can be safely shared across multiple threads.
+* **Immutable Configuration**: `PopulateConfig` is effectively immutable after construction.
+* **Thread-Confined Recursion**: Each call to `populate()` creates its own localized context (Carriers and ObjectFactory), ensuring no shared state
+  between concurrent requests.
+* **Safe Randomization**: The internal random data generation uses `java.security.SecureRandom`, which is thread-safe.
+
+You can confidently use a single `PopulateFactory` instance as a singleton or static constant across your entire test suite.
+
+## Building from Source
+
+### Prerequisites
+
+- JDK 11 or higher
+- Maven 3.6.3 or higher
+
+### Commands
+
+- **Build and Install**: `mvn clean install`
+- **Run Tests**: `mvn test`
+- **Check Coverage**: `mvn -Psonar clean test jacoco:report` (Reports generated in `target/site/jacoco/`)

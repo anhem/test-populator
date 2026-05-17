@@ -28,8 +28,8 @@ public class MutatorPopulator extends MethodPopulator implements PopulatingStrat
         Class<T> clazz = classCarrier.getClazz();
         PopulateConfig populateConfig = classCarrier.getPopulateConfig();
         try {
-            Constructor<T> constructor = getConstructor(clazz, populateConfig.canAccessNonPublicConstructors(), populateConfig.getConstructorType());
-            setAccessible(constructor, populateConfig.canAccessNonPublicConstructors());
+            Constructor<T> constructor = getConstructor(clazz, populateConfig.isAccessNonPublicConstructors(), populateConfig.getConstructorType());
+            setAccessible(constructor, populateConfig.isAccessNonPublicConstructors());
             T objectOfClass;
             List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
             if (constructor.getParameterCount() > 0) {
