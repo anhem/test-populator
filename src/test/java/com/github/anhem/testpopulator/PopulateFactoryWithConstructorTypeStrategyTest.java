@@ -29,7 +29,7 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         populateConfig = PopulateConfig.builder()
                 .constructorStrategy()
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -92,7 +92,7 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         Class<AllArgsConstructorPrivate> clazz = AllArgsConstructorPrivate.class;
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(false)
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
                 .build();
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
         populateConfig = populateConfig.toBuilder()
@@ -109,7 +109,7 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         Class<AllArgsConstructorProtected> clazz = AllArgsConstructorProtected.class;
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(false)
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
                 .build();
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
 
@@ -161,7 +161,8 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
     @Test
     void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
         populateConfig = populateConfig.toBuilder()
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
+                .and()
                 .nullOnCircularDependency(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

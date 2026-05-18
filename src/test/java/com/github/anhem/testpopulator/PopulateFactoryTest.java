@@ -155,7 +155,8 @@ class PopulateFactoryTest {
                 .randomValues(true)
                 .accessNonPublicConstructors(true)
                 .addOverride(MyUUID.class, () -> new MyUUID(UUID.randomUUID().toString()))
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
+                .and()
                 .nullOnCircularDependency(true)
                 .build();
     }

@@ -13,7 +13,7 @@ class ConstructorRequiredTypesTest {
     @Test
     void canPopulateConstructorRequiredTypes() {
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 

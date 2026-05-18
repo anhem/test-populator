@@ -27,7 +27,7 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
         populateConfig = PopulateConfig.builder()
                 .builderStrategy()
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }

@@ -58,7 +58,7 @@ class PopulateFactoryWithOverridesTest {
     void localOverridesWorkWithObjectFactory() {
         MyUUID localValue = new MyUUID(UUID.randomUUID().toString());
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 

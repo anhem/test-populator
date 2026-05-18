@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator.config;
 
 import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class KotlinSupportBugReproductionTest {
@@ -34,15 +35,13 @@ public class KotlinSupportBugReproductionTest {
     void canTurnOffKotlinDefaultValuesViaToBuilder() {
         PopulateConfig config1 = PopulateConfig.builder()
                 .kotlinSupport(true)
-                    .defaultValues(true)
-                    .and()
+                .defaultValues(true)
                 .build();
         assertThat(config1.isUseKotlinDefaultValues()).isTrue();
 
         PopulateConfig config2 = config1.toBuilder()
                 .kotlinSupport(true)
-                    .defaultValues(false)
-                    .and()
+                .defaultValues(false)
                 .build();
 
         assertThat(config2.isUseKotlinDefaultValues()).isFalse();

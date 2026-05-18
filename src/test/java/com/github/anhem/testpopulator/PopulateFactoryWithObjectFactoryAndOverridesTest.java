@@ -18,9 +18,10 @@ class PopulateFactoryWithObjectFactoryAndOverridesTest {
     void canGenerateCodeWithMethodsImportsAndStaticImports() {
         String uuidString = "82e8962f-885d-4845-914b-c206a42d7c91";
         MyUUID myUUID = new MyUUID(uuidString);
-        
+
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
+                .and()
                 .addOverride(MyUUID.class, new OverridePopulate<MyUUID>() {
                     @Override
                     public MyUUID create() {
@@ -36,8 +37,8 @@ class PopulateFactoryWithObjectFactoryAndOverridesTest {
                     public Set<String> createMethods() {
                         return Set.of(
                                 "\tprivate static MyUUID createMyUUID(String value) {\n" +
-                                "\t\treturn new MyUUID(value);\n" +
-                                "\t}"
+                                        "\t\treturn new MyUUID(value);\n" +
+                                        "\t}"
                         );
                     }
 
@@ -67,7 +68,8 @@ class PopulateFactoryWithObjectFactoryAndOverridesTest {
         List<String> customList = List.of("A", "B");
 
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
+                .and()
                 .addOverride("setStringValue", String.class, new OverridePopulate<String>() {
                     @Override
                     public String create() {
@@ -115,8 +117,8 @@ class PopulateFactoryWithObjectFactoryAndOverridesTest {
                     public Set<String> createMethods() {
                         return Set.of(
                                 "\tprivate static List<String> createList() {\n" +
-                                "\t\treturn Arrays.asList(\"A\", \"B\");\n" +
-                                "\t}"
+                                        "\t\treturn Arrays.asList(\"A\", \"B\");\n" +
+                                        "\t}"
                         );
                     }
 

@@ -23,7 +23,7 @@ class PopulateFactoryWithKotlinSupportTest {
                 .and()
                 .constructorStrategy()
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -102,7 +102,7 @@ class PopulateFactoryWithKotlinSupportTest {
                 .clearStrategies()
                 .fieldStrategy()
                 .and()
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 

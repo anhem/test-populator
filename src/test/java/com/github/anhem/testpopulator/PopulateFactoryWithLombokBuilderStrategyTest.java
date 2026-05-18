@@ -31,7 +31,7 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
                 .builderStrategy()
                 .pattern(LOMBOK)
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -130,7 +130,8 @@ class PopulateFactoryWithLombokBuilderStrategyTest {
     @Test
     void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
         populateConfig = populateConfig.toBuilder()
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
+                .and()
                 .nullOnCircularDependency(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

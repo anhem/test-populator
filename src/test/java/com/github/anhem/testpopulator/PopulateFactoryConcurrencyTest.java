@@ -91,7 +91,7 @@ class PopulateFactoryConcurrencyTest {
         int numberOfThreads = 20;
         int iterationsPerThread = 5;
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);

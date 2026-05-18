@@ -36,7 +36,7 @@ class PopulateFactoryWithSetterStrategyTest {
         populateConfig = PopulateConfig.builder()
                 .setterStrategy()
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -93,7 +93,8 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefixes("with")
+                .setterStrategy()
+                .addPrefixes("with")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -104,7 +105,8 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithBlankSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefixes("")
+                .setterStrategy()
+                .addPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithCustomSetters.class);
@@ -115,7 +117,8 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSetters() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefixes("set", "with", "also", "as")
+                .setterStrategy()
+                .addPrefixes("set", "with", "also", "as")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -126,7 +129,8 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void PojoWithMultipleCustomSettersUsingBlankSetter() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefixes("")
+                .setterStrategy()
+                .addPrefixes("")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -138,7 +142,7 @@ class PopulateFactoryWithSetterStrategyTest {
     void PojoPrivateConstructor() {
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoPrivateConstructor value1 = populateAndAssert(PojoPrivateConstructor.class);
@@ -180,7 +184,8 @@ class PopulateFactoryWithSetterStrategyTest {
     @Test
     void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
         populateConfig = populateConfig.toBuilder()
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
+                .and()
                 .nullOnCircularDependency(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -196,7 +201,8 @@ class PopulateFactoryWithSetterStrategyTest {
                 .and()
                 .constructorStrategy()
                 .and()
-                .builderPattern(LOMBOK)
+                .builderStrategy()
+                .pattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
@@ -209,7 +215,8 @@ class PopulateFactoryWithSetterStrategyTest {
                 .and()
                 .setterStrategy()
                 .and()
-                .builderPattern(LOMBOK)
+                .builderStrategy()
+                .pattern(LOMBOK)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         Pojo value1 = populateFactory.populate(clazz);

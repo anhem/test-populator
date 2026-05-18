@@ -13,7 +13,7 @@ class StaticMethodRequiredTypesTest {
     @Test
     void canPopulateStaticMethodRequiredTypes() {
         PopulateConfig populateConfig = PopulateConfig.builder()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 

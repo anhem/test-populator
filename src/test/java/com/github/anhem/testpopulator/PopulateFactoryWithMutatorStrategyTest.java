@@ -35,7 +35,7 @@ class PopulateFactoryWithMutatorStrategyTest {
         populateConfig = PopulateConfig.builder()
                 .mutatorStrategy()
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -116,7 +116,10 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void PojoWithMultipleCustomSettersUsingBlankSetter() {
         populateConfig = populateConfig.toBuilder()
-                .addSetterPrefixes("")
+                .setterStrategy()
+                .addPrefixes("")
+                .and()
+                .reorderStrategies(MUTATOR)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoWithMultipleCustomSetters value1 = populateAndAssertWithGeneratedCode(PojoWithMultipleCustomSetters.class);
@@ -128,7 +131,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     void PojoPrivateConstructor() {
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         PojoPrivateConstructor value1 = populateAndAssert(PojoPrivateConstructor.class);
@@ -170,7 +173,8 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void circularDependencyThrowsExceptionWhenNullOnCircularDependencyIsFalse() {
         populateConfig = populateConfig.toBuilder()
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
+                .and()
                 .nullOnCircularDependency(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -251,6 +255,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void MutatorWithConstructorUsingLargestConstructorType() {
         populateConfig = populateConfig.toBuilder()
+                .mutatorStrategy()
                 .constructorType(LARGEST)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -263,6 +268,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void MutatorWithConstructorUsingSmallestConstructorType() {
         populateConfig = populateConfig.toBuilder()
+                .mutatorStrategy()
                 .constructorType(SMALLEST)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -275,6 +281,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void MutatorWithConstructorUsingDefaultConstructorType() {
         populateConfig = populateConfig.toBuilder()
+                .mutatorStrategy()
                 .constructorType(NO_ARGS)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -287,6 +294,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void MutatorWithMultipleConstructorsUsingLargestConstructorType() {
         populateConfig = populateConfig.toBuilder()
+                .mutatorStrategy()
                 .constructorType(LARGEST)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -299,6 +307,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void MutatorWithMultipleConstructorsUsingSmallestConstructorType() {
         populateConfig = populateConfig.toBuilder()
+                .mutatorStrategy()
                 .constructorType(SMALLEST)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -311,6 +320,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     @Test
     void MutatorWithMultipleConstructorsUsingNoArgsConstructorType() {
         populateConfig = populateConfig.toBuilder()
+                .mutatorStrategy()
                 .constructorType(NO_ARGS)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
@@ -324,7 +334,7 @@ class PopulateFactoryWithMutatorStrategyTest {
     void LombokImmutableBuilder() {
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
         LombokImmutable value1 = populateAndAssert(LombokImmutable.LombokImmutableBuilder.class).build();
@@ -336,7 +346,8 @@ class PopulateFactoryWithMutatorStrategyTest {
     void ImmutableImmutablesAbstract() {
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
-                .objectFactoryEnabled(false)
+                .objectFactory(false)
+                .and()
                 .setBlacklistedMethods("from")
                 .build();
         populateFactory = new PopulateFactory(populateConfig);

@@ -32,8 +32,12 @@ class PopulateFactoryWithProtobufBuilderStrategyTest {
                 .builderStrategy()
                 .pattern(PROTOBUF)
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
+                .and()
+                .staticMethodStrategy()
                 .methodType(MethodType.SIMPLEST)
+                .and()
+                .reorderStrategies(BUILDER)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }

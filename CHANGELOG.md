@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2026-05-18
+
+### Configuration (PopulateConfig)
+- **API Consolidation:** Completed the migration to nested sub-builders. Redundant top-level helper methods (e.g., `builderPattern()`, `setterPrefixes()`, `objectFactoryEnabled()`) have been removed to enforce a single, consistent way of configuring strategies.
+- **Implicit Strategy Registration:** Calling a sub-builder (e.g., `.builderStrategy()`) now automatically registers that strategy in the `strategyOrder` if it's not already present.
+- **Builder Reset:** Added `.reset()` to `BuilderConfig` allowing users to revert builder-specific settings (like method names) to their pattern-defaults (e.g., switching from custom names back to Protobuf defaults).
+- **Robust Copying:** Enhanced `toBuilder()` to perform a more direct and reliable copy of the internal configuration state.
+
 ## [1.0.0] - 2026-05-17
 
 ### Major Features

@@ -285,17 +285,6 @@ public class PopulateConfig {
         }
 
         /**
-         * Different builders behave slightly different. The builderPattern sets which one to use.
-         *
-         * @param builderPattern supports LOMBOK, IMMUTABLES or PROTOBUF
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder builderPattern(BuilderPattern builderPattern) {
-            this.builderPattern = builderPattern;
-            return this;
-        }
-
-        /**
          * Declares if random or fixed values should be used. Random values are not created entirely at random. They are created to be random enough.
          *
          * @param randomValues true/false
@@ -318,73 +307,6 @@ public class PopulateConfig {
         }
 
         /**
-         * Set setter prefixes, replacing existing ones.
-         *
-         * @param setterPrefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder setSetterPrefixes(Collection<String> setterPrefixes) {
-            this.setterPrefixes = new HashSet<>(setterPrefixes);
-            return this;
-        }
-
-        /**
-         * Set setter prefixes, replacing existing ones.
-         *
-         * @param setterPrefixes prefixes for methods that work in a similar way as a regular setter method.
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder setSetterPrefixes(String... setterPrefixes) {
-            return setSetterPrefixes(Arrays.asList(setterPrefixes));
-        }
-
-        /**
-         * Add setter prefixes to existing ones.
-         *
-         * @param setterPrefixes a collection of prefixes for methods that work in a similar way as a regular setter method.
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder addSetterPrefixes(Collection<String> setterPrefixes) {
-            if (this.setterPrefixes == null) {
-                this.setterPrefixes = new HashSet<>();
-            }
-            this.setterPrefixes.addAll(setterPrefixes);
-            return this;
-        }
-
-        /**
-         * Add setter prefixes to existing ones.
-         *
-         * @param setterPrefixes prefixes for methods that work in a similar way as a regular setter method.
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder addSetterPrefixes(String... setterPrefixes) {
-            return addSetterPrefixes(Arrays.asList(setterPrefixes));
-        }
-
-        /**
-         * Clear setter prefixes.
-         *
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder clearSetterPrefixes() {
-            this.setterPrefixes = new HashSet<>();
-            return this;
-        }
-
-        /**
-         * This will result in populated objects to also be generated as java code in target/generated-test-sources/test-populator/.
-         * These files can then be copied into your project and used as any other java class.
-         *
-         * @param objectFactoryEnabled true/false
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder objectFactoryEnabled(boolean objectFactoryEnabled) {
-            this.objectFactoryEnabled = objectFactoryEnabled;
-            return this;
-        }
-
-        /**
          * Enable to solve issues with classes having circular dependencies.
          *
          * @param nullOnCircularDependency true/false
@@ -392,52 +314,6 @@ public class PopulateConfig {
          */
         public PopulateConfigBuilder nullOnCircularDependency(boolean nullOnCircularDependency) {
             this.nullOnCircularDependency = nullOnCircularDependency;
-            return this;
-        }
-
-        /**
-         * Set what constructor is preferred when creating objects using MUTATOR strategy.
-         * SMALLEST will attempt to pick a constructor with at least one parameter and fall back on NO_ARGS if none is found.
-         * @param constructorType NO_ARGS, SMALLEST, LARGEST
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder constructorType(ConstructorType constructorType) {
-            this.constructorType = constructorType;
-            return this;
-        }
-
-        /**
-         *  Set the name of the builder method used when creating objects using BUILDER strategy.
-         *  This option will be ignored for LOMBOK, IMMUTABLES and PROTOBUF.
-         * @param builderMethod a string representation of the method name
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder builderMethod(String builderMethod) {
-            this.builderMethod = builderMethod;
-            return this;
-        }
-
-        /**
-         *  Set the name of the build method used when creating objects using BUILDER strategy.
-         *  This option will be ignored for LOMBOK, IMMUTABLES and PROTOBUF.
-         * @param buildMethod a string representation of the method name
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder buildMethod(String buildMethod) {
-            this.buildMethod = buildMethod;
-            return this;
-        }
-
-        /**
-         * Set type of method to find when using STATIC_METHOD strategy.
-         * SIMPLEST will attempt to calculate a complexity score for each static method and pick the simplest.
-         * This is to attempt to avoid more complex methods that for example uses Iterator, StreamReader etc.
-         * Methods with primitives, Strings, Boolean etc. will be prioritized instead.
-         * @param methodType LARGEST, SMALLEST, SIMPLEST
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder methodType(MethodType methodType) {
-            this.methodType = methodType;
             return this;
         }
 
@@ -514,17 +390,6 @@ public class PopulateConfig {
         public StaticMethodConfig staticMethodStrategy() {
             addStrategyOrder(STATIC_METHOD);
             return new StaticMethodConfig(this);
-        }
-
-        /**
-         * Set the path where the ObjectFactory should write generated Java source files.
-         *
-         * @param objectFactoryPath path to write generated files to
-         * @return PopulateConfigBuilder
-         */
-        public PopulateConfigBuilder objectFactoryPath(String objectFactoryPath) {
-            this.objectFactoryPath = objectFactoryPath;
-            return this;
         }
 
         /**
@@ -694,20 +559,20 @@ public class PopulateConfig {
                 .setBlacklistedFields(new ArrayList<>(blacklistedFields))
                 .setClassOverrides(new HashMap<>(classOverrides))
                 .setNameOverrides(new HashMap<>(nameOverrides))
-                .builderPattern(builderPattern)
                 .randomValues(randomValues)
                 .accessNonPublicConstructors(accessNonPublicConstructors)
-                .setSetterPrefixes(new ArrayList<>(setterPrefixes))
-                .objectFactoryEnabled(objectFactoryEnabled)
-                .nullOnCircularDependency(nullOnCircularDependency)
-                .constructorType(constructorType)
-                .builderMethod(builderMethod)
-                .buildMethod(buildMethod)
-                .objectFactoryPath(objectFactoryPath)
-                .methodType(methodType);
+                .nullOnCircularDependency(nullOnCircularDependency);
+        populateConfigBuilder.builderPattern = builderPattern;
+        populateConfigBuilder.setterPrefixes = setterPrefixes != null ? new HashSet<>(setterPrefixes) : null;
+        populateConfigBuilder.objectFactoryEnabled = objectFactoryEnabled;
+        populateConfigBuilder.constructorType = constructorType;
+        populateConfigBuilder.builderMethod = builderMethod;
+        populateConfigBuilder.buildMethod = buildMethod;
+        populateConfigBuilder.objectFactoryPath = objectFactoryPath;
+        populateConfigBuilder.methodType = methodType;
         populateConfigBuilder.kotlinSupport = kotlinSupport;
         populateConfigBuilder.useKotlinDefaultValues = useKotlinDefaultValues;
-        populateConfigBuilder.strategyOrder = new ArrayList<>(strategyOrder);
+        populateConfigBuilder.strategyOrder = strategyOrder != null ? new ArrayList<>(strategyOrder) : null;
         return populateConfigBuilder;
     }
 
@@ -792,17 +657,17 @@ public class PopulateConfig {
         }
 
         public BuilderConfig pattern(BuilderPattern pattern) {
-            parent.builderPattern(pattern);
+            parent.builderPattern = pattern;
             return this;
         }
 
         public BuilderConfig builderMethod(String builderMethod) {
-            parent.builderMethod(builderMethod);
+            parent.builderMethod = builderMethod;
             return this;
         }
 
         public BuilderConfig buildMethod(String buildMethod) {
-            parent.buildMethod(buildMethod);
+            parent.buildMethod = buildMethod;
             return this;
         }
 
@@ -854,7 +719,7 @@ public class PopulateConfig {
          * @return SetterConfig
          */
         public SetterConfig setPrefixes(Collection<String> prefixes) {
-            parent.setSetterPrefixes(prefixes);
+            parent.setterPrefixes = new HashSet<>(prefixes);
             return this;
         }
 
@@ -865,8 +730,7 @@ public class PopulateConfig {
          * @return SetterConfig
          */
         public SetterConfig setPrefixes(String... prefixes) {
-            parent.setSetterPrefixes(prefixes);
-            return this;
+            return setPrefixes(Arrays.asList(prefixes));
         }
 
         /**
@@ -876,7 +740,10 @@ public class PopulateConfig {
          * @return SetterConfig
          */
         public SetterConfig addPrefixes(Collection<String> prefixes) {
-            parent.addSetterPrefixes(prefixes);
+            if (parent.setterPrefixes == null) {
+                parent.setterPrefixes = new HashSet<>();
+            }
+            parent.setterPrefixes.addAll(prefixes);
             return this;
         }
 
@@ -887,8 +754,7 @@ public class PopulateConfig {
          * @return SetterConfig
          */
         public SetterConfig addPrefixes(String... prefixes) {
-            parent.addSetterPrefixes(prefixes);
-            return this;
+            return addPrefixes(Arrays.asList(prefixes));
         }
 
         /**
@@ -897,7 +763,7 @@ public class PopulateConfig {
          * @return SetterConfig
          */
         public SetterConfig clearPrefixes() {
-            parent.clearSetterPrefixes();
+            parent.setterPrefixes = new HashSet<>();
             return this;
         }
     }
@@ -912,7 +778,7 @@ public class PopulateConfig {
         }
 
         public MutatorConfig constructorType(ConstructorType type) {
-            parent.constructorType(type);
+            parent.constructorType = type;
             return this;
         }
     }
@@ -927,7 +793,7 @@ public class PopulateConfig {
         }
 
         public StaticMethodConfig methodType(MethodType type) {
-            parent.methodType(type);
+            parent.methodType = type;
             return this;
         }
     }
@@ -969,7 +835,7 @@ public class PopulateConfig {
          * @return ObjectFactoryConfig
          */
         public ObjectFactoryConfig path(String path) {
-            parent.objectFactoryPath(path);
+            parent.objectFactoryPath = path;
             return this;
         }
     }

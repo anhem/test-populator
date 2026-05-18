@@ -26,7 +26,7 @@ class PopulateFactoryWithClassOverrideTest {
                 .addOverride(MyUUID.class, new MyUUIDOverridePopulate())
                 .addOverride(Integer.class, () -> -1)
                 .addOverride(ZonedDateTime.class, ZonedDateTime::now)
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }

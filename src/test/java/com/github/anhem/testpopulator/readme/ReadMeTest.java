@@ -47,7 +47,7 @@ class ReadMeTest {
         PopulateFactory populateFactory = new PopulateFactory(
                 PopulateConfig.builder()
                         .addOverride(MyUUID.class, myUUIDOverridePopulate)
-                        .objectFactoryEnabled(true)
+                        .objectFactory(true)
                         .build()
         );
 

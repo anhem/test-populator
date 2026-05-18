@@ -16,7 +16,8 @@ class DiverseJavaTypesTest {
         populateConfig = PopulateConfig.builder()
                 .setterStrategy()
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
+                .and()
                 .build();
         populateAndAssert(populateConfig);
     }
@@ -26,7 +27,8 @@ class DiverseJavaTypesTest {
         populateConfig = PopulateConfig.builder()
                 .constructorStrategy()
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
+                .and()
                 .build();
         populateAndAssert(populateConfig);
     }
@@ -45,7 +47,7 @@ class DiverseJavaTypesTest {
         populateConfig = PopulateConfig.builder()
                 .mutatorStrategy()
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         populateAndAssert(populateConfig);
     }
@@ -55,7 +57,7 @@ class DiverseJavaTypesTest {
         populateConfig = PopulateConfig.builder()
                 .staticMethodStrategy()
                 .and()
-                .objectFactoryEnabled(true)
+                .objectFactory(true)
                 .build();
         populateAndAssert(populateConfig);
     }
