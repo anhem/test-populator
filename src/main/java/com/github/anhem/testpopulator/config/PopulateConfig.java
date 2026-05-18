@@ -805,6 +805,17 @@ public class PopulateConfig {
             parent.buildMethod(buildMethod);
             return this;
         }
+
+        /**
+         * Reset builder and build method names to defaults.
+         *
+         * @return BuilderConfig
+         */
+        public BuilderConfig reset() {
+            parent.builderMethod = null;
+            parent.buildMethod = null;
+            return this;
+        }
     }
 
     /**

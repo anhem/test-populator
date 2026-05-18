@@ -331,6 +331,35 @@ class PopulateConfigTest {
     }
 
     @Test
+    void builderConfigResetRevertsToDefaults() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .builderStrategy()
+                    .builderMethod("create")
+                    .buildMethod("finish")
+                    .reset()
+                    .and()
+                .build();
+
+        assertThat(populateConfig.getBuilderMethod()).isEqualTo(DEFAULT_BUILDER_METHOD);
+        assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
+    }
+
+    @Test
+    void builderConfigResetWithProtobufRevertsToDefaults() {
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .builderPattern(PROTOBUF)
+                .builderStrategy()
+                    .builderMethod("create")
+                    .buildMethod("finish")
+                    .reset()
+                    .and()
+                .build();
+
+        assertThat(populateConfig.getBuilderMethod()).isEqualTo(PROTOBUF_BUILDER_METHOD);
+        assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
+    }
+
+    @Test
     void toStringContainsAllFields() {
         String toString = DEFAULT_POPULATE_CONFIG.toString();
         assertThat(toString).contains("classOverrides");
