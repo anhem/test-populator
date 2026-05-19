@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 
 ## [1.0.0] - 2026-05-17
 
+> **Note:** For migration instructions, please refer to the [Migration Guide: v1.0.1](#migration-guide-v101).
+
 ### Major Features
 - **Native Kotlin Support:** Automatically handles Kotlin classes, including those with default parameter values and complex generic collections, by intelligently mapping synthetic constructors back to primary metadata.
 - **Protobuf Support:** Seamlessly populates Protobuf messages using their generated builders and `newBuilder()`/`build()` pattern.
@@ -44,26 +46,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-# Migration Guide: v0.1.x to v1.0.0
+# Migration Guide: v1.0.1
 
-This guide assists in migrating from Test-Populator v0.x to v1.0.0. This release includes significant API refactoring to improve discoverability and type safety.
+This guide assists in migrating from Test-Populator v0.x or v1.0.0 to v1.0.1. This release finalizes the configuration API consolidation and enforces strict usage of nested sub-builders.
 
 ## Breaking Changes
 
-### 1. PopulateConfig Builder API Refactor
+### 1. Final Removal of Top-Level Configuration Helpers
 
-The top-level configuration methods for specific strategies have been moved into nested builders.
+Redundant top-level helper methods in `PopulateConfig.Builder` have been removed. You must now use the corresponding sub-builders.
 
-**v0.1.x:**
+**v1.0.0 (Deprecated/Redundant):**
 ```java
 PopulateConfig config = PopulateConfig.builder()
     .builderPattern(BuilderPattern.LOMBOK)
     .setterPrefixes("with")
-    .strategyOrder(Strategy.CONSTRUCTOR, Strategy.SETTER)
+    .objectFactoryEnabled(true)
     .build();
 ```
 
-**v1.0.0:**
+**v1.0.1 (Required):**
 ```java
 PopulateConfig config = PopulateConfig.builder()
     .builderStrategy()
@@ -72,92 +74,67 @@ PopulateConfig config = PopulateConfig.builder()
     .setterStrategy()
         .setPrefixes("with")
         .and()
-    .reorderStrategies(Strategy.CONSTRUCTOR, Strategy.SETTER)
-    .build();
-```
-
-### 2. Method Renames and Signature Changes
-
-- `PopulateConfig.getOverridePopulate()` -> `getClassOverrides()`.
-- `PopulateConfig.getStrategyOrder()` still exists, but the builder method `strategyOrder(List<Strategy>)` and `strategyOrder(Strategy)` have been replaced by `reorderStrategies(Strategy...)`.
-- Configuration methods for blacklists and prefixes that previously used `List<String>` now use `Set<String>`.
-- `blacklistedMethods(List<String>)` -> `setBlacklistedMethods(Collection<String>)` or `setBlacklistedMethods(String...)`.
-- `blacklistedFields(List<String>)` -> `setBlacklistedFields(Collection<String>)` or `setBlacklistedFields(String...)`.
-
-### 3. Removal of Deprecated Methods
-
-All methods previously marked as `@Deprecated` in v0.x have been removed. This includes:
-- `PopulateConfig.Builder.addBlacklistedMethod(String)` (use `addBlacklistedMethods`)
-- `PopulateConfig.Builder.addBlacklistedField(String)` (use `addBlacklistedFields`)
-- `PopulateConfig.Builder.setterPrefix(String)` (use `setterStrategy().addPrefixes()`)
-
-### 4. ObjectFactory Configuration
-
-The configuration for the experimental `ObjectFactory` has been moved to a sub-builder.
-
-**v0.x:**
-```java
-PopulateConfig config = PopulateConfig.builder()
-    .objectFactoryEnabled(true)
-    .objectFactoryPath("custom/path")
-    .build();
-```
-
-**v1.0.0:**
-```java
-PopulateConfig config = PopulateConfig.builder()
     .objectFactory(true)
-        .path("custom/path")
         .and()
     .build();
 ```
 
+The following methods have been removed from `PopulateConfig.Builder`:
+- `builderPattern(BuilderPattern)` -> use `builderStrategy().pattern(BuilderPattern)`
+- `setterPrefixes(String...)` -> use `setterStrategy().setPrefixes(String...)`
+- `setterPrefixes(Collection<String>)` -> use `setterStrategy().setPrefixes(Collection<String>)`
+- `objectFactoryEnabled(boolean)` -> use `objectFactory(boolean)`
+- `objectFactoryPath(String)` -> use `objectFactory(true).path(String)`
+- `objectFactoryWriteToFile(boolean)` -> use `objectFactory(true).writeToFile(boolean)`
+
+### 2. Method Renames and Signature Changes
+
+- `PopulateConfig.getOverridePopulate()` -> `getClassOverrides()`.
+- Local overrides in `PopulateFactory.populate()` now require strict type safety. Passing a raw `String` as a key in the overrides map is no longer supported; use `OverrideTarget` for name-based overrides.
+- Configuration methods for blacklists and prefixes that previously used `List<String>` now consistently use `Set<String>` internally, though builder methods often accept `Collection` or varargs.
+
 ## New Features and Improvements
 
-### Local Overrides in `PopulateFactory`
+### 1. Implicit Strategy Registration
 
-You can now pass overrides directly to the `populate` method using convenience methods. These overrides are scoped to the current execution and take precedence over global configuration.
+Calling a sub-builder (e.g., `.builderStrategy()`, `.setterStrategy()`) now automatically registers that strategy in the `strategyOrder`. You only need to call `reorderStrategies()` if you need a specific priority other than the order in which they were configured.
+
+### 2. Builder Reset
+
+You can now reset builder-specific naming configurations to their pattern defaults:
+```java
+PopulateConfig config = PopulateConfig.builder()
+    .builderStrategy()
+        .setBuilderMethodName("custom")
+        .reset() // Reverts builderMethodName to the default for the current pattern
+        .and()
+    .build();
+```
+
+### 3. Local Overrides in `PopulateFactory`
+
+The `populate` method allows applying call-scoped overrides that take precedence over global configuration:
 
 ```java
 PopulateFactory factory = new PopulateFactory();
 
-// 1. Convenience method for a single class override
+// 1. Single class override
 MyClass obj = factory.populate(MyClass.class, String.class, () -> "local-value");
 
-// 2. Convenience method for a single name + type override
+// 2. Name + type override
 MyClass obj = factory.populate(MyClass.class, "id", UUID.class, () -> UUID.randomUUID());
 
-// 3. For multiple overrides, pass specialized maps
-Map<Class<?>, OverridePopulate<?>> classOverrides = Map.of(Integer.class, () -> 42);
-Map<OverrideTarget, OverridePopulate<?>> nameOverrides = Map.of(OverrideTarget.of("email", String.class), () -> "test@example.com");
-
-// Either individually
-MyClass obj1 = factory.populate(MyClass.class, classOverrides);
-MyClass obj2 = factory.populate(MyClass.class, nameOverrides);
-
-// Or both (using Map)
-Map<Object, OverridePopulate<?>> mixedOverrides = Map.of(
+// 3. Mixed overrides using a Map
+Map<Object, OverridePopulate<?>> overrides = Map.of(
     Integer.class, () -> 42,
     OverrideTarget.of("email", String.class), () -> "test@example.com"
 );
-MyClass obj3 = factory.populate(MyClass.class, mixedOverrides);
+MyClass obj = factory.populate(MyClass.class, overrides);
 ```
 
-> **Note:** The `populate` method is now strictly type-safe. Using an unsupported key type (like a raw `String`) in the overrides map will result in an `IllegalArgumentException`.
+### 4. Kotlin Support
 
-### Type-Safe Name Overrides
-
-Name-based overrides now require a target class to prevent accidental matches across different types.
-
-```java
-PopulateConfig config = PopulateConfig.builder()
-    .addOverride("id", UUID.class, () -> UUID.nameUUIDFromBytes("test".getBytes()))
-    .build();
-```
-
-### Kotlin Support
-
-Native support for Kotlin default values can now be enabled via the builder:
+Native support for Kotlin classes, including default parameter values, can be enabled via the builder:
 
 ```java
 PopulateConfig config = PopulateConfig.builder()
@@ -166,22 +143,3 @@ PopulateConfig config = PopulateConfig.builder()
         .and()
     .build();
 ```
-
-Alternatively, you can enable it without default values:
-
-```java
-PopulateConfig config = PopulateConfig.builder()
-    .kotlinSupport(true)
-    .build();
-```
-
-### Expanded JDK Type Support
-
-Many JDK types that previously required custom overrides are now supported out-of-the-box, including `Optional`, `Stream`, `Path`, `InetAddress`, `Currency`, and `Locale`. Check the `CHANGELOG.md` for the full list.
-
-## Internal Refactoring (ObjectFactory)
-
-If you have implemented custom `ObjectBuilder` classes for the experimental code generation feature:
-- The base class `ObjectBuilder` has changed significantly.
-- Legacy specific builders (`BuildTypeObjectBuilder`, etc.) have been removed in favor of `TemplateObjectBuilder`.
-- Refer to the new `CodeTemplate` enum for the supported formatting patterns.
