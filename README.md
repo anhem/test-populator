@@ -8,6 +8,35 @@
 
 Test-Populator is a Java library that automatically creates and populates objects with fixed or random data, simplifying the creation of test data.
 
+## 🚀 Quick Start
+
+Get up and running in seconds. No complex setup required.
+
+### 1. Add Dependency (Maven)
+```xml
+<dependency>
+    <groupId>com.github.anhem</groupId>
+    <artifactId>test-populator</artifactId>
+    <version>1.0.1</version>
+    <scope>test</scope>
+</dependency>
+```
+
+### 2. Populate Anything
+```java
+// One-liner for basic POJOs, Records, and Classes
+MyClass myObj = new PopulateFactory().populate(MyClass.class);
+
+// Native Kotlin support (handles default values)
+User user = new PopulateFactory(PopulateConfig.builder().kotlinSupport(true).build())
+    .populate(User.class);
+
+// Native Protobuf support
+MyMessage message = new PopulateFactory(PopulateConfig.builder()
+    .builderStrategy().pattern(BuilderPattern.PROTOBUF).and().build())
+    .populate(MyMessage.class);
+```
+
 ## Table of Contents
 
 - [Why Use Test-Populator?](#why-use-test-populator)
