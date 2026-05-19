@@ -3,7 +3,8 @@
 [![CI](https://github.com/anhem/test-populator/workflows/CI/badge.svg)](https://github.com/anhem/test-populator/actions)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=anhem_test-populator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=anhem_test-populator)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://central.sonatype.com/artifact/com.github.anhem/test-populator/)
-[![OpenJDK](https://img.shields.io/badge/OpenJDK-11-brightgreen)](https://github.com/anhem/test-populator/blob/main/pom.xml#L27)
+[![Java Version](https://img.shields.io/badge/Java-11%2C%2017%2C%2021%2C%2025-brightgreen)](https://github.com/anhem/test-populator/actions/workflows/build.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Changelog](https://img.shields.io/badge/changelog-v1.0.1-blue)](CHANGELOG.md)
 
 Test-Populator is a Java library that automatically creates and populates objects with fixed or random data, simplifying the creation of test data.
@@ -106,6 +107,7 @@ MyClass{
 ## Key Features
 
 * **Automatic Object Population**: Instantly create fully-populated, complex Java objects with a single line of code.
+* **Broad Java Compatibility**: Rigorously tested on **Java 11, 17, 21, and 25**.
 * **Multiple Creation Strategies**: Intelligently creates objects using a configurable chain of strategies (constructor, setters, builders, etc.) to
   handle almost any class design.
 * **Highly Configurable**: Tailor the object creation logic to your exact needs. You can generate random or fixed (deterministic) data, provide custom
