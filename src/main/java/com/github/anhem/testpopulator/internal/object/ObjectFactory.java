@@ -12,6 +12,8 @@ public interface ObjectFactory {
 
     <T> void field(Class<T> clazz, int expectedChildren, boolean isPrivateConstructor);
 
+    void field(String fieldName);
+
     <T> void mutator(Class<T> clazz, int expectedChildren);
 
     <T> void builder(Class<T> clazz, int expectedChildren, String builderMethodName, String buildMethodName);

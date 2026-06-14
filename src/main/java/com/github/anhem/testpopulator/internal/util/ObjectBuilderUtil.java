@@ -145,6 +145,31 @@ public class ObjectBuilderUtil {
                 METHOD_END);
     }
 
+    public static String getSetFieldHelperMethod() {
+        return String.join(System.lineSeparator(),
+                "\tprivate static void setField(Object obj, String fieldName, Object value) {",
+                TRY_START,
+                "\t\t\tClass<?> clazz = obj.getClass();",
+                "\t\t\tjava.lang.reflect.Field field = null;",
+                "\t\t\twhile (clazz != null) {",
+                "\t\t\t\ttry {",
+                "\t\t\t\t\tfield = clazz.getDeclaredField(fieldName);",
+                "\t\t\t\t\tbreak;",
+                "\t\t\t\t} catch (NoSuchFieldException e) {",
+                "\t\t\t\t\tclazz = clazz.getSuperclass();",
+                "\t\t\t\t}",
+                "\t\t\t}",
+                "\t\t\tif (field == null) {",
+                "\t\t\t\tthrow new NoSuchFieldException(fieldName);",
+                "\t\t\t}",
+                "\t\t\tfield.setAccessible(true);",
+                "\t\t\tfield.set(obj, value);",
+                "\t\t} catch (Exception e) {",
+                THROW_RUNTIME_EXCEPTION,
+                BLOCK_END,
+                METHOD_END);
+    }
+
     private static boolean requiresImport(Class<?> clazz) {
         return !"java.lang".equals(clazz.getPackageName());
     }

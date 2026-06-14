@@ -104,8 +104,9 @@ public class GeneratedCodeUtil {
     private static void compileGeneratedFile(Path path) {
         File file = new File(path.getParent().toFile(), path.getFileName().toString());
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        int result = compiler.run(null, null, new ByteArrayOutputStream(), file.getPath());
-        assertThat(result).as("compilation failed").isZero();
+        ByteArrayOutputStream err = new ByteArrayOutputStream();
+        int result = compiler.run(null, null, err, file.getPath());
+        assertThat(result).as("compilation failed: " + err).isZero();
     }
 
     private static void removeGeneratedFiles(Path path) {

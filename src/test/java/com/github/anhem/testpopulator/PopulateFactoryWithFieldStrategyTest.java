@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator;
 
+import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
@@ -34,8 +35,9 @@ class PopulateFactoryWithFieldStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
-                .fieldStrategy()
+                .objectFactory(true)
                 .and()
+                .fieldStrategy()
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -185,7 +187,18 @@ class PopulateFactoryWithFieldStrategyTest {
 
     @Test
     void canOverrideCollectionByName() {
-        Pojo pojo = populateFactory.populate(Pojo.class, "listOfStrings", List.class, () -> List.of("foo", "bar"));
+        OverridePopulate<List<String>> listOverride = new OverridePopulate<>() {
+            @Override
+            public List<String> create() {
+                return List.of("foo", "bar");
+            }
+
+            @Override
+            public String createCode() {
+                return "List.of(\"foo\", \"bar\")";
+            }
+        };
+        Pojo pojo = populateFactory.populate(Pojo.class, "listOfStrings", List.class, (OverridePopulate) listOverride);
 
         assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }
@@ -195,11 +208,12 @@ class PopulateFactoryWithFieldStrategyTest {
     }
 
     private <T> T populateAndAssert(Class<T> clazz) {
-        assertThat(populateConfig.isObjectFactoryEnabled()).isFalse();
+        assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(FIELD);
         T value = populateFactory.populate(clazz);
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(clazz);
+        assertGeneratedCode(value, populateConfig);
 
         return value;
     }

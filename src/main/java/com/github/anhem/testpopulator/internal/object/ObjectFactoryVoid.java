@@ -29,6 +29,11 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public void field(String fieldName) {
+        //ignored
+    }
+
+    @Override
     public <T> void mutator(Class<T> clazz, int expectedChildren) {
         //ignored
     }

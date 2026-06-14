@@ -67,6 +67,15 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
+    public void field(String fieldName) {
+        setNextObjectBuilder(TemplateObjectBuilder.builder()
+                .name(fieldName)
+                .buildType(FIELD)
+                .expectedChildren(1)
+                .build());
+    }
+
+    @Override
     public <T> void mutator(Class<T> clazz, int expectedChildren) {
         setNextObjectBuilder(containerBuilder(clazz, MUTATOR, expectedChildren)
                 .build());

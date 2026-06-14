@@ -6,8 +6,11 @@ import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.Strategy.FIELD;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
@@ -25,28 +28,30 @@ public class FieldPopulator implements PopulatingStrategy {
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             setAccessible(constructor, populateConfig.isAccessNonPublicConstructors());
-            classCarrier.getObjectFactory().field(clazz, 0, Modifier.isPrivate(constructor.getModifiers()));
-            T objectOfClass = constructor.newInstance();
-            getDeclaredFields(clazz, populateConfig.getBlacklistedFields()).stream()
+            List<Field> fields = getDeclaredFields(clazz, populateConfig.getBlacklistedFields()).stream()
                     .filter(field -> !Modifier.isFinal(field.getModifiers()))
                     .filter(field -> !isKotlinDelegate(field, populateConfig.isKotlinSupport()))
-                    .forEach(field -> {
-                        try {
-                            setAccessible(field, objectOfClass);
-                            if (isCollectionLike(field.getType())) {
-                                CollectionCarrier<Object> collectionCarrier = classCarrier.toCollectionCarrier(
-                                        field.getType(),
-                                        field.getName(),
-                                        toArgumentTypes(field.getGenericType(), field.getType()).toArray(new Type[0])
-                                );
-                                field.set(objectOfClass, populator.populate(collectionCarrier));
-                            } else {
-                                field.set(objectOfClass, populator.populate(classCarrier.toClassCarrier(field.getType(), field.getName())));
-                            }
-                        } catch (Exception e) {
-                            throw new PopulateException(format(FAILED_TO_SET_FIELD, field.getName(), objectOfClass.getClass().getName()), e);
-                        }
-                    });
+                    .collect(Collectors.toList());
+            classCarrier.getObjectFactory().field(clazz, fields.size(), !Modifier.isPublic(constructor.getModifiers()));
+            T objectOfClass = constructor.newInstance();
+            fields.forEach(field -> {
+                try {
+                    setAccessible(field, objectOfClass);
+                    classCarrier.getObjectFactory().field(field.getName());
+                    if (isCollectionLike(field.getType())) {
+                        CollectionCarrier<Object> collectionCarrier = classCarrier.toCollectionCarrier(
+                                field.getType(),
+                                field.getName(),
+                                toArgumentTypes(field.getGenericType(), field.getType()).toArray(new Type[0])
+                        );
+                        field.set(objectOfClass, populator.populate(collectionCarrier));
+                    } else {
+                        field.set(objectOfClass, populator.populate(classCarrier.toClassCarrier(field.getType(), field.getName())));
+                    }
+                } catch (Exception e) {
+                    throw new PopulateException(format(FAILED_TO_SET_FIELD, field.getName(), objectOfClass.getClass().getName()), e);
+                }
+            });
             return objectOfClass;
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), FIELD), e);

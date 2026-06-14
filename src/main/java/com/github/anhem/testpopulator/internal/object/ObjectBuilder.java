@@ -105,6 +105,9 @@ public abstract class ObjectBuilder {
                     if (!child.methodChildren.isEmpty()) {
                         return child.createMethods(child.methodChildren);
                     }
+                    if (child.getBuildType() == BuildType.FIELD) {
+                        return Stream.of(String.format("setField(%s, \"%s\", %s);", getMethodTargetName(), child.getName(), child.buildArguments()));
+                    }
                     return Stream.of(String.format("%s.%s(%s);", getMethodTargetName(), child.getName(), child.buildArguments()));
                 });
     }
@@ -115,7 +118,7 @@ public abstract class ObjectBuilder {
 
     public void addChild(ObjectBuilder child) {
         children.add(child);
-        if (child.getBuildType() == BuildType.MUTATOR || child.getBuildType() == BuildType.METHOD || child.getBuildType() == BuildType.FIELD) {
+        if (child.getBuildType() == BuildType.MUTATOR || child.getBuildType() == BuildType.METHOD || (child.getBuildType() == BuildType.FIELD && child.getClazz() == null)) {
             methodChildren.add(child);
         } else {
             argumentChildren.add(child);
@@ -202,10 +205,20 @@ public abstract class ObjectBuilder {
         Set<String> methods = new HashSet<>(extraMethods);
         Optional.ofNullable(getHelperMethod(getClazz())).ifPresent(methods::add);
         if (isPrivateAccess()) {
-            methods.add(com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.getInstantiateHelperMethod());
+            methods.add(getInstantiateHelperMethod());
+        }
+        if (hasFieldAssignments()) {
+            methods.add(getSetFieldHelperMethod());
         }
         children.forEach(child -> methods.addAll(child.getMethods()));
         return methods;
+    }
+
+    private boolean hasFieldAssignments() {
+        if (buildType == BuildType.FIELD && !methodChildren.isEmpty()) {
+            return true;
+        }
+        return children.stream().anyMatch(ObjectBuilder::hasFieldAssignments);
     }
 
     protected Stream<String> buildChildren() {
