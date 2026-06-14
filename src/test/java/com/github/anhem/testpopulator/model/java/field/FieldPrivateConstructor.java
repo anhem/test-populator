@@ -9,4 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 public class FieldPrivateConstructor {
+    private String stringValue;
+    private Integer integerValue;
+    private Boolean booleanValue;
 }
