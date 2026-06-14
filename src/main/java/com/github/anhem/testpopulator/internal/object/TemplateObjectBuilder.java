@@ -1,6 +1,5 @@
 package com.github.anhem.testpopulator.internal.object;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,24 +16,17 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     private final boolean clearArgsIfNullChild;
     private final String buildMethodName;
 
-    private final boolean privateConstructor;
-
     private TemplateObjectBuilder(Builder builder) {
-        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized);
+        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized, builder.privateAccess);
         this.codeTemplate = builder.codeTemplate;
         this.factoryClassName = builder.factoryClassName;
         this.methodName = builder.methodName;
         this.skipIfNull = builder.skipIfNull;
         this.clearArgsIfNullChild = builder.clearArgsIfNullChild;
         this.buildMethodName = builder.buildMethodName;
-        this.privateConstructor = builder.privateConstructor;
         for (Class<?> referencedClass : builder.referencedClasses) {
             addReferencedClass(referencedClass);
         }
-    }
-
-    public boolean isPrivateConstructor() {
-        return privateConstructor;
     }
 
     public static Builder builder() {
@@ -49,19 +41,12 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         return super.build();
     }
 
-    @Override
-    public Set<String> getMethods() {
-        Set<String> methods = new HashSet<>(super.getMethods());
-        if (isPrivateConstructor()) {
-            methods.add(com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.getInstantiateHelperMethod());
-        }
-        return methods;
-    }
+
 
     @Override
     protected void getImports(Set<String> imports, Set<String> staticImports) {
         super.getImports(imports, staticImports);
-        if (isPrivateConstructor()) {
+        if (isPrivateAccess()) {
             getArgumentChildren().forEach(child -> {
                 Class<?> c = child.getClazz();
                 if (c != null) {
@@ -76,7 +61,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         if (codeTemplate == null || (skipIfNull && isNullValue())) {
             return Stream.empty();
         }
-        if (isPrivateConstructor()) {
+        if (isPrivateAccess()) {
             String parameterTypes = formatParameterTypes(argumentChildren);
             String args = getArgs(argumentChildren);
             return Stream.of(String.format("%s %s %s = instantiate(%s.class, new Class<?>[]{%s}, new Object[]{%s});",
@@ -134,7 +119,6 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         private boolean skipIfNull;
         private boolean clearArgsIfNullChild;
         private String buildMethodName;
-        private boolean privateConstructor;
 
         public Builder codeTemplate(CodeTemplate codeTemplate) {
             this.codeTemplate = codeTemplate;
@@ -163,11 +147,6 @@ public class TemplateObjectBuilder extends ObjectBuilder {
 
         public Builder buildMethodName(String buildMethodName) {
             this.buildMethodName = buildMethodName;
-            return this;
-        }
-
-        public Builder privateConstructor(boolean privateConstructor) {
-            this.privateConstructor = privateConstructor;
             return this;
         }
 

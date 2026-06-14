@@ -19,6 +19,16 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public <T> void field(Class<T> clazz, int expectedChildren) {
+        //ignored
+    }
+
+    @Override
+    public <T> void field(Class<T> clazz, int expectedChildren, boolean isPrivateConstructor) {
+        //ignored
+    }
+
+    @Override
     public <T> void mutator(Class<T> clazz, int expectedChildren) {
         //ignored
     }

@@ -577,9 +577,6 @@ public class PopulateConfig {
     }
 
     private void validate() {
-        if (strategyOrder.contains(FIELD) && objectFactoryEnabled) {
-            throw new IllegalArgumentException(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
-        }
     }
 
     private static <T> T valueOrDefault(T value, T defaultValue) {

@@ -25,6 +25,7 @@ public class FieldPopulator implements PopulatingStrategy {
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             setAccessible(constructor, populateConfig.isAccessNonPublicConstructors());
+            classCarrier.getObjectFactory().field(clazz, 0, Modifier.isPrivate(constructor.getModifiers()));
             T objectOfClass = constructor.newInstance();
             getDeclaredFields(clazz, populateConfig.getBlacklistedFields()).stream()
                     .filter(field -> !Modifier.isFinal(field.getModifiers()))

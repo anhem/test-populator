@@ -8,6 +8,7 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
     protected boolean useFullyQualifiedName;
     protected int expectedChildren;
     protected boolean parameterized;
+    protected boolean privateAccess;
     protected Class<?>[] referencedClasses = new Class<?>[0];
 
     public B clazz(Class<?> clazz) {
@@ -37,6 +38,11 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
 
     public B parameterized(boolean parameterized) {
         this.parameterized = parameterized;
+        return (B) this;
+    }
+
+    public B privateAccess(boolean privateAccess) {
+        this.privateAccess = privateAccess;
         return (B) this;
     }
 

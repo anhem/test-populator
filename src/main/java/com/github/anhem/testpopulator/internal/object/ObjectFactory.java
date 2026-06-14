@@ -8,6 +8,10 @@ public interface ObjectFactory {
 
     <T> void setter(Class<T> clazz, int expectedChildren);
 
+    <T> void field(Class<T> clazz, int expectedChildren);
+
+    <T> void field(Class<T> clazz, int expectedChildren, boolean isPrivateConstructor);
+
     <T> void mutator(Class<T> clazz, int expectedChildren);
 
     <T> void builder(Class<T> clazz, int expectedChildren, String builderMethodName, String buildMethodName);

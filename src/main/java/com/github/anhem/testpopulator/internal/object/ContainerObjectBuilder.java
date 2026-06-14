@@ -12,7 +12,7 @@ public class ContainerObjectBuilder extends ObjectBuilder {
     private final String referencedClassName;
 
     private ContainerObjectBuilder(Builder builder) {
-        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized);
+        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized, builder.privateAccess);
         this.template = builder.template;
         this.referencedClassName = builder.referencedClassName;
         for (Class<?> referencedClass : builder.referencedClasses) {
@@ -26,6 +26,10 @@ public class ContainerObjectBuilder extends ObjectBuilder {
 
     @Override
     protected Stream<String> getInstantiationLine(List<ObjectBuilder> argumentChildren) {
+        if (isPrivateAccess()) {
+            return Stream.of(String.format("%s %s %s = instantiate(%s.class, new Class<?>[]{}, new Object[]{});",
+                    PSF, getClassName(), getName(), getClassName()));
+        }
         if (template == null) {
             return Stream.empty();
         }

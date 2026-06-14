@@ -5,6 +5,7 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.circular.A;
 import com.github.anhem.testpopulator.model.java.NamedDates;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
+import com.github.anhem.testpopulator.model.java.field.FieldPrivateConstructor;
 import com.github.anhem.testpopulator.model.java.field.Fields;
 import com.github.anhem.testpopulator.model.java.field.FieldsDateAndTimeMix;
 import com.github.anhem.testpopulator.model.java.setter.*;
@@ -20,6 +21,7 @@ import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptio
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
+import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -210,5 +212,20 @@ class PopulateFactoryWithFieldStrategyTest {
         populateFactory = new PopulateFactory(populateConfig);
         Fields value = populateFactory.populate(Fields.class);
         assertThat(value).isNotNull();
+    }
+
+    @Test
+    void fieldPrivateConstructorWithObjectFactory() {
+        populateConfig = PopulateConfig.builder()
+                .fieldStrategy()
+                .and()
+                .accessNonPublicConstructors(true)
+                .objectFactory(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        FieldPrivateConstructor value = populateFactory.populate(FieldPrivateConstructor.class);
+        assertThat(value).isNotNull();
+        assertGeneratedCode(value, populateConfig);
     }
 }

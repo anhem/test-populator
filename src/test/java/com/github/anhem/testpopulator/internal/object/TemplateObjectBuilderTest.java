@@ -163,8 +163,8 @@ class TemplateObjectBuilderTest {
                 .name("myObject")
                 .buildType(BuildType.CONSTRUCTOR)
                 .expectedChildren(0)
-                .privateConstructor(true)
+                .privateAccess(true)
                 .build();
-        assertThat(builder.isPrivateConstructor()).isTrue();
+        assertThat(builder.isPrivateAccess()).isTrue();
     }
 }

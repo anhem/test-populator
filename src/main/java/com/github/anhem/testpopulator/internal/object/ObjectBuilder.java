@@ -25,20 +25,26 @@ public abstract class ObjectBuilder {
     private final int expectedChildren;
     private final boolean parameterized;
     private boolean skipNullMethods;
+    private boolean privateAccess;
     private ObjectBuilder parent;
     private String value;
 
     protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
-        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false);
+        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false, false);
     }
 
     protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized) {
+        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, parameterized, false);
+    }
+
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized, boolean privateAccess) {
         this.clazz = clazz;
         this.name = name;
         this.buildType = buildType;
         this.useFullyQualifiedName = useFullyQualifiedName;
         this.expectedChildren = expectedChildren;
         this.parameterized = parameterized;
+        this.privateAccess = privateAccess;
     }
 
     public void setSkipNullMethods(boolean skipNullMethods) {
@@ -109,7 +115,7 @@ public abstract class ObjectBuilder {
 
     public void addChild(ObjectBuilder child) {
         children.add(child);
-        if (child.getBuildType() == BuildType.MUTATOR || child.getBuildType() == BuildType.METHOD) {
+        if (child.getBuildType() == BuildType.MUTATOR || child.getBuildType() == BuildType.METHOD || child.getBuildType() == BuildType.FIELD) {
             methodChildren.add(child);
         } else {
             argumentChildren.add(child);
@@ -160,6 +166,14 @@ public abstract class ObjectBuilder {
         this.value = value;
     }
 
+    public boolean isPrivateAccess() {
+        return privateAccess;
+    }
+
+    public void setPrivateAccess(boolean privateAccess) {
+        this.privateAccess = privateAccess;
+    }
+
     public String getValue() {
         return value;
     }
@@ -187,6 +201,9 @@ public abstract class ObjectBuilder {
     protected Set<String> getMethods() {
         Set<String> methods = new HashSet<>(extraMethods);
         Optional.ofNullable(getHelperMethod(getClazz())).ifPresent(methods::add);
+        if (isPrivateAccess()) {
+            methods.add(com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.getInstantiateHelperMethod());
+        }
         children.forEach(child -> methods.addAll(child.getMethods()));
         return methods;
     }

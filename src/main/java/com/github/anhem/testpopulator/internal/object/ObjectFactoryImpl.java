@@ -42,7 +42,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isPrivate) {
         setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
                 .codeTemplate(CodeTemplate.CONSTRUCTOR)
-                .privateConstructor(isPrivate)
+                .privateAccess(isPrivate)
                 .build());
     }
 
@@ -50,6 +50,19 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public <T> void setter(Class<T> clazz, int expectedChildren) {
         setNextObjectBuilder(containerBuilder(clazz, SETTER, expectedChildren)
                 .template(CodeTemplate.SETTER.getFormat())
+                .build());
+    }
+
+    @Override
+    public <T> void field(Class<T> clazz, int expectedChildren) {
+        field(clazz, expectedChildren, false);
+    }
+
+    @Override
+    public <T> void field(Class<T> clazz, int expectedChildren, boolean isPrivateConstructor) {
+        setNextObjectBuilder(containerBuilder(clazz, FIELD, expectedChildren)
+                .template(CodeTemplate.SETTER.getFormat())
+                .privateAccess(isPrivateConstructor)
                 .build());
     }
 
