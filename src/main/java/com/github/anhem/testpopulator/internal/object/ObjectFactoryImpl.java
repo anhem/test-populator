@@ -70,7 +70,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public void field(String fieldName) {
         setNextObjectBuilder(TemplateObjectBuilder.builder()
                 .name(fieldName)
-                .buildType(FIELD)
+                .buildType(FIELD_ASSIGNMENT)
                 .expectedChildren(1)
                 .build());
     }

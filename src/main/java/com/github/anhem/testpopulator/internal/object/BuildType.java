@@ -14,5 +14,6 @@ public enum BuildType {
     ENUM_MAP,
     ARRAY,
     VALUE,
-    FIELD
+    FIELD,
+    FIELD_ASSIGNMENT
 }

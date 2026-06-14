@@ -105,7 +105,7 @@ public abstract class ObjectBuilder {
                     if (!child.methodChildren.isEmpty()) {
                         return child.createMethods(child.methodChildren);
                     }
-                    if (child.getBuildType() == BuildType.FIELD) {
+                    if (child.getBuildType() == BuildType.FIELD_ASSIGNMENT) {
                         return Stream.of(String.format("setField(%s, \"%s\", %s);", getMethodTargetName(), child.getName(), child.buildArguments()));
                     }
                     return Stream.of(String.format("%s.%s(%s);", getMethodTargetName(), child.getName(), child.buildArguments()));
@@ -118,7 +118,7 @@ public abstract class ObjectBuilder {
 
     public void addChild(ObjectBuilder child) {
         children.add(child);
-        if (child.getBuildType() == BuildType.MUTATOR || child.getBuildType() == BuildType.METHOD || (child.getBuildType() == BuildType.FIELD && child.getClazz() == null)) {
+        if (child.getBuildType() == BuildType.MUTATOR || child.getBuildType() == BuildType.METHOD || child.getBuildType() == BuildType.FIELD_ASSIGNMENT) {
             methodChildren.add(child);
         } else {
             argumentChildren.add(child);
