@@ -37,7 +37,7 @@ public class FieldPopulator implements PopulatingStrategy {
             fields.forEach(field -> {
                 try {
                     setAccessible(field, objectOfClass);
-                    classCarrier.getObjectFactory().field(field.getName());
+                    classCarrier.getObjectFactory().method(field.getName(), 1);
                     if (isCollectionLike(field.getType())) {
                         CollectionCarrier<Object> collectionCarrier = classCarrier.toCollectionCarrier(
                                 field.getType(),
