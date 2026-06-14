@@ -35,8 +35,14 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void constructor(Class<T> clazz, int expectedChildren) {
+        constructor(clazz, expectedChildren, false);
+    }
+
+    @Override
+    public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isPrivate) {
         setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
                 .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                .privateConstructor(isPrivate)
                 .build());
     }
 

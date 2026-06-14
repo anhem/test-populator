@@ -4,6 +4,8 @@ public interface ObjectFactory {
 
     <T> void constructor(Class<T> clazz, int expectedChildren);
 
+    <T> void constructor(Class<T> clazz, int expectedChildren, boolean isPrivate);
+
     <T> void setter(Class<T> clazz, int expectedChildren);
 
     <T> void mutator(Class<T> clazz, int expectedChildren);

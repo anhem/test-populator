@@ -16,6 +16,8 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     private final boolean clearArgsIfNullChild;
     private final String buildMethodName;
 
+    private final boolean privateConstructor;
+
     private TemplateObjectBuilder(Builder builder) {
         super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized);
         this.codeTemplate = builder.codeTemplate;
@@ -24,9 +26,14 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         this.skipIfNull = builder.skipIfNull;
         this.clearArgsIfNullChild = builder.clearArgsIfNullChild;
         this.buildMethodName = builder.buildMethodName;
+        this.privateConstructor = builder.privateConstructor;
         for (Class<?> referencedClass : builder.referencedClasses) {
             addReferencedClass(referencedClass);
         }
+    }
+
+    public boolean isPrivateConstructor() {
+        return privateConstructor;
     }
 
     public static Builder builder() {
@@ -82,6 +89,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         private boolean skipIfNull;
         private boolean clearArgsIfNullChild;
         private String buildMethodName;
+        private boolean privateConstructor;
 
         public Builder codeTemplate(CodeTemplate codeTemplate) {
             this.codeTemplate = codeTemplate;
@@ -110,6 +118,11 @@ public class TemplateObjectBuilder extends ObjectBuilder {
 
         public Builder buildMethodName(String buildMethodName) {
             this.buildMethodName = buildMethodName;
+            return this;
+        }
+
+        public Builder privateConstructor(boolean privateConstructor) {
+            this.privateConstructor = privateConstructor;
             return this;
         }
 

@@ -155,4 +155,16 @@ class TemplateObjectBuilderTest {
                 "    .build();"
         );
     }
+
+    @Test
+    void privateConstructorField() {
+        TemplateObjectBuilder builder = TemplateObjectBuilder.builder()
+                .clazz(Object.class)
+                .name("myObject")
+                .buildType(BuildType.CONSTRUCTOR)
+                .expectedChildren(0)
+                .privateConstructor(true)
+                .build();
+        assertThat(builder.isPrivateConstructor()).isTrue();
+    }
 }
