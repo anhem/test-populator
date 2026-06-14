@@ -61,7 +61,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void field(Class<T> clazz, int expectedChildren, boolean isPrivateConstructor) {
         setNextObjectBuilder(containerBuilder(clazz, FIELD, expectedChildren)
-                .template(CodeTemplate.SETTER.getFormat())
+                .template(CodeTemplate.FIELD.getFormat())
                 .privateAccess(isPrivateConstructor)
                 .build());
     }

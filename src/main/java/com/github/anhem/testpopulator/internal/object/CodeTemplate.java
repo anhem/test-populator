@@ -5,6 +5,7 @@ public enum CodeTemplate {
     STATIC_METHOD("%1$s %2$s %4$s = %5$s.%6$s(%7$s);"),
     BUILDER("%1$s %2$s %4$s = %2$s.%6$s()"),
     SETTER("%1$s %2$s %4$s = new %2$s();"),
+    FIELD("%1$s %2$s %4$s = new %2$s();"),
     COLLECTION("%1$s %2$s %4$s = new %2$s();"),
     TYPED_COLLECTION("%1$s %2$s<%3$s> %4$s = new %2$s<>();"),
     ENUM_SET("%1$s %2$s<%3$s> %4$s = EnumSet.noneOf(%5$s.class);"),
