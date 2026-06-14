@@ -4,6 +4,7 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -103,7 +104,7 @@ public class GeneratedCodeUtil {
     private static void compileGeneratedFile(Path path) {
         File file = new File(path.getParent().toFile(), path.getFileName().toString());
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        int result = compiler.run(null, null, null, file.getPath());
+        int result = compiler.run(null, null, new ByteArrayOutputStream(), file.getPath());
         assertThat(result).as("compilation failed").isZero();
     }
 

@@ -123,10 +123,14 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
     }
 
     @Test
-    void tryingToAccessPrivateConstructorThrowsException() {
-        assertThatThrownBy(() -> populateAndAssertWithGeneratedCode(AllArgsConstructorPrivate.class))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining(String.format(NO_MATCHING_STRATEGY, AllArgsConstructorPrivate.class.getName(), populateConfig.getStrategyOrder()));
+    void tryingToAccessPrivateConstructorSucceedsWhenAccessNonPublicConstructorsIsTrue() {
+        populateConfig = populateConfig.toBuilder()
+                .accessNonPublicConstructors(true)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+        AllArgsConstructorPrivate value1 = populateAndAssertWithGeneratedCode(AllArgsConstructorPrivate.class);
+        AllArgsConstructorPrivate value2 = populateAndAssertWithGeneratedCode(AllArgsConstructorPrivate.class);
+        assertRandomlyPopulatedValues(value1, value2);
     }
 
     @Test

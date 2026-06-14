@@ -132,6 +132,19 @@ public class ObjectBuilderUtil {
         return null;
     }
 
+    public static String getInstantiateHelperMethod() {
+        return String.join(System.lineSeparator(),
+                "\tprivate static <T> T instantiate(Class<T> clazz, Class<?>[] parameterTypes, Object[] args) {",
+                TRY_START,
+                "\t\t\tjava.lang.reflect.Constructor<T> constructor = clazz.getDeclaredConstructor(parameterTypes);",
+                "\t\t\tconstructor.setAccessible(true);",
+                "\t\t\treturn constructor.newInstance(args);",
+                "\t\t} catch (Exception e) {",
+                THROW_RUNTIME_EXCEPTION,
+                BLOCK_END,
+                METHOD_END);
+    }
+
     private static boolean requiresImport(Class<?> clazz) {
         return !"java.lang".equals(clazz.getPackageName());
     }

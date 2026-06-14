@@ -1,11 +1,12 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.concatenate;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.endBuilder;
+import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
 
 public class TemplateObjectBuilder extends ObjectBuilder {
 
@@ -49,12 +50,56 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     }
 
     @Override
+    public Set<String> getMethods() {
+        Set<String> methods = new HashSet<>(super.getMethods());
+        if (isPrivateConstructor()) {
+            methods.add(com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.getInstantiateHelperMethod());
+        }
+        return methods;
+    }
+
+    @Override
+    protected void getImports(Set<String> imports, Set<String> staticImports) {
+        super.getImports(imports, staticImports);
+        if (isPrivateConstructor()) {
+            getArgumentChildren().forEach(child -> {
+                Class<?> c = child.getClazz();
+                if (c != null) {
+                    addImport(c, null, child.isUseFullyQualifiedName(), imports, staticImports);
+                }
+            });
+        }
+    }
+
+    @Override
     protected Stream<String> getInstantiationLine(List<ObjectBuilder> argumentChildren) {
         if (codeTemplate == null || (skipIfNull && isNullValue())) {
             return Stream.empty();
         }
+        if (isPrivateConstructor()) {
+            String parameterTypes = formatParameterTypes(argumentChildren);
+            String args = getArgs(argumentChildren);
+            return Stream.of(String.format("%s %s %s = instantiate(%s.class, new Class<?>[]{%s}, new Object[]{%s});",
+                    PSF, getClassName(), getName(), getClassName(), parameterTypes, args));
+        }
         String args = getArgs(argumentChildren);
         return Stream.of(codeTemplate.render(PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, args));
+    }
+
+    private String formatParameterTypes(List<ObjectBuilder> argumentChildren) {
+        return argumentChildren.stream()
+                .map(child -> {
+                    Class<?> c = child.getClazz();
+                    if (c == null) {
+                        return "null";
+                    }
+                    String className = child.isUseFullyQualifiedName() ? c.getCanonicalName() : c.getSimpleName();
+                    if (child.getBuildType() == BuildType.ARRAY) {
+                        return className + "[].class";
+                    }
+                    return className + ".class";
+                })
+                .collect(Collectors.joining(", "));
     }
 
     @Override
