@@ -35,7 +35,7 @@ public class ConstructorPopulator implements PopulatingStrategy {
 
     protected <T> T populateUsingConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         int parameterCount = constructor.getParameterCount();
-        classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), parameterCount, Modifier.isPrivate(constructor.getModifiers()));
+        classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), parameterCount, !Modifier.isPublic(constructor.getModifiers()));
         Object[] arguments = isKotlinConstructor(constructor, classCarrier.getPopulateConfig().isKotlinSupport()) ?
                 populateKotlinArguments(constructor, classCarrier, populator) :
                 populateArguments(constructor, classCarrier, populator, parameterCount);
