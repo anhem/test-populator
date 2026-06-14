@@ -176,7 +176,7 @@ public abstract class ObjectBuilder {
         return new ObjectResult(packageName, className, imports, staticImports, objects, methods);
     }
 
-    private void getImports(Set<String> imports, Set<String> staticImports) {
+    protected void getImports(Set<String> imports, Set<String> staticImports) {
         addImport(getClazz(), value, isUseFullyQualifiedName(), imports, staticImports);
         referencedClasses.forEach(c -> addImport(c, null, isUseFullyQualifiedName(), imports, staticImports));
         imports.addAll(extraImports);
@@ -184,7 +184,7 @@ public abstract class ObjectBuilder {
         children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
     }
 
-    private Set<String> getMethods() {
+    protected Set<String> getMethods() {
         Set<String> methods = new HashSet<>(extraMethods);
         Optional.ofNullable(getHelperMethod(getClazz())).ifPresent(methods::add);
         children.forEach(child -> methods.addAll(child.getMethods()));

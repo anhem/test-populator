@@ -577,9 +577,6 @@ public class PopulateConfig {
     }
 
     private void validate() {
-        if (accessNonPublicConstructors && objectFactoryEnabled) {
-            throw new IllegalArgumentException(INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY);
-        }
         if (strategyOrder.contains(FIELD) && objectFactoryEnabled) {
             throw new IllegalArgumentException(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
         }

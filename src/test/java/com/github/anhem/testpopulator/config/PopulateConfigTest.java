@@ -278,14 +278,14 @@ class PopulateConfigTest {
     }
 
     @Test
-    void validateThrowsExceptionWhenAccessNonPublicConstructorsAndObjectFactoryEnabled() {
-        assertThatThrownBy(() -> PopulateConfig.builder()
+    void canEnableAccessNonPublicConstructorsAndObjectFactory() {
+        PopulateConfig config = PopulateConfig.builder()
                 .accessNonPublicConstructors(true)
                 .objectFactory(true)
                 .and()
-                .build())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY);
+                .build();
+        assertThat(config.isAccessNonPublicConstructors()).isTrue();
+        assertThat(config.isObjectFactoryEnabled()).isTrue();
     }
 
     @Test

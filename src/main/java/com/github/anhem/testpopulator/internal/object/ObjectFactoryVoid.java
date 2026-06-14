@@ -9,6 +9,11 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
+    public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isPrivate) {
+        //ignored
+    }
+
+    @Override
     public <T> void setter(Class<T> clazz, int expectedChildren) {
         //ignored
     }
