@@ -11,7 +11,6 @@ import static com.github.anhem.testpopulator.config.ConstructorType.SMALLEST;
 import static com.github.anhem.testpopulator.config.PopulateConfig.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateConfigTest {
 
@@ -287,17 +286,6 @@ class PopulateConfigTest {
                 .isNotNull();
     }
 
-    @Test
-    void validateThrowsExceptionWhenFieldStrategyAndObjectFactoryEnabled() {
-        assertThatThrownBy(() -> PopulateConfig.builder()
-                .fieldStrategy()
-                .and()
-                .objectFactory(true)
-                .and()
-                .build())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
-    }
 
     @Test
     void builderPatternSpecificMethodNames() {

@@ -17,7 +17,6 @@ import static com.github.anhem.testpopulator.config.Strategy.*;
  * Calling toBuilder() on a PopulateConfig object will convert it back to a builder, making it easy to make copies of a configuration with slightly different settings.
  */
 public class PopulateConfig {
-    public static final String INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY = "objectFactory can not be enabled while strategyOrder contains FIELD";
     public static final Set<String> DEFAULT_BLACKLISTED_METHODS = Set.of("$jacocoInit");
     public static final Set<String> DEFAULT_BLACKLISTED_FIELDS = Set.of("__$lineHits$__", "$jacocoData");
     public static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER, STATIC_METHOD);
@@ -408,7 +407,6 @@ public class PopulateConfig {
          */
         public PopulateConfig build() {
             PopulateConfig populateConfig = new PopulateConfig(this);
-            populateConfig.validate();
             return populateConfig;
         }
 
@@ -575,11 +573,6 @@ public class PopulateConfig {
         return populateConfigBuilder;
     }
 
-    private void validate() {
-        if (strategyOrder.contains(FIELD) && objectFactoryEnabled) {
-            throw new IllegalArgumentException(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
-        }
-    }
 
     private static <T> T valueOrDefault(T value, T defaultValue) {
         return value == null ? defaultValue : value;

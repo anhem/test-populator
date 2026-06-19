@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator.internal.util;
 import com.github.anhem.testpopulator.internal.object.BuildType;
 import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -156,6 +157,41 @@ public class ObjectBuilderUtil {
                 BLOCK_END,
                 METHOD_END
         );
+    }
+
+    public static String getFieldHelperMethod(Class<?> clazz, String helperMethodName, List<Field> fields) {
+        String fullyQualifiedClassName = clazz.getCanonicalName();
+        Class<?>[] parameterTypes = getParameterTypes(fields);
+        String parameterDeclarations = getParameterDeclarations(parameterTypes);
+
+        List<String> lines = new ArrayList<>();
+        lines.add(String.format("\tprivate static %s %s(%s) {", fullyQualifiedClassName, helperMethodName, parameterDeclarations));
+        lines.add(TRY_START);
+        lines.add(String.format("\t\t\tjava.lang.reflect.Constructor<%s> constructor = %s.class.getDeclaredConstructor();", fullyQualifiedClassName, fullyQualifiedClassName));
+        lines.add("\t\t\tconstructor.setAccessible(true);");
+        lines.add(String.format("\t\t\t%s obj = constructor.newInstance();", fullyQualifiedClassName));
+
+        for (int i = 0; i < fields.size(); i++) {
+            java.lang.reflect.Field field = fields.get(i);
+            String declaringClassName = getFullyQualifiedClassName(field.getDeclaringClass());
+            lines.add(String.format("\t\t\tjava.lang.reflect.Field f%d = %s.class.getDeclaredField(\"%s\");", i, declaringClassName, field.getName()));
+            lines.add(String.format("\t\t\tf%d.setAccessible(true);", i));
+            lines.add(String.format("\t\t\tf%d.set(obj, p%d);", i, i));
+        }
+
+        lines.add("\t\t\treturn obj;");
+        lines.add("\t\t} catch (Exception e) {");
+        lines.add(THROW_RUNTIME_EXCEPTION);
+        lines.add(BLOCK_END);
+        lines.add(METHOD_END);
+
+        return String.join(System.lineSeparator(), lines);
+    }
+
+    private static Class<?>[] getParameterTypes(List<Field> fields) {
+        return fields.stream()
+                .map(Field::getType)
+                .toArray(Class<?>[]::new);
     }
 
     private static String getParameterDeclarations(Class<?>[] parameterTypes) {

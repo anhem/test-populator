@@ -3,6 +3,7 @@ package com.github.anhem.testpopulator.internal.object;
 public enum CodeTemplate {
     CONSTRUCTOR("%1$s %2$s %4$s = new %2$s(%7$s);"),
     PRIVATE_CONSTRUCTOR("%1$s %2$s %4$s = %6$s(%7$s);"),
+    FIELD("%1$s %2$s %4$s = %6$s(%7$s);"),
     STATIC_METHOD("%1$s %2$s %4$s = %5$s.%6$s(%7$s);"),
     BUILDER("%1$s %2$s %4$s = %2$s.%6$s()"),
     SETTER("%1$s %2$s %4$s = new %2$s();"),

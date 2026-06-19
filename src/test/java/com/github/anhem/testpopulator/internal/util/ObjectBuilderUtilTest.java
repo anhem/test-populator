@@ -323,4 +323,33 @@ class ObjectBuilderUtilTest {
                 "\t\t}",
                 "\t}"));
     }
+
+    @Test
+    void getFieldHelperMethodGeneratesReflectionHelper() throws NoSuchFieldException {
+        java.lang.reflect.Field stringValueField = Pojo.class.getDeclaredField("stringValue");
+        java.lang.reflect.Field integerValueField = Pojo.class.getDeclaredField("integerValue");
+
+        String result = getFieldHelperMethod(
+                Pojo.class,
+                "createPojo_0",
+                List.of(stringValueField, integerValueField));
+
+        assertThat(result).isEqualTo(String.join(System.lineSeparator(),
+                "\tprivate static com.github.anhem.testpopulator.model.java.setter.Pojo createPojo_0(java.lang.String p0, java.lang.Integer p1) {",
+                "\t\ttry {",
+                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.model.java.setter.Pojo> constructor = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredConstructor();",
+                "\t\t\tconstructor.setAccessible(true);",
+                "\t\t\tcom.github.anhem.testpopulator.model.java.setter.Pojo obj = constructor.newInstance();",
+                "\t\t\tjava.lang.reflect.Field f0 = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredField(\"stringValue\");",
+                "\t\t\tf0.setAccessible(true);",
+                "\t\t\tf0.set(obj, p0);",
+                "\t\t\tjava.lang.reflect.Field f1 = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredField(\"integerValue\");",
+                "\t\t\tf1.setAccessible(true);",
+                "\t\t\tf1.set(obj, p1);",
+                "\t\t\treturn obj;",
+                "\t\t} catch (Exception e) {",
+                "\t\t\tthrow new RuntimeException(e);",
+                "\t\t}",
+                "\t}"));
+    }
 }
