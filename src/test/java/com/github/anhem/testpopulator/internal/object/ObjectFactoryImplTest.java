@@ -39,10 +39,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final MyClass myClass_0 = new MyClass(\n" +
-                        "\t\t\t\"myString\",\n" +
-                        "\t\t\t1\n" +
-                        "\t);"
+                "public static final MyClass myClass_0 = new MyClass(\"myString\", 1);"
         );
         assertThat(objectResult.getMethods()).isEmpty();
     }
@@ -60,10 +57,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).containsExactlyInAnyOrder("java.lang.reflect.Constructor");
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final MyClass myClass_0 = createMyClass_0(\n" +
-                        "\t\t\t\"myString\",\n" +
-                        "\t\t\t1\n" +
-                        "\t);"
+                "public static final MyClass myClass_0 = createMyClass_0(\"myString\", 1);"
         );
         String expectedMethod = String.join(System.lineSeparator(),
                 "\tprivate static MyClass createMyClass_0(\n" +
@@ -190,9 +184,7 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final Map<String, String> map_0 = Map.of(\n" +
-                        "\t\t\t\"myKey\", \"myValue\"\n" +
-                        "\t);",
+                "public static final Map<String, String> map_0 = Map.of(\"myKey\", \"myValue\");",
                 "public static final MyClass myClass_0 = new MyClass(map_0);"
         );
     }
@@ -213,9 +205,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getObjects()).containsExactly(
                 "public static final HashMap<String, String> hashMap_0 = new HashMap<>();",
                 "static {",
-                "hashMap_0.put(\n" +
-                        "\t\t\t\t\"myKey\", \"myValue\"\n" +
-                        "\t\t);",
+                "hashMap_0.put(\"myKey\", \"myValue\");",
                 "}",
                 "public static final MyClass myClass_0 = new MyClass(hashMap_0);"
         );
@@ -641,6 +631,25 @@ class ObjectFactoryImplTest {
     @Test
     void valueThrowsException() {
         Assertions.assertThrows(ObjectException.class, () -> objectFactoryImpl.value(PopulateConfig.builder().build(), PopulateConfig.class, null));
+    }
+
+    @Test
+    void createObjectUsingConstructorIsMultiline() {
+        objectFactoryImpl.constructor(MyClass.class, 4, false, new Class<?>[0]);
+        objectFactoryImpl.value("myString", String.class, null);
+        objectFactoryImpl.value(1, Integer.class, null);
+        objectFactoryImpl.value(2, Integer.class, null);
+        objectFactoryImpl.value(3, Integer.class, null);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final MyClass myClass_0 = new MyClass(\n" +
+                        "\t\t\t\"myString\",\n" +
+                        "\t\t\t1,\n" +
+                        "\t\t\t2,\n" +
+                        "\t\t\t3\n" +
+                        "\t);"
+        );
     }
 
     private String getExpectedMyClassStaticImport() {

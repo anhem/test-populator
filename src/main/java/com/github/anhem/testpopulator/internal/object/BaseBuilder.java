@@ -8,6 +8,7 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
     protected boolean useFullyQualifiedName;
     protected int expectedChildren;
     protected boolean parameterized;
+    protected int lineBreakCount = 3;
     protected Class<?>[] referencedClasses = new Class<?>[0];
 
     public B clazz(Class<?> clazz) {
@@ -37,6 +38,11 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
 
     public B parameterized(boolean parameterized) {
         this.parameterized = parameterized;
+        return (B) this;
+    }
+
+    public B lineBreakCount(int lineBreakCount) {
+        this.lineBreakCount = lineBreakCount;
         return (B) this;
     }
 

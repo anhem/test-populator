@@ -25,21 +25,23 @@ public abstract class ObjectBuilder {
     private final Set<String> extraStaticImports = new HashSet<>();
     private final int expectedChildren;
     private final boolean parameterized;
+    private final int lineBreakCount;
     private boolean skipNullMethods;
     private ObjectBuilder parent;
     private String value;
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
-        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false);
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, int lineBreakCount) {
+        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false, lineBreakCount);
     }
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized) {
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized, int lineBreakCount) {
         this.clazz = clazz;
         this.name = name;
         this.buildType = buildType;
         this.useFullyQualifiedName = useFullyQualifiedName;
         this.expectedChildren = expectedChildren;
         this.parameterized = parameterized;
+        this.lineBreakCount = lineBreakCount;
     }
 
     public void setSkipNullMethods(boolean skipNullMethods) {
@@ -247,11 +249,13 @@ public abstract class ObjectBuilder {
         if (children.isEmpty()) {
             return "";
         }
-        if (children.size() > 1) {
+        boolean isMap = getBuildType() == BuildType.MAP || (getBuildType() == BuildType.METHOD && "put".equals(getName()));
+        boolean forceMultiline = isMap && children.size() > 2;
+        if (children.size() > lineBreakCount || forceMultiline) {
             boolean isMethodLevel = getBuildType() == BuildType.METHOD;
             String prefixTabs = isMethodLevel ? "\t\t\t\t" : "\t\t\t";
             String suffixTabs = isMethodLevel ? "\t\t" : "\t";
-            if (getBuildType() == BuildType.MAP || (getBuildType() == BuildType.METHOD && "put".equals(getName()))) {
+            if (isMap) {
                 return buildMapArguments(children, prefixTabs, suffixTabs);
             }
             return buildMultilineArguments(children, prefixTabs, suffixTabs);

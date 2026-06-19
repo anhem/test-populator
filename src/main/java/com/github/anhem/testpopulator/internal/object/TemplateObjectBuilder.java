@@ -17,7 +17,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     private final String buildMethodName;
 
     private TemplateObjectBuilder(Builder builder) {
-        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized);
+        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized, builder.lineBreakCount);
         this.codeTemplate = builder.codeTemplate;
         this.factoryClassName = builder.factoryClassName;
         this.methodName = builder.methodName;

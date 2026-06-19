@@ -396,6 +396,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .name(getName(clazz))
                 .buildType(buildType)
                 .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
+                .lineBreakCount(populateConfig.getLineBreakCount())
                 .expectedChildren(expectedChildren);
     }
 
@@ -405,6 +406,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .name(getName(clazz))
                 .buildType(buildType)
                 .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
+                .lineBreakCount(populateConfig.getLineBreakCount())
                 .expectedChildren(expectedChildren);
     }
 

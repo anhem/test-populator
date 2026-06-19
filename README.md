@@ -321,6 +321,7 @@ Allows the library to use private or protected constructors.
 
 * `blacklistedMethods` / `blacklistedFields`: A list of method or field names to skip during population. Useful for avoiding code coverage
   instrumentation fields like `$jacocoInit`.
+* `lineBreakCount`: Sets the threshold for formatting generated Java code across multiple lines. When the number of fields or arguments exceeds this value, the generated code will be formatted with line breaks for readability. Default is `3`. Configure via `.lineBreakCount(...)`.
 * `objectFactoryEnabled`: If `true`, generates Java source code for the populated object in the
   `target/generated-test-sources/test-populator/` directory (automatically adjusted to `build/` for Gradle).
   Configure via `.objectFactory(true).path("custom/path")`.
