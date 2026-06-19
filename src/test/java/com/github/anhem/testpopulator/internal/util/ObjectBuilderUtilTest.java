@@ -364,12 +364,8 @@ class ObjectBuilderUtilTest {
                 "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor();",
                 "\t\t\tconstructor.setAccessible(true);",
                 "\t\t\tPojo obj = constructor.newInstance();",
-                "\t\t\tField f0 = Pojo.class.getDeclaredField(\"stringValue\");",
-                "\t\t\tf0.setAccessible(true);",
-                "\t\t\tf0.set(obj, p0);",
-                "\t\t\tField f1 = Pojo.class.getDeclaredField(\"integerValue\");",
-                "\t\t\tf1.setAccessible(true);",
-                "\t\t\tf1.set(obj, p1);",
+                "\t\t\tsetField(obj, Pojo.class, \"stringValue\", p0);",
+                "\t\t\tsetField(obj, Pojo.class, \"integerValue\", p1);",
                 "\t\t\treturn obj;",
                 "\t\t} catch (Exception e) {",
                 "\t\t\tthrow new RuntimeException(e);",
@@ -377,8 +373,28 @@ class ObjectBuilderUtilTest {
                 "\t}"));
         assertThat(imports).containsExactlyInAnyOrder(
                 "com.github.anhem.testpopulator.model.java.setter.Pojo",
-                "java.lang.reflect.Constructor",
-                "java.lang.reflect.Field"
+                "java.lang.reflect.Constructor"
         );
+    }
+
+    @Test
+    void getSetFieldMethodGeneratesSetFieldMethod() {
+        Map<String, Class<?>> classNames = new HashMap<>();
+        Set<String> imports = new HashSet<>();
+        Set<String> staticImports = new HashSet<>();
+
+        String result = getSetFieldMethod(classNames, imports, staticImports);
+
+        assertThat(result).isEqualTo(String.join(System.lineSeparator(),
+                "\tprivate static void setField(Object obj, Class<?> clazz, String fieldName, Object value) {",
+                "\t\ttry {",
+                "\t\t\tField field = clazz.getDeclaredField(fieldName);",
+                "\t\t\tfield.setAccessible(true);",
+                "\t\t\tfield.set(obj, value);",
+                "\t\t} catch (Exception e) {",
+                "\t\t\tthrow new RuntimeException(e);",
+                "\t\t}",
+                "\t}"));
+        assertThat(imports).containsExactlyInAnyOrder("java.lang.reflect.Field");
     }
 }

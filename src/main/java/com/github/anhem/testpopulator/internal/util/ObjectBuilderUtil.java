@@ -164,7 +164,6 @@ public class ObjectBuilderUtil {
     public static String getFieldHelperMethod(Class<?> clazz, String helperMethodName, List<java.lang.reflect.Field> fields, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
         String className = getClassName(clazz, classNames, imports, staticImports);
         String constructorClassName = getClassName(java.lang.reflect.Constructor.class, classNames, imports, staticImports);
-        String fieldClassName = getClassName(java.lang.reflect.Field.class, classNames, imports, staticImports);
         Class<?>[] parameterTypes = getParameterTypes(fields);
         String parameterDeclarations = getParameterDeclarations(parameterTypes, classNames, imports, staticImports);
 
@@ -178,9 +177,7 @@ public class ObjectBuilderUtil {
         for (int i = 0; i < fields.size(); i++) {
             java.lang.reflect.Field field = fields.get(i);
             String declaringClassName = getClassName(field.getDeclaringClass(), classNames, imports, staticImports);
-            lines.add(String.format("\t\t\t%s f%d = %s.class.getDeclaredField(\"%s\");", fieldClassName, i, declaringClassName, field.getName()));
-            lines.add(String.format("\t\t\tf%d.setAccessible(true);", i));
-            lines.add(String.format("\t\t\tf%d.set(obj, p%d);", i, i));
+            lines.add(String.format("\t\t\tsetField(obj, %s.class, \"%s\", p%d);", declaringClassName, field.getName(), i));
         }
 
         lines.add("\t\t\treturn obj;");
@@ -190,6 +187,20 @@ public class ObjectBuilderUtil {
         lines.add(METHOD_END);
 
         return String.join(System.lineSeparator(), lines);
+    }
+
+    public static String getSetFieldMethod(Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        String fieldClassName = getClassName(java.lang.reflect.Field.class, classNames, imports, staticImports);
+        return String.join(System.lineSeparator(),
+                "\tprivate static void setField(Object obj, Class<?> clazz, String fieldName, Object value) {",
+                TRY_START,
+                String.format("\t\t\t%s field = clazz.getDeclaredField(fieldName);", fieldClassName),
+                "\t\t\tfield.setAccessible(true);",
+                "\t\t\tfield.set(obj, value);",
+                "\t\t} catch (Exception e) {",
+                THROW_RUNTIME_EXCEPTION,
+                BLOCK_END,
+                METHOD_END);
     }
 
     private static Class<?>[] getParameterTypes(List<Field> fields) {

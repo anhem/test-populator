@@ -61,6 +61,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         Set<String> extraImports = new HashSet<>();
         Set<String> extraStaticImports = new HashSet<>();
         objectBuilder.addMethod(getFieldHelperMethod(clazz, helperMethodName, fields, classNames, extraImports, extraStaticImports));
+        objectBuilder.addMethod(getSetFieldMethod(classNames, extraImports, extraStaticImports));
         objectBuilder.addImports(extraImports);
         objectBuilder.addStaticImports(extraStaticImports);
         setNextObjectBuilder(objectBuilder);
