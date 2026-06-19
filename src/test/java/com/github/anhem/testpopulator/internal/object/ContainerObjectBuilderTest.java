@@ -20,7 +20,7 @@ class ContainerObjectBuilderTest {
                 .name("arrayList")
                 .buildType(LIST)
                 .template(CodeTemplate.TYPED_COLLECTION.getFormat())
-                .useFullyQualifiedName(false)
+                .formattingContext(new FormattingContext(false, 3))
                 .expectedChildren(1)
                 .parameterized(true)
                 .build();
@@ -56,7 +56,7 @@ class ContainerObjectBuilderTest {
                 .name("arrayList")
                 .buildType(LIST)
                 .template(CodeTemplate.TYPED_COLLECTION.getFormat())
-                .useFullyQualifiedName(false)
+                .formattingContext(new FormattingContext(false, 3))
                 .expectedChildren(1)
                 .parameterized(true)
                 .build();
@@ -87,7 +87,7 @@ class ContainerObjectBuilderTest {
                 .name("myObj")
                 .buildType(SETTER)
                 .template(CodeTemplate.SETTER.getFormat())
-                .useFullyQualifiedName(false)
+                .formattingContext(new FormattingContext(false, 3))
                 .expectedChildren(1)
                 .parameterized(false)
                 .build();

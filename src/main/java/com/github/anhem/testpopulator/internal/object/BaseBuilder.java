@@ -5,10 +5,9 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
     protected Class<?> clazz;
     protected String name;
     protected BuildType buildType;
-    protected boolean useFullyQualifiedName;
+    protected FormattingContext formattingContext = new FormattingContext(false, 3);
     protected int expectedChildren;
     protected boolean parameterized;
-    protected int lineBreakCount = 3;
     protected Class<?>[] referencedClasses = new Class<?>[0];
 
     public B clazz(Class<?> clazz) {
@@ -26,8 +25,8 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
         return (B) this;
     }
 
-    public B useFullyQualifiedName(boolean useFullyQualifiedName) {
-        this.useFullyQualifiedName = useFullyQualifiedName;
+    public B formattingContext(FormattingContext formattingContext) {
+        this.formattingContext = formattingContext;
         return (B) this;
     }
 
@@ -38,11 +37,6 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
 
     public B parameterized(boolean parameterized) {
         this.parameterized = parameterized;
-        return (B) this;
-    }
-
-    public B lineBreakCount(int lineBreakCount) {
-        this.lineBreakCount = lineBreakCount;
         return (B) this;
     }
 

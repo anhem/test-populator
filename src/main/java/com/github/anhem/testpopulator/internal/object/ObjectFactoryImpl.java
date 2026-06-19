@@ -95,6 +95,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .name(methodName)
                 .buildType(METHOD)
                 .expectedChildren(expectedChildren)
+                .formattingContext(new FormattingContext(false, populateConfig.getLineBreakCount()))
                 .build());
     }
 
@@ -395,8 +396,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .clazz(clazz)
                 .name(getName(clazz))
                 .buildType(buildType)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .lineBreakCount(populateConfig.getLineBreakCount())
+                .formattingContext(new FormattingContext(useFullyQualifiedName(clazz, classNames), populateConfig.getLineBreakCount()))
                 .expectedChildren(expectedChildren);
     }
 
@@ -405,8 +405,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .clazz(clazz)
                 .name(getName(clazz))
                 .buildType(buildType)
-                .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .lineBreakCount(populateConfig.getLineBreakCount())
+                .formattingContext(new FormattingContext(useFullyQualifiedName(clazz, classNames), populateConfig.getLineBreakCount()))
                 .expectedChildren(expectedChildren);
     }
 

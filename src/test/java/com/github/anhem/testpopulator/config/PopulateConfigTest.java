@@ -31,6 +31,7 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.getObjectFactoryPath()).isNull();
         assertThat(DEFAULT_POPULATE_CONFIG.isNullOnCircularDependency()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.getMethodType()).isEqualTo(MethodType.LARGEST);
+        assertThat(DEFAULT_POPULATE_CONFIG.getLineBreakCount()).isEqualTo(3);
         assertEqual(DEFAULT_POPULATE_CONFIG.toBuilder().build(), DEFAULT_POPULATE_CONFIG);
     }
 
@@ -434,11 +435,13 @@ class PopulateConfigTest {
         PopulateConfig populateConfig = PopulateConfig.builder()
                 .objectFactory(true)
                 .path("custom/path")
+                .lineBreakCount(5)
                 .and()
                 .build();
 
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getObjectFactoryPath()).isEqualTo("custom/path");
+        assertThat(populateConfig.getLineBreakCount()).isEqualTo(5);
     }
 
     @Test

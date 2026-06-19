@@ -15,7 +15,7 @@ public abstract class ObjectBuilder {
     private final Class<?> clazz;
     private final String name;
     private final BuildType buildType;
-    private final boolean useFullyQualifiedName;
+    private final FormattingContext formattingContext;
     private final List<ObjectBuilder> children = new ArrayList<>();
     private final List<ObjectBuilder> argumentChildren = new ArrayList<>();
     private final List<ObjectBuilder> methodChildren = new ArrayList<>();
@@ -25,23 +25,22 @@ public abstract class ObjectBuilder {
     private final Set<String> extraStaticImports = new HashSet<>();
     private final int expectedChildren;
     private final boolean parameterized;
-    private final int lineBreakCount;
+
     private boolean skipNullMethods;
     private ObjectBuilder parent;
     private String value;
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, int lineBreakCount) {
-        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false, lineBreakCount);
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, FormattingContext formattingContext, int expectedChildren) {
+        this(clazz, name, buildType, formattingContext, expectedChildren, false);
     }
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized, int lineBreakCount) {
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, FormattingContext formattingContext, int expectedChildren, boolean parameterized) {
         this.clazz = clazz;
         this.name = name;
         this.buildType = buildType;
-        this.useFullyQualifiedName = useFullyQualifiedName;
+        this.formattingContext = formattingContext;
         this.expectedChildren = expectedChildren;
         this.parameterized = parameterized;
-        this.lineBreakCount = lineBreakCount;
     }
 
     public void setSkipNullMethods(boolean skipNullMethods) {
@@ -53,7 +52,7 @@ public abstract class ObjectBuilder {
     }
 
     public boolean isUseFullyQualifiedName() {
-        return useFullyQualifiedName;
+        return formattingContext.isUseFullyQualifiedName();
     }
 
     public boolean isParameterized() {
@@ -251,7 +250,7 @@ public abstract class ObjectBuilder {
         }
         boolean isMap = getBuildType() == BuildType.MAP || (getBuildType() == BuildType.METHOD && "put".equals(getName()));
         boolean forceMultiline = isMap && children.size() > 2;
-        if (children.size() > lineBreakCount || forceMultiline) {
+        if (children.size() > formattingContext.getLineBreakCount() || forceMultiline) {
             boolean isMethodLevel = getBuildType() == BuildType.METHOD;
             String prefixTabs = isMethodLevel ? "\t\t\t\t" : "\t\t\t";
             String suffixTabs = isMethodLevel ? "\t\t" : "\t";
