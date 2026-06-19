@@ -75,7 +75,7 @@ public class GeneratedCodeUtil {
                     .withEqualsForType((a, b) -> true, Iterator.class)
                     .isEqualTo(object);
         } finally {
-            //removeGeneratedFiles(path);
+            removeGeneratedFiles(path);
         }
     }
 
