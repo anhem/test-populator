@@ -15,12 +15,14 @@ import java.util.stream.*;
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.NULL;
 import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.*;
+import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.getPrivateConstructorHelperMethod;
 import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.useFullyQualifiedName;
 
 public class ObjectFactoryImpl implements ObjectFactory {
 
     static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
     private static final String NEW_PREFIX = "new ";
+    private static final String CREATE_PREFIX = "create";
 
     private final PopulateConfig populateConfig;
     private final Map<String, Integer> classNameCounters;
@@ -34,10 +36,18 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public <T> void constructor(Class<T> clazz, int expectedChildren) {
-        setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
-                .codeTemplate(CodeTemplate.CONSTRUCTOR)
-                .build());
+    public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes) {
+        if (isNonPublicConstructor) {
+            TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren).codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR);
+            String helperMethodName = getHelperMethodName(builder.name);
+            TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();
+            objectBuilder.addMethod(getPrivateConstructorHelperMethod(clazz, helperMethodName, constructorParameterTypes));
+            setNextObjectBuilder(objectBuilder);
+        } else {
+            setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
+                    .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                    .build());
+        }
     }
 
     @Override
@@ -408,5 +418,9 @@ public class ObjectFactoryImpl implements ObjectFactory {
         String name = String.format("%s_%d", Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1), classCounter);
         classNameCounters.put(key, ++classCounter);
         return name;
+    }
+
+    private static String getHelperMethodName(String name) {
+        return CREATE_PREFIX + Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 }

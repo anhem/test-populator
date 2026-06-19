@@ -29,7 +29,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void createObjectUsingConstructor() {
-        objectFactoryImpl.constructor(MyClass.class, 2);
+        objectFactoryImpl.constructor(MyClass.class, 2, false, new Class<?>[0]);
         objectFactoryImpl.value("myString", String.class, null);
         objectFactoryImpl.value(1, Integer.class, null);
 
@@ -39,7 +39,35 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass_0 = new MyClass(\"myString\", 1);"));
+        assertThat(objectResult.getMethods()).isEmpty();
     }
+
+    @Test
+    void createObjectUsingNonPublicConstructor() {
+        objectFactoryImpl.constructor(MyClass.class, 2, true, new Class<?>[]{String.class, int.class});
+        objectFactoryImpl.value("myString", String.class, null);
+        objectFactoryImpl.value(1, Integer.class, null);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
+        assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
+        assertThat(objectResult.getImports()).isEmpty();
+        assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
+        assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass_0 = createMyClass_0(\"myString\", 1);"));
+
+        String expectedMethod = String.join(System.lineSeparator(),
+                "\tprivate static com.github.anhem.testpopulator.internal.object.ObjectFactoryImplTest.MyClass createMyClass_0(java.lang.String p0, int p1) {",
+                "\t\ttry {",
+                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.internal.object.ObjectFactoryImplTest.MyClass> constructor = com.github.anhem.testpopulator.internal.object.ObjectFactoryImplTest.MyClass.class.getDeclaredConstructor(java.lang.String.class, int.class);",
+                "\t\t\tconstructor.setAccessible(true);",
+                "\t\t\treturn constructor.newInstance(p0, p1);",
+                "\t\t} catch (Exception e) {",
+                "\t\t\tthrow new RuntimeException(e);",
+                "\t\t}",
+                "\t}");
+        assertThat(objectResult.getMethods()).isEqualTo(Set.of(expectedMethod));
+    }
+
 
     @Test
     void createObjectUsingSetter() {
@@ -86,7 +114,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void createSetOf() {
-        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.constructor(MyClass.class, 1, false, new Class<?>[0]);
         objectFactoryImpl.setOf();
         objectFactoryImpl.value("myString", String.class, null);
 
@@ -105,7 +133,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void createSet() {
-        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.constructor(MyClass.class, 1, false, new Class<?>[0]);
         objectFactoryImpl.set(HashSet.class);
         objectFactoryImpl.value("myString", String.class, null);
 
@@ -128,7 +156,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void createMapOf() {
-        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.constructor(MyClass.class, 1, false, new Class<?>[0]);
         objectFactoryImpl.mapOf();
         objectFactoryImpl.value("myKey", String.class, null);
         objectFactoryImpl.value("myValue", String.class, null);
@@ -148,7 +176,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void createMap() {
-        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.constructor(MyClass.class, 1, false, new Class<?>[0]);
         objectFactoryImpl.map(HashMap.class);
         objectFactoryImpl.value("myKey", String.class, null);
         objectFactoryImpl.value("myValue", String.class, null);
@@ -170,7 +198,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void createListOf() {
-        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.constructor(MyClass.class, 1, false, new Class<?>[0]);
         objectFactoryImpl.listOf();
         objectFactoryImpl.value("myString", String.class, null);
 
@@ -189,7 +217,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void createList() {
-        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.constructor(MyClass.class, 1, false, new Class<?>[0]);
         objectFactoryImpl.list(ArrayList.class);
         objectFactoryImpl.value("myString", String.class, null);
 
@@ -211,7 +239,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void createArray() {
-        objectFactoryImpl.constructor(MyClass.class, 1);
+        objectFactoryImpl.constructor(MyClass.class, 1, false, new Class<?>[0]);
         objectFactoryImpl.array(Boolean.class);
         objectFactoryImpl.value(true, Boolean.class, null);
 
@@ -536,7 +564,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void allValues() {
-        objectFactoryImpl.constructor(MyClass.class, 13);
+        objectFactoryImpl.constructor(MyClass.class, 13, false, new Class<?>[0]);
         objectFactoryImpl.value(ArbitraryEnum.A, ArbitraryEnum.class, null);
         objectFactoryImpl.value(1, Integer.class, null);
         objectFactoryImpl.value(2L, Long.class, null);

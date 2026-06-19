@@ -9,6 +9,7 @@ import com.github.anhem.testpopulator.model.java.constructor.NestedCollections;
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
 import org.junit.jupiter.api.Test;
 
+import java.net.*;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -223,5 +224,103 @@ class ObjectBuilderUtilTest {
         assertThat(useFullyQualifiedName(java.sql.Date.class, classNames)).isFalse();
         assertThat(useFullyQualifiedName(Date.class, classNames)).isTrue();
         assertThat(classNames).hasSize(1);
+    }
+
+    @Test
+    void getHelperMethodReturnsUrlHelperForUrlClass() {
+        String result = getHelperMethod(URL.class);
+
+        assertThat(result).isEqualTo(String.join(System.lineSeparator(),
+                "\tprivate static java.net.URL toUrl(String url) {",
+                "\t\ttry {",
+                "\t\t\treturn new java.net.URL(url);",
+                "\t\t} catch (java.net.MalformedURLException e) {",
+                "\t\t\tthrow new RuntimeException(e);",
+                "\t\t}",
+                "\t}"));
+    }
+
+    @Test
+    void getHelperMethodReturnsInetAddressHelperForInetAddressClass() {
+        String expected = String.join(System.lineSeparator(),
+                "\tprivate static java.net.InetAddress toInetAddress(String host) {",
+                "\t\ttry {",
+                "\t\t\treturn java.net.InetAddress.getByName(host);",
+                "\t\t} catch (java.net.UnknownHostException e) {",
+                "\t\t\tthrow new RuntimeException(e);",
+                "\t\t}",
+                "\t}");
+
+        assertThat(getHelperMethod(InetAddress.class)).isEqualTo(expected);
+        assertThat(getHelperMethod(Inet4Address.class)).isEqualTo(expected);
+        assertThat(getHelperMethod(Inet6Address.class)).isEqualTo(expected);
+        assertThat(getHelperMethod(InetSocketAddress.class)).isEqualTo(expected);
+    }
+
+    @Test
+    void getHelperMethodReturnsNullForUnrelatedClass() {
+        assertThat(getHelperMethod(Pojo.class)).isNull();
+    }
+
+    @Test
+    void getHelperMethodReturnsNullForNullInput() {
+        assertThat(getHelperMethod(null)).isNull();
+    }
+
+    @Test
+    void getPrivateConstructorHelperMethodGeneratesReflectionHelperWithMixedParameterTypes() {
+        String result = getPrivateConstructorHelperMethod(
+                Pojo.class,
+                "createPojo_0",
+                new Class<?>[]{String.class, int.class});
+
+        assertThat(result).isEqualTo(String.join(System.lineSeparator(),
+                "\tprivate static com.github.anhem.testpopulator.model.java.setter.Pojo createPojo_0(java.lang.String p0, int p1) {",
+                "\t\ttry {",
+                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.model.java.setter.Pojo> constructor = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredConstructor(java.lang.String.class, int.class);",
+                "\t\t\tconstructor.setAccessible(true);",
+                "\t\t\treturn constructor.newInstance(p0, p1);",
+                "\t\t} catch (Exception e) {",
+                "\t\t\tthrow new RuntimeException(e);",
+                "\t\t}",
+                "\t}"));
+    }
+
+    @Test
+    void getPrivateConstructorHelperMethodGeneratesReflectionHelperWithNoParameters() {
+        String result = getPrivateConstructorHelperMethod(
+                Pojo.class,
+                "createPojo_0",
+                new Class<?>[0]);
+
+        assertThat(result).isEqualTo(String.join(System.lineSeparator(),
+                "\tprivate static com.github.anhem.testpopulator.model.java.setter.Pojo createPojo_0() {",
+                "\t\ttry {",
+                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.model.java.setter.Pojo> constructor = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredConstructor();",
+                "\t\t\tconstructor.setAccessible(true);",
+                "\t\t\treturn constructor.newInstance();",
+                "\t\t} catch (Exception e) {",
+                "\t\t\tthrow new RuntimeException(e);",
+                "\t\t}",
+                "\t}"));
+    }
+
+    @Test
+    void getPrivateConstructorHelperMethodGeneratesReflectionHelperWithObjectOnlyParameters() {
+        String result = getPrivateConstructorHelperMethod(
+                Pojo.class,
+                "createPojo_0",
+                new Class<?>[]{String.class, Integer.class});
+
+        assertThat(result).isEqualTo(String.join(System.lineSeparator(),
+                "\tprivate static com.github.anhem.testpopulator.model.java.setter.Pojo createPojo_0(java.lang.String p0, java.lang.Integer p1) {",
+                "\t\ttry {",
+                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.model.java.setter.Pojo> constructor = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredConstructor(java.lang.String.class, java.lang.Integer.class);",
+                "\t\t\tconstructor.setAccessible(true);",
+                "\t\t\treturn constructor.newInstance(p0, p1);",
+                "\t\t} catch (Exception e) {",
+                "\t\t\tthrow new RuntimeException(e);",
+                "\t\t}",
+                "\t}"));
     }
 }

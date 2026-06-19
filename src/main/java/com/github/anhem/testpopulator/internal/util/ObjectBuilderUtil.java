@@ -132,6 +132,37 @@ public class ObjectBuilderUtil {
         return null;
     }
 
+    public static String getPrivateConstructorHelperMethod(Class<?> clazz, String helperMethodName, Class<?>[] parameterTypes) {
+        String fqn = clazz.getCanonicalName();
+        StringBuilder paramDecl = new StringBuilder();
+        StringBuilder paramTypeArgs = new StringBuilder();
+        StringBuilder paramArgs = new StringBuilder();
+        for (int i = 0; i < parameterTypes.length; i++) {
+            String typeFqn = parameterTypes[i].isPrimitive()
+                    ? parameterTypes[i].getName()
+                    : parameterTypes[i].getCanonicalName();
+            if (i > 0) {
+                paramDecl.append(", ");
+                paramTypeArgs.append(", ");
+                paramArgs.append(", ");
+            }
+            paramDecl.append(typeFqn).append(" p").append(i);
+            paramTypeArgs.append(typeFqn).append(".class");
+            paramArgs.append("p").append(i);
+        }
+        return String.join(System.lineSeparator(),
+                String.format("\tprivate static %s %s(%s) {", fqn, helperMethodName, paramDecl),
+                TRY_START,
+                String.format("\t\t\tjava.lang.reflect.Constructor<%s> constructor = %s.class.getDeclaredConstructor(%s);",
+                        fqn, fqn, paramTypeArgs),
+                "\t\t\tconstructor.setAccessible(true);",
+                String.format("\t\t\treturn constructor.newInstance(%s);", paramArgs),
+                "\t\t} catch (Exception e) {",
+                THROW_RUNTIME_EXCEPTION,
+                BLOCK_END,
+                METHOD_END);
+    }
+
     private static boolean requiresImport(Class<?> clazz) {
         return !"java.lang".equals(clazz.getPackageName());
     }
