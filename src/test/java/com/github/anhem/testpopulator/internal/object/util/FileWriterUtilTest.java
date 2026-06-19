@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal.util;
+package com.github.anhem.testpopulator.internal.object.util;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.object.ObjectResult;
@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.*;
+import static com.github.anhem.testpopulator.internal.object.util.FileWriterUtil.*;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static java.io.File.createTempFile;
 import static java.nio.file.Files.readAllLines;
@@ -60,7 +60,7 @@ class FileWriterUtilTest {
         writePackage(OBJECT_RESULT, path);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
-                "package com.github.anhem.testpopulator.internal.util;",
+                "package com.github.anhem.testpopulator.internal.object.util;",
                 ""
         ));
     }
@@ -130,11 +130,11 @@ class FileWriterUtilTest {
         writeObjects(OBJECT_RESULT, path);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
-                "	public static final ArrayList<ArbitraryEnum> arrayList0 = new ArrayList<>();",
+                "\tpublic static final ArrayList<ArbitraryEnum> arrayList0 = new ArrayList<>();",
                 "",
-                "	static {",
-                "		arrayList0.add(\"A\")",
-                "	}"));
+                "\tstatic {",
+                "\t\tarrayList0.add(\"A\")",
+                "\t}"));
     }
 
     private static Path getTempPath() throws IOException {

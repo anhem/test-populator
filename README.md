@@ -48,6 +48,8 @@ MyMessage message = new PopulateFactory(PopulateConfig.builder()
   - [Other Options](#other-options)
 - [Kotlin Support](#kotlin-support)
 - [Usage Examples](#usage-examples)
+- [Java Code Generation](#java-code-generation)
+- [Comparison to Similar Libraries](#comparison-to-similar-libraries)
 - [Technical Insights](#technical-insights)
 - [Thread Safety](#thread-safety)
 - [Building from Source](#building-from-source)
@@ -321,6 +323,7 @@ Allows the library to use private or protected constructors.
 
 * `blacklistedMethods` / `blacklistedFields`: A list of method or field names to skip during population. Useful for avoiding code coverage
   instrumentation fields like `$jacocoInit`.
+
 * `objectFactoryEnabled`: If `true`, generates Java source code for the populated object in the
   `target/generated-test-sources/test-populator/` directory (automatically adjusted to `build/` for Gradle).
   Configure via `.objectFactory(true).path("custom/path")`.
@@ -569,6 +572,89 @@ class MyServiceTest {
     }
 }
 ```
+
+## Java Code Generation
+
+Test-Populator includes a powerful feature that allows you to automatically generate the actual Java source code that instantiates your populated objects.
+
+### Why Use Code Generation?
+
+While Test-Populator is great for generating objects at runtime, there are scenarios where having the static Java code is preferable:
+
+1. **Zero Test Dependencies**: If you need to provide complex default mock objects in your tests, you might not want to add `test-populator` as a permanent dependency to your project just to generate boilerplate data.
+2. **Speed & Stability**: Statically compiled instantiation code is inherently faster and more deterministic than relying on reflection and runtime population.
+3. **Easier Debugging**: You can clearly see exactly how an object was built by reading the generated Java code, making it easy to tweak a single specific value manually in the generated file.
+4. **Transitioning Away**: You can use this feature to completely remove `test-populator` from your project! Simply use it once to generate all the boilerplate code you need, commit the generated files to your repository, and then remove the library dependency entirely.
+
+### How it Works
+
+To enable code generation, you simply flip the `objectFactoryEnabled` flag in your configuration:
+
+```java
+PopulateConfig config = PopulateConfig.builder()
+        .objectFactoryEnabled(true)
+        .build();
+MyClass myClass = new PopulateFactory(config).populate(MyClass.class);
+```
+
+As the library recursively builds your `MyClass` object in memory, it simultaneously builds a structural tree of the code required to recreate it.
+Once the population is complete, it writes a new Java file to your configured output directory (defaults to `target/generated-test-sources/test-populator/`).
+
+The generated code will look something like this:
+
+```java
+package com.github.anhem.testpopulator.model;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+public class MyClass_TestData_8fdb5937ca560430 {
+
+    public static final Map<String, LocalDate> MAP_0 = Map.of("dsyyjxizvp", LocalDate.parse("2021-02-14"));
+    public static final InnerClass INNER_CLASS_0 = new InnerClass(789707, MAP_0);
+    public static final List<ArbitraryEnum> LIST_0 = List.of(ArbitraryEnum.B);
+    public static final MyClass MY_CLASS_0 = new MyClass("xksqbhddha", LIST_0, INNER_CLASS_0);
+
+}
+```
+
+### Naming Convention
+
+Generated files follow a specific naming convention: `<ClassName>_TestData_<ConfigurationHash>.java`.
+The 16-character SHA-256 hash suffix is generated from your `PopulateConfig`. This prevents file name collisions when generating test data for the same class using different configurations.
+
+You can then simply copy the `MyClass_TestData_8fdb5937ca560430.java` file into your main `src/test/java/` directory, commit it, and use `MyClass_TestData_8fdb5937ca560430.MY_CLASS_0` directly in your tests!
+
+## Comparison to Similar Libraries
+
+> [!NOTE]
+> The following comparison was analyzed and written by AI. We encourage you to do your own research and test different libraries to find the best fit for your specific needs.
+
+There are several other excellent libraries for automating test data setup. While they all aim to eliminate boilerplate code by automatically generating fully-populated object graphs, Test-Populator distinguishes itself through its **extreme lightweight design**:
+
+* **Zero Classpath Clutter**: Unlike many alternatives that rely on third-party utilities (like Objenesis or SLF4J), Test-Populator is written entirely in pure, native Java using standard `java.lang.reflect`. It has zero transitive dependencies, eliminating the risk of version conflicts in your project.
+* **Zero Reflection Overhead**: By leveraging the [Java Code Generation](#java-code-generation) feature, you can completely remove the library dependency from your project after generating the static `.java` files. This means your tests will run at compile-time speed with zero runtime reflection overhead.
+
+Here is how Test-Populator compares to specific alternatives:
+
+### [Instancio](https://www.instancio.org/)
+
+Featured in the [Awesome Java](https://github.com/akullpp/awesome-java) list, Instancio is a modern and powerful data generator.
+* **When to choose Instancio**: It is a fantastic choice if you need a highly fluent API for fine-grained, per-field data generation deep within the object graph, reproducible data via random seeds, or built-in integration with Bean Validation (JSR 380) annotations.
+* **Test-Populator Advantage**: Test-Populator offers [Java Code Generation](#java-code-generation) (allowing you to generate static code and completely remove the library dependency), out-of-the-box [Kotlin support](#kotlin-support) without external dependencies, and explicit control over instantiation strategies (Constructor vs. Builder vs. Setters). Test-Populator also has zero runtime dependencies.
+
+### [EasyRandom](https://github.com/j-easy/easy-random) (formerly Random Beans)
+
+EasyRandom is a classic, widely-used library for generating object graphs with random data.
+* **When to choose EasyRandom**: It is highly mature, works seamlessly with Spring, and has a large ecosystem of extensions.
+* **Test-Populator Advantage**: EasyRandom relies entirely on runtime reflection and does not offer Java source code generation. Test-Populator's unique ability to generate actual `.java` files provides a highly deterministic, fast, and dependency-free alternative for your test suite. Test-Populator also provides better native support for modern Kotlin classes and records.
+
+### [Podam](https://github.com/mtedone/podam) (POJO Data Mocker)
+
+Podam is another older, popular tool that automatically fills POJOs with dummy data using introspection.
+* **When to choose Podam**: It is great for quickly mocking traditional, simple JavaBeans.
+* **Test-Populator Advantage**: Podam can struggle with modern immutable Java patterns (like complex builders, records, or Kotlin default parameters) without writing custom strategies. Test-Populator's strategy-based engine natively supports Lombok, Immutables, Protobuf, and Kotlin out-of-the-box.
 
 ## Technical Insights
 

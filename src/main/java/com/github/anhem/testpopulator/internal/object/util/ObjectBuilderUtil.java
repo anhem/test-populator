@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal.util;
+package com.github.anhem.testpopulator.internal.object.util;
 
 import com.github.anhem.testpopulator.internal.object.BuildType;
 import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
@@ -45,7 +45,7 @@ public class ObjectBuilderUtil {
             addImport(clazz.getComponentType(), value, false, imports, staticImports);
             return;
         }
-        if (clazz.isPrimitive() || clazz.getName().startsWith("java.lang.")) {
+        if (clazz.isPrimitive() || "java.lang".equals(clazz.getPackageName())) {
             return;
         }
         if (clazz.isEnum()) {
@@ -70,7 +70,7 @@ public class ObjectBuilderUtil {
     }
 
     public static Stream<String> endBuilder(String buildMethodName) {
-        return Stream.of(String.format("    .%s();", buildMethodName));
+        return Stream.of(String.format("\t.%s();", buildMethodName));
     }
 
     public static Stream<String> startStaticBlock() {
@@ -131,23 +131,25 @@ public class ObjectBuilderUtil {
         return null;
     }
 
-    public static String getPrivateConstructorHelperMethod(Class<?> clazz, String helperMethodName, Class<?>[] parameterTypes) {
-        String fullyQualifiedClassName = clazz.getCanonicalName();
-        String parameterDeclarations = getParameterDeclarations(parameterTypes);
-        String parameterTypeClasses = getParameterTypeClasses(parameterTypes);
+    public static String getPrivateConstructorHelperMethod(Class<?> clazz, String helperMethodName, Class<?>[] parameterTypes, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        String className = getClassName(clazz, classNames, imports, staticImports);
+        String constructorClassName = getClassName(java.lang.reflect.Constructor.class, classNames, imports, staticImports);
+        String parameterDeclarations = getParameterDeclarations(parameterTypes, classNames, imports, staticImports);
+        String parameterTypeClasses = getParameterTypeClasses(parameterTypes, classNames, imports, staticImports);
         String parameterArguments = getParameterArguments(parameterTypes);
         return String.join(System.lineSeparator(),
                 String.format(
                         "\tprivate static %s %s(%s) {",
-                        fullyQualifiedClassName,
+                        className,
                         helperMethodName,
                         parameterDeclarations
                 ),
                 TRY_START,
                 String.format(
-                        "\t\t\tjava.lang.reflect.Constructor<%s> constructor = %s.class.getDeclaredConstructor(%s);",
-                        fullyQualifiedClassName,
-                        fullyQualifiedClassName,
+                        "\t\t\t%s<%s> constructor = %s.class.getDeclaredConstructor(%s);",
+                        constructorClassName,
+                        className,
+                        className,
                         parameterTypeClasses
                 ),
                 "\t\t\tconstructor.setAccessible(true);",
@@ -159,24 +161,23 @@ public class ObjectBuilderUtil {
         );
     }
 
-    public static String getFieldHelperMethod(Class<?> clazz, String helperMethodName, List<Field> fields) {
-        String fullyQualifiedClassName = clazz.getCanonicalName();
+    public static String getFieldHelperMethod(Class<?> clazz, String helperMethodName, List<java.lang.reflect.Field> fields, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        String className = getClassName(clazz, classNames, imports, staticImports);
+        String constructorClassName = getClassName(java.lang.reflect.Constructor.class, classNames, imports, staticImports);
         Class<?>[] parameterTypes = getParameterTypes(fields);
-        String parameterDeclarations = getParameterDeclarations(parameterTypes);
+        String parameterDeclarations = getParameterDeclarations(parameterTypes, classNames, imports, staticImports);
 
         List<String> lines = new ArrayList<>();
-        lines.add(String.format("\tprivate static %s %s(%s) {", fullyQualifiedClassName, helperMethodName, parameterDeclarations));
+        lines.add(String.format("\tprivate static %s %s(%s) {", className, helperMethodName, parameterDeclarations));
         lines.add(TRY_START);
-        lines.add(String.format("\t\t\tjava.lang.reflect.Constructor<%s> constructor = %s.class.getDeclaredConstructor();", fullyQualifiedClassName, fullyQualifiedClassName));
+        lines.add(String.format("\t\t\t%s<%s> constructor = %s.class.getDeclaredConstructor();", constructorClassName, className, className));
         lines.add("\t\t\tconstructor.setAccessible(true);");
-        lines.add(String.format("\t\t\t%s obj = constructor.newInstance();", fullyQualifiedClassName));
+        lines.add(String.format("\t\t\t%s obj = constructor.newInstance();", className));
 
         for (int i = 0; i < fields.size(); i++) {
             java.lang.reflect.Field field = fields.get(i);
-            String declaringClassName = getFullyQualifiedClassName(field.getDeclaringClass());
-            lines.add(String.format("\t\t\tjava.lang.reflect.Field f%d = %s.class.getDeclaredField(\"%s\");", i, declaringClassName, field.getName()));
-            lines.add(String.format("\t\t\tf%d.setAccessible(true);", i));
-            lines.add(String.format("\t\t\tf%d.set(obj, p%d);", i, i));
+            String declaringClassName = getClassName(field.getDeclaringClass(), classNames, imports, staticImports);
+            lines.add(String.format("\t\t\tsetField(obj, %s.class, \"%s\", p%d);", declaringClassName, field.getName(), i));
         }
 
         lines.add("\t\t\treturn obj;");
@@ -188,32 +189,75 @@ public class ObjectBuilderUtil {
         return String.join(System.lineSeparator(), lines);
     }
 
+    public static String getSetFieldMethod(Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        String fieldClassName = getClassName(java.lang.reflect.Field.class, classNames, imports, staticImports);
+        return String.join(System.lineSeparator(),
+                "\tprivate static void setField(Object obj, Class<?> clazz, String fieldName, Object value) {",
+                TRY_START,
+                String.format("\t\t\t%s field = clazz.getDeclaredField(fieldName);", fieldClassName),
+                "\t\t\tfield.setAccessible(true);",
+                "\t\t\tfield.set(obj, value);",
+                "\t\t} catch (Exception e) {",
+                THROW_RUNTIME_EXCEPTION,
+                BLOCK_END,
+                METHOD_END);
+    }
+
     private static Class<?>[] getParameterTypes(List<Field> fields) {
         return fields.stream()
                 .map(Field::getType)
                 .toArray(Class<?>[]::new);
     }
 
-    private static String getParameterDeclarations(Class<?>[] parameterTypes) {
+    private static String getParameterDeclarations(Class<?>[] parameterTypes, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        if (parameterTypes.length > 1) {
+            return System.lineSeparator() + "\t\t\t" + java.util.stream.IntStream.range(0, parameterTypes.length)
+                    .mapToObj(i -> String.format("%s p%d", getClassName(parameterTypes[i], classNames, imports, staticImports), i))
+                    .collect(java.util.stream.Collectors.joining("," + System.lineSeparator() + "\t\t\t")) +
+                    System.lineSeparator() + "\t";
+        }
         return java.util.stream.IntStream.range(0, parameterTypes.length)
-                .mapToObj(i -> String.format("%s p%d", getFullyQualifiedClassName(parameterTypes[i]), i))
+                .mapToObj(i -> String.format("%s p%d", getClassName(parameterTypes[i], classNames, imports, staticImports), i))
                 .collect(java.util.stream.Collectors.joining(", "));
     }
 
-    private static String getParameterTypeClasses(Class<?>[] parameterTypes) {
+    private static String getParameterTypeClasses(Class<?>[] parameterTypes, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        if (parameterTypes.length > 1) {
+            return System.lineSeparator() + "\t\t\t\t\t" + Arrays.stream(parameterTypes)
+                    .map(p -> String.format("%s.class", getClassName(p, classNames, imports, staticImports)))
+                    .collect(java.util.stream.Collectors.joining("," + System.lineSeparator() + "\t\t\t\t\t")) +
+                    System.lineSeparator() + "\t\t\t\t";
+        }
         return Arrays.stream(parameterTypes)
-                .map(p -> String.format("%s.class", getFullyQualifiedClassName(p)))
+                .map(p -> String.format("%s.class", getClassName(p, classNames, imports, staticImports)))
                 .collect(java.util.stream.Collectors.joining(", "));
     }
 
     private static String getParameterArguments(Class<?>[] parameterTypes) {
+        if (parameterTypes.length > 1) {
+            return System.lineSeparator() + "\t\t\t\t" + java.util.stream.IntStream.range(0, parameterTypes.length)
+                    .mapToObj(i -> "p" + i)
+                    .collect(java.util.stream.Collectors.joining("," + System.lineSeparator() + "\t\t\t\t")) +
+                    System.lineSeparator() + "\t\t\t";
+        }
         return java.util.stream.IntStream.range(0, parameterTypes.length)
                 .mapToObj(i -> "p" + i)
                 .collect(java.util.stream.Collectors.joining(", "));
     }
 
-    private static String getFullyQualifiedClassName(Class<?> clazz) {
-        return clazz.isPrimitive() ? clazz.getName() : clazz.getCanonicalName();
+    public static String getClassName(Class<?> clazz, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        if (clazz.isPrimitive()) {
+            return clazz.getName();
+        }
+        if (clazz.isArray()) {
+            return getClassName(clazz.getComponentType(), classNames, imports, staticImports) + "[]";
+        }
+        boolean useFqn = useFullyQualifiedName(clazz, classNames);
+        if (!useFqn) {
+            addImport(clazz, null, false, imports, staticImports);
+            return clazz.getSimpleName();
+        }
+        return clazz.getCanonicalName();
     }
 
     private static boolean requiresImport(Class<?> clazz) {

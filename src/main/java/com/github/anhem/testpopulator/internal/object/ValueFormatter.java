@@ -13,7 +13,7 @@ import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.formatBytes;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.formatBytes;
 
 public class ValueFormatter {
 

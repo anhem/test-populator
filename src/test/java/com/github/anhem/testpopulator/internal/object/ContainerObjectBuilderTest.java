@@ -10,9 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ContainerObjectBuilderTest {
 
-    private static final String TYPED_COLLECTION_TEMPLATE = "%1$s %2$s<%3$s> %4$s = new %2$s<>();";
-    private static final String SETTER_TEMPLATE = "%1$s %2$s %4$s = new %2$s();";
-
     @Test
     void buildCollection() {
         ContainerObjectBuilder builder = ContainerObjectBuilder.builder()

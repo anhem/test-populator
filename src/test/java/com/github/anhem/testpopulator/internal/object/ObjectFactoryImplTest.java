@@ -38,7 +38,9 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass_0 = new MyClass(\"myString\", 1);"));
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final MyClass MY_CLASS_0 = new MyClass(\"myString\", 1);"
+        );
         assertThat(objectResult.getMethods()).isEmpty();
     }
 
@@ -52,20 +54,33 @@ class ObjectFactoryImplTest {
 
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
-        assertThat(objectResult.getImports()).isEmpty();
+        assertThat(objectResult.getImports()).containsExactlyInAnyOrder("java.lang.reflect.Constructor");
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass_0 = createMyClass_0(\"myString\", 1);"));
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final MyClass MY_CLASS_0 = createMY_CLASS_0(\"myString\", 1);"
+        );
         String expectedMethod = String.join(System.lineSeparator(),
-                "\tprivate static com.github.anhem.testpopulator.internal.object.ObjectFactoryImplTest.MyClass createMyClass_0(java.lang.String p0, int p1) {",
+                "\tprivate static MyClass createMY_CLASS_0(\n" +
+                        "\t\t\tString p0,\n" +
+                        "\t\t\tint p1\n" +
+                        "\t) {",
                 "\t\ttry {",
-                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.internal.object.ObjectFactoryImplTest.MyClass> constructor = com.github.anhem.testpopulator.internal.object.ObjectFactoryImplTest.MyClass.class.getDeclaredConstructor(java.lang.String.class, int.class);",
+                "\t\t\tConstructor<MyClass> constructor = MyClass.class.getDeclaredConstructor(\n" +
+                        "\t\t\t\t\tString.class,\n" +
+                        "\t\t\t\t\tint.class\n" +
+                        "\t\t\t\t);",
                 "\t\t\tconstructor.setAccessible(true);",
-                "\t\t\treturn constructor.newInstance(p0, p1);",
+                "\t\t\treturn constructor.newInstance(\n" +
+                        "\t\t\t\tp0,\n" +
+                        "\t\t\t\tp1\n" +
+                        "\t\t\t);",
                 "\t\t} catch (Exception e) {",
                 "\t\t\tthrow new RuntimeException(e);",
                 "\t\t}",
-                "\t}");
+                "\t}"
+        );
         assertThat(objectResult.getMethods()).isEqualTo(Set.of(expectedMethod));
+        assertThat(objectResult.getImports()).containsExactlyInAnyOrder("java.lang.reflect.Constructor");
     }
 
 
@@ -83,10 +98,10 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = new MyClass();",
+                "public static final MyClass MY_CLASS_0 = new MyClass();",
                 "static {",
-                "myClass_0.setString(\"myString\");",
-                "myClass_0.setInteger(1);",
+                "MY_CLASS_0.setString(\"myString\");",
+                "MY_CLASS_0.setInteger(1);",
                 "}"
         ));
     }
@@ -104,12 +119,12 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = MyClass.builder()",
-                "    .string(\"myString\")",
-                "    .integer(1)",
-                "    .build();"
-        ));
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final MyClass MY_CLASS_0 = MyClass.builder()",
+                "\t.string(\"myString\")",
+                "\t.integer(1)",
+                "\t.build();"
+        );
     }
 
     @Test
@@ -126,8 +141,8 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final Set<String> set_0 = Set.of(\"myString\");",
-                "public static final MyClass myClass_0 = new MyClass(set_0);"
+                "public static final Set<String> SET_0 = Set.of(\"myString\");",
+                "public static final MyClass MY_CLASS_0 = new MyClass(SET_0);"
         ));
     }
 
@@ -145,11 +160,11 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final HashSet<String> hashSet_0 = new HashSet<>();",
+                "public static final HashSet<String> HASH_SET_0 = new HashSet<>();",
                 "static {",
-                "hashSet_0.add(\"myString\");",
+                "HASH_SET_0.add(\"myString\");",
                 "}",
-                "public static final MyClass myClass_0 = new MyClass(hashSet_0);"
+                "public static final MyClass MY_CLASS_0 = new MyClass(HASH_SET_0);"
 
         ));
     }
@@ -168,10 +183,10 @@ class ObjectFactoryImplTest {
                 "java.util.Map"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final Map<String, String> map_0 = Map.of(\"myKey\", \"myValue\");",
-                "public static final MyClass myClass_0 = new MyClass(map_0);"
-        ));
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final Map<String, String> MAP_0 = Map.of(\"myKey\", \"myValue\");",
+                "public static final MyClass MY_CLASS_0 = new MyClass(MAP_0);"
+        );
     }
 
     @Test
@@ -187,13 +202,13 @@ class ObjectFactoryImplTest {
                 "java.util.HashMap"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final HashMap<String, String> hashMap_0 = new HashMap<>();",
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final HashMap<String, String> HASH_MAP_0 = new HashMap<>();",
                 "static {",
-                "hashMap_0.put(\"myKey\", \"myValue\");",
+                "HASH_MAP_0.put(\"myKey\", \"myValue\");",
                 "}",
-                "public static final MyClass myClass_0 = new MyClass(hashMap_0);"
-        ));
+                "public static final MyClass MY_CLASS_0 = new MyClass(HASH_MAP_0);"
+        );
     }
 
     @Test
@@ -210,8 +225,8 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final List<String> list_0 = List.of(\"myString\");",
-                "public static final MyClass myClass_0 = new MyClass(list_0);"
+                "public static final List<String> LIST_0 = List.of(\"myString\");",
+                "public static final MyClass MY_CLASS_0 = new MyClass(LIST_0);"
         ));
     }
 
@@ -229,11 +244,11 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final ArrayList<String> arrayList_0 = new ArrayList<>();",
+                "public static final ArrayList<String> ARRAY_LIST_0 = new ArrayList<>();",
                 "static {",
-                "arrayList_0.add(\"myString\");",
+                "ARRAY_LIST_0.add(\"myString\");",
                 "}",
-                "public static final MyClass myClass_0 = new MyClass(arrayList_0);"
+                "public static final MyClass MY_CLASS_0 = new MyClass(ARRAY_LIST_0);"
         ));
     }
 
@@ -249,8 +264,8 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final Boolean[] boolean_0 = new Boolean[]{true};",
-                "public static final MyClass myClass_0 = new MyClass(boolean_0);"
+                "public static final Boolean[] BOOLEAN_0 = new Boolean[]{true};",
+                "public static final MyClass MY_CLASS_0 = new MyClass(BOOLEAN_0);"
         ));
     }
 
@@ -264,7 +279,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEmpty();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final String string_0 = \"myString\";"
+                "public static final String STRING_0 = \"myString\";"
         ));
     }
 
@@ -291,7 +306,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final List list_0 = CUSTOM_STRING;"
+                "public static final List LIST_0 = CUSTOM_STRING;"
         ));
     }
 
@@ -318,7 +333,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final List list_0 = CUSTOM_STRING_FOR_CLASS;"
+                "public static final List LIST_0 = CUSTOM_STRING_FOR_CLASS;"
         ));
     }
 
@@ -350,7 +365,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
     }
@@ -383,7 +398,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
     }
@@ -422,7 +437,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
         assertThat(objectResult.getImports()).contains(importDefinition);
@@ -462,7 +477,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
         assertThat(objectResult.getImports()).contains(importDefinition);
@@ -508,7 +523,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
         assertThat(objectResult.getImports()).contains(importDefinition);
@@ -555,7 +570,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
         assertThat(objectResult.getImports()).contains(importDefinition);
@@ -594,27 +609,48 @@ class ObjectFactoryImplTest {
                 getExpectedMyClassStaticImport(),
                 "com.github.anhem.testpopulator.model.java.ArbitraryEnum.A"
         ));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = new MyClass(" +
-                        "A, " +
-                        "1, " +
-                        "2L, " +
-                        "3.0, " +
-                        "true, " +
-                        "BigDecimal.valueOf(1), " +
-                        "\"myString\", " +
-                        "LocalDate.parse(\"1970-01-01\"), " +
-                        "LocalDateTime.parse(\"1970-01-01T00:00\"), " +
-                        "ZonedDateTime.parse(\"1970-01-01T00:00Z[UTC]\"), " +
-                        "Instant.parse(\"1970-01-01T00:00:00Z\"), " +
-                        "'c', " +
-                        "UUID.fromString(\"82e8962f-885d-4845-914b-c206a42d7c91\")" +
-                        ");"));
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final MyClass MY_CLASS_0 = new MyClass(\n" +
+                        "\t\t\tA,\n" +
+                        "\t\t\t1,\n" +
+                        "\t\t\t2L,\n" +
+                        "\t\t\t3.0,\n" +
+                        "\t\t\ttrue,\n" +
+                        "\t\t\tBigDecimal.valueOf(1),\n" +
+                        "\t\t\t\"myString\",\n" +
+                        "\t\t\tLocalDate.parse(\"1970-01-01\"),\n" +
+                        "\t\t\tLocalDateTime.parse(\"1970-01-01T00:00\"),\n" +
+                        "\t\t\tZonedDateTime.parse(\"1970-01-01T00:00Z[UTC]\"),\n" +
+                        "\t\t\tInstant.parse(\"1970-01-01T00:00:00Z\"),\n" +
+                        "\t\t\t'c',\n" +
+                        "\t\t\tUUID.fromString(\"82e8962f-885d-4845-914b-c206a42d7c91\")\n" +
+                        "\t);"
+        );
     }
 
     @Test
     void valueThrowsException() {
         Assertions.assertThrows(ObjectException.class, () -> objectFactoryImpl.value(PopulateConfig.builder().build(), PopulateConfig.class, null));
+    }
+
+    @Test
+    void createObjectUsingConstructorIsMultiline() {
+        objectFactoryImpl.constructor(MyClass.class, 4, false, new Class<?>[0]);
+        String longString = "thisIsAVeryLongStringThatWillExceedTheOneHundredCharacterLimitAndTriggerMultilineFormattingNow";
+        objectFactoryImpl.value(longString, String.class, null);
+        objectFactoryImpl.value(1, Integer.class, null);
+        objectFactoryImpl.value(2, Integer.class, null);
+        objectFactoryImpl.value(3, Integer.class, null);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final MyClass MY_CLASS_0 = new MyClass(\n" +
+                        "\t\t\t\"" + longString + "\",\n" +
+                        "\t\t\t1,\n" +
+                        "\t\t\t2,\n" +
+                        "\t\t\t3\n" +
+                        "\t);"
+        );
     }
 
     private String getExpectedMyClassStaticImport() {
