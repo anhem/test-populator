@@ -115,11 +115,12 @@ public class FileWriterUtil {
 
     static String encode(PopulateConfig populateConfig) {
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             byte[] bytes = messageDigest.digest(populateConfig.toString().getBytes());
             return IntStream.range(0, bytes.length)
                     .mapToObj(i -> String.format("%02x", bytes[i]))
-                    .collect(Collectors.joining());
+                    .collect(Collectors.joining())
+                    .substring(0, 16);
         } catch (NoSuchAlgorithmException e) {
             throw new ObjectException("Could not encode configuration", e);
         }
