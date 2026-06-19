@@ -40,7 +40,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
             TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren).codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR);
             String helperMethodName = getHelperMethodName(builder.name);
             TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();
-            objectBuilder.addMethod(getPrivateConstructorHelperMethod(clazz, helperMethodName, constructorParameterTypes));
+            Set<String> extraImports = new HashSet<>();
+            Set<String> extraStaticImports = new HashSet<>();
+            objectBuilder.addMethod(getPrivateConstructorHelperMethod(clazz, helperMethodName, constructorParameterTypes, classNames, extraImports, extraStaticImports));
+            objectBuilder.addImports(extraImports);
+            objectBuilder.addStaticImports(extraStaticImports);
             setNextObjectBuilder(objectBuilder);
         } else {
             setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
@@ -54,7 +58,11 @@ public class ObjectFactoryImpl implements ObjectFactory {
         TemplateObjectBuilder.Builder builder = templateBuilder(clazz, FIELD, expectedChildren).codeTemplate(CodeTemplate.FIELD);
         String helperMethodName = getHelperMethodName(builder.name);
         TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();
-        objectBuilder.addMethod(getFieldHelperMethod(clazz, helperMethodName, fields));
+        Set<String> extraImports = new HashSet<>();
+        Set<String> extraStaticImports = new HashSet<>();
+        objectBuilder.addMethod(getFieldHelperMethod(clazz, helperMethodName, fields, classNames, extraImports, extraStaticImports));
+        objectBuilder.addImports(extraImports);
+        objectBuilder.addStaticImports(extraStaticImports);
         setNextObjectBuilder(objectBuilder);
     }
 

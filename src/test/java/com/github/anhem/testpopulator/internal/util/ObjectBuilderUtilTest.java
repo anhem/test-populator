@@ -269,34 +269,48 @@ class ObjectBuilderUtilTest {
 
     @Test
     void getPrivateConstructorHelperMethodGeneratesReflectionHelperWithMixedParameterTypes() {
+        Map<String, Class<?>> classNames = new HashMap<>();
+        Set<String> imports = new HashSet<>();
+        Set<String> staticImports = new HashSet<>();
+
         String result = getPrivateConstructorHelperMethod(
                 Pojo.class,
                 "createPojo_0",
-                new Class<?>[]{String.class, int.class});
+                new Class<?>[]{String.class, int.class},
+                classNames, imports, staticImports);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
-                "\tprivate static com.github.anhem.testpopulator.model.java.setter.Pojo createPojo_0(java.lang.String p0, int p1) {",
+                "\tprivate static Pojo createPojo_0(String p0, int p1) {",
                 "\t\ttry {",
-                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.model.java.setter.Pojo> constructor = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredConstructor(java.lang.String.class, int.class);",
+                "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor(String.class, int.class);",
                 "\t\t\tconstructor.setAccessible(true);",
                 "\t\t\treturn constructor.newInstance(p0, p1);",
                 "\t\t} catch (Exception e) {",
                 "\t\t\tthrow new RuntimeException(e);",
                 "\t\t}",
                 "\t}"));
+        assertThat(imports).containsExactlyInAnyOrder(
+                "com.github.anhem.testpopulator.model.java.setter.Pojo",
+                "java.lang.reflect.Constructor"
+        );
     }
 
     @Test
     void getPrivateConstructorHelperMethodGeneratesReflectionHelperWithNoParameters() {
+        Map<String, Class<?>> classNames = new HashMap<>();
+        Set<String> imports = new HashSet<>();
+        Set<String> staticImports = new HashSet<>();
+
         String result = getPrivateConstructorHelperMethod(
                 Pojo.class,
                 "createPojo_0",
-                new Class<?>[0]);
+                new Class<?>[0],
+                classNames, imports, staticImports);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
-                "\tprivate static com.github.anhem.testpopulator.model.java.setter.Pojo createPojo_0() {",
+                "\tprivate static Pojo createPojo_0() {",
                 "\t\ttry {",
-                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.model.java.setter.Pojo> constructor = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredConstructor();",
+                "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor();",
                 "\t\t\tconstructor.setAccessible(true);",
                 "\t\t\treturn constructor.newInstance();",
                 "\t\t} catch (Exception e) {",
@@ -307,15 +321,20 @@ class ObjectBuilderUtilTest {
 
     @Test
     void getPrivateConstructorHelperMethodGeneratesReflectionHelperWithObjectOnlyParameters() {
+        Map<String, Class<?>> classNames = new HashMap<>();
+        Set<String> imports = new HashSet<>();
+        Set<String> staticImports = new HashSet<>();
+
         String result = getPrivateConstructorHelperMethod(
                 Pojo.class,
                 "createPojo_0",
-                new Class<?>[]{String.class, Integer.class});
+                new Class<?>[]{String.class, Integer.class},
+                classNames, imports, staticImports);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
-                "\tprivate static com.github.anhem.testpopulator.model.java.setter.Pojo createPojo_0(java.lang.String p0, java.lang.Integer p1) {",
+                "\tprivate static Pojo createPojo_0(String p0, Integer p1) {",
                 "\t\ttry {",
-                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.model.java.setter.Pojo> constructor = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredConstructor(java.lang.String.class, java.lang.Integer.class);",
+                "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor(String.class, Integer.class);",
                 "\t\t\tconstructor.setAccessible(true);",
                 "\t\t\treturn constructor.newInstance(p0, p1);",
                 "\t\t} catch (Exception e) {",
@@ -329,21 +348,26 @@ class ObjectBuilderUtilTest {
         java.lang.reflect.Field stringValueField = Pojo.class.getDeclaredField("stringValue");
         java.lang.reflect.Field integerValueField = Pojo.class.getDeclaredField("integerValue");
 
+        Map<String, Class<?>> classNames = new HashMap<>();
+        Set<String> imports = new HashSet<>();
+        Set<String> staticImports = new HashSet<>();
+
         String result = getFieldHelperMethod(
                 Pojo.class,
                 "createPojo_0",
-                List.of(stringValueField, integerValueField));
+                List.of(stringValueField, integerValueField),
+                classNames, imports, staticImports);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
-                "\tprivate static com.github.anhem.testpopulator.model.java.setter.Pojo createPojo_0(java.lang.String p0, java.lang.Integer p1) {",
+                "\tprivate static Pojo createPojo_0(String p0, Integer p1) {",
                 "\t\ttry {",
-                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.model.java.setter.Pojo> constructor = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredConstructor();",
+                "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor();",
                 "\t\t\tconstructor.setAccessible(true);",
-                "\t\t\tcom.github.anhem.testpopulator.model.java.setter.Pojo obj = constructor.newInstance();",
-                "\t\t\tjava.lang.reflect.Field f0 = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredField(\"stringValue\");",
+                "\t\t\tPojo obj = constructor.newInstance();",
+                "\t\t\tField f0 = Pojo.class.getDeclaredField(\"stringValue\");",
                 "\t\t\tf0.setAccessible(true);",
                 "\t\t\tf0.set(obj, p0);",
-                "\t\t\tjava.lang.reflect.Field f1 = com.github.anhem.testpopulator.model.java.setter.Pojo.class.getDeclaredField(\"integerValue\");",
+                "\t\t\tField f1 = Pojo.class.getDeclaredField(\"integerValue\");",
                 "\t\t\tf1.setAccessible(true);",
                 "\t\t\tf1.set(obj, p1);",
                 "\t\t\treturn obj;",
@@ -351,5 +375,10 @@ class ObjectBuilderUtilTest {
                 "\t\t\tthrow new RuntimeException(e);",
                 "\t\t}",
                 "\t}"));
+        assertThat(imports).containsExactlyInAnyOrder(
+                "com.github.anhem.testpopulator.model.java.setter.Pojo",
+                "java.lang.reflect.Constructor",
+                "java.lang.reflect.Field"
+        );
     }
 }

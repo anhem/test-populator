@@ -52,13 +52,13 @@ class ObjectFactoryImplTest {
 
         assertThat(objectResult.getPackageName()).isEqualTo(PACKAGE);
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
-        assertThat(objectResult.getImports()).isEmpty();
+        assertThat(objectResult.getImports()).containsExactlyInAnyOrder("java.lang.reflect.Constructor");
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass_0 = createMyClass_0(\"myString\", 1);"));
         String expectedMethod = String.join(System.lineSeparator(),
-                "\tprivate static com.github.anhem.testpopulator.internal.object.ObjectFactoryImplTest.MyClass createMyClass_0(java.lang.String p0, int p1) {",
+                "\tprivate static MyClass createMyClass_0(String p0, int p1) {",
                 "\t\ttry {",
-                "\t\t\tjava.lang.reflect.Constructor<com.github.anhem.testpopulator.internal.object.ObjectFactoryImplTest.MyClass> constructor = com.github.anhem.testpopulator.internal.object.ObjectFactoryImplTest.MyClass.class.getDeclaredConstructor(java.lang.String.class, int.class);",
+                "\t\t\tConstructor<MyClass> constructor = MyClass.class.getDeclaredConstructor(String.class, int.class);",
                 "\t\t\tconstructor.setAccessible(true);",
                 "\t\t\treturn constructor.newInstance(p0, p1);",
                 "\t\t} catch (Exception e) {",
@@ -66,6 +66,7 @@ class ObjectFactoryImplTest {
                 "\t\t}",
                 "\t}");
         assertThat(objectResult.getMethods()).isEqualTo(Set.of(expectedMethod));
+        assertThat(objectResult.getImports()).containsExactlyInAnyOrder("java.lang.reflect.Constructor");
     }
 
 
