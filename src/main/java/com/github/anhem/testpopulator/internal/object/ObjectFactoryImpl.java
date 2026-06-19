@@ -15,8 +15,7 @@ import java.util.stream.*;
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.NULL;
 import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.*;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.getPrivateConstructorHelperMethod;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.useFullyQualifiedName;
+import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
 
 public class ObjectFactoryImpl implements ObjectFactory {
 
@@ -48,6 +47,15 @@ public class ObjectFactoryImpl implements ObjectFactory {
                     .codeTemplate(CodeTemplate.CONSTRUCTOR)
                     .build());
         }
+    }
+
+    @Override
+    public <T> void field(Class<T> clazz, int expectedChildren, java.util.List<java.lang.reflect.Field> fields) {
+        TemplateObjectBuilder.Builder builder = templateBuilder(clazz, FIELD, expectedChildren).codeTemplate(CodeTemplate.FIELD);
+        String helperMethodName = getHelperMethodName(builder.name);
+        TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();
+        objectBuilder.addMethod(getFieldHelperMethod(clazz, helperMethodName, fields));
+        setNextObjectBuilder(objectBuilder);
     }
 
     @Override
