@@ -70,7 +70,7 @@ public class ObjectBuilderUtil {
     }
 
     public static Stream<String> endBuilder(String buildMethodName) {
-        return Stream.of(String.format("    .%s();", buildMethodName));
+        return Stream.of(String.format("\t.%s();", buildMethodName));
     }
 
     public static Stream<String> startStaticBlock() {
@@ -210,18 +210,36 @@ public class ObjectBuilderUtil {
     }
 
     private static String getParameterDeclarations(Class<?>[] parameterTypes, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        if (parameterTypes.length > 1) {
+            return System.lineSeparator() + "\t\t\t" + java.util.stream.IntStream.range(0, parameterTypes.length)
+                    .mapToObj(i -> String.format("%s p%d", getClassName(parameterTypes[i], classNames, imports, staticImports), i))
+                    .collect(java.util.stream.Collectors.joining("," + System.lineSeparator() + "\t\t\t")) +
+                    System.lineSeparator() + "\t";
+        }
         return java.util.stream.IntStream.range(0, parameterTypes.length)
                 .mapToObj(i -> String.format("%s p%d", getClassName(parameterTypes[i], classNames, imports, staticImports), i))
                 .collect(java.util.stream.Collectors.joining(", "));
     }
 
     private static String getParameterTypeClasses(Class<?>[] parameterTypes, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        if (parameterTypes.length > 1) {
+            return System.lineSeparator() + "\t\t\t\t\t" + Arrays.stream(parameterTypes)
+                    .map(p -> String.format("%s.class", getClassName(p, classNames, imports, staticImports)))
+                    .collect(java.util.stream.Collectors.joining("," + System.lineSeparator() + "\t\t\t\t\t")) +
+                    System.lineSeparator() + "\t\t\t\t";
+        }
         return Arrays.stream(parameterTypes)
                 .map(p -> String.format("%s.class", getClassName(p, classNames, imports, staticImports)))
                 .collect(java.util.stream.Collectors.joining(", "));
     }
 
     private static String getParameterArguments(Class<?>[] parameterTypes) {
+        if (parameterTypes.length > 1) {
+            return System.lineSeparator() + "\t\t\t\t" + java.util.stream.IntStream.range(0, parameterTypes.length)
+                    .mapToObj(i -> "p" + i)
+                    .collect(java.util.stream.Collectors.joining("," + System.lineSeparator() + "\t\t\t\t")) +
+                    System.lineSeparator() + "\t\t\t";
+        }
         return java.util.stream.IntStream.range(0, parameterTypes.length)
                 .mapToObj(i -> "p" + i)
                 .collect(java.util.stream.Collectors.joining(", "));

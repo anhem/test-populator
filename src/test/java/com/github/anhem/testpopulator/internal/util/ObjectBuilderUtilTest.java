@@ -107,7 +107,7 @@ class ObjectBuilderUtilTest {
 
     @Test
     void endBuilderReturnsStreamOfString() {
-        assertThat(endBuilder("build")).hasSize(1).contains("    .build();");
+        assertThat(endBuilder("build")).hasSize(1).contains("\t.build();");
     }
 
     @Test
@@ -280,11 +280,20 @@ class ObjectBuilderUtilTest {
                 classNames, imports, staticImports);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
-                "\tprivate static Pojo createPojo_0(String p0, int p1) {",
+                "\tprivate static Pojo createPojo_0(",
+                "\t\t\tString p0,",
+                "\t\t\tint p1",
+                "\t) {",
                 "\t\ttry {",
-                "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor(String.class, int.class);",
+                "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor(",
+                "\t\t\t\t\tString.class,",
+                "\t\t\t\t\tint.class",
+                "\t\t\t\t);",
                 "\t\t\tconstructor.setAccessible(true);",
-                "\t\t\treturn constructor.newInstance(p0, p1);",
+                "\t\t\treturn constructor.newInstance(",
+                "\t\t\t\tp0,",
+                "\t\t\t\tp1",
+                "\t\t\t);",
                 "\t\t} catch (Exception e) {",
                 "\t\t\tthrow new RuntimeException(e);",
                 "\t\t}",
@@ -332,11 +341,20 @@ class ObjectBuilderUtilTest {
                 classNames, imports, staticImports);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
-                "\tprivate static Pojo createPojo_0(String p0, Integer p1) {",
+                "\tprivate static Pojo createPojo_0(",
+                "\t\t\tString p0,",
+                "\t\t\tInteger p1",
+                "\t) {",
                 "\t\ttry {",
-                "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor(String.class, Integer.class);",
+                "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor(",
+                "\t\t\t\t\tString.class,",
+                "\t\t\t\t\tInteger.class",
+                "\t\t\t\t);",
                 "\t\t\tconstructor.setAccessible(true);",
-                "\t\t\treturn constructor.newInstance(p0, p1);",
+                "\t\t\treturn constructor.newInstance(",
+                "\t\t\t\tp0,",
+                "\t\t\t\tp1",
+                "\t\t\t);",
                 "\t\t} catch (Exception e) {",
                 "\t\t\tthrow new RuntimeException(e);",
                 "\t\t}",
@@ -359,7 +377,10 @@ class ObjectBuilderUtilTest {
                 classNames, imports, staticImports);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
-                "\tprivate static Pojo createPojo_0(String p0, Integer p1) {",
+                "\tprivate static Pojo createPojo_0(",
+                "\t\t\tString p0,",
+                "\t\t\tInteger p1",
+                "\t) {",
                 "\t\ttry {",
                 "\t\t\tConstructor<Pojo> constructor = Pojo.class.getDeclaredConstructor();",
                 "\t\t\tconstructor.setAccessible(true);",

@@ -38,7 +38,12 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass_0 = new MyClass(\"myString\", 1);"));
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final MyClass myClass_0 = new MyClass(\n" +
+                        "\t\t\t\"myString\",\n" +
+                        "\t\t\t1\n" +
+                        "\t);"
+        );
         assertThat(objectResult.getMethods()).isEmpty();
     }
 
@@ -54,17 +59,32 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).containsExactlyInAnyOrder("java.lang.reflect.Constructor");
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of("public static final MyClass myClass_0 = createMyClass_0(\"myString\", 1);"));
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final MyClass myClass_0 = createMyClass_0(\n" +
+                        "\t\t\t\"myString\",\n" +
+                        "\t\t\t1\n" +
+                        "\t);"
+        );
         String expectedMethod = String.join(System.lineSeparator(),
-                "\tprivate static MyClass createMyClass_0(String p0, int p1) {",
+                "\tprivate static MyClass createMyClass_0(\n" +
+                        "\t\t\tString p0,\n" +
+                        "\t\t\tint p1\n" +
+                        "\t) {",
                 "\t\ttry {",
-                "\t\t\tConstructor<MyClass> constructor = MyClass.class.getDeclaredConstructor(String.class, int.class);",
+                "\t\t\tConstructor<MyClass> constructor = MyClass.class.getDeclaredConstructor(\n" +
+                        "\t\t\t\t\tString.class,\n" +
+                        "\t\t\t\t\tint.class\n" +
+                        "\t\t\t\t);",
                 "\t\t\tconstructor.setAccessible(true);",
-                "\t\t\treturn constructor.newInstance(p0, p1);",
+                "\t\t\treturn constructor.newInstance(\n" +
+                        "\t\t\t\tp0,\n" +
+                        "\t\t\t\tp1\n" +
+                        "\t\t\t);",
                 "\t\t} catch (Exception e) {",
                 "\t\t\tthrow new RuntimeException(e);",
                 "\t\t}",
-                "\t}");
+                "\t}"
+        );
         assertThat(objectResult.getMethods()).isEqualTo(Set.of(expectedMethod));
         assertThat(objectResult.getImports()).containsExactlyInAnyOrder("java.lang.reflect.Constructor");
     }
@@ -105,12 +125,12 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getClassName()).isEqualTo("MyClass_TestData");
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+        assertThat(objectResult.getObjects()).containsExactly(
                 "public static final MyClass myClass_0 = MyClass.builder()",
-                "    .string(\"myString\")",
-                "    .integer(1)",
-                "    .build();"
-        ));
+                "\t.string(\"myString\")",
+                "\t.integer(1)",
+                "\t.build();"
+        );
     }
 
     @Test
@@ -169,10 +189,12 @@ class ObjectFactoryImplTest {
                 "java.util.Map"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final Map<String, String> map_0 = Map.of(\"myKey\", \"myValue\");",
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final Map<String, String> map_0 = Map.of(\n" +
+                        "\t\t\t\"myKey\", \"myValue\"\n" +
+                        "\t);",
                 "public static final MyClass myClass_0 = new MyClass(map_0);"
-        ));
+        );
     }
 
     @Test
@@ -188,13 +210,15 @@ class ObjectFactoryImplTest {
                 "java.util.HashMap"
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+        assertThat(objectResult.getObjects()).containsExactly(
                 "public static final HashMap<String, String> hashMap_0 = new HashMap<>();",
                 "static {",
-                "hashMap_0.put(\"myKey\", \"myValue\");",
+                "hashMap_0.put(\n" +
+                        "\t\t\t\t\"myKey\", \"myValue\"\n" +
+                        "\t\t);",
                 "}",
                 "public static final MyClass myClass_0 = new MyClass(hashMap_0);"
-        ));
+        );
     }
 
     @Test
@@ -595,22 +619,23 @@ class ObjectFactoryImplTest {
                 getExpectedMyClassStaticImport(),
                 "com.github.anhem.testpopulator.model.java.ArbitraryEnum.A"
         ));
-        assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = new MyClass(" +
-                        "A, " +
-                        "1, " +
-                        "2L, " +
-                        "3.0, " +
-                        "true, " +
-                        "BigDecimal.valueOf(1), " +
-                        "\"myString\", " +
-                        "LocalDate.parse(\"1970-01-01\"), " +
-                        "LocalDateTime.parse(\"1970-01-01T00:00\"), " +
-                        "ZonedDateTime.parse(\"1970-01-01T00:00Z[UTC]\"), " +
-                        "Instant.parse(\"1970-01-01T00:00:00Z\"), " +
-                        "'c', " +
-                        "UUID.fromString(\"82e8962f-885d-4845-914b-c206a42d7c91\")" +
-                        ");"));
+        assertThat(objectResult.getObjects()).containsExactly(
+                "public static final MyClass myClass_0 = new MyClass(\n" +
+                        "\t\t\tA,\n" +
+                        "\t\t\t1,\n" +
+                        "\t\t\t2L,\n" +
+                        "\t\t\t3.0,\n" +
+                        "\t\t\ttrue,\n" +
+                        "\t\t\tBigDecimal.valueOf(1),\n" +
+                        "\t\t\t\"myString\",\n" +
+                        "\t\t\tLocalDate.parse(\"1970-01-01\"),\n" +
+                        "\t\t\tLocalDateTime.parse(\"1970-01-01T00:00\"),\n" +
+                        "\t\t\tZonedDateTime.parse(\"1970-01-01T00:00Z[UTC]\"),\n" +
+                        "\t\t\tInstant.parse(\"1970-01-01T00:00:00Z\"),\n" +
+                        "\t\t\t'c',\n" +
+                        "\t\t\tUUID.fromString(\"82e8962f-885d-4845-914b-c206a42d7c91\")\n" +
+                        "\t);"
+        );
     }
 
     @Test

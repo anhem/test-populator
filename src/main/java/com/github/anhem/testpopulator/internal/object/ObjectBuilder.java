@@ -225,7 +225,7 @@ public abstract class ObjectBuilder {
                 .filter(child -> !skipNullMethods || !child.anyArgumentIsNull())
                 .map(child -> {
                     if (buildType == BuildType.BUILDER) {
-                        return String.format("    .%s(%s)", child.getName(), child.buildArguments());
+                        return String.format("\t.%s(%s)", child.getName(), child.buildArguments());
                     }
                     return String.format("%s.%s(%s);", name, child.getName(), child.buildArguments());
                 });
@@ -243,6 +243,47 @@ public abstract class ObjectBuilder {
     }
 
     protected String buildArguments(List<ObjectBuilder> children) {
+        if (children.isEmpty()) {
+            return "";
+        }
+        if (children.size() > 1) {
+            boolean isMethodLevel = getBuildType() == BuildType.METHOD;
+            String prefixTabs = isMethodLevel ? "\t\t\t\t" : "\t\t\t";
+            String suffixTabs = isMethodLevel ? "\t\t" : "\t";
+
+            if (getBuildType() == BuildType.MAP || (getBuildType() == BuildType.METHOD && "put".equals(getName()))) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(System.lineSeparator()).append(prefixTabs);
+                for (int i = 0; i < children.size(); i++) {
+                    ObjectBuilder child = children.get(i);
+                    String arg = child.isNullValue() ? NULL : (isBasicValue(child) ? child.buildInlineArgument().get(0) : child.getName());
+                    sb.append(arg);
+                    if (i < children.size() - 1) {
+                        if (i % 2 == 0) {
+                            sb.append(", ");
+                        } else {
+                            sb.append(",").append(System.lineSeparator()).append(prefixTabs);
+                        }
+                    }
+                }
+                sb.append(System.lineSeparator()).append(suffixTabs);
+                return sb.toString();
+            }
+            String delimiter = "," + System.lineSeparator() + prefixTabs;
+            String prefix = System.lineSeparator() + prefixTabs;
+            String suffix = System.lineSeparator() + suffixTabs;
+            return children.stream()
+                    .map(child -> {
+                        if (child.isNullValue()) {
+                            return List.of(NULL);
+                        }
+                        if (isBasicValue(child)) {
+                            return child.buildInlineArgument();
+                        }
+                        return List.of(child.getName());
+                    }).flatMap(Collection::stream)
+                    .collect(joining(delimiter, prefix, suffix));
+        }
         return children.stream()
                 .map(child -> {
                     if (child.isNullValue()) {
