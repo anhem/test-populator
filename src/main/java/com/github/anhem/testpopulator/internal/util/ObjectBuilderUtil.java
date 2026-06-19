@@ -54,14 +54,12 @@ public class ObjectBuilderUtil {
             } else {
                 imports.add(className);
             }
-        }
-        else if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
+        } else if (Modifier.isStatic(clazz.getModifiers()) && clazz.getEnclosingClass() != null) {
             staticImports.add(String.format(QUALIFIED_NAME_FORMAT, clazz.getEnclosingClass().getCanonicalName(), clazz.getSimpleName()));
             if (isMapEntry(clazz)) {
                 imports.add("java.util.AbstractMap");
             }
-        }
-        else {
+        } else {
             imports.add(clazz.getCanonicalName());
         }
     }
@@ -133,34 +131,53 @@ public class ObjectBuilderUtil {
     }
 
     public static String getPrivateConstructorHelperMethod(Class<?> clazz, String helperMethodName, Class<?>[] parameterTypes) {
-        String fqn = clazz.getCanonicalName();
-        StringBuilder paramDecl = new StringBuilder();
-        StringBuilder paramTypeArgs = new StringBuilder();
-        StringBuilder paramArgs = new StringBuilder();
-        for (int i = 0; i < parameterTypes.length; i++) {
-            String typeFqn = parameterTypes[i].isPrimitive()
-                    ? parameterTypes[i].getName()
-                    : parameterTypes[i].getCanonicalName();
-            if (i > 0) {
-                paramDecl.append(", ");
-                paramTypeArgs.append(", ");
-                paramArgs.append(", ");
-            }
-            paramDecl.append(typeFqn).append(" p").append(i);
-            paramTypeArgs.append(typeFqn).append(".class");
-            paramArgs.append("p").append(i);
-        }
+        String fullyQualifiedClassName = clazz.getCanonicalName();
+        String parameterDeclarations = getParameterDeclarations(parameterTypes);
+        String parameterTypeClasses = getParameterTypeClasses(parameterTypes);
+        String parameterArguments = getParameterArguments(parameterTypes);
         return String.join(System.lineSeparator(),
-                String.format("\tprivate static %s %s(%s) {", fqn, helperMethodName, paramDecl),
+                String.format(
+                        "\tprivate static %s %s(%s) {",
+                        fullyQualifiedClassName,
+                        helperMethodName,
+                        parameterDeclarations
+                ),
                 TRY_START,
-                String.format("\t\t\tjava.lang.reflect.Constructor<%s> constructor = %s.class.getDeclaredConstructor(%s);",
-                        fqn, fqn, paramTypeArgs),
+                String.format(
+                        "\t\t\tjava.lang.reflect.Constructor<%s> constructor = %s.class.getDeclaredConstructor(%s);",
+                        fullyQualifiedClassName,
+                        fullyQualifiedClassName,
+                        parameterTypeClasses
+                ),
                 "\t\t\tconstructor.setAccessible(true);",
-                String.format("\t\t\treturn constructor.newInstance(%s);", paramArgs),
+                String.format("\t\t\treturn constructor.newInstance(%s);", parameterArguments),
                 "\t\t} catch (Exception e) {",
                 THROW_RUNTIME_EXCEPTION,
                 BLOCK_END,
-                METHOD_END);
+                METHOD_END
+        );
+    }
+
+    private static String getParameterDeclarations(Class<?>[] parameterTypes) {
+        return java.util.stream.IntStream.range(0, parameterTypes.length)
+                .mapToObj(i -> String.format("%s p%d", getFullyQualifiedClassName(parameterTypes[i]), i))
+                .collect(java.util.stream.Collectors.joining(", "));
+    }
+
+    private static String getParameterTypeClasses(Class<?>[] parameterTypes) {
+        return Arrays.stream(parameterTypes)
+                .map(p -> String.format("%s.class", getFullyQualifiedClassName(p)))
+                .collect(java.util.stream.Collectors.joining(", "));
+    }
+
+    private static String getParameterArguments(Class<?>[] parameterTypes) {
+        return java.util.stream.IntStream.range(0, parameterTypes.length)
+                .mapToObj(i -> "p" + i)
+                .collect(java.util.stream.Collectors.joining(", "));
+    }
+
+    private static String getFullyQualifiedClassName(Class<?> clazz) {
+        return clazz.isPrimitive() ? clazz.getName() : clazz.getCanonicalName();
     }
 
     private static boolean requiresImport(Class<?> clazz) {
