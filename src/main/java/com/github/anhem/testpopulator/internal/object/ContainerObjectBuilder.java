@@ -12,7 +12,7 @@ public class ContainerObjectBuilder extends ObjectBuilder {
     private final String referencedClassName;
 
     private ContainerObjectBuilder(Builder builder) {
-        super(builder.clazz, builder.name, builder.buildType, builder.formattingContext, builder.expectedChildren, builder.parameterized);
+        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized);
         this.template = builder.template;
         this.referencedClassName = builder.referencedClassName;
         for (Class<?> referencedClass : builder.referencedClasses) {

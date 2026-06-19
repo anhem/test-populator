@@ -5,7 +5,7 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
     protected Class<?> clazz;
     protected String name;
     protected BuildType buildType;
-    protected FormattingContext formattingContext = new FormattingContext(false, 3);
+    protected boolean useFullyQualifiedName;
     protected int expectedChildren;
     protected boolean parameterized;
     protected Class<?>[] referencedClasses = new Class<?>[0];
@@ -25,8 +25,8 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
         return (B) this;
     }
 
-    public B formattingContext(FormattingContext formattingContext) {
-        this.formattingContext = formattingContext;
+    public B useFullyQualifiedName(boolean useFullyQualifiedName) {
+        this.useFullyQualifiedName = useFullyQualifiedName;
         return (B) this;
     }
 

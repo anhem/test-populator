@@ -16,7 +16,7 @@ public abstract class ObjectBuilder {
     private final Class<?> clazz;
     private final String name;
     private final BuildType buildType;
-    private final FormattingContext formattingContext;
+    private final boolean useFullyQualifiedName;
     private final List<ObjectBuilder> children = new ArrayList<>();
     private final List<ObjectBuilder> argumentChildren = new ArrayList<>();
     private final List<ObjectBuilder> methodChildren = new ArrayList<>();
@@ -31,15 +31,15 @@ public abstract class ObjectBuilder {
     private ObjectBuilder parent;
     private String value;
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, FormattingContext formattingContext, int expectedChildren) {
-        this(clazz, name, buildType, formattingContext, expectedChildren, false);
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
+        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false);
     }
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, FormattingContext formattingContext, int expectedChildren, boolean parameterized) {
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized) {
         this.clazz = clazz;
         this.name = name;
         this.buildType = buildType;
-        this.formattingContext = formattingContext;
+        this.useFullyQualifiedName = useFullyQualifiedName;
         this.expectedChildren = expectedChildren;
         this.parameterized = parameterized;
     }
@@ -53,7 +53,7 @@ public abstract class ObjectBuilder {
     }
 
     public boolean isUseFullyQualifiedName() {
-        return formattingContext.isUseFullyQualifiedName();
+        return useFullyQualifiedName;
     }
 
     public boolean isParameterized() {
@@ -249,7 +249,7 @@ public abstract class ObjectBuilder {
         if (children.isEmpty()) {
             return "";
         }
-        return ArgumentFormatterUtil.format(children, getBuildType(), getName(), formattingContext);
+        return ArgumentFormatterUtil.format(children, getBuildType(), getName(), useFullyQualifiedName);
     }
 
     protected String formatTypes() {

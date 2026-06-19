@@ -636,7 +636,8 @@ class ObjectFactoryImplTest {
     @Test
     void createObjectUsingConstructorIsMultiline() {
         objectFactoryImpl.constructor(MyClass.class, 4, false, new Class<?>[0]);
-        objectFactoryImpl.value("myString", String.class, null);
+        String longString = "thisIsAVeryLongStringThatWillExceedTheOneHundredCharacterLimitAndTriggerMultilineFormattingNow";
+        objectFactoryImpl.value(longString, String.class, null);
         objectFactoryImpl.value(1, Integer.class, null);
         objectFactoryImpl.value(2, Integer.class, null);
         objectFactoryImpl.value(3, Integer.class, null);
@@ -644,7 +645,7 @@ class ObjectFactoryImplTest {
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).containsExactly(
                 "public static final MyClass myClass_0 = new MyClass(\n" +
-                        "\t\t\t\"myString\",\n" +
+                        "\t\t\t\"" + longString + "\",\n" +
                         "\t\t\t1,\n" +
                         "\t\t\t2,\n" +
                         "\t\t\t3\n" +

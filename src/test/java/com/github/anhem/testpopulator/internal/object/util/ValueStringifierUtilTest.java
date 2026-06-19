@@ -3,7 +3,7 @@ package com.github.anhem.testpopulator.internal.object.util;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
-import com.github.anhem.testpopulator.internal.object.FormattingContext;
+
 import com.github.anhem.testpopulator.internal.object.ObjectBuilder;
 import com.github.anhem.testpopulator.internal.object.TemplateObjectBuilder;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class ValueStringifierUtilTest {
     @Test
     void stringifyWithFormatter() {
         ObjectBuilder builder = TemplateObjectBuilder.builder()
-                .formattingContext(new FormattingContext(true, 0))
+                .useFullyQualifiedName(true)
                 .buildType(VALUE)
                 .build();
         PopulateConfig config = PopulateConfig.builder().build();

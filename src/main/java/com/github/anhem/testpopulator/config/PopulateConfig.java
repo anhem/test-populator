@@ -33,7 +33,6 @@ public class PopulateConfig {
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
     public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
     public static final boolean DEFAULT_USE_KOTLIN_DEFAULT_VALUES = false;
-    public static final int DEFAULT_LINE_BREAK_COUNT = 3;
 
     public static class PopulateConfigBuilder {
         private Set<String> blacklistedMethods = null;
@@ -54,7 +53,6 @@ public class PopulateConfig {
         private MethodType methodType;
         private Boolean kotlinSupport;
         private Boolean useKotlinDefaultValues;
-        private Integer lineBreakCount;
 
         /**
          * Set blacklisted methods, replacing existing ones.
@@ -451,7 +449,6 @@ public class PopulateConfig {
     private final MethodType methodType;
     private final boolean kotlinSupport;
     private final boolean useKotlinDefaultValues;
-    private final int lineBreakCount;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
         this.blacklistedMethods = collectionOrDefault(populateConfigBuilder.blacklistedMethods, DEFAULT_BLACKLISTED_METHODS);
@@ -474,7 +471,6 @@ public class PopulateConfig {
         this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
         this.kotlinSupport = valueOrDefault(populateConfigBuilder.kotlinSupport, DEFAULT_KOTLIN_SUPPORT);
         this.useKotlinDefaultValues = valueOrDefault(populateConfigBuilder.useKotlinDefaultValues, DEFAULT_USE_KOTLIN_DEFAULT_VALUES);
-        this.lineBreakCount = valueOrDefault(populateConfigBuilder.lineBreakCount, DEFAULT_LINE_BREAK_COUNT);
     }
 
     public Set<String> getBlacklistedMethods() {
@@ -549,10 +545,6 @@ public class PopulateConfig {
         return useKotlinDefaultValues;
     }
 
-    public int getLineBreakCount() {
-        return lineBreakCount;
-    }
-
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -577,7 +569,6 @@ public class PopulateConfig {
         populateConfigBuilder.methodType = methodType;
         populateConfigBuilder.kotlinSupport = kotlinSupport;
         populateConfigBuilder.useKotlinDefaultValues = useKotlinDefaultValues;
-        populateConfigBuilder.lineBreakCount = lineBreakCount;
         populateConfigBuilder.strategyOrder = strategyOrder != null ? new ArrayList<>(strategyOrder) : null;
         return populateConfigBuilder;
     }
@@ -615,7 +606,6 @@ public class PopulateConfig {
                 ", methodType=" + methodType +
                 ", kotlinSupport=" + kotlinSupport +
                 ", useKotlinDefaultValues=" + useKotlinDefaultValues +
-                ", lineBreakCount=" + lineBreakCount +
                 '}';
     }
 
@@ -835,17 +825,6 @@ public class PopulateConfig {
          */
         public ObjectFactoryConfig path(String path) {
             parent.objectFactoryPath = path;
-            return this;
-        }
-
-        /**
-         * Set the amount of arguments a constructor, method or builder can have before formatting them across multiple lines.
-         *
-         * @param lineBreakCount amount of arguments before line break
-         * @return ObjectFactoryConfig
-         */
-        public ObjectFactoryConfig lineBreakCount(int lineBreakCount) {
-            parent.lineBreakCount = lineBreakCount;
             return this;
         }
     }
