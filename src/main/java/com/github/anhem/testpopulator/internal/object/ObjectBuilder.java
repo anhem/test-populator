@@ -120,6 +120,10 @@ public abstract class ObjectBuilder {
         return children;
     }
 
+    public void addMethod(String method) {
+        this.extraMethods.add(method);
+    }
+
     public void addMethods(Collection<String> methods) {
         this.extraMethods.addAll(methods);
     }

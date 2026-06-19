@@ -4,7 +4,7 @@ import static com.github.anhem.testpopulator.internal.object.ObjectResult.EMPTY_
 
 public class ObjectFactoryVoid implements ObjectFactory {
     @Override
-    public <T> void constructor(Class<T> clazz, int expectedChildren) {
+    public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes) {
         //ignored
     }
 
