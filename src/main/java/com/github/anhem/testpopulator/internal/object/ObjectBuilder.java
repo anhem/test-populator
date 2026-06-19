@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator.internal.object;
 
 import java.util.*;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
@@ -250,51 +251,48 @@ public abstract class ObjectBuilder {
             boolean isMethodLevel = getBuildType() == BuildType.METHOD;
             String prefixTabs = isMethodLevel ? "\t\t\t\t" : "\t\t\t";
             String suffixTabs = isMethodLevel ? "\t\t" : "\t";
-
             if (getBuildType() == BuildType.MAP || (getBuildType() == BuildType.METHOD && "put".equals(getName()))) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(System.lineSeparator()).append(prefixTabs);
-                for (int i = 0; i < children.size(); i++) {
-                    ObjectBuilder child = children.get(i);
-                    String arg = child.isNullValue() ? NULL : (isBasicValue(child) ? child.buildInlineArgument().get(0) : child.getName());
-                    sb.append(arg);
-                    if (i < children.size() - 1) {
-                        if (i % 2 == 0) {
-                            sb.append(", ");
-                        } else {
-                            sb.append(",").append(System.lineSeparator()).append(prefixTabs);
-                        }
-                    }
-                }
-                sb.append(System.lineSeparator()).append(suffixTabs);
-                return sb.toString();
+                return buildMapArguments(children, prefixTabs, suffixTabs);
             }
-            String delimiter = "," + System.lineSeparator() + prefixTabs;
-            String prefix = System.lineSeparator() + prefixTabs;
-            String suffix = System.lineSeparator() + suffixTabs;
-            return children.stream()
-                    .map(child -> {
-                        if (child.isNullValue()) {
-                            return List.of(NULL);
-                        }
-                        if (isBasicValue(child)) {
-                            return child.buildInlineArgument();
-                        }
-                        return List.of(child.getName());
-                    }).flatMap(Collection::stream)
-                    .collect(joining(delimiter, prefix, suffix));
+            return buildMultilineArguments(children, prefixTabs, suffixTabs);
         }
         return children.stream()
-                .map(child -> {
-                    if (child.isNullValue()) {
-                        return List.of(NULL);
-                    }
-                    if (isBasicValue(child)) {
-                        return child.buildInlineArgument();
-                    }
-                    return List.of(child.getName());
-                }).flatMap(Collection::stream)
+                .map(this::getChildArgument)
                 .collect(joining(ARGUMENT_DELIMITER));
+    }
+
+    private String buildMapArguments(List<ObjectBuilder> children, String prefixTabs, String suffixTabs) {
+        String prefix = System.lineSeparator() + prefixTabs;
+        String suffix = System.lineSeparator() + suffixTabs;
+        String pairDelimiter = "," + System.lineSeparator() + prefixTabs;
+
+        return IntStream.iterate(0, i -> i < children.size(), i -> i + 2)
+                .mapToObj(i -> {
+                    if (i + 1 < children.size()) {
+                        return getChildArgument(children.get(i)) + ", " + getChildArgument(children.get(i + 1));
+                    }
+                    return getChildArgument(children.get(i));
+                })
+                .collect(joining(pairDelimiter, prefix, suffix));
+    }
+
+    private String buildMultilineArguments(List<ObjectBuilder> children, String prefixTabs, String suffixTabs) {
+        String delimiter = "," + System.lineSeparator() + prefixTabs;
+        String prefix = System.lineSeparator() + prefixTabs;
+        String suffix = System.lineSeparator() + suffixTabs;
+        return children.stream()
+                .map(this::getChildArgument)
+                .collect(joining(delimiter, prefix, suffix));
+    }
+
+    private String getChildArgument(ObjectBuilder child) {
+        if (child.isNullValue()) {
+            return NULL;
+        }
+        if (isBasicValue(child)) {
+            return child.buildInlineArgument().get(0);
+        }
+        return child.getName();
     }
 
     private List<String> buildInlineArgument() {
