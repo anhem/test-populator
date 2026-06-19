@@ -39,7 +39,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final MyClass myClass_0 = new MyClass(\"myString\", 1);"
+                "public static final MyClass MY_CLASS_0 = new MyClass(\"myString\", 1);"
         );
         assertThat(objectResult.getMethods()).isEmpty();
     }
@@ -57,10 +57,10 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).containsExactlyInAnyOrder("java.lang.reflect.Constructor");
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final MyClass myClass_0 = createMyClass_0(\"myString\", 1);"
+                "public static final MyClass MY_CLASS_0 = createMY_CLASS_0(\"myString\", 1);"
         );
         String expectedMethod = String.join(System.lineSeparator(),
-                "\tprivate static MyClass createMyClass_0(\n" +
+                "\tprivate static MyClass createMY_CLASS_0(\n" +
                         "\t\t\tString p0,\n" +
                         "\t\t\tint p1\n" +
                         "\t) {",
@@ -98,10 +98,10 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = new MyClass();",
+                "public static final MyClass MY_CLASS_0 = new MyClass();",
                 "static {",
-                "myClass_0.setString(\"myString\");",
-                "myClass_0.setInteger(1);",
+                "MY_CLASS_0.setString(\"myString\");",
+                "MY_CLASS_0.setInteger(1);",
                 "}"
         ));
     }
@@ -120,7 +120,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final MyClass myClass_0 = MyClass.builder()",
+                "public static final MyClass MY_CLASS_0 = MyClass.builder()",
                 "\t.string(\"myString\")",
                 "\t.integer(1)",
                 "\t.build();"
@@ -141,8 +141,8 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final Set<String> set_0 = Set.of(\"myString\");",
-                "public static final MyClass myClass_0 = new MyClass(set_0);"
+                "public static final Set<String> SET_0 = Set.of(\"myString\");",
+                "public static final MyClass MY_CLASS_0 = new MyClass(SET_0);"
         ));
     }
 
@@ -160,11 +160,11 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final HashSet<String> hashSet_0 = new HashSet<>();",
+                "public static final HashSet<String> HASH_SET_0 = new HashSet<>();",
                 "static {",
-                "hashSet_0.add(\"myString\");",
+                "HASH_SET_0.add(\"myString\");",
                 "}",
-                "public static final MyClass myClass_0 = new MyClass(hashSet_0);"
+                "public static final MyClass MY_CLASS_0 = new MyClass(HASH_SET_0);"
 
         ));
     }
@@ -184,8 +184,8 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final Map<String, String> map_0 = Map.of(\"myKey\", \"myValue\");",
-                "public static final MyClass myClass_0 = new MyClass(map_0);"
+                "public static final Map<String, String> MAP_0 = Map.of(\"myKey\", \"myValue\");",
+                "public static final MyClass MY_CLASS_0 = new MyClass(MAP_0);"
         );
     }
 
@@ -203,11 +203,11 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final HashMap<String, String> hashMap_0 = new HashMap<>();",
+                "public static final HashMap<String, String> HASH_MAP_0 = new HashMap<>();",
                 "static {",
-                "hashMap_0.put(\"myKey\", \"myValue\");",
+                "HASH_MAP_0.put(\"myKey\", \"myValue\");",
                 "}",
-                "public static final MyClass myClass_0 = new MyClass(hashMap_0);"
+                "public static final MyClass MY_CLASS_0 = new MyClass(HASH_MAP_0);"
         );
     }
 
@@ -225,8 +225,8 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final List<String> list_0 = List.of(\"myString\");",
-                "public static final MyClass myClass_0 = new MyClass(list_0);"
+                "public static final List<String> LIST_0 = List.of(\"myString\");",
+                "public static final MyClass MY_CLASS_0 = new MyClass(LIST_0);"
         ));
     }
 
@@ -244,11 +244,11 @@ class ObjectFactoryImplTest {
         ));
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final ArrayList<String> arrayList_0 = new ArrayList<>();",
+                "public static final ArrayList<String> ARRAY_LIST_0 = new ArrayList<>();",
                 "static {",
-                "arrayList_0.add(\"myString\");",
+                "ARRAY_LIST_0.add(\"myString\");",
                 "}",
-                "public static final MyClass myClass_0 = new MyClass(arrayList_0);"
+                "public static final MyClass MY_CLASS_0 = new MyClass(ARRAY_LIST_0);"
         ));
     }
 
@@ -264,8 +264,8 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEqualTo(Set.of(getExpectedMyClassStaticImport()));
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final Boolean[] boolean_0 = new Boolean[]{true};",
-                "public static final MyClass myClass_0 = new MyClass(boolean_0);"
+                "public static final Boolean[] BOOLEAN_0 = new Boolean[]{true};",
+                "public static final MyClass MY_CLASS_0 = new MyClass(BOOLEAN_0);"
         ));
     }
 
@@ -279,7 +279,7 @@ class ObjectFactoryImplTest {
         assertThat(objectResult.getImports()).isEmpty();
         assertThat(objectResult.getStaticImports()).isEmpty();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final String string_0 = \"myString\";"
+                "public static final String STRING_0 = \"myString\";"
         ));
     }
 
@@ -306,7 +306,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final List list_0 = CUSTOM_STRING;"
+                "public static final List LIST_0 = CUSTOM_STRING;"
         ));
     }
 
@@ -333,7 +333,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final List list_0 = CUSTOM_STRING_FOR_CLASS;"
+                "public static final List LIST_0 = CUSTOM_STRING_FOR_CLASS;"
         ));
     }
 
@@ -365,7 +365,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
     }
@@ -398,7 +398,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
     }
@@ -437,7 +437,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
         assertThat(objectResult.getImports()).contains(importDefinition);
@@ -477,7 +477,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
         assertThat(objectResult.getImports()).contains(importDefinition);
@@ -523,7 +523,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
         assertThat(objectResult.getImports()).contains(importDefinition);
@@ -570,7 +570,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).isEqualTo(List.of(
-                "public static final MyClass myClass_0 = myHelper();"
+                "public static final MyClass MY_CLASS_0 = myHelper();"
         ));
         assertThat(objectResult.getMethods()).contains(methodDefinition);
         assertThat(objectResult.getImports()).contains(importDefinition);
@@ -610,7 +610,7 @@ class ObjectFactoryImplTest {
                 "com.github.anhem.testpopulator.model.java.ArbitraryEnum.A"
         ));
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final MyClass myClass_0 = new MyClass(\n" +
+                "public static final MyClass MY_CLASS_0 = new MyClass(\n" +
                         "\t\t\tA,\n" +
                         "\t\t\t1,\n" +
                         "\t\t\t2L,\n" +
@@ -644,7 +644,7 @@ class ObjectFactoryImplTest {
 
         ObjectResult objectResult = objectFactoryImpl.build();
         assertThat(objectResult.getObjects()).containsExactly(
-                "public static final MyClass myClass_0 = new MyClass(\n" +
+                "public static final MyClass MY_CLASS_0 = new MyClass(\n" +
                         "\t\t\t\"" + longString + "\",\n" +
                         "\t\t\t1,\n" +
                         "\t\t\t2,\n" +

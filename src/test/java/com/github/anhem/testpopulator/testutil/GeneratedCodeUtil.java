@@ -92,7 +92,8 @@ public class GeneratedCodeUtil {
 
     @SuppressWarnings("unchecked")
     private static <T> T getStaticObjectFromClass(Class<T> clazz, String simpleName) {
-        String variableName = String.format("%s_0", Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1));
+        String snakeCaseName = simpleName.replaceAll("([a-z])([A-Z]+)", "$1_$2").toUpperCase();
+        String variableName = String.format("%s_0", snakeCaseName);
         try {
             return (T) clazz.getDeclaredField(variableName).get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {

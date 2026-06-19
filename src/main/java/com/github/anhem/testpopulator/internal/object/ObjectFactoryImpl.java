@@ -373,9 +373,10 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     private String getName(Class<?> clazz) {
         String simpleName = clazz.getSimpleName();
-        String key = clazz.getSimpleName().toLowerCase();
+        String key = simpleName.toLowerCase();
         int classCounter = classNameCounters.computeIfAbsent(key, k -> 0);
-        String name = String.format("%s_%d", Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1), classCounter);
+        String snakeCaseName = simpleName.replaceAll("([a-z])([A-Z]+)", "$1_$2").toUpperCase();
+        String name = String.format("%s_%d", snakeCaseName, classCounter);
         classNameCounters.put(key, ++classCounter);
         return name;
     }

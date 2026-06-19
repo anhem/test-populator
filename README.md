@@ -48,6 +48,7 @@ MyMessage message = new PopulateFactory(PopulateConfig.builder()
   - [Other Options](#other-options)
 - [Kotlin Support](#kotlin-support)
 - [Usage Examples](#usage-examples)
+- [Java Code Generation](#java-code-generation)
 - [Technical Insights](#technical-insights)
 - [Thread Safety](#thread-safety)
 - [Building from Source](#building-from-source)
@@ -570,6 +571,54 @@ class MyServiceTest {
     }
 }
 ```
+
+## Java Code Generation
+
+Test-Populator includes a powerful feature that allows you to automatically generate the actual Java source code that instantiates your populated objects.
+
+### Why Use Code Generation?
+
+While Test-Populator is great for generating objects at runtime, there are scenarios where having the static Java code is preferable:
+
+1. **Zero Test Dependencies**: If you need to provide complex default mock objects in your tests, you might not want to add `test-populator` as a permanent dependency to your project just to generate boilerplate data.
+2. **Speed & Stability**: Statically compiled instantiation code is inherently faster and more deterministic than relying on reflection and runtime population.
+3. **Easier Debugging**: You can clearly see exactly how an object was built by reading the generated Java code, making it easy to tweak a single specific value manually in the generated file.
+4. **Transitioning Away**: You can use this feature to completely remove `test-populator` from your project! Simply use it once to generate all the boilerplate code you need, commit the generated files to your repository, and then remove the library dependency entirely.
+
+### How it Works
+
+To enable code generation, you simply flip the `objectFactoryEnabled` flag in your configuration:
+
+```java
+PopulateConfig config = PopulateConfig.builder()
+        .objectFactoryEnabled(true)
+        .build();
+MyClass myClass = new PopulateFactory(config).populate(MyClass.class);
+```
+
+As the library recursively builds your `MyClass` object in memory, it simultaneously builds a structural tree of the code required to recreate it.
+Once the population is complete, it writes a new Java file to your configured output directory (defaults to `target/generated-test-sources/test-populator/`).
+
+The generated code will look something like this:
+
+```java
+package com.github.anhem.testpopulator.model;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+public class MyClass_TestData {
+
+    public static final Map<String, LocalDate> MAP_0 = Map.of("dsyyjxizvp", LocalDate.parse("2021-02-14"));
+    public static final InnerClass INNER_CLASS_0 = new InnerClass(789707, MAP_0);
+    public static final List<ArbitraryEnum> LIST_0 = List.of(ArbitraryEnum.B);
+    public static final MyClass MY_CLASS_0 = new MyClass("xksqbhddha", LIST_0, INNER_CLASS_0);
+
+}
+```
+
+You can then simply copy the `MyClass_TestData.java` file into your main `src/test/java/` directory, commit it, and use `MyClass_TestData.MY_CLASS_0` directly in your tests!
 
 ## Technical Insights
 
