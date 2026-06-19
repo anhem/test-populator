@@ -608,7 +608,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-public class MyClass_TestData {
+public class MyClass_TestData_8fdb5937ca560430 {
 
     public static final Map<String, LocalDate> MAP_0 = Map.of("dsyyjxizvp", LocalDate.parse("2021-02-14"));
     public static final InnerClass INNER_CLASS_0 = new InnerClass(789707, MAP_0);
@@ -618,7 +618,12 @@ public class MyClass_TestData {
 }
 ```
 
-You can then simply copy the `MyClass_TestData.java` file into your main `src/test/java/` directory, commit it, and use `MyClass_TestData.MY_CLASS_0` directly in your tests!
+### Naming Convention
+
+Generated files follow a specific naming convention: `<ClassName>_TestData_<ConfigurationHash>.java`.
+The 16-character SHA-256 hash suffix is generated from your `PopulateConfig`. This prevents file name collisions when generating test data for the same class using different configurations.
+
+You can then simply copy the `MyClass_TestData_8fdb5937ca560430.java` file into your main `src/test/java/` directory, commit it, and use `MyClass_TestData_8fdb5937ca560430.MY_CLASS_0` directly in your tests!
 
 ## Technical Insights
 
