@@ -219,16 +219,6 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         return value;
     }
 
-    private <T> T populateAndAssert(Class<T> clazz) {
-        assertThat(populateConfig.isObjectFactoryEnabled()).isFalse();
-        assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR);
-        T value = populateFactory.populate(clazz);
-        assertThat(value).isNotNull();
-        assertThat(value).isInstanceOf(clazz);
-
-        return value;
-    }
-
     @Test
     void allArgsConstructorWithKotlinSupportEnabled() {
         populateConfig = populateConfig.toBuilder()
