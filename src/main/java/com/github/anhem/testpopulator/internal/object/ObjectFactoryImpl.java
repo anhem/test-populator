@@ -1,10 +1,7 @@
 package com.github.anhem.testpopulator.internal.object;
 
-import com.github.anhem.testpopulator.config.OverridePopulate;
-import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
-import com.github.anhem.testpopulator.exception.ObjectException;
-import com.github.anhem.testpopulator.internal.util.KotlinUtil;
+import com.github.anhem.testpopulator.internal.object.util.ValueStringifierUtil;
 import com.github.anhem.testpopulator.internal.util.ProtobufUtil;
 
 import java.nio.file.Path;
@@ -14,12 +11,12 @@ import java.util.stream.*;
 
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.NULL;
-import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.*;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
+import static com.github.anhem.testpopulator.internal.object.util.FileWriterUtil.*;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.*;
 
 public class ObjectFactoryImpl implements ObjectFactory {
 
-    static final String UNSUPPORTED_TYPE = "Failed to find type to create value for %s. Not implemented?";
+    static final String UNSUPPORTED_TYPE = ValueStringifierUtil.UNSUPPORTED_TYPE;
     private static final String NEW_PREFIX = "new ";
     private static final String CREATE_PREFIX = "create";
 
@@ -286,7 +283,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         TemplateObjectBuilder objectBuilder = templateBuilder(clazz, VALUE, 0)
                 .codeTemplate(CodeTemplate.VALUE)
                 .build();
-        String stringValue = toStringValue(value, clazz, name, objectBuilder);
+        String stringValue = ValueStringifierUtil.stringify(value, clazz, name, populateConfig, objectBuilder);
         if (objectBuilder.isUseFullyQualifiedName()) {
             if (stringValue.startsWith(NEW_PREFIX)) {
                 stringValue = String.format("%s%s.%s", NEW_PREFIX, clazz.getPackageName(), stringValue.replace(NEW_PREFIX, ""));
@@ -335,61 +332,6 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .orElse(null);
     }
 
-    private String toStringValue(Object object, Class<?> clazz, String name, ObjectBuilder objectBuilder) {
-        if (object.getClass().isEnum()) {
-            return object.toString();
-        }
-
-        if (KotlinUtil.isKotlinSingleton(clazz, populateConfig.isKotlinSupport())) {
-            return String.format("%s.INSTANCE", clazz.getSimpleName());
-        }
-
-        if (name != null) {
-            OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
-            OverridePopulate<?> nameOverride = populateConfig.getNameOverrides().get(overrideTarget);
-            if (nameOverride != null && isCreateCodeOverridden(nameOverride)) {
-                return applyOverride(nameOverride, objectBuilder);
-            }
-        }
-
-        OverridePopulate<?> classOverride = populateConfig.getClassOverrides().get(clazz);
-        if (classOverride != null && isCreateCodeOverridden(classOverride)) {
-            return applyOverride(classOverride, objectBuilder);
-        }
-
-        String formattedValue = ValueFormatter.format(object, clazz);
-        if (formattedValue != null) {
-            return formattedValue;
-        }
-
-        if (name != null) {
-            OverrideTarget overrideTarget = OverrideTarget.of(name, clazz);
-            if (populateConfig.getNameOverrides().containsKey(overrideTarget)) {
-                return populateConfig.getNameOverrides().get(overrideTarget).createCode();
-            }
-        }
-
-        if (classOverride != null) {
-            return classOverride.createCode();
-        }
-
-        throw new ObjectException(String.format(UNSUPPORTED_TYPE, clazz.getTypeName()));
-    }
-
-    private String applyOverride(OverridePopulate<?> overridePopulate, ObjectBuilder objectBuilder) {
-        objectBuilder.addMethods(overridePopulate.createMethods());
-        objectBuilder.addImports(overridePopulate.createImports());
-        objectBuilder.addStaticImports(overridePopulate.createStaticImports());
-        return overridePopulate.createCode();
-    }
-
-    private boolean isCreateCodeOverridden(OverridePopulate<?> overridePopulate) {
-        try {
-            return !overridePopulate.getClass().getMethod("createCode").getDeclaringClass().equals(OverridePopulate.class);
-        } catch (NoSuchMethodException e) {
-            return false;
-        }
-    }
 
     private TemplateObjectBuilder.Builder templateBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
         return TemplateObjectBuilder.builder()

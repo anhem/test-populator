@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.collectionHasNullValues;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.collectionHasNullValues;
 
 public class ContainerObjectBuilder extends ObjectBuilder {
 

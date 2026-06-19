@@ -21,9 +21,9 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.getPath;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.formatClassName;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.getPackageName;
+import static com.github.anhem.testpopulator.internal.object.util.FileWriterUtil.getPath;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.formatClassName;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.getPackageName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GeneratedCodeUtil {

@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal.util;
+package com.github.anhem.testpopulator.internal.object.util;
 
 import com.github.anhem.testpopulator.internal.object.BuildType;
 import com.github.anhem.testpopulator.internal.object.ObjectBuilder;

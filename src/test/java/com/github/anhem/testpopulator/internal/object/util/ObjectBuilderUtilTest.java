@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal.util;
+package com.github.anhem.testpopulator.internal.object.util;
 
 import com.github.anhem.testpopulator.internal.object.BuildType;
 import com.github.anhem.testpopulator.internal.object.ContainerObjectBuilder;
@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.object.BuildType.*;
 import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.NULL;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ObjectBuilderUtilTest {

@@ -1,17 +1,18 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import com.github.anhem.testpopulator.internal.object.util.ArgumentFormatterUtil;
+
 import java.util.*;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.*;
+import static com.github.anhem.testpopulator.internal.object.util.ArgumentFormatterUtil.ARGUMENT_DELIMITER;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.*;
 import static java.util.stream.Collectors.joining;
 
 public abstract class ObjectBuilder {
 
     public static final String NULL = "null";
     public static final String PSF = "public static final";
-    protected static final String ARGUMENT_DELIMITER = ", ";
     private final Class<?> clazz;
     private final String name;
     private final BuildType buildType;
@@ -92,14 +93,14 @@ public abstract class ObjectBuilder {
         if (shouldSkipMethods(methodChildren)) {
             return Stream.empty();
         }
-        return concatenate(startStaticBlock(), createMethods(methodChildren), endStaticBlock());
+        return concatenate(startStaticBlock(), renderMethodCalls(methodChildren), endStaticBlock());
     }
 
-    protected Stream<String> createMethods(List<ObjectBuilder> methodChildren) {
+    protected Stream<String> renderMethodCalls(List<ObjectBuilder> methodChildren) {
         return methodChildren.stream()
                 .flatMap(child -> {
                     if (!child.methodChildren.isEmpty()) {
-                        return child.createMethods(child.methodChildren);
+                        return child.renderMethodCalls(child.methodChildren);
                     }
                     return Stream.of(String.format("%s.%s(%s);", getMethodTargetName(), child.getName(), child.buildArguments()));
                 });
@@ -175,25 +176,25 @@ public abstract class ObjectBuilder {
         String className = formatClassName(getClazz());
         Set<String> imports = new HashSet<>();
         Set<String> staticImports = new HashSet<>();
-        getImports(imports, staticImports);
+        collectImports(imports, staticImports);
         List<String> objects = build();
-        Set<String> methods = getMethods();
+        Set<String> methods = collectMethods();
 
         return new ObjectResult(packageName, className, imports, staticImports, objects, methods);
     }
 
-    private void getImports(Set<String> imports, Set<String> staticImports) {
+    private void collectImports(Set<String> imports, Set<String> staticImports) {
         addImport(getClazz(), value, isUseFullyQualifiedName(), imports, staticImports);
         referencedClasses.forEach(c -> addImport(c, null, isUseFullyQualifiedName(), imports, staticImports));
         imports.addAll(extraImports);
         staticImports.addAll(extraStaticImports);
-        children.forEach(objectBuilder -> objectBuilder.getImports(imports, staticImports));
+        children.forEach(objectBuilder -> objectBuilder.collectImports(imports, staticImports));
     }
 
-    private Set<String> getMethods() {
+    private Set<String> collectMethods() {
         Set<String> methods = new HashSet<>(extraMethods);
         Optional.ofNullable(getHelperMethod(getClazz())).ifPresent(methods::add);
-        children.forEach(child -> methods.addAll(child.getMethods()));
+        children.forEach(child -> methods.addAll(child.collectMethods()));
         return methods;
     }
 
@@ -207,6 +208,7 @@ public abstract class ObjectBuilder {
                 .map(ObjectBuilder::build)
                 .flatMap(Collection::stream);
     }
+
     public boolean isNullValue() {
         return value != null && value.equals(NULL);
     }
@@ -222,7 +224,7 @@ public abstract class ObjectBuilder {
         return isUseFullyQualifiedName() ? getClazz().getCanonicalName() : getClazz().getSimpleName();
     }
 
-    protected Stream<String> createMethods() {
+    protected Stream<String> renderBuilderMethodCalls() {
         return children.stream()
                 .filter(child -> !skipNullMethods || !child.anyArgumentIsNull())
                 .map(child -> {
@@ -232,7 +234,6 @@ public abstract class ObjectBuilder {
                     return String.format("%s.%s(%s);", name, child.getName(), child.buildArguments());
                 });
     }
-
 
     public String buildArguments() {
         if (children.isEmpty()) {
@@ -248,58 +249,7 @@ public abstract class ObjectBuilder {
         if (children.isEmpty()) {
             return "";
         }
-        boolean isMap = getBuildType() == BuildType.MAP || (getBuildType() == BuildType.METHOD && "put".equals(getName()));
-        boolean forceMultiline = isMap && children.size() > 2;
-        if (children.size() > formattingContext.getLineBreakCount() || forceMultiline) {
-            boolean isMethodLevel = getBuildType() == BuildType.METHOD;
-            String prefixTabs = isMethodLevel ? "\t\t\t\t" : "\t\t\t";
-            String suffixTabs = isMethodLevel ? "\t\t" : "\t";
-            if (isMap) {
-                return buildMapArguments(children, prefixTabs, suffixTabs);
-            }
-            return buildMultilineArguments(children, prefixTabs, suffixTabs);
-        }
-        return children.stream()
-                .map(this::getChildArgument)
-                .collect(joining(ARGUMENT_DELIMITER));
-    }
-
-    private String buildMapArguments(List<ObjectBuilder> children, String prefixTabs, String suffixTabs) {
-        String prefix = System.lineSeparator() + prefixTabs;
-        String suffix = System.lineSeparator() + suffixTabs;
-        String pairDelimiter = "," + System.lineSeparator() + prefixTabs;
-
-        return IntStream.iterate(0, i -> i < children.size(), i -> i + 2)
-                .mapToObj(i -> {
-                    if (i + 1 < children.size()) {
-                        return getChildArgument(children.get(i)) + ", " + getChildArgument(children.get(i + 1));
-                    }
-                    return getChildArgument(children.get(i));
-                })
-                .collect(joining(pairDelimiter, prefix, suffix));
-    }
-
-    private String buildMultilineArguments(List<ObjectBuilder> children, String prefixTabs, String suffixTabs) {
-        String delimiter = "," + System.lineSeparator() + prefixTabs;
-        String prefix = System.lineSeparator() + prefixTabs;
-        String suffix = System.lineSeparator() + suffixTabs;
-        return children.stream()
-                .map(this::getChildArgument)
-                .collect(joining(delimiter, prefix, suffix));
-    }
-
-    private String getChildArgument(ObjectBuilder child) {
-        if (child.isNullValue()) {
-            return NULL;
-        }
-        if (isBasicValue(child)) {
-            return child.buildInlineArgument().get(0);
-        }
-        return child.getName();
-    }
-
-    private List<String> buildInlineArgument() {
-        return List.of(value == null ? NULL : value);
+        return ArgumentFormatterUtil.format(children, getBuildType(), getName(), formattingContext);
     }
 
     protected String formatTypes() {
