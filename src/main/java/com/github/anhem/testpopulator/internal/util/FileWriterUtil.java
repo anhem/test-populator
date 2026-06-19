@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -76,17 +78,30 @@ public class FileWriterUtil {
     }
 
     public static void writeObjects(ObjectResult objectResult, Path path) {
-        objectResult.getObjects().forEach(s -> {
+        List<String> staticBlockLines = new ArrayList<>();
+        boolean inStaticBlock = false;
+
+        for (String s : objectResult.getObjects()) {
             if (s.startsWith(STATIC_BLOCK_START)) {
-                writeLine(path, String.format("%s\t%s", System.lineSeparator(), s));
+                inStaticBlock = true;
             } else if (s.startsWith(STATIC_BLOCK_END)) {
-                writeLine(path, String.format("\t%s", s));
-            } else if (s.startsWith(PSF)) {
-                writeLine(path, String.format("\t%s", s));
+                inStaticBlock = false;
+            } else if (inStaticBlock) {
+                staticBlockLines.add(s);
             } else {
-                writeLine(path, String.format("\t\t%s", s));
+                if (s.startsWith(PSF)) {
+                    writeLine(path, String.format("\t%s", s));
+                } else {
+                    writeLine(path, String.format("\t\t%s", s));
+                }
             }
-        });
+        }
+
+        if (!staticBlockLines.isEmpty()) {
+            writeLine(path, String.format("%s\t%s", System.lineSeparator(), STATIC_BLOCK_START));
+            staticBlockLines.forEach(s -> writeLine(path, String.format("\t\t%s", s)));
+            writeLine(path, String.format("\t%s", STATIC_BLOCK_END));
+        }
     }
 
     private static void writeLine(Path path, String line) {
