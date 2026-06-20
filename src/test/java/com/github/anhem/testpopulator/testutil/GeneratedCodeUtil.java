@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.testutil;
 
+import com.github.anhem.testpopulator.config.Language;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 
 import javax.tools.JavaCompiler;
@@ -33,19 +34,19 @@ public class GeneratedCodeUtil {
 
     public static <T> void assertGeneratedCode(Class<T> clazz, T object, PopulateConfig populateConfig) {
         String packageName = getPackageName(object.getClass());
-        Path path = getPath(packageName, formatClassName(clazz), populateConfig);
+        Path path = getPath(packageName, formatClassName(clazz), populateConfig, Language.JAVA);
         assertGeneratedCode(object, path, packageName, clazz.getSimpleName(), populateConfig);
     }
 
     public static <T> void assertGeneratedCode(T object, PopulateConfig populateConfig) {
         String packageName = getPackageName(object.getClass());
-        Path path = getPath(packageName, formatClassName(object.getClass()), populateConfig);
+        Path path = getPath(packageName, formatClassName(object.getClass()), populateConfig, Language.JAVA);
         assertGeneratedCode(object, path, packageName, object.getClass().getSimpleName(), populateConfig);
     }
 
     public static <T> void assertGeneratedCodeContains(T object, PopulateConfig populateConfig, String... expectedSnippets) {
         String packageName = getPackageName(object.getClass());
-        Path path = getPath(packageName, formatClassName(object.getClass()), populateConfig);
+        Path path = getPath(packageName, formatClassName(object.getClass()), populateConfig, Language.JAVA);
         try {
             String sourceCode = Files.readString(path);
             assertThat(sourceCode).contains(expectedSnippets);

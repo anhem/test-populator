@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.object.util;
 
+import com.github.anhem.testpopulator.config.Language;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
 import com.github.anhem.testpopulator.internal.object.ObjectResult;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.PSF;
 import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.STATIC_BLOCK_END;
 import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.STATIC_BLOCK_START;
 
@@ -25,12 +25,12 @@ public class FileWriterUtil {
     private FileWriterUtil() {
     }
 
-    public static Path getPath(ObjectResult objectResult, PopulateConfig populateConfig) {
-        return getPath(objectResult.getPackageName(), objectResult.getClassName(), populateConfig);
+    public static Path getPath(ObjectResult objectResult, PopulateConfig populateConfig, Language language) {
+        return getPath(objectResult.getPackageName(), objectResult.getClassName(), populateConfig, language);
     }
 
-    public static Path getPath(String packageName, String className, PopulateConfig populateConfig) {
-        return Paths.get(populateConfig.getObjectFactoryPath(), toPackagePath(packageName), String.format("%s_%s.java", className, encode(populateConfig)));
+    public static Path getPath(String packageName, String className, PopulateConfig populateConfig, Language language) {
+        return Paths.get(populateConfig.getObjectFactoryPath(), toPackagePath(packageName), String.format("%s_%s%s", className, encode(populateConfig), language.getFileExtension()));
     }
 
     public static void createOrOverwriteFile(Path path) {
@@ -42,26 +42,27 @@ public class FileWriterUtil {
         }
     }
 
-    public static void writePackage(ObjectResult objectResult, Path path) {
-        writeLine(path, String.format("package %s;%s", objectResult.getPackageName(), System.lineSeparator()));
+    public static void writePackage(ObjectResult objectResult, Path path, Language language) {
+        writeLine(path, String.format("package %s%s%s", objectResult.getPackageName(), language.getStatementEnd(), System.lineSeparator()));
     }
 
-    public static void writeImports(ObjectResult objectResult, Path path) {
+    public static void writeImports(ObjectResult objectResult, Path path, Language language) {
         objectResult.getImports().stream()
                 .sorted()
-                .forEach(s -> writeLine(path, String.format("import %s;", s)));
+                .forEach(s -> writeLine(path, String.format("import %s%s", s, language.getStatementEnd())));
         writeLine(path, "");
     }
 
-    public static void writeStaticImports(ObjectResult objectResult, Path path) {
+    public static void writeStaticImports(ObjectResult objectResult, Path path, Language language) {
+        String importPrefix = language == Language.KOTLIN ? "import " : "import static ";
         objectResult.getStaticImports().stream()
                 .sorted()
-                .forEach(s -> writeLine(path, String.format("import static %s;", s)));
+                .forEach(s -> writeLine(path, String.format("%s%s%s", importPrefix, s, language.getStatementEnd())));
         writeLine(path, "");
     }
 
-    public static void writeStartClass(ObjectResult objectResult, Path path, PopulateConfig populateConfig) {
-        writeLine(path, String.format("public class %s_%s {%s", objectResult.getClassName(), encode(populateConfig), System.lineSeparator()));
+    public static void writeStartClass(ObjectResult objectResult, Path path, PopulateConfig populateConfig, Language language) {
+        writeLine(path, String.format("%s %s_%s {%s", language.getClassDeclaration(), objectResult.getClassName(), encode(populateConfig), System.lineSeparator()));
     }
 
     public static void writeEndClass(Path path) {
@@ -77,7 +78,7 @@ public class FileWriterUtil {
         }
     }
 
-    public static void writeObjects(ObjectResult objectResult, Path path) {
+    public static void writeObjects(ObjectResult objectResult, Path path, Language language) {
         List<String> staticBlockLines = new ArrayList<>();
         boolean inStaticBlock = false;
 
@@ -89,7 +90,7 @@ public class FileWriterUtil {
             } else if (inStaticBlock) {
                 staticBlockLines.add(s);
             } else {
-                if (s.startsWith(PSF)) {
+                if (s.startsWith(language.getModifier())) {
                     writeLine(path, String.format("\t%s", s));
                 } else {
                     writeLine(path, String.format("\t\t%s", s));

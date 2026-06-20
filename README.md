@@ -110,14 +110,19 @@ MyClass{
 
 * **Automatic Object Population**: Instantly create fully-populated, complex Java objects with a single line of code.
 * **Broad Java Compatibility**: Rigorously tested on **Java 11, 17, 21, and 25**.
+* **Deep Type Support**: Automatically resolves generic type arguments down the object graph (e.g., properly populating custom nested generics like
+  `Pair<String, Integer>` without type erasure), handles complex parameterized types including unbound wildcards (`List<?>`, `Set<?>`, `Map<?, ?>`),
+  as well as
+  core Java abstractions like `Number`.
 * **Multiple Creation Strategies**: Intelligently creates objects using a configurable chain of strategies (constructor, setters, builders, etc.) to
   handle almost any class design.
 * **Highly Configurable**: Tailor the object creation logic to your exact needs. You can generate random or fixed (deterministic) data, provide custom
   logic for specific types (like `UUID`), handle circular dependencies, and more.
 * **Builder Support**: Natively supports common builder patterns from libraries like **[Lombok](https://projectlombok.org/)**,
   **[Immutables](https://immutables.github.io/)**, and **[Protobuf](https://protobuf.dev/)**.
-* **Kotlin Support**: Natively supports populating Kotlin classes, including those that use **default parameter values**, by correctly handling
-  synthetic constructors without requiring any external Kotlin dependencies.
+* **Kotlin Support**: Natively supports populating Kotlin classes (including generic types like `Pair` and `Triple`), and properly handles **default
+  parameter values**
+  by invoking synthetic constructors without requiring any external Kotlin dependencies.
 * **Zero Runtime Dependencies:** Written in plain Java, this library is lightweight and has no external runtime dependencies, ensuring it won't
   introduce transitive dependency conflicts into your project.
 * **Java Code Generation**: Automatically generate the Java source code for the populated objects, which you can then save and reuse in

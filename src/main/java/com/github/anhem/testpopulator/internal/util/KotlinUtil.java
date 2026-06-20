@@ -6,9 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.getDeclaredMethods;
@@ -25,10 +23,13 @@ public class KotlinUtil {
     }
 
     public static <T> boolean isKotlinConstructor(Constructor<T> constructor, boolean kotlinSupport) {
+        return isKotlinConstructor(constructor.getParameterTypes(), kotlinSupport);
+    }
+
+    public static boolean isKotlinConstructor(Class<?>[] parameterTypes, boolean kotlinSupport) {
         if (!kotlinSupport) {
             return false;
         }
-        Class<?>[] parameterTypes = constructor.getParameterTypes();
         return parameterTypes.length > 0 && parameterTypes[parameterTypes.length - 1].getSimpleName().equals(KOTLIN_DEFAULT_CONSTRUCTOR_MARKER);
     }
 
@@ -81,6 +82,45 @@ public class KotlinUtil {
 
     public static <T> boolean isMatchingKotlinSingletonOrCompanion(Class<T> clazz, boolean kotlinSupport) {
         return kotlinSupport && (isKotlinSingleton(clazz) || hasKotlinCompanion(clazz));
+    }
+
+    public static <T> boolean isKotlinSpecialType(Class<T> clazz, boolean kotlinSupport) {
+        return kotlinSupport && (isKotlinSingleton(clazz) || hasKotlinCompanion(clazz) || isKotlinValueClass(clazz) || isKotlinSealedClass(clazz));
+    }
+
+    public static boolean isKotlinValueClass(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredMethods())
+                .anyMatch(KotlinUtil::isValueClassConstructor);
+    }
+
+    public static Method getKotlinValueClassConstructor(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredMethods())
+                .filter(KotlinUtil::isValueClassConstructor)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static boolean isValueClassConstructor(Method method) {
+        return Modifier.isStatic(method.getModifiers()) &&
+                (method.getName().equals("constructor-impl") || method.getName().equals("constructor_impl")) &&
+                method.getReturnType().equals(method.getDeclaringClass());
+    }
+
+    public static boolean isKotlinSealedClass(Class<?> clazz) {
+        if (!Modifier.isAbstract(clazz.getModifiers())) {
+            return false;
+        }
+        return Arrays.stream(clazz.getDeclaredClasses())
+                .anyMatch(c -> clazz.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers()));
+    }
+
+    public static List<Class<?>> getKotlinSealedSubclasses(Class<?> clazz) {
+        if (!Modifier.isAbstract(clazz.getModifiers())) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(clazz.getDeclaredClasses())
+                .filter(c -> clazz.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers()))
+                .collect(Collectors.toList());
     }
 
     static <T> boolean isMatchingFactoryMethod(Method method, Class<T> clazz) {

@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import com.github.anhem.testpopulator.config.Language;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.object.util.ValueStringifierUtil;
 import com.github.anhem.testpopulator.internal.util.ProtobufUtil;
@@ -16,7 +17,6 @@ import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderU
 
 public class ObjectFactoryImpl implements ObjectFactory {
 
-    static final String UNSUPPORTED_TYPE = ValueStringifierUtil.UNSUPPORTED_TYPE;
     private static final String NEW_PREFIX = "new ";
     private static final String CREATE_PREFIX = "create";
 
@@ -24,17 +24,21 @@ public class ObjectFactoryImpl implements ObjectFactory {
     private final Map<String, Integer> classNameCounters;
     private final Map<String, Class<?>> classNames;
     private ObjectBuilder currentObjectBuilder;
+    private final Language language;
 
-    public ObjectFactoryImpl(PopulateConfig populateConfig) {
+    public ObjectFactoryImpl(Class<?> rootClass, PopulateConfig populateConfig) {
         this.populateConfig = populateConfig;
         this.classNameCounters = new HashMap<>();
         this.classNames = new HashMap<>();
+        this.language = Language.fromClass(rootClass);
     }
 
     @Override
     public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes) {
         if (isNonPublicConstructor) {
-            TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren).codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR);
+            TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
+                    .codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR)
+                    .parameterTypes(constructorParameterTypes);
             String helperMethodName = getHelperMethodName(builder.name);
             TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();
             Set<String> extraImports = new HashSet<>();
@@ -46,6 +50,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         } else {
             setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
                     .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                    .parameterTypes(constructorParameterTypes)
                     .build());
         }
     }
@@ -67,7 +72,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void setter(Class<T> clazz, int expectedChildren) {
         setNextObjectBuilder(containerBuilder(clazz, SETTER, expectedChildren)
-                .template(CodeTemplate.SETTER.getFormat())
+                .codeTemplate(CodeTemplate.SETTER)
                 .build());
     }
 
@@ -98,6 +103,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
+        if (language == Language.KOTLIN && methodName.endsWith("-impl")) {
+            setNextObjectBuilder(templateBuilder(clazz, BuildType.CONSTRUCTOR, expectedChildren)
+                    .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                    .build());
+            return;
+        }
         setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, expectedChildren)
                 .codeTemplate(CodeTemplate.STATIC_METHOD)
                 .factoryClassName(clazz.getSimpleName())
@@ -108,7 +119,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void set(Class<T> clazz) {
         setNextObjectBuilder(containerBuilder(clazz, SET, 1)
-                .template(CodeTemplate.TYPED_COLLECTION.getFormat())
+                .codeTemplate(CodeTemplate.TYPED_COLLECTION)
                 .parameterized(true)
                 .build());
         method("add", 1);
@@ -128,7 +139,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void enumSet(Class<T> clazz, Class<?> enumClazz) {
         setNextObjectBuilder(containerBuilder(clazz, ENUM_SET, 1)
-                .template(CodeTemplate.ENUM_SET.getFormat())
+                .codeTemplate(CodeTemplate.ENUM_SET)
                 .parameterized(true)
                 .referencedClassName(enumClazz.getSimpleName())
                 .referencedClasses(enumClazz)
@@ -139,7 +150,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void list(Class<T> clazz) {
         setNextObjectBuilder(containerBuilder(clazz, LIST, 1)
-                .template(CodeTemplate.TYPED_COLLECTION.getFormat())
+                .codeTemplate(CodeTemplate.TYPED_COLLECTION)
                 .parameterized(true)
                 .build());
         method("add", 1);
@@ -161,7 +172,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         boolean parameterized = !clazz.equals(Properties.class);
         CodeTemplate codeTemplate = parameterized ? CodeTemplate.TYPED_COLLECTION : CodeTemplate.COLLECTION;
         setNextObjectBuilder(containerBuilder(clazz, MAP, 1)
-                .template(codeTemplate.getFormat())
+                .codeTemplate(codeTemplate)
                 .parameterized(parameterized)
                 .build());
         method("put", 2);
@@ -183,7 +194,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         boolean parameterized = !clazz.equals(Properties.class);
         CodeTemplate codeTemplate = parameterized ? CodeTemplate.ENUM_MAP : CodeTemplate.COLLECTION;
         setNextObjectBuilder(containerBuilder(clazz, ENUM_MAP, 1)
-                .template(codeTemplate.getFormat())
+                .codeTemplate(codeTemplate)
                 .parameterized(parameterized)
                 .referencedClassName(enumClazz.getSimpleName())
                 .referencedClasses(enumClazz)
@@ -314,13 +325,13 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public void writeToFile() {
         ObjectResult objectResult = build();
         if (objectResult.isValid()) {
-            Path path = getPath(objectResult, populateConfig);
+            Path path = getPath(objectResult, populateConfig, language);
             createOrOverwriteFile(path);
-            writePackage(objectResult, path);
-            writeImports(objectResult, path);
-            writeStaticImports(objectResult, path);
-            writeStartClass(objectResult, path, populateConfig);
-            writeObjects(objectResult, path);
+            writePackage(objectResult, path, language);
+            writeImports(objectResult, path, language);
+            writeStaticImports(objectResult, path, language);
+            writeStartClass(objectResult, path, populateConfig, language);
+            writeObjects(objectResult, path, language);
             writeMethods(objectResult, path);
             writeEndClass(path);
         }
@@ -339,7 +350,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .name(getName(clazz))
                 .buildType(buildType)
                 .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(expectedChildren);
+                .expectedChildren(expectedChildren)
+                .language(this.language);
     }
 
     private ContainerObjectBuilder.Builder containerBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
@@ -348,7 +360,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .name(getName(clazz))
                 .buildType(buildType)
                 .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(expectedChildren);
+                .expectedChildren(expectedChildren)
+                .language(this.language);
     }
 
     private void setNextObjectBuilder(ObjectBuilder objectBuilder) {

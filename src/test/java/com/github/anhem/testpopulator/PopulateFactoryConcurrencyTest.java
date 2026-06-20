@@ -22,6 +22,7 @@ class PopulateFactoryConcurrencyTest {
         int iterationsPerThread = 100;
         String globalValue = "global";
         PopulateConfig populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .addOverride(String.class, () -> globalValue)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
@@ -61,6 +62,7 @@ class PopulateFactoryConcurrencyTest {
         int numberOfThreads = 50;
         int iterationsPerThread = 20;
         PopulateConfig populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .nullOnCircularDependency(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
@@ -91,6 +93,7 @@ class PopulateFactoryConcurrencyTest {
         int numberOfThreads = 20;
         int iterationsPerThread = 5;
         PopulateConfig populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);

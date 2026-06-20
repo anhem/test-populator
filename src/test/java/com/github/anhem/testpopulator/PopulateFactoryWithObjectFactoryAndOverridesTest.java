@@ -20,6 +20,7 @@ class PopulateFactoryWithObjectFactoryAndOverridesTest {
         MyUUID myUUID = new MyUUID(uuidString);
 
         PopulateConfig populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .and()
                 .addOverride(MyUUID.class, new OverridePopulate<MyUUID>() {
@@ -68,6 +69,7 @@ class PopulateFactoryWithObjectFactoryAndOverridesTest {
         List<String> customList = List.of("A", "B");
 
         PopulateConfig populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .and()
                 .addOverride("setStringValue", String.class, new OverridePopulate<String>() {

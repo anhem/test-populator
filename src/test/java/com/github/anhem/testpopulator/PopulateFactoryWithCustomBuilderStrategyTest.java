@@ -25,6 +25,7 @@ class PopulateFactoryWithCustomBuilderStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .builderStrategy()
                 .and()
                 .objectFactory(true)

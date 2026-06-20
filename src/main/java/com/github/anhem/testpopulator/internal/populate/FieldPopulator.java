@@ -38,15 +38,13 @@ public class FieldPopulator implements PopulatingStrategy {
             fieldsToPopulate.forEach(field -> {
                 try {
                     setAccessible(field, objectOfClass);
-                    if (isCollectionLike(field.getType())) {
-                        CollectionCarrier<Object> collectionCarrier = classCarrier.toCollectionCarrier(
-                                field.getType(),
-                                field.getName(),
-                                toArgumentTypes(field.getGenericType(), field.getType()).toArray(new Type[0])
-                        );
+                    Type resolvedType = classCarrier.resolveType(field.getGenericType());
+                    Class<?> targetClass = resolveClass(resolvedType, classCarrier.getPopulateConfig().getWildcardFallbackType());
+                    if (isCollectionLike(targetClass)) {
+                        CollectionCarrier<Object> collectionCarrier = classCarrier.toCollectionCarrier(field.getGenericType(), field.getName());
                         field.set(objectOfClass, populator.populate(collectionCarrier));
                     } else {
-                        field.set(objectOfClass, populator.populate(classCarrier.toClassCarrier(field.getType(), field.getName())));
+                        field.set(objectOfClass, populator.populate(classCarrier.toClassCarrier(field.getGenericType(), field.getName())));
                     }
                 } catch (Exception e) {
                     throw new PopulateException(format(FAILED_TO_SET_FIELD, field.getName(), objectOfClass.getClass().getName()), e);

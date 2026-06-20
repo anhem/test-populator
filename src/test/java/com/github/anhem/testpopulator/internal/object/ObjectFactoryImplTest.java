@@ -24,7 +24,7 @@ class ObjectFactoryImplTest {
 
     @BeforeEach
     void setUp() {
-        objectFactoryImpl = new ObjectFactoryImpl(DEFAULT_POPULATE_CONFIG);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, DEFAULT_POPULATE_CONFIG);
     }
 
     @Test
@@ -288,7 +288,7 @@ class ObjectFactoryImplTest {
     void valueWithNameOverride() {
         String overrideName = "myCustomName";
         List<String> overrideValue = List.of("myOverriddenValue");
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(overrideName, List.class, new OverridePopulate<>() {
                     @Override
                     public Object create() {
@@ -300,7 +300,7 @@ class ObjectFactoryImplTest {
                         return "CUSTOM_STRING";
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, (Class<List<String>>) (Class<?>) List.class, overrideName);
 
@@ -315,7 +315,7 @@ class ObjectFactoryImplTest {
     void valueWithClassOverride() {
         Class<List<String>> overrideClass = (Class<List<String>>) (Class<?>) List.class;
         List<String> overrideValue = List.of("myOverriddenValue");
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(overrideClass, new OverridePopulate<>() {
                     @Override
                     public List<String> create() {
@@ -327,7 +327,7 @@ class ObjectFactoryImplTest {
                         return "CUSTOM_STRING_FOR_CLASS";
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, overrideClass, null);
 
@@ -342,7 +342,7 @@ class ObjectFactoryImplTest {
         Class<MyClass> overrideClass = MyClass.class;
         MyClass overrideValue = new MyClass();
         String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(overrideClass, new OverridePopulate<>() {
                     @Override
                     public MyClass create() {
@@ -359,7 +359,7 @@ class ObjectFactoryImplTest {
                         return Set.of(methodDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, overrideClass, null);
 
@@ -375,7 +375,7 @@ class ObjectFactoryImplTest {
         String overrideName = "myCustomName";
         MyClass overrideValue = new MyClass();
         String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(overrideName, MyClass.class, new OverridePopulate<>() {
                     @Override
                     public Object create() {
@@ -392,7 +392,7 @@ class ObjectFactoryImplTest {
                         return Set.of(methodDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, MyClass.class, overrideName);
 
@@ -409,7 +409,7 @@ class ObjectFactoryImplTest {
         MyClass overrideValue = new MyClass();
         String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
         String importDefinition = "java.util.Collections";
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(overrideClass, new OverridePopulate<>() {
                     @Override
                     public MyClass create() {
@@ -431,7 +431,7 @@ class ObjectFactoryImplTest {
                         return Set.of(importDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, overrideClass, null);
 
@@ -449,7 +449,7 @@ class ObjectFactoryImplTest {
         MyClass overrideValue = new MyClass();
         String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
         String importDefinition = "java.util.Collections";
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(overrideName, MyClass.class, new OverridePopulate<>() {
                     @Override
                     public Object create() {
@@ -471,7 +471,7 @@ class ObjectFactoryImplTest {
                         return Set.of(importDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, MyClass.class, overrideName);
 
@@ -490,7 +490,7 @@ class ObjectFactoryImplTest {
         String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
         String importDefinition = "java.util.Collections";
         String staticImportDefinition = "java.util.Collections.singletonList";
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(overrideClass, new OverridePopulate<>() {
                     @Override
                     public MyClass create() {
@@ -517,7 +517,7 @@ class ObjectFactoryImplTest {
                         return Set.of(staticImportDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, overrideClass, null);
 
@@ -537,7 +537,7 @@ class ObjectFactoryImplTest {
         String methodDefinition = "private static MyClass myHelper() { return new MyClass(); }";
         String importDefinition = "java.util.Collections";
         String staticImportDefinition = "java.util.Collections.singletonList";
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(overrideName, MyClass.class, new OverridePopulate<>() {
                     @Override
                     public Object create() {
@@ -564,7 +564,7 @@ class ObjectFactoryImplTest {
                         return Set.of(staticImportDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, MyClass.class, overrideName);
 
@@ -630,7 +630,7 @@ class ObjectFactoryImplTest {
 
     @Test
     void valueThrowsException() {
-        Assertions.assertThrows(ObjectException.class, () -> objectFactoryImpl.value(PopulateConfig.builder().build(), PopulateConfig.class, null));
+        Assertions.assertThrows(ObjectException.class, () -> objectFactoryImpl.value(PopulateConfig.builder().wildcardFallbackType(String.class).build(), PopulateConfig.class, null));
     }
 
     @Test

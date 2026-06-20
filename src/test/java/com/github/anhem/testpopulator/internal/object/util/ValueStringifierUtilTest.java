@@ -20,7 +20,7 @@ class ValueStringifierUtilTest {
     @Test
     void stringifyEnum() {
         ObjectBuilder builder = TemplateObjectBuilder.builder().buildType(VALUE).build();
-        PopulateConfig config = PopulateConfig.builder().build();
+        PopulateConfig config = PopulateConfig.builder().wildcardFallbackType(String.class).build();
         String result = ValueStringifierUtil.stringify(Month.JANUARY, Month.class, "month", config, builder);
         assertThat(result).isEqualTo("JANUARY");
     }
@@ -31,7 +31,7 @@ class ValueStringifierUtilTest {
                 .useFullyQualifiedName(true)
                 .buildType(VALUE)
                 .build();
-        PopulateConfig config = PopulateConfig.builder().build();
+        PopulateConfig config = PopulateConfig.builder().wildcardFallbackType(String.class).build();
         LocalDate date = LocalDate.of(2023, 1, 1);
         String result = ValueStringifierUtil.stringify(date, LocalDate.class, "date", config, builder);
         assertThat(result).isEqualTo("LocalDate.parse(\"2023-01-01\")");
@@ -40,7 +40,7 @@ class ValueStringifierUtilTest {
     @Test
     void stringifyClassOverride() {
         ObjectBuilder builder = TemplateObjectBuilder.builder().buildType(VALUE).build();
-        PopulateConfig config = PopulateConfig.builder()
+        PopulateConfig config = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(CustomType.class, new CustomOverride())
                 .build();
         
@@ -51,7 +51,7 @@ class ValueStringifierUtilTest {
     @Test
     void stringifyUnsupportedTypeThrowsException() {
         ObjectBuilder builder = TemplateObjectBuilder.builder().buildType(VALUE).build();
-        PopulateConfig config = PopulateConfig.builder().build();
+        PopulateConfig config = PopulateConfig.builder().wildcardFallbackType(String.class).build();
         
         assertThatThrownBy(() -> ValueStringifierUtil.stringify(new CustomType(), CustomType.class, "custom", config, builder))
                 .isInstanceOf(ObjectException.class)

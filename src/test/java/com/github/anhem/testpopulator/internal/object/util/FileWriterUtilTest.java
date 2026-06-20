@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+import static com.github.anhem.testpopulator.config.Language.JAVA;
 import static com.github.anhem.testpopulator.internal.object.util.FileWriterUtil.*;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
 import static java.io.File.createTempFile;
@@ -41,7 +42,7 @@ class FileWriterUtilTest {
     @Test
     void getPathReturnsPathBuiltFromObjectResultAndPopulateConfig() {
         PopulateConfig populateConfig = DEFAULT_POPULATE_CONFIG.toBuilder().objectFactory(true).build();
-        Path path = FileWriterUtil.getPath(OBJECT_RESULT, populateConfig);
+        Path path = FileWriterUtil.getPath(OBJECT_RESULT, populateConfig, JAVA);
 
         assertThat(path).hasToString(String.format("%s/%s/%s_%s.java", populateConfig.getObjectFactoryPath(), toPackagePath(this.getClass().getPackageName()), this.getClass().getName(), encode(populateConfig)));
     }
@@ -57,7 +58,7 @@ class FileWriterUtilTest {
     void writePackageAddsPackageToFile() throws IOException {
         Path path = getTempPath();
 
-        writePackage(OBJECT_RESULT, path);
+        writePackage(OBJECT_RESULT, path, JAVA);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
                 "package com.github.anhem.testpopulator.internal.object.util;",
@@ -69,7 +70,7 @@ class FileWriterUtilTest {
     void writeImportAddsImportsToFile() throws IOException {
         Path path = getTempPath();
 
-        writeImports(OBJECT_RESULT, path);
+        writeImports(OBJECT_RESULT, path, JAVA);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
                 "import java.util.ArrayList;",
@@ -81,7 +82,7 @@ class FileWriterUtilTest {
     void writeStaticImportAddsStaticImportsToFile() throws IOException {
         Path path = getTempPath();
 
-        writeStaticImports(OBJECT_RESULT, path);
+        writeStaticImports(OBJECT_RESULT, path, JAVA);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
                 "import static com.github.anhem.testpopulator.model.java.ArbitraryEnum.A;",
@@ -93,7 +94,7 @@ class FileWriterUtilTest {
     void writeStartClassAddsClassToFile() throws IOException {
         Path path = getTempPath();
 
-        writeStartClass(OBJECT_RESULT, path, DEFAULT_POPULATE_CONFIG);
+        writeStartClass(OBJECT_RESULT, path, DEFAULT_POPULATE_CONFIG, JAVA);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
                 String.format("public class %s_%s {", this.getClass().getName(), FileWriterUtil.encode(DEFAULT_POPULATE_CONFIG)),
@@ -127,7 +128,7 @@ class FileWriterUtilTest {
     void writeObjectsAddsObjectsToFile() throws IOException {
         Path path = getTempPath();
 
-        writeObjects(OBJECT_RESULT, path);
+        writeObjects(OBJECT_RESULT, path, JAVA);
 
         assertThat(readAllLines(path)).isEqualTo(List.of(
                 "\tpublic static final ArrayList<ArbitraryEnum> arrayList0 = new ArrayList<>();",

@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.object.util;
 
+import com.github.anhem.testpopulator.config.Language;
 import com.github.anhem.testpopulator.config.OverridePopulate;
 import com.github.anhem.testpopulator.config.OverrideTarget;
 import com.github.anhem.testpopulator.config.PopulateConfig;
@@ -21,6 +22,9 @@ public class ValueStringifierUtil {
         }
 
         if (KotlinUtil.isKotlinSingleton(clazz, config.isKotlinSupport())) {
+            if (objectBuilder.getLanguage() == Language.KOTLIN) {
+                return clazz.getSimpleName();
+            }
             return String.format("%s.INSTANCE", clazz.getSimpleName());
         }
 
@@ -37,7 +41,7 @@ public class ValueStringifierUtil {
             return applyOverride(classOverride, objectBuilder);
         }
 
-        String formatted = ValueFormatter.format(value, clazz);
+        String formatted = ValueFormatter.format(value, clazz, objectBuilder.getLanguage());
         if (formatted != null) {
             return formatted;
         }

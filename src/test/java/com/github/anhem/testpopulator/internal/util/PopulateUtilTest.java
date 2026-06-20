@@ -34,7 +34,7 @@ class PopulateUtilTest {
 
     @Test
     void toArgumentTypesReturnsParameterArgumentTypes() {
-        List<Type> argumentTypes = toArgumentTypes(getArbitraryParameter());
+        List<Type> argumentTypes = toArgumentTypes(getArbitraryParameter(), Object.class);
 
         assertThat(argumentTypes).hasSize(1);
         assertThat(argumentTypes.get(0)).isEqualTo(String.class);
@@ -44,7 +44,7 @@ class PopulateUtilTest {
     void getDeclaredFieldsReturnsAllDeclaredFields() {
         List<Field> declaredFields = getDeclaredFields(PojoExtendsPojoExtendsPojoAbstract.class, DEFAULT_POPULATE_CONFIG.getBlacklistedFields());
 
-        assertThat(declaredFields).isNotEmpty().hasSize(108);
+        assertThat(declaredFields).hasSize(140);
         List<String> fieldNames = declaredFields.stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());

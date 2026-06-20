@@ -23,6 +23,7 @@ class PopulateFactoryWithImmutablesBuilderStrategyTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(IMMUTABLES)
                 .and()

@@ -8,7 +8,7 @@ public class KotlinSupportBugReproductionTest {
 
     @Test
     void canTurnOffKotlinSupportAfterTurningItOn() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .kotlinSupport(true)
                 .and()
                 .kotlinSupport(false)
@@ -19,7 +19,7 @@ public class KotlinSupportBugReproductionTest {
 
     @Test
     void canTurnOffKotlinSupportViaToBuilder() {
-        PopulateConfig config1 = PopulateConfig.builder()
+        PopulateConfig config1 = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .kotlinSupport(true)
                 .build();
         assertThat(config1.isKotlinSupport()).isTrue();
@@ -33,7 +33,7 @@ public class KotlinSupportBugReproductionTest {
 
     @Test
     void canTurnOffKotlinDefaultValuesViaToBuilder() {
-        PopulateConfig config1 = PopulateConfig.builder()
+        PopulateConfig config1 = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .kotlinSupport(true)
                 .defaultValues(true)
                 .build();

@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import com.github.anhem.testpopulator.config.Language;
 import com.github.anhem.testpopulator.internal.object.util.ArgumentFormatterUtil;
 
 import java.util.*;
@@ -12,7 +13,6 @@ import static java.util.stream.Collectors.joining;
 public abstract class ObjectBuilder {
 
     public static final String NULL = "null";
-    public static final String PSF = "public static final";
     private final Class<?> clazz;
     private final String name;
     private final BuildType buildType;
@@ -26,22 +26,19 @@ public abstract class ObjectBuilder {
     private final Set<String> extraStaticImports = new HashSet<>();
     private final int expectedChildren;
     private final boolean parameterized;
-
+    private final Language language;
     private boolean skipNullMethods;
     private ObjectBuilder parent;
     private String value;
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
-        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false);
-    }
-
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized) {
-        this.clazz = clazz;
-        this.name = name;
-        this.buildType = buildType;
-        this.useFullyQualifiedName = useFullyQualifiedName;
-        this.expectedChildren = expectedChildren;
-        this.parameterized = parameterized;
+    protected ObjectBuilder(BaseBuilder<?> builder) {
+        this.clazz = builder.clazz;
+        this.name = builder.name;
+        this.buildType = builder.buildType;
+        this.useFullyQualifiedName = builder.useFullyQualifiedName;
+        this.expectedChildren = builder.expectedChildren;
+        this.parameterized = builder.parameterized;
+        this.language = builder.language;
     }
 
     public void setSkipNullMethods(boolean skipNullMethods) {
@@ -56,8 +53,12 @@ public abstract class ObjectBuilder {
         return useFullyQualifiedName;
     }
 
-    public boolean isParameterized() {
+    protected boolean isParameterized() {
         return parameterized;
+    }
+
+    public Language getLanguage() {
+        return language;
     }
 
     public List<String> build() {
