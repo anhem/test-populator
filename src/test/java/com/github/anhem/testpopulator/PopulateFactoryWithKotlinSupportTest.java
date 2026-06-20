@@ -4,7 +4,6 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.kotlin.*;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.RECURSIVE_ASSERTION_CONFIGURATION;
@@ -150,9 +149,13 @@ class PopulateFactoryWithKotlinSupportTest {
     }
 
     @Test
-    @Disabled
-    void canPopulateKotlinPair() {
-        populateAndAssertWithGeneratedCode(KotlinPair.class);
+    void canPopulateKotlinPairWithinWrapper() {
+        populateAndAssertWithGeneratedCode(KotlinLikePairWrapper.class);
+    }
+
+    @Test
+    void canPopulateGenericInheritanceWrapper() {
+        populateAndAssertWithGeneratedCode(GenericInheritanceWrapper.class);
     }
 
     @Test

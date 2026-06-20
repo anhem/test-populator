@@ -4,10 +4,7 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -56,7 +53,10 @@ public class ConstructorPopulator implements PopulatingStrategy {
 
     private <T> Object populateArgument(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator, int i) {
         Parameter parameter = constructor.getParameters()[i];
-        if (isCollectionLike(parameter.getType())) {
+        Type resolvedType = classCarrier.resolveType(parameter.getParameterizedType());
+        Class<?> targetClass = resolveClass(resolvedType, classCarrier.getPopulateConfig().getWildcardFallbackType());
+
+        if (isCollectionLike(targetClass)) {
             return populator.populate(classCarrier.toCollectionCarrier(parameter));
         } else {
             return populator.populate(classCarrier.toClassCarrier(parameter));

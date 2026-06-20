@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode
-public class KotlinPair<A, B> {
+public class KotlinLikePair<A, B> {
     private final A first;
     private final B second;
 
-    public KotlinPair(A first, B second) {
+    public KotlinLikePair(A first, B second) {
         this.first = first;
         this.second = second;
     }
@@ -22,7 +22,7 @@ public class KotlinPair<A, B> {
         return second;
     }
 
-    public KotlinPair<A, B> copy(A first, B second) {
-        return new KotlinPair<>(first, second);
+    public KotlinLikePair<A, B> copy(A first, B second) {
+        return new KotlinLikePair<>(first, second);
     }
 }
