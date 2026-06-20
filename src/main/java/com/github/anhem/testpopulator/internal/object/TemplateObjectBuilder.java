@@ -1,5 +1,8 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import com.github.anhem.testpopulator.config.Language;
+import com.github.anhem.testpopulator.internal.util.KotlinUtil;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,6 +18,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     private final boolean skipIfNull;
     private final boolean clearArgsIfNullChild;
     private final String buildMethodName;
+    private final Class<?>[] parameterTypes;
 
     private TemplateObjectBuilder(Builder builder) {
         super(builder);
@@ -24,6 +28,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         this.skipIfNull = builder.skipIfNull;
         this.clearArgsIfNullChild = builder.clearArgsIfNullChild;
         this.buildMethodName = builder.buildMethodName;
+        this.parameterTypes = builder.parameterTypes;
         for (Class<?> referencedClass : builder.referencedClasses) {
             addReferencedClass(referencedClass);
         }
@@ -64,7 +69,25 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         if (clearArgsIfNullChild && children.stream().anyMatch(ObjectBuilder::isNullValue)) {
             return "";
         }
-        return super.buildArguments(children);
+        return super.buildArguments(getValidKotlinChildren(children));
+    }
+
+    @Override
+    protected Stream<String> buildChildren(List<ObjectBuilder> children) {
+        return super.buildChildren(getValidKotlinChildren(children));
+    }
+
+    private List<ObjectBuilder> getValidKotlinChildren(List<ObjectBuilder> children) {
+        if (parameterTypes != null &&
+                Language.fromClass(getClazz()) == Language.KOTLIN &&
+                KotlinUtil.isKotlinConstructor(parameterTypes, true)) {
+            int maskCount = (parameterTypes.length - 2) / 32 + 1;
+            int realParameterCount = parameterTypes.length - maskCount - 1;
+            if (children.size() >= realParameterCount) {
+                return children.subList(0, realParameterCount);
+            }
+        }
+        return children;
     }
 
     private String getArgs(List<ObjectBuilder> argumentChildren) {
@@ -100,6 +123,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         private boolean skipIfNull;
         private boolean clearArgsIfNullChild;
         private String buildMethodName;
+        private Class<?>[] parameterTypes;
 
         public Builder codeTemplate(CodeTemplate codeTemplate) {
             this.codeTemplate = codeTemplate;
@@ -128,6 +152,11 @@ public class TemplateObjectBuilder extends ObjectBuilder {
 
         public Builder buildMethodName(String buildMethodName) {
             this.buildMethodName = buildMethodName;
+            return this;
+        }
+
+        public Builder parameterTypes(Class<?>[] parameterTypes) {
+            this.parameterTypes = parameterTypes;
             return this;
         }
 

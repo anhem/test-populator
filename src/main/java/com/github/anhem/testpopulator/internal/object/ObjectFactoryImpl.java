@@ -17,7 +17,6 @@ import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderU
 
 public class ObjectFactoryImpl implements ObjectFactory {
 
-    static final String UNSUPPORTED_TYPE = ValueStringifierUtil.UNSUPPORTED_TYPE;
     private static final String NEW_PREFIX = "new ";
     private static final String CREATE_PREFIX = "create";
 
@@ -37,7 +36,9 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes) {
         if (isNonPublicConstructor) {
-            TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren).codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR);
+            TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
+                    .codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR)
+                    .parameterTypes(constructorParameterTypes);
             String helperMethodName = getHelperMethodName(builder.name);
             TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();
             Set<String> extraImports = new HashSet<>();
@@ -49,6 +50,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         } else {
             setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
                     .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                    .parameterTypes(constructorParameterTypes)
                     .build());
         }
     }
@@ -101,6 +103,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
+        if (language == Language.KOTLIN && methodName.endsWith("-impl")) {
+            setNextObjectBuilder(templateBuilder(clazz, BuildType.CONSTRUCTOR, expectedChildren)
+                    .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                    .build());
+            return;
+        }
         setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, expectedChildren)
                 .codeTemplate(CodeTemplate.STATIC_METHOD)
                 .factoryClassName(clazz.getSimpleName())

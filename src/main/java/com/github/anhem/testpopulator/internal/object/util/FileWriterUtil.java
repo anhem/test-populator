@@ -54,9 +54,10 @@ public class FileWriterUtil {
     }
 
     public static void writeStaticImports(ObjectResult objectResult, Path path, Language language) {
+        String importPrefix = language == Language.KOTLIN ? "import " : "import static ";
         objectResult.getStaticImports().stream()
                 .sorted()
-                .forEach(s -> writeLine(path, String.format("import static %s%s", s, language.getStatementEnd())));
+                .forEach(s -> writeLine(path, String.format("%s%s%s", importPrefix, s, language.getStatementEnd())));
         writeLine(path, "");
     }
 

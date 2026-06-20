@@ -27,7 +27,6 @@ public abstract class ObjectBuilder {
     private final int expectedChildren;
     private final boolean parameterized;
     private final Language language;
-
     private boolean skipNullMethods;
     private ObjectBuilder parent;
     private String value;
