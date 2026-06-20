@@ -8,12 +8,12 @@ import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderU
 
 public class ContainerObjectBuilder extends ObjectBuilder {
 
-    private final String template;
+    private final CodeTemplate codeTemplate;
     private final String referencedClassName;
 
     private ContainerObjectBuilder(Builder builder) {
-        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized);
-        this.template = builder.template;
+        super(builder);
+        this.codeTemplate = builder.codeTemplate;
         this.referencedClassName = builder.referencedClassName;
         for (Class<?> referencedClass : builder.referencedClasses) {
             addReferencedClass(referencedClass);
@@ -26,10 +26,17 @@ public class ContainerObjectBuilder extends ObjectBuilder {
 
     @Override
     protected Stream<String> getInstantiationLine(List<ObjectBuilder> argumentChildren) {
-        if (template == null) {
+        if (codeTemplate == null) {
             return Stream.empty();
         }
-        return Stream.of(String.format(template, PSF, getClassName(), formatTypes(), getName(), referencedClassName));
+        return Stream.of(codeTemplate.render(
+                getLanguage(),
+                getLanguage().getModifier(),
+                getClassName(),
+                formatTypes(),
+                getName(),
+                referencedClassName
+        ));
     }
 
     @Override
@@ -53,11 +60,11 @@ public class ContainerObjectBuilder extends ObjectBuilder {
     }
 
     public static class Builder extends BaseBuilder<Builder> {
-        private String template;
+        private CodeTemplate codeTemplate;
         private String referencedClassName;
 
-        public Builder template(String template) {
-            this.template = template;
+        public Builder codeTemplate(CodeTemplate codeTemplate) {
+            this.codeTemplate = codeTemplate;
             return this;
         }
 

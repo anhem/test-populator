@@ -9,6 +9,7 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
     protected int expectedChildren;
     protected boolean parameterized;
     protected Class<?>[] referencedClasses = new Class<?>[0];
+    protected com.github.anhem.testpopulator.config.Language language = com.github.anhem.testpopulator.config.Language.JAVA;
 
     public B clazz(Class<?> clazz) {
         this.clazz = clazz;
@@ -42,6 +43,11 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
 
     public B referencedClasses(Class<?>... referencedClasses) {
         this.referencedClasses = referencedClasses;
+        return (B) this;
+    }
+
+    public B language(com.github.anhem.testpopulator.config.Language language) {
+        this.language = language;
         return (B) this;
     }
 

@@ -90,7 +90,7 @@ public class PopulateFactory {
                 .addNameOverrides(nameOverrides)
                 .build();
         Populator p = noOverrides ? populator : new Populator(createValueFactory(config));
-        ObjectFactory objectFactory = config.isObjectFactoryEnabled() ? new ObjectFactoryImpl(config) : new ObjectFactoryVoid();
+        ObjectFactory objectFactory = config.isObjectFactoryEnabled() ? new ObjectFactoryImpl(clazz, config) : new ObjectFactoryVoid();
         T result = p.populate(initialize(clazz, objectFactory, config));
         objectFactory.writeToFile();
         return result;

@@ -24,7 +24,7 @@ class ObjectFactoryImplTest {
 
     @BeforeEach
     void setUp() {
-        objectFactoryImpl = new ObjectFactoryImpl(DEFAULT_POPULATE_CONFIG);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, DEFAULT_POPULATE_CONFIG);
     }
 
     @Test
@@ -300,7 +300,7 @@ class ObjectFactoryImplTest {
                         return "CUSTOM_STRING";
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, (Class<List<String>>) (Class<?>) List.class, overrideName);
 
@@ -327,7 +327,7 @@ class ObjectFactoryImplTest {
                         return "CUSTOM_STRING_FOR_CLASS";
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, overrideClass, null);
 
@@ -359,7 +359,7 @@ class ObjectFactoryImplTest {
                         return Set.of(methodDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, overrideClass, null);
 
@@ -392,7 +392,7 @@ class ObjectFactoryImplTest {
                         return Set.of(methodDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, MyClass.class, overrideName);
 
@@ -431,7 +431,7 @@ class ObjectFactoryImplTest {
                         return Set.of(importDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, overrideClass, null);
 
@@ -471,7 +471,7 @@ class ObjectFactoryImplTest {
                         return Set.of(importDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, MyClass.class, overrideName);
 
@@ -517,7 +517,7 @@ class ObjectFactoryImplTest {
                         return Set.of(staticImportDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, overrideClass, null);
 
@@ -564,7 +564,7 @@ class ObjectFactoryImplTest {
                         return Set.of(staticImportDefinition);
                     }
                 }).build();
-        objectFactoryImpl = new ObjectFactoryImpl(populateConfig);
+        objectFactoryImpl = new ObjectFactoryImpl(Object.class, populateConfig);
 
         objectFactoryImpl.value(overrideValue, MyClass.class, overrideName);
 
