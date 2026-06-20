@@ -229,7 +229,7 @@ public class CollectionPopulator implements PopulatingStrategy {
             return populator.populate(typeCarrier.toCollectionCarrier(parameterizedType.getRawType(), parameterizedType.getActualTypeArguments()));
         }
         if (type instanceof TypeVariable) {
-            type = Object.class;
+            type = typeCarrier.getPopulateConfig().getWildcardFallbackType();
         }
         if (type instanceof GenericArrayType) {
             type = ((GenericArrayType) type).getGenericComponentType();
