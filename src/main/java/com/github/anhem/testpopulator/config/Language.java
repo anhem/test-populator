@@ -32,6 +32,7 @@ public enum Language {
         return statementEnd;
     }
 
+    @SuppressWarnings("java:S1872")
     public static Language fromClass(Class<?> clazz) {
         if (clazz == null) {
             return JAVA;
