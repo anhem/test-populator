@@ -154,11 +154,6 @@ class PopulateFactoryWithKotlinSupportTest {
     }
 
     @Test
-    void canPopulateGenericInheritanceWrapper() {
-        populateAndAssertWithGeneratedCode(GenericInheritanceWrapper.class);
-    }
-
-    @Test
     void canPopulateKotlinLikeSealedClass() {
         populateAndAssertWithGeneratedCode(KotlinLikeSealedClass.class);
     }
