@@ -18,7 +18,8 @@ class PopulateFactoryWithKotlinSupportTest {
 
     @BeforeEach
     void setUp() {
-        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
+        populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .kotlinSupport(true)
                 .and()
                 .constructorStrategy()
@@ -124,7 +125,9 @@ class PopulateFactoryWithKotlinSupportTest {
 
     @Test
     void cannotPopulateKotlinSingletonWhenKotlinSupportIsDisabled() {
-        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class).build();
+        populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
+                .build();
         populateFactory = new PopulateFactory(populateConfig);
 
         assertThatThrownBy(() -> populateFactory.populate(KotlinLikeSingleton.class))

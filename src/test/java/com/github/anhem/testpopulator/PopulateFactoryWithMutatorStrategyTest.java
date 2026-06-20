@@ -32,7 +32,8 @@ class PopulateFactoryWithMutatorStrategyTest {
 
     @BeforeEach
     void setUp() {
-        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
+        populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .mutatorStrategy()
                 .and()
                 .objectFactory(true)

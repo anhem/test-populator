@@ -19,7 +19,8 @@ class PopulateFactoryWithObjectFactoryAndOverridesTest {
         String uuidString = "82e8962f-885d-4845-914b-c206a42d7c91";
         MyUUID myUUID = new MyUUID(uuidString);
 
-        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .and()
                 .addOverride(MyUUID.class, new OverridePopulate<MyUUID>() {
@@ -67,7 +68,8 @@ class PopulateFactoryWithObjectFactoryAndOverridesTest {
         Integer customInt = 888;
         List<String> customList = List.of("A", "B");
 
-        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .and()
                 .addOverride("setStringValue", String.class, new OverridePopulate<String>() {

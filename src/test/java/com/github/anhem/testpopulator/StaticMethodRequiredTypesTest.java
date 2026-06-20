@@ -12,7 +12,8 @@ class StaticMethodRequiredTypesTest {
 
     @Test
     void canPopulateStaticMethodRequiredTypes() {
-        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);

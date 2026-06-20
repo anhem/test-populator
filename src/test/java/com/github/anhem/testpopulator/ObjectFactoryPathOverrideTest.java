@@ -18,7 +18,8 @@ class ObjectFactoryPathOverrideTest {
     @Test
     void generatedFileIsPlacedInCustomPath() {
         String customPath = tempDir.resolve("custom-generated-sources").toString();
-        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
+        PopulateConfig populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .path(customPath)
                 .and()

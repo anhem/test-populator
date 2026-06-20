@@ -20,7 +20,8 @@ class PopulateFactoryWithStaticStrategyTest {
 
     @BeforeEach
     void setUp() {
-        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
+        populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .staticMethodStrategy()
                 .and()
                 .objectFactory(true)
@@ -74,7 +75,8 @@ class PopulateFactoryWithStaticStrategyTest {
 
     @Test
     void multipleStaticMethodsWithSimplestMethodType() {
-        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
+        populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .staticMethodStrategy()
                 .methodType(MethodType.SIMPLEST)
                 .and()
@@ -88,7 +90,8 @@ class PopulateFactoryWithStaticStrategyTest {
 
     @Test
     void multipleStaticMethodsWithSmallestMethodType() {
-        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
+        populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .staticMethodStrategy()
                 .methodType(MethodType.SMALLEST)
                 .and()

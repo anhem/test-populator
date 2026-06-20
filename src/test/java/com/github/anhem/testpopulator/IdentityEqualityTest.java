@@ -13,7 +13,9 @@ class IdentityEqualityTest {
 
     @BeforeEach
     void setUp() {
-        PopulateConfig config = PopulateConfig.builder().wildcardFallbackType(String.class).build();
+        PopulateConfig config = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
+                .build();
         populateFactory = new PopulateFactory(config);
     }
 

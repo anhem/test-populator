@@ -135,7 +135,8 @@ class PopulateFactoryTest {
     }
 
     private static PopulateConfig createFullyConfiguredPopulateConfig() {
-        return PopulateConfig.builder().wildcardFallbackType(String.class)
+        return PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(LOMBOK)
                 .and()
