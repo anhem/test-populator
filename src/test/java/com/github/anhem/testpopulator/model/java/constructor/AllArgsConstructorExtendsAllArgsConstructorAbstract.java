@@ -157,6 +157,7 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             Hashtable<? extends String, ? extends Integer> hashtableWithWildcard,
             Vector<? extends String> vectorWithWildcard,
             Stack<? extends String> stackWithWildcard,
+            Number number,
             String anotherString
     ) {
         super(
@@ -293,7 +294,8 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
                 mapEntryWithWildcard,
                 hashtableWithWildcard,
                 vectorWithWildcard,
-                stackWithWildcard
+                stackWithWildcard,
+                number
         );
         this.anotherString = anotherString;
     }

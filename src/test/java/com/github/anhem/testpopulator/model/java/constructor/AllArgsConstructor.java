@@ -155,4 +155,5 @@ public class AllArgsConstructor {
     private final Hashtable<? extends String, ? extends Integer> hashtableWithWildcard;
     private final Vector<? extends String> vectorWithWildcard;
     private final Stack<? extends String> stackWithWildcard;
+    private final Number number;
 }

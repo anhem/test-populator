@@ -158,4 +158,5 @@ public class Pojo {
     private Hashtable<? extends String, ? extends Integer> hashtableWithWildcard;
     private Vector<? extends String> vectorWithWildcard;
     private Stack<? extends String> stackWithWildcard;
+    private Number number;
 }

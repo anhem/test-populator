@@ -167,4 +167,5 @@ public class LombokImmutableWithSingular {
     Hashtable<? extends String, ? extends Integer> hashtableWithWildcard;
     Vector<? extends String> vectorWithWildcard;
     Stack<? extends String> stackWithWildcard;
+    Number number;
 }

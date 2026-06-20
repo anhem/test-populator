@@ -151,4 +151,5 @@ public class Fields {
     public Hashtable<? extends String, ? extends Integer> hashtableWithWildcard;
     public Vector<? extends String> vectorWithWildcard;
     public Stack<? extends String> stackWithWildcard;
+    public Number number;
 }

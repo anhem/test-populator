@@ -285,4 +285,6 @@ public interface ImmutablesInterface {
     Vector<? extends String> getVectorWithWildcard();
 
     Stack<? extends String> getStackWithWildcard();
+
+    Number getNumber();
 }

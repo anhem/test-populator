@@ -285,4 +285,6 @@ public abstract class ImmutablesAbstract {
     public abstract Vector<? extends String> getVectorWithWildcard();
 
     public abstract Stack<? extends String> getStackWithWildcard();
+
+    public abstract Number getNumber();
 }

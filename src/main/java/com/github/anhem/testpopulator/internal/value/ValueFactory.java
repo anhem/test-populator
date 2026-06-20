@@ -162,6 +162,7 @@ public class ValueFactory {
         suppliers.put(Inet4Address.class, this::getInet4Address);
         suppliers.put(Inet6Address.class, this::getInet6Address);
         suppliers.put(InetSocketAddress.class, this::getInetSocketAddress);
+        suppliers.put(Number.class, this::getNumber);
         suppliers.putAll(classOverrides);
         return suppliers;
     }
@@ -273,6 +274,10 @@ public class ValueFactory {
 
     private BigInteger getBigInteger() {
         return setRandomValues ? BigInteger.valueOf(getLong()) : BIG_INTEGER;
+    }
+
+    private Number getNumber() {
+        return getInteger();
     }
 
     private LocalTime getLocalTime() {
