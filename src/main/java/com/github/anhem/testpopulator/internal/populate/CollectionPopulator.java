@@ -5,9 +5,7 @@ import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -220,9 +218,18 @@ public class CollectionPopulator implements PopulatingStrategy {
 
     private Object continuePopulateWithType(TypeCarrier typeCarrier, Populator populator) {
         Type type = typeCarrier.getType();
+        if (type instanceof WildcardType) {
+            type = ((WildcardType) type).getUpperBounds()[0];
+        }
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             return populator.populate(typeCarrier.toCollectionCarrier(parameterizedType.getRawType(), parameterizedType.getActualTypeArguments()));
+        }
+        if (type instanceof TypeVariable) {
+            type = Object.class;
+        }
+        if (type instanceof GenericArrayType) {
+            type = ((GenericArrayType) type).getGenericComponentType();
         }
         return populator.populate(typeCarrier.toClassCarrier(type));
     }

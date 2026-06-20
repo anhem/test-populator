@@ -123,5 +123,32 @@ public class Fields {
     private Inet4Address inet4Address;
     private Inet6Address inet6Address;
     private InetSocketAddress inetSocketAddress;
-
+    public Map<String, ? extends Integer> mapWithWildcardValue;
+    public List<? extends Integer> listWithWildcard;
+    public Set<? extends Integer> setWithWildcard;
+    public Map<? extends String, ? extends Integer> mapWithWildcardKeyAndValue;
+    public Queue<? extends String> queueWithWildcard;
+    public Deque<? extends String> dequeWithWildcard;
+    public SortedSet<? extends String> sortedSetWithWildcard;
+    public NavigableSet<? extends String> navigableSetWithWildcard;
+    public SortedMap<? extends String, ? extends Integer> sortedMapWithWildcard;
+    public NavigableMap<? extends String, ? extends Integer> navigableMapWithWildcard;
+    public ConcurrentMap<? extends String, ? extends String> concurrentMapWithWildcard;
+    public ConcurrentNavigableMap<? extends String, ? extends String> concurrentNavigableMapWithWildcard;
+    public ConcurrentSkipListMap<? extends String, ? extends String> concurrentSkipListMapWithWildcard;
+    public CopyOnWriteArrayList<? extends String> copyOnWriteArrayListWithWildcard;
+    public CopyOnWriteArraySet<? extends String> copyOnWriteArraySetWithWildcard;
+    public ConcurrentSkipListSet<? extends String> concurrentSkipListSetWithWildcard;
+    public TreeMap<? extends String, ? extends String> treeMapWithWildcard;
+    public TreeSet<? extends String> treeSetWithWildcard;
+    public ArrayList<? extends String> arrayListWithWildcard;
+    public LinkedList<? extends String> linkedListWithWildcard;
+    public HashMap<? extends String, ? extends String> hashMapWithWildcard;
+    public LinkedHashMap<? extends String, ? extends String> linkedHashMapWithWildcard;
+    public HashSet<? extends String> hashSetWithWildcard;
+    public LinkedHashSet<? extends String> linkedHashSetWithWildcard;
+    public Map.Entry<? extends String, ? extends String> mapEntryWithWildcard;
+    public Hashtable<? extends String, ? extends Integer> hashtableWithWildcard;
+    public Vector<? extends String> vectorWithWildcard;
+    public Stack<? extends String> stackWithWildcard;
 }

@@ -230,4 +230,59 @@ public abstract class ImmutablesAbstract {
 
     public abstract InetSocketAddress getInetSocketAddress();
 
+    public abstract Map<String, ? extends Integer> getMapWithWildcardValue();
+
+    public abstract List<? extends Integer> getListWithWildcard();
+
+    public abstract Set<? extends Integer> getSetWithWildcard();
+
+    public abstract Map<? extends String, ? extends Integer> getMapWithWildcardKeyAndValue();
+
+    public abstract Queue<? extends String> getQueueWithWildcard();
+
+    public abstract Deque<? extends String> getDequeWithWildcard();
+
+    public abstract SortedSet<? extends String> getSortedSetWithWildcard();
+
+    public abstract NavigableSet<? extends String> getNavigableSetWithWildcard();
+
+    public abstract SortedMap<? extends String, ? extends Integer> getSortedMapWithWildcard();
+
+    public abstract NavigableMap<? extends String, ? extends Integer> getNavigableMapWithWildcard();
+
+    public abstract ConcurrentMap<? extends String, ? extends String> getConcurrentMapWithWildcard();
+
+    public abstract ConcurrentNavigableMap<? extends String, ? extends String> getConcurrentNavigableMapWithWildcard();
+
+    public abstract ConcurrentSkipListMap<? extends String, ? extends String> getConcurrentSkipListMapWithWildcard();
+
+    public abstract CopyOnWriteArrayList<? extends String> getCopyOnWriteArrayListWithWildcard();
+
+    public abstract CopyOnWriteArraySet<? extends String> getCopyOnWriteArraySetWithWildcard();
+
+    public abstract ConcurrentSkipListSet<? extends String> getConcurrentSkipListSetWithWildcard();
+
+    public abstract TreeMap<? extends String, ? extends String> getTreeMapWithWildcard();
+
+    public abstract TreeSet<? extends String> getTreeSetWithWildcard();
+
+    public abstract ArrayList<? extends String> getArrayListWithWildcard();
+
+    public abstract LinkedList<? extends String> getLinkedListWithWildcard();
+
+    public abstract HashMap<? extends String, ? extends String> getHashMapWithWildcard();
+
+    public abstract LinkedHashMap<? extends String, ? extends String> getLinkedHashMapWithWildcard();
+
+    public abstract HashSet<? extends String> getHashSetWithWildcard();
+
+    public abstract LinkedHashSet<? extends String> getLinkedHashSetWithWildcard();
+
+    public abstract Map.Entry<? extends String, ? extends String> getMapEntryWithWildcard();
+
+    public abstract Hashtable<? extends String, ? extends Integer> getHashtableWithWildcard();
+
+    public abstract Vector<? extends String> getVectorWithWildcard();
+
+    public abstract Stack<? extends String> getStackWithWildcard();
 }
