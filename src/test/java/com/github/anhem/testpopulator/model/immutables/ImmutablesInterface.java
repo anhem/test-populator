@@ -230,67 +230,6 @@ public interface ImmutablesInterface {
 
     InetSocketAddress getInetSocketAddress();
 
-    Map<String, ? extends Integer> getMapWithWildcardValue();
-
-    List<? extends Integer> getListWithWildcard();
-
-    Set<? extends Integer> getSetWithWildcard();
-
-    Map<? extends String, ? extends Integer> getMapWithWildcardKeyAndValue();
-
-    Queue<? extends String> getQueueWithWildcard();
-
-    Deque<? extends String> getDequeWithWildcard();
-
-    SortedSet<? extends String> getSortedSetWithWildcard();
-
-    NavigableSet<? extends String> getNavigableSetWithWildcard();
-
-    SortedMap<? extends String, ? extends Integer> getSortedMapWithWildcard();
-
-    NavigableMap<? extends String, ? extends Integer> getNavigableMapWithWildcard();
-
-    ConcurrentMap<? extends String, ? extends String> getConcurrentMapWithWildcard();
-
-    ConcurrentNavigableMap<? extends String, ? extends String> getConcurrentNavigableMapWithWildcard();
-
-    ConcurrentSkipListMap<? extends String, ? extends String> getConcurrentSkipListMapWithWildcard();
-
-    CopyOnWriteArrayList<? extends String> getCopyOnWriteArrayListWithWildcard();
-
-    CopyOnWriteArraySet<? extends String> getCopyOnWriteArraySetWithWildcard();
-
-    ConcurrentSkipListSet<? extends String> getConcurrentSkipListSetWithWildcard();
-
-    TreeMap<? extends String, ? extends String> getTreeMapWithWildcard();
-
-    TreeSet<? extends String> getTreeSetWithWildcard();
-
-    ArrayList<? extends String> getArrayListWithWildcard();
-
-    LinkedList<? extends String> getLinkedListWithWildcard();
-
-    HashMap<? extends String, ? extends String> getHashMapWithWildcard();
-
-    LinkedHashMap<? extends String, ? extends String> getLinkedHashMapWithWildcard();
-
-    HashSet<? extends String> getHashSetWithWildcard();
-
-    LinkedHashSet<? extends String> getLinkedHashSetWithWildcard();
-
-    Map.Entry<? extends String, ? extends String> getMapEntryWithWildcard();
-
-    Hashtable<? extends String, ? extends Integer> getHashtableWithWildcard();
-
-    Vector<? extends String> getVectorWithWildcard();
-
-    Stack<? extends String> getStackWithWildcard();
-
     Number getNumber();
 
-    Set<?> getSetWithUnboundWildcard();
-
-    List<?> getListWithUnboundWildcard();
-
-    Map<?, ?> getMapWithUnboundWildcard();
 }
