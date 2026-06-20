@@ -13,7 +13,7 @@ class DiverseJavaTypesTest {
 
     @Test
     void setterStrategy() {
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setterStrategy()
                 .and()
                 .objectFactory(true)
@@ -24,7 +24,7 @@ class DiverseJavaTypesTest {
 
     @Test
     void constructorStrategy() {
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .constructorStrategy()
                 .and()
                 .objectFactory(true)
@@ -35,7 +35,7 @@ class DiverseJavaTypesTest {
 
     @Test
     void fieldStrategy() {
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .fieldStrategy()
                 .and()
                 .build();
@@ -44,7 +44,7 @@ class DiverseJavaTypesTest {
 
     @Test
     void mutatorStrategy() {
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .mutatorStrategy()
                 .and()
                 .objectFactory(true)
@@ -54,7 +54,7 @@ class DiverseJavaTypesTest {
 
     @Test
     void staticMethodStrategy() {
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .staticMethodStrategy()
                 .and()
                 .objectFactory(true)

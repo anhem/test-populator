@@ -42,7 +42,7 @@ public class FieldPopulator implements PopulatingStrategy {
                         CollectionCarrier<Object> collectionCarrier = classCarrier.toCollectionCarrier(
                                 field.getType(),
                                 field.getName(),
-                                toArgumentTypes(field.getGenericType(), field.getType()).toArray(new Type[0])
+                                toArgumentTypes(field.getGenericType(), field.getType(), classCarrier.getPopulateConfig().getWildcardFallbackType()).toArray(new Type[0])
                         );
                         field.set(objectOfClass, populator.populate(collectionCarrier));
                     } else {

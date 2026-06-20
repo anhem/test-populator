@@ -155,4 +155,7 @@ public class LombokImmutable {
     Vector<? extends String> vectorWithWildcard;
     Stack<? extends String> stackWithWildcard;
     Number number;
+    Set<?> setWithUnboundWildcard;
+    List<?> listWithUnboundWildcard;
+    Map<?, ?> mapWithUnboundWildcard;
 }

@@ -287,4 +287,10 @@ public interface ImmutablesInterface {
     Stack<? extends String> getStackWithWildcard();
 
     Number getNumber();
+
+    Set<?> getSetWithUnboundWildcard();
+
+    List<?> getListWithUnboundWildcard();
+
+    Map<?, ?> getMapWithUnboundWildcard();
 }

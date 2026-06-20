@@ -21,7 +21,7 @@ class ArrayPopulatorTest {
     @BeforeEach
     void setUp() {
         arrayPopulator = new ArrayPopulator();
-        PopulateConfig config = PopulateConfig.builder().build();
+        PopulateConfig config = PopulateConfig.builder().wildcardFallbackType(String.class).build();
         ValueFactory valueFactory = new ValueFactory(
                 config.isRandomValues(),
                 config.getClassOverrides(),
@@ -34,7 +34,7 @@ class ArrayPopulatorTest {
     @Test
     void populateWithClassCarrier() {
         Class<String[]> clazz = String[].class;
-        ClassCarrier<String[]> classCarrier = new ClassCarrier<>(clazz, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build());
+        ClassCarrier<String[]> classCarrier = new ClassCarrier<>(clazz, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().wildcardFallbackType(String.class).build());
 
         String[] result = arrayPopulator.populate(classCarrier, populator);
 
@@ -47,7 +47,7 @@ class ArrayPopulatorTest {
     void populateWithCollectionCarrier() {
         Class<String[]> clazz = String[].class;
         Type[] typeArguments = new Type[]{String.class};
-        CollectionCarrier<String[]> collectionCarrier = new CollectionCarrier<>(clazz, typeArguments, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build());
+        CollectionCarrier<String[]> collectionCarrier = new CollectionCarrier<>(clazz, typeArguments, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().wildcardFallbackType(String.class).build());
 
         String[] result = arrayPopulator.populate(collectionCarrier, populator);
 
@@ -59,7 +59,7 @@ class ArrayPopulatorTest {
     @Test
     void populateWithPrimitiveArray() {
         Class<int[]> clazz = int[].class;
-        ClassCarrier<int[]> classCarrier = new ClassCarrier<>(clazz, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build());
+        ClassCarrier<int[]> classCarrier = new ClassCarrier<>(clazz, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().wildcardFallbackType(String.class).build());
 
         int[] result = arrayPopulator.populate(classCarrier, populator);
 

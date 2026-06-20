@@ -84,6 +84,7 @@ public class ValueFormatter {
         javaStringSuppliers.put(InetSocketAddress.class, object -> String.format("new InetSocketAddress(toInetAddress(\"%s\"), %d)", ((InetSocketAddress) object).getAddress().getHostAddress(), ((InetSocketAddress) object).getPort()));
         javaStringSuppliers.put(CharSequence.class, object -> String.format("\"%s\"", object));
         javaStringSuppliers.put(Class.class, object -> String.format("%s.class", ((Class<?>) object).getName()));
+        javaStringSuppliers.put(Object.class, object -> "new java.lang.Object()");
         javaStringSuppliers.put(ObjectException.class, object -> String.format("new ObjectException(\"%s\")", ((ObjectException) object).getMessage()));
         javaStringSuppliers.put(Enum.class, object -> String.format("%s.%s", object.getClass().getSimpleName(), object));
         javaStringSuppliers.put(byte[].class, object -> String.format("new byte[]{%s}", formatBytes((byte[]) object)));

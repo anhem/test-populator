@@ -21,7 +21,7 @@ class StrategyOrderTest {
         // OrderSensitiveClass has a constructor that takes 'Unpopulatable', which has no concrete implementation.
         // The populator will choose the CONSTRUCTOR strategy, try to populate its arguments, and fail.
 
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .reorderStrategies(Strategy.CONSTRUCTOR, Strategy.SETTER)
                 .build();
 
@@ -40,7 +40,7 @@ class StrategyOrderTest {
         // and setters. Since the no-arg constructor does not require 'Unpopulatable',
         // the population succeeds.
 
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .reorderStrategies(Strategy.SETTER, Strategy.CONSTRUCTOR)
                 .build();
 

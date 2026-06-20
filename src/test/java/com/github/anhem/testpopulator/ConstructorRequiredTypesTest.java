@@ -12,7 +12,7 @@ class ConstructorRequiredTypesTest {
 
     @Test
     void canPopulateConstructorRequiredTypes() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);

@@ -287,4 +287,10 @@ public abstract class ImmutablesAbstract {
     public abstract Stack<? extends String> getStackWithWildcard();
 
     public abstract Number getNumber();
+
+    public abstract Set<?> getSetWithUnboundWildcard();
+
+    public abstract List<?> getListWithUnboundWildcard();
+
+    public abstract Map<?, ?> getMapWithUnboundWildcard();
 }

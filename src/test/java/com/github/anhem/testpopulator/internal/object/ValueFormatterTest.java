@@ -57,8 +57,8 @@ class ValueFormatterTest {
 
     @Test
     void returnsNullForUnknownType() {
-        assertThat(ValueFormatter.format(new Object(), Object.class, Language.JAVA)).isNull();
-        assertThat(ValueFormatter.format(new Object(), Object.class, Language.KOTLIN)).isNull();
+        assertThat(ValueFormatter.format(new Object(), Object.class, Language.JAVA)).isEqualTo("new java.lang.Object()");
+        assertThat(ValueFormatter.format(new Object(), Object.class, Language.KOTLIN)).isEqualTo("new java.lang.Object()");
     }
     
     @Test

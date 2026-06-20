@@ -220,6 +220,9 @@ public class CollectionPopulator implements PopulatingStrategy {
         Type type = typeCarrier.getType();
         if (type instanceof WildcardType) {
             type = ((WildcardType) type).getUpperBounds()[0];
+            if (type.equals(Object.class)) {
+                type = typeCarrier.getPopulateConfig().getWildcardFallbackType();
+            }
         }
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;

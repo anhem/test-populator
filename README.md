@@ -110,6 +110,8 @@ MyClass{
 
 * **Automatic Object Population**: Instantly create fully-populated, complex Java objects with a single line of code.
 * **Broad Java Compatibility**: Rigorously tested on **Java 11, 17, 21, and 25**.
+* **Deep Type Support**: Automatically handles complex parameterized types including unbound wildcards (`List<?>`, `Set<?>`, `Map<?, ?>`), as well as
+  core Java abstractions like `Number`.
 * **Multiple Creation Strategies**: Intelligently creates objects using a configurable chain of strategies (constructor, setters, builders, etc.) to
   handle almost any class design.
 * **Highly Configurable**: Tailor the object creation logic to your exact needs. You can generate random or fixed (deterministic) data, provide custom

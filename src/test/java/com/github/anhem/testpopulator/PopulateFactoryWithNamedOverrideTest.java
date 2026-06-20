@@ -10,7 +10,7 @@ class PopulateFactoryWithNamedOverrideTest {
 
     @Test
     void nameOverrideWithTypeMismatchIsIgnoredAndFallsBackToDefault() {
-        PopulateConfig config = PopulateConfig.builder()
+        PopulateConfig config = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride("setStringValue", Integer.class, () -> 123)
                 .build();
         PopulateFactory factory = new PopulateFactory(config);
@@ -23,7 +23,7 @@ class PopulateFactoryWithNamedOverrideTest {
     @Test
     void nameOverrideWithTypeMismatchFallsBackToClassOverride() {
         String classOverrideValue = "classOverride";
-        PopulateConfig config = PopulateConfig.builder()
+        PopulateConfig config = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride("setStringValue", Integer.class, () -> 123)
                 .addOverride(String.class, () -> classOverrideValue)
                 .build();
@@ -36,7 +36,7 @@ class PopulateFactoryWithNamedOverrideTest {
 
     @Test
     void nameOverrideWithKotlinSupportEnabled() {
-        PopulateConfig config = PopulateConfig.builder()
+        PopulateConfig config = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .kotlinSupport(true)
                 .and()
                 .addOverride("setStringValue", String.class, () -> "overridden")

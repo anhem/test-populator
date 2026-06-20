@@ -22,7 +22,7 @@ class PopulateFactoryWithClassOverrideTest {
 
     @BeforeEach
     void setUp() {
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(MyUUID.class, new MyUUIDOverridePopulate())
                 .addOverride(Integer.class, () -> -1)
                 .addOverride(ZonedDateTime.class, ZonedDateTime::now)

@@ -156,4 +156,7 @@ public abstract class AllArgsConstructorAbstract {
     private final Vector<? extends String> vectorWithWildcard;
     private final Stack<? extends String> stackWithWildcard;
     private final Number number;
+    private final Set<?> setWithUnboundWildcard;
+    private final List<?> listWithUnboundWildcard;
+    private final Map<?, ?> mapWithUnboundWildcard;
 }

@@ -83,7 +83,7 @@ public class ClassCarrier<T> extends Carrier {
         return new CollectionCarrier<>(
                 (Class<V>) parameter.getType(),
                 name,
-                toArgumentTypes(parameter).toArray(new Type[0]),
+                toArgumentTypes(parameter, populateConfig.getWildcardFallbackType()).toArray(new Type[0]),
                 objectFactory,
                 visited,
                 populateConfig
@@ -95,7 +95,7 @@ public class ClassCarrier<T> extends Carrier {
         return new CollectionCarrier<>(
                 clazz,
                 name,
-                toArgumentTypes(null, clazz).toArray(new Type[0]),
+                toArgumentTypes(null, clazz, populateConfig.getWildcardFallbackType()).toArray(new Type[0]),
                 objectFactory,
                 visited,
                 populateConfig

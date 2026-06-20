@@ -158,6 +158,9 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
             Vector<? extends String> vectorWithWildcard,
             Stack<? extends String> stackWithWildcard,
             Number number,
+            Set<?> setWithUnboundWildcard,
+            List<?> listWithUnboundWildcard,
+            Map<?, ?> mapWithUnboundWildcard,
             String anotherString
     ) {
         super(
@@ -295,7 +298,10 @@ public class AllArgsConstructorExtendsAllArgsConstructorAbstract extends AllArgs
                 hashtableWithWildcard,
                 vectorWithWildcard,
                 stackWithWildcard,
-                number
+                number,
+                setWithUnboundWildcard,
+                listWithUnboundWildcard,
+                mapWithUnboundWildcard
         );
         this.anotherString = anotherString;
     }

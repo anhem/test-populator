@@ -26,7 +26,7 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
 
     @BeforeEach
     void setUp() {
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .constructorStrategy()
                 .and()
                 .objectFactory(true)

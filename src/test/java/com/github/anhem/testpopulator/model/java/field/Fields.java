@@ -152,4 +152,7 @@ public class Fields {
     public Vector<? extends String> vectorWithWildcard;
     public Stack<? extends String> stackWithWildcard;
     public Number number;
+    public Set<?> setWithUnboundWildcard;
+    public List<?> listWithUnboundWildcard;
+    public Map<?, ?> mapWithUnboundWildcard;
 }

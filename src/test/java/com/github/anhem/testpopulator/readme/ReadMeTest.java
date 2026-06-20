@@ -45,7 +45,7 @@ class ReadMeTest {
     void exceptionIsThrownWhenObjectFactoryIsEnabledAndTypeSupplierImplementationDoesNotImplementCreateString() {
         OverridePopulate<MyUUID> myUUIDOverridePopulate = () -> new MyUUID(UUID.randomUUID().toString());
         PopulateFactory populateFactory = new PopulateFactory(
-                PopulateConfig.builder()
+                PopulateConfig.builder().wildcardFallbackType(String.class)
                         .addOverride(MyUUID.class, myUUIDOverridePopulate)
                         .objectFactory(true)
                         .build()

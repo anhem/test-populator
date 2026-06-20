@@ -21,7 +21,7 @@ class PopulateFactoryWithOverridesTest {
     void localOverrideTakesPrecedenceOverGlobalConfig() {
         String globalValue = "global";
         String localValue = "local";
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(String.class, () -> globalValue)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
@@ -35,7 +35,7 @@ class PopulateFactoryWithOverridesTest {
     void globalAndOverridesAreMerged() {
         String globalString = "globalString";
         Integer localInteger = 999;
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(String.class, () -> globalString)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
@@ -57,7 +57,7 @@ class PopulateFactoryWithOverridesTest {
     @Test
     void localOverridesWorkWithObjectFactory() {
         MyUUID localValue = new MyUUID(UUID.randomUUID().toString());
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
@@ -84,7 +84,7 @@ class PopulateFactoryWithOverridesTest {
 
     @Test
     void multipleOverrides() {
-        PopulateConfig populateConfig = PopulateConfig.builder().build();
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class).build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);
 
         String localString = "localString";
@@ -129,7 +129,7 @@ class PopulateFactoryWithOverridesTest {
 
     @Test
     void pojoWithKotlinSupportEnabled() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .kotlinSupport(true)
                 .build();
         PopulateFactory populateFactory = new PopulateFactory(populateConfig);

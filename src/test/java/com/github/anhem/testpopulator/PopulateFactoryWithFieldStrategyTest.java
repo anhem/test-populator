@@ -32,7 +32,7 @@ class PopulateFactoryWithFieldStrategyTest {
 
     @BeforeEach
     void setUp() {
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .fieldStrategy()
                 .and()
                 .objectFactory(true)

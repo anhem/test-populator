@@ -24,14 +24,20 @@ public class PopulateUtil {
     private PopulateUtil() {
     }
 
-    public static List<Type> toArgumentTypes(Parameter parameter) {
-        return toArgumentTypes(parameter.getParameterizedType(), parameter.getType());
+    public static List<Type> toArgumentTypes(Parameter parameter, Class<?> wildcardFallbackType) {
+        return toArgumentTypes(parameter.getParameterizedType(), parameter.getType(), wildcardFallbackType);
     }
 
-    public static List<Type> toArgumentTypes(Type type, Class<?> clazz) {
+    public static List<Type> toArgumentTypes(Type type, Class<?> clazz, Class<?> wildcardFallbackType) {
         if (type instanceof ParameterizedType) {
             return Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
-                    .map(t -> t instanceof WildcardType ? ((WildcardType) t).getUpperBounds()[0] : t)
+                    .map(t -> {
+                        if (t instanceof WildcardType) {
+                            Type upperBound = ((WildcardType) t).getUpperBounds()[0];
+                            return upperBound.equals(Object.class) ? wildcardFallbackType : upperBound;
+                        }
+                        return t;
+                    })
                     .collect(Collectors.toList());
         }
         if (type instanceof GenericArrayType) {

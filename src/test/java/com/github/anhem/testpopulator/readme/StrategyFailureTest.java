@@ -25,7 +25,7 @@ class StrategyFailureTest {
         // If only the SETTER strategy is used, File will fail to populate,
         // causing the overall MyNestedConstructorClass population to fail.
 
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .reorderStrategies(Strategy.SETTER) // Only try SETTER strategy
                 .build();
 
@@ -45,7 +45,7 @@ class StrategyFailureTest {
         // If only the SETTER strategy is used, HttpClient will fail to populate,
         // causing the overall MyNestedStaticMethodClass population to fail.
 
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .reorderStrategies(Strategy.SETTER) // Only try SETTER strategy
                 .build();
 

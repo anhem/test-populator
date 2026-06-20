@@ -33,7 +33,7 @@ class PopulateFactoryWithSetterStrategyTest {
 
     @BeforeEach
     void setUp() {
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setterStrategy()
                 .and()
                 .objectFactory(true)

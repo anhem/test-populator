@@ -45,7 +45,7 @@ public class CollectionCarrier<T> extends ClassCarrier<T> {
             PopulateConfig populateConfig
     ) {
         super(clazz, parameter.getName(), objectFactory, visited, populateConfig);
-        this.argumentTypes = toArgumentTypes(parameter);
+        this.argumentTypes = toArgumentTypes(parameter, populateConfig.getWildcardFallbackType());
     }
 
     public List<Type> getArgumentTypes() {

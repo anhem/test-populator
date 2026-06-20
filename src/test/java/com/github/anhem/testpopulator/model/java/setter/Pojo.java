@@ -159,4 +159,7 @@ public class Pojo {
     private Vector<? extends String> vectorWithWildcard;
     private Stack<? extends String> stackWithWildcard;
     private Number number;
+    private Set<?> setWithUnboundWildcard;
+    private List<?> listWithUnboundWildcard;
+    private Map<?, ?> mapWithUnboundWildcard;
 }
