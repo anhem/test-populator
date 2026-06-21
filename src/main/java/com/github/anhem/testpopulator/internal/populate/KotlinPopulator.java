@@ -5,6 +5,7 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_POPULATE_KOTLIN_TYPE;
@@ -31,6 +32,23 @@ public class KotlinPopulator implements PopulatingStrategy {
                             .map(parameter -> {
                                 return populator.populate(classCarrier.createChild(parameter));
                             }).toArray());
+                }
+            }
+            if (isKotlinValueClass(clazz)) {
+                Method valueClassConstructor = getKotlinValueClassConstructor(clazz);
+                if (valueClassConstructor != null) {
+                    classCarrier.getObjectFactory().staticMethod(clazz, valueClassConstructor.getName(), valueClassConstructor.getParameters().length);
+                    return (T) valueClassConstructor.invoke(null, Stream.of(valueClassConstructor.getParameters())
+                            .map(parameter -> {
+                                return populator.populate(classCarrier.createChild(parameter));
+                            }).toArray());
+                }
+            }
+            if (isKotlinSealedClass(clazz)) {
+                List<Class<?>> sealedSubclasses = getKotlinSealedSubclasses(clazz);
+                if (!sealedSubclasses.isEmpty()) {
+                    Class<?> subclass = sealedSubclasses.get(0);
+                    return (T) populator.populate(classCarrier.createChild(subclass));
                 }
             }
         } catch (Exception e) {

@@ -1,10 +1,7 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.model.java.setter.Pojo;
-import com.github.anhem.testpopulator.model.kotlin.KotlinLikeClass;
-import com.github.anhem.testpopulator.model.kotlin.KotlinLikeSingleton;
-import com.github.anhem.testpopulator.model.kotlin.KotlinLikeWithCompanion;
-import com.github.anhem.testpopulator.model.kotlin.KotlinLikeWithDelegate;
+import com.github.anhem.testpopulator.model.kotlin.*;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -67,5 +64,66 @@ class KotlinUtilTest {
     @Test
     void getCompanionObjectReturnsNull() {
         assertThat(getCompanionObject(Pojo.class)).isNull();
+    }
+
+    @Test
+    void isKotlinSpecialTypeReturnsTrueForSpecialTypes() {
+        assertThat(isKotlinSpecialType(KotlinLikeSingleton.class, true)).isTrue();
+        assertThat(isKotlinSpecialType(KotlinLikeWithCompanion.class, true)).isTrue();
+        assertThat(isKotlinSpecialType(KotlinLikeValueClass.class, true)).isTrue();
+        assertThat(isKotlinSpecialType(KotlinLikeSealedClass.class, true)).isTrue();
+    }
+
+    @Test
+    void isKotlinSpecialTypeReturnsFalseForRegularClasses() {
+        assertThat(isKotlinSpecialType(Pojo.class, true)).isFalse();
+        assertThat(isKotlinSpecialType(KotlinLikeClass.class, true)).isFalse();
+    }
+
+    @Test
+    void isKotlinSpecialTypeReturnsFalseWhenKotlinSupportDisabled() {
+        assertThat(isKotlinSpecialType(KotlinLikeSingleton.class, false)).isFalse();
+    }
+
+    @Test
+    void isKotlinValueClassReturnsTrue() {
+        assertThat(isKotlinValueClass(KotlinLikeValueClass.class)).isTrue();
+    }
+
+    @Test
+    void isKotlinValueClassReturnsFalse() {
+        assertThat(isKotlinValueClass(Pojo.class)).isFalse();
+    }
+
+    @Test
+    void getKotlinValueClassConstructorReturnsConstructor() {
+        assertThat(getKotlinValueClassConstructor(KotlinLikeValueClass.class)).isNotNull();
+    }
+
+    @Test
+    void getKotlinValueClassConstructorReturnsNull() {
+        assertThat(getKotlinValueClassConstructor(Pojo.class)).isNull();
+    }
+
+    @Test
+    void isKotlinSealedClassReturnsTrue() {
+        assertThat(isKotlinSealedClass(KotlinLikeSealedClass.class)).isTrue();
+    }
+
+    @Test
+    void isKotlinSealedClassReturnsFalse() {
+        assertThat(isKotlinSealedClass(Pojo.class)).isFalse();
+        assertThat(isKotlinSealedClass(KotlinLikeSealedClass.SubClassA.class)).isFalse();
+    }
+
+    @Test
+    void getKotlinSealedSubclassesReturnsSubclasses() {
+        assertThat(getKotlinSealedSubclasses(KotlinLikeSealedClass.class)).isNotEmpty();
+        assertThat(getKotlinSealedSubclasses(KotlinLikeSealedClass.class)).contains(KotlinLikeSealedClass.SubClassA.class, KotlinLikeSealedClass.SubClassB.class);
+    }
+
+    @Test
+    void getKotlinSealedSubclassesReturnsEmptyList() {
+        assertThat(getKotlinSealedSubclasses(Pojo.class)).isEmpty();
     }
 }
