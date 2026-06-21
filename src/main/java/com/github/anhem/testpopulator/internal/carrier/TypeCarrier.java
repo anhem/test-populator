@@ -7,6 +7,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+
 public class TypeCarrier extends Carrier {
 
     private final Type type;
@@ -31,7 +34,7 @@ public class TypeCarrier extends Carrier {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> ClassCarrier<T> toClassCarrier(Type type) {
-        return new ClassCarrier<>((Class<T>) type, name, objectFactory, new ArrayList<>(visited), populateConfig);
+    public <T> ClassCarrier<T> createChild(Type type) {
+        return new ClassCarrier<>((Class<T>) type, name, objectFactory, new ArrayList<>(visited), populateConfig, emptyMap(), emptyList());
     }
 }

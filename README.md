@@ -110,6 +110,12 @@ MyClass{
 
 * **Automatic Object Population**: Instantly create fully-populated, complex Java objects with a single line of code.
 * **Broad Java Compatibility**: Rigorously tested on **Java 11, 17, 21, and 25**.
+* **Deep Type Support**: Automatically resolves generic type arguments down the object graph (e.g., properly populating custom nested generics like
+  `Pair<String, Integer>` without type erasure), and handles complex parameterized types including unbound wildcards (`List<?>`, `Set<?>`,
+  `Map<?, ?>`).
+  *Note: By default, unbound wildcards are populated with `String` rather than `Object`. This guarantees that generated dummy data works seamlessly
+  with recursive value-based equality assertions (`equals()`/`hashCode()`) and is easier to read in debugger views. You can override this
+  via `PopulateConfig.builder().wildcardFallbackType(...)`.*
 * **Multiple Creation Strategies**: Intelligently creates objects using a configurable chain of strategies (constructor, setters, builders, etc.) to
   handle almost any class design.
 * **Highly Configurable**: Tailor the object creation logic to your exact needs. You can generate random or fixed (deterministic) data, provide custom

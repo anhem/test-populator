@@ -23,6 +23,9 @@ public class ValueFormatter {
     }
 
     static {
+        stringSuppliers.put(Class.class, object -> String.format("%s.class", ((Class<?>) object).getSimpleName()));
+        stringSuppliers.put(Object.class, object -> "new Object()");
+        stringSuppliers.put(Number.class, Object::toString);
         stringSuppliers.put(Integer.class, Object::toString);
         stringSuppliers.put(int.class, Object::toString);
         stringSuppliers.put(Long.class, object -> object + "L");

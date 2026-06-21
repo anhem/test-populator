@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_POPULATE_KOTLIN_TYPE;
 import static com.github.anhem.testpopulator.internal.util.KotlinUtil.*;
-import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isCollectionLike;
 import static java.lang.String.format;
 
 public class KotlinPopulator implements PopulatingStrategy {
@@ -30,11 +29,7 @@ public class KotlinPopulator implements PopulatingStrategy {
                     classCarrier.getObjectFactory().staticMethod(clazz, getCompanionMethodName(companionMethod), companionMethod.getParameters().length);
                     return (T) companionMethod.invoke(companionObject, Stream.of(companionMethod.getParameters())
                             .map(parameter -> {
-                                if (isCollectionLike(parameter.getType())) {
-                                    return populator.populate(classCarrier.toCollectionCarrier(parameter));
-                                } else {
-                                    return populator.populate(classCarrier.toClassCarrier(parameter));
-                                }
+                                return populator.populate(classCarrier.createChild(parameter));
                             }).toArray());
                 }
             }

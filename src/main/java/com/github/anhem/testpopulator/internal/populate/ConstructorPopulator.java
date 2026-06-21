@@ -15,7 +15,8 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isKotlinConstructor;
-import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.getLargestConstructor;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.setAccessible;
 import static java.lang.String.format;
 
 public class ConstructorPopulator implements PopulatingStrategy {
@@ -56,11 +57,7 @@ public class ConstructorPopulator implements PopulatingStrategy {
 
     private <T> Object populateArgument(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator, int i) {
         Parameter parameter = constructor.getParameters()[i];
-        if (isCollectionLike(parameter.getType())) {
-            return populator.populate(classCarrier.toCollectionCarrier(parameter));
-        } else {
-            return populator.populate(classCarrier.toClassCarrier(parameter));
-        }
+        return populator.populate(classCarrier.createChild(parameter));
     }
 
     private <T> Object[] populateKotlinArguments(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator) {
