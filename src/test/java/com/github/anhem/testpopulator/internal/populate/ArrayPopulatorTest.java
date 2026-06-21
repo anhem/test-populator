@@ -33,7 +33,7 @@ class ArrayPopulatorTest {
     @Test
     void populateWithClassCarrier() {
         Class<String[]> clazz = String[].class;
-        ClassCarrier<String[]> classCarrier = new ClassCarrier<>(clazz, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build());
+        ClassCarrier<String[]> classCarrier = new ClassCarrier<>(clazz, null, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build(), Collections.emptyMap(), Collections.emptyList());
 
         String[] result = arrayPopulator.populate(classCarrier, populator);
 
@@ -58,7 +58,7 @@ class ArrayPopulatorTest {
     @Test
     void populateWithPrimitiveArray() {
         Class<int[]> clazz = int[].class;
-        ClassCarrier<int[]> classCarrier = new ClassCarrier<>(clazz, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build());
+        ClassCarrier<int[]> classCarrier = new ClassCarrier<>(clazz, null, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build(), Collections.emptyMap(), Collections.emptyList());
 
         int[] result = arrayPopulator.populate(classCarrier, populator);
 

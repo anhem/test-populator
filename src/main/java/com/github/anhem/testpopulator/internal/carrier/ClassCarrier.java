@@ -12,7 +12,6 @@ import java.util.Map;
 
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 public class ClassCarrier<T> extends Carrier {
 
@@ -20,36 +19,6 @@ public class ClassCarrier<T> extends Carrier {
     private final String name;
     private final Map<String, Type> typeVariables;
     private final List<Type> argumentTypes;
-
-    public ClassCarrier(
-            Class<T> clazz,
-            ObjectFactory objectFactory,
-            List<String> visited,
-            PopulateConfig populateConfig
-    ) {
-        this(clazz, null, objectFactory, visited, populateConfig, emptyMap());
-    }
-
-    public ClassCarrier(
-            Class<T> clazz,
-            String name,
-            ObjectFactory objectFactory,
-            List<String> visited,
-            PopulateConfig populateConfig
-    ) {
-        this(clazz, name, objectFactory, visited, populateConfig, emptyMap());
-    }
-
-    public ClassCarrier(
-            Class<T> clazz,
-            String name,
-            ObjectFactory objectFactory,
-            List<String> visited,
-            PopulateConfig populateConfig,
-            Map<String, Type> typeVariables
-    ) {
-        this(clazz, name, objectFactory, visited, populateConfig, typeVariables, emptyList());
-    }
 
     public ClassCarrier(
             Class<T> clazz,
@@ -84,11 +53,11 @@ public class ClassCarrier<T> extends Carrier {
     }
 
     public <V> ClassCarrier<V> createChild(Class<V> clazz) {
-        return new ClassCarrier<>(clazz, name, objectFactory, new ArrayList<>(visited), populateConfig, typeVariables);
+        return new ClassCarrier<>(clazz, name, objectFactory, new ArrayList<>(visited), populateConfig, typeVariables, emptyList());
     }
 
     public <V> ClassCarrier<V> createChild(Class<V> clazz, String name) {
-        return new ClassCarrier<>(clazz, name, objectFactory, new ArrayList<>(visited), populateConfig, typeVariables);
+        return new ClassCarrier<>(clazz, name, objectFactory, new ArrayList<>(visited), populateConfig, typeVariables, emptyList());
     }
 
     @SuppressWarnings("unchecked")

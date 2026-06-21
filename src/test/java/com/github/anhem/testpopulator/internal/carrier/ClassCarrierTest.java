@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ClassCarrierTest {
@@ -22,12 +24,12 @@ class ClassCarrierTest {
 
     @Test
     void hasConstructorsReturnsTrue() {
-        assertThat(new ClassCarrier<>(HashMap.class, "test", new ObjectFactoryVoid(), new ArrayList<>(), CONFIG_NULL_ON_CIRCULAR).hasConstructors()).isTrue();
+        assertThat(new ClassCarrier<>(HashMap.class, "test", new ObjectFactoryVoid(), new ArrayList<>(), CONFIG_NULL_ON_CIRCULAR, emptyMap(), emptyList()).hasConstructors()).isTrue();
     }
 
     @Test
     void hasConstructorsReturnsFalse() {
-        assertThat(new ClassCarrier<>(Map.class, "test", new ObjectFactoryVoid(), new ArrayList<>(), CONFIG_NULL_ON_CIRCULAR).hasConstructors()).isFalse();
+        assertThat(new ClassCarrier<>(Map.class, "test", new ObjectFactoryVoid(), new ArrayList<>(), CONFIG_NULL_ON_CIRCULAR, emptyMap(), emptyList()).hasConstructors()).isFalse();
     }
 
     @Test

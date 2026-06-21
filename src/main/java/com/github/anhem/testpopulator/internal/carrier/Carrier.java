@@ -7,6 +7,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+
 public abstract class Carrier {
 
     protected final ObjectFactory objectFactory;
@@ -14,7 +17,7 @@ public abstract class Carrier {
     protected final PopulateConfig populateConfig;
 
     public static <T> ClassCarrier<T> initialize(Class<T> clazz, ObjectFactory objectFactory, PopulateConfig populateConfig) {
-        return new ClassCarrier<>(clazz, objectFactory, new ArrayList<>(), populateConfig);
+        return new ClassCarrier<>(clazz, null, objectFactory, new ArrayList<>(), populateConfig, emptyMap(), emptyList());
     }
 
     protected Carrier(ObjectFactory objectFactory, List<String> visited, PopulateConfig populateConfig) {
@@ -33,11 +36,11 @@ public abstract class Carrier {
 
     @SuppressWarnings("unchecked")
     public <T> ClassCarrier<T> createChild(Type type, Type[] typeArguments) {
-        return new ClassCarrier<>((Class<T>) type, null, objectFactory, visited, populateConfig, java.util.Collections.emptyMap(), java.util.Arrays.asList(typeArguments));
+        return new ClassCarrier<>((Class<T>) type, null, objectFactory, visited, populateConfig, emptyMap(), java.util.Arrays.asList(typeArguments));
     }
 
     @SuppressWarnings("unchecked")
     public <T> ClassCarrier<T> createChild(Type type, String name, Type[] typeArguments) {
-        return new ClassCarrier<>((Class<T>) type, name, objectFactory, visited, populateConfig, java.util.Collections.emptyMap(), java.util.Arrays.asList(typeArguments));
+        return new ClassCarrier<>((Class<T>) type, name, objectFactory, visited, populateConfig, emptyMap(), java.util.Arrays.asList(typeArguments));
     }
 }

@@ -1,5 +1,6 @@
 package com.github.anhem.testpopulator.internal.util;
 
+import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
@@ -26,6 +27,8 @@ import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.testutil.FieldTestUtil.getField;
 import static com.github.anhem.testpopulator.testutil.MethodTestUtil.getMethod;
 import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEFAULT_POPULATE_CONFIG;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateUtilTest {
@@ -207,7 +210,7 @@ class PopulateUtilTest {
     }
 
     private static <T> ClassCarrier<T> createClassCarrier(Class<T> clazz) {
-        return new ClassCarrier<>(clazz, "dummy", new ObjectFactoryVoid(), new java.util.ArrayList<>(), com.github.anhem.testpopulator.config.PopulateConfig.builder().build(), java.util.Collections.emptyMap());
+        return new ClassCarrier<>(clazz, "dummy", new ObjectFactoryVoid(), new java.util.ArrayList<>(), PopulateConfig.builder().build(), emptyMap(), emptyList());
     }
 
     private static Method getArbitraryMethod() {
