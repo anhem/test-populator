@@ -126,5 +126,36 @@ public class LombokImmutable {
     Inet4Address inet4Address;
     Inet6Address inet6Address;
     InetSocketAddress inetSocketAddress;
-
+    Map<String, ? extends Integer> mapWithWildcardValue;
+    List<? extends Integer> listWithWildcard;
+    Set<? extends Integer> setWithWildcard;
+    Map<? extends String, ? extends Integer> mapWithWildcardKeyAndValue;
+    Queue<? extends String> queueWithWildcard;
+    Deque<? extends String> dequeWithWildcard;
+    SortedSet<? extends String> sortedSetWithWildcard;
+    NavigableSet<? extends String> navigableSetWithWildcard;
+    SortedMap<? extends String, ? extends Integer> sortedMapWithWildcard;
+    NavigableMap<? extends String, ? extends Integer> navigableMapWithWildcard;
+    ConcurrentMap<? extends String, ? extends String> concurrentMapWithWildcard;
+    ConcurrentNavigableMap<? extends String, ? extends String> concurrentNavigableMapWithWildcard;
+    ConcurrentSkipListMap<? extends String, ? extends String> concurrentSkipListMapWithWildcard;
+    CopyOnWriteArrayList<? extends String> copyOnWriteArrayListWithWildcard;
+    CopyOnWriteArraySet<? extends String> copyOnWriteArraySetWithWildcard;
+    ConcurrentSkipListSet<? extends String> concurrentSkipListSetWithWildcard;
+    TreeMap<? extends String, ? extends String> treeMapWithWildcard;
+    TreeSet<? extends String> treeSetWithWildcard;
+    ArrayList<? extends String> arrayListWithWildcard;
+    LinkedList<? extends String> linkedListWithWildcard;
+    HashMap<? extends String, ? extends String> hashMapWithWildcard;
+    LinkedHashMap<? extends String, ? extends String> linkedHashMapWithWildcard;
+    HashSet<? extends String> hashSetWithWildcard;
+    LinkedHashSet<? extends String> linkedHashSetWithWildcard;
+    Map.Entry<? extends String, ? extends String> mapEntryWithWildcard;
+    Hashtable<? extends String, ? extends Integer> hashtableWithWildcard;
+    Vector<? extends String> vectorWithWildcard;
+    Stack<? extends String> stackWithWildcard;
+    Number number;
+    Set<?> setWithUnboundWildcard;
+    List<?> listWithUnboundWildcard;
+    Map<?, ?> mapWithUnboundWildcard;
 }

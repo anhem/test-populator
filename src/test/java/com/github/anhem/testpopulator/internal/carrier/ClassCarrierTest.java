@@ -14,10 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ClassCarrierTest {
 
-    private static final PopulateConfig CONFIG_NULL_ON_CIRCULAR = PopulateConfig.builder()
+    private static final PopulateConfig CONFIG_NULL_ON_CIRCULAR = PopulateConfig.builder().wildcardFallbackType(String.class)
             .nullOnCircularDependency(true)
             .build();
-    private static final PopulateConfig CONFIG_NO_NULL_ON_CIRCULAR = PopulateConfig.builder()
+    private static final PopulateConfig CONFIG_NO_NULL_ON_CIRCULAR = PopulateConfig.builder().wildcardFallbackType(String.class)
             .nullOnCircularDependency(false)
             .build();
 

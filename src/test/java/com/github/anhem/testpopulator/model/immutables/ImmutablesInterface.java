@@ -230,4 +230,6 @@ public interface ImmutablesInterface {
 
     InetSocketAddress getInetSocketAddress();
 
+    Number getNumber();
+
 }

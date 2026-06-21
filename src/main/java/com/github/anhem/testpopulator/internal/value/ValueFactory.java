@@ -119,6 +119,9 @@ public class ValueFactory {
         suppliers.put(BigInteger.class, this::getBigInteger);
         suppliers.put(String.class, this::getString);
         suppliers.put(CharSequence.class, this::getString);
+        suppliers.put(Class.class, () -> Object.class);
+        suppliers.put(Object.class, Object::new);
+        suppliers.put(Number.class, this::getNumber);
         suppliers.put(LocalDate.class, this::getLocalDate);
         suppliers.put(LocalTime.class, this::getLocalTime);
         suppliers.put(LocalDateTime.class, this::getLocalDateTime);
@@ -162,6 +165,7 @@ public class ValueFactory {
         suppliers.put(Inet4Address.class, this::getInet4Address);
         suppliers.put(Inet6Address.class, this::getInet6Address);
         suppliers.put(InetSocketAddress.class, this::getInetSocketAddress);
+        suppliers.put(Number.class, this::getNumber);
         suppliers.putAll(classOverrides);
         return suppliers;
     }
@@ -273,6 +277,10 @@ public class ValueFactory {
 
     private BigInteger getBigInteger() {
         return setRandomValues ? BigInteger.valueOf(getLong()) : BIG_INTEGER;
+    }
+
+    private Number getNumber() {
+        return getInteger();
     }
 
     private LocalTime getLocalTime() {

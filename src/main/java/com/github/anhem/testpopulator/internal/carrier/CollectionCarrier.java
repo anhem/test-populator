@@ -7,6 +7,7 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.toArgumentTypes;
 
@@ -39,13 +40,26 @@ public class CollectionCarrier<T> extends ClassCarrier<T> {
 
     public CollectionCarrier(
             Class<T> clazz,
+            String name,
+            Type[] typeArguments,
+            ObjectFactory objectFactory,
+            List<String> visited,
+            PopulateConfig populateConfig,
+            Map<String, Type> typeVariables
+    ) {
+        super(clazz, name, objectFactory, visited, populateConfig, typeVariables);
+        this.argumentTypes = Arrays.asList(typeArguments);
+    }
+
+    public CollectionCarrier(
+            Class<T> clazz,
             Parameter parameter,
             ObjectFactory objectFactory,
             List<String> visited,
             PopulateConfig populateConfig
     ) {
         super(clazz, parameter.getName(), objectFactory, visited, populateConfig);
-        this.argumentTypes = toArgumentTypes(parameter);
+        this.argumentTypes = toArgumentTypes(parameter, populateConfig.getWildcardFallbackType());
     }
 
     public List<Type> getArgumentTypes() {

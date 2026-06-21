@@ -24,14 +24,20 @@ public class PopulateUtil {
     private PopulateUtil() {
     }
 
-    public static List<Type> toArgumentTypes(Parameter parameter) {
-        return toArgumentTypes(parameter.getParameterizedType(), parameter.getType());
+    public static List<Type> toArgumentTypes(Parameter parameter, Class<?> wildcardFallbackType) {
+        return toArgumentTypes(parameter.getParameterizedType(), parameter.getType(), wildcardFallbackType);
     }
 
-    public static List<Type> toArgumentTypes(Type type, Class<?> clazz) {
+    public static List<Type> toArgumentTypes(Type type, Class<?> clazz, Class<?> wildcardFallbackType) {
         if (type instanceof ParameterizedType) {
             return Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
-                    .map(t -> t instanceof WildcardType ? ((WildcardType) t).getUpperBounds()[0] : t)
+                    .map(t -> {
+                        if (t instanceof WildcardType) {
+                            Type upperBound = ((WildcardType) t).getUpperBounds()[0];
+                            return upperBound.equals(Object.class) ? wildcardFallbackType : upperBound;
+                        }
+                        return t;
+                    })
                     .collect(Collectors.toList());
         }
         if (type instanceof GenericArrayType) {
@@ -53,6 +59,43 @@ public class PopulateUtil {
             return List.of(Object.class);
         }
         return Collections.emptyList();
+    }
+
+    public static Map<String, Type> buildTypeVariables(Class<?> clazz, Type type, Map<String, Type> parentTypeVariables) {
+        Map<String, Type> typeVariables = new HashMap<>();
+        if (type instanceof ParameterizedType) {
+            Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
+            TypeVariable<? extends Class<?>>[] typeParameters = clazz.getTypeParameters();
+            for (int i = 0; i < typeParameters.length && i < actualTypeArguments.length; i++) {
+                Type arg = actualTypeArguments[i];
+                if (arg instanceof TypeVariable) {
+                    arg = parentTypeVariables.getOrDefault(((TypeVariable<?>) arg).getName(), arg);
+                }
+                typeVariables.put(typeParameters[i].getName(), arg);
+            }
+        }
+        return typeVariables;
+    }
+
+    public static Class<?> resolveClass(Type type, Class<?> fallbackClazz) {
+        if (type instanceof Class) {
+            return (Class<?>) type;
+        }
+        if (type instanceof ParameterizedType) {
+            return (Class<?>) ((ParameterizedType) type).getRawType();
+        }
+        if (type instanceof WildcardType) {
+            Type upperBound = ((WildcardType) type).getUpperBounds()[0];
+            if (upperBound.equals(Object.class)) {
+                return fallbackClazz;
+            }
+            return resolveClass(upperBound, fallbackClazz);
+        }
+        if (type instanceof GenericArrayType) {
+            Class<?> component = resolveClass(((GenericArrayType) type).getGenericComponentType(), fallbackClazz);
+            return Array.newInstance(component, 0).getClass();
+        }
+        return fallbackClazz;
     }
 
     public static <T> List<Field> getDeclaredFields(Class<T> clazz, Set<String> blacklistedFields) {
