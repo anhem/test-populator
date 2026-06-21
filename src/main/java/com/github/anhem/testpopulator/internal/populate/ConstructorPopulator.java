@@ -6,6 +6,7 @@ import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -14,7 +15,8 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isKotlinConstructor;
-import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.getLargestConstructor;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.setAccessible;
 import static java.lang.String.format;
 
 public class ConstructorPopulator implements PopulatingStrategy {
@@ -34,7 +36,12 @@ public class ConstructorPopulator implements PopulatingStrategy {
 
     protected <T> T populateUsingConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         int parameterCount = constructor.getParameterCount();
-        classCarrier.getObjectFactory().constructor(classCarrier.getClazz(), parameterCount);
+        classCarrier.getObjectFactory().constructor(
+                classCarrier.getClazz(),
+                parameterCount,
+                !Modifier.isPublic(constructor.getModifiers()),
+                constructor.getParameterTypes()
+        );
         Object[] arguments = isKotlinConstructor(constructor, classCarrier.getPopulateConfig().isKotlinSupport()) ?
                 populateKotlinArguments(constructor, classCarrier, populator) :
                 populateArguments(constructor, classCarrier, populator, parameterCount);
@@ -50,11 +57,7 @@ public class ConstructorPopulator implements PopulatingStrategy {
 
     private <T> Object populateArgument(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator, int i) {
         Parameter parameter = constructor.getParameters()[i];
-        if (isCollectionLike(parameter.getType())) {
-            return populator.populate(classCarrier.toCollectionCarrier(parameter));
-        } else {
-            return populator.populate(classCarrier.toClassCarrier(parameter));
-        }
+        return populator.populate(classCarrier.createChild(parameter));
     }
 
     private <T> Object[] populateKotlinArguments(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator) {

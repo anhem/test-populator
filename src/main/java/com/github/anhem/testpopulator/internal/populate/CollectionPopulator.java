@@ -2,12 +2,9 @@ package com.github.anhem.testpopulator.internal.populate;
 
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.carrier.TypeCarrier;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -25,10 +22,10 @@ public class CollectionPopulator implements PopulatingStrategy {
 
     @Override
     public <T> T populate(ClassCarrier<T> classCarrier, Populator populator) {
-        return doPopulate((CollectionCarrier<T>) classCarrier, populator);
+        return doPopulate(classCarrier, populator);
     }
 
-    private <T> T doPopulate(CollectionCarrier<T> collectionCarrier, Populator populator) {
+    private <T> T doPopulate(ClassCarrier<T> collectionCarrier, Populator populator) {
         try {
             Class<T> clazz = collectionCarrier.getClazz();
             if (isMap(clazz)) {
@@ -59,7 +56,7 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForMap(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private <T> T populateForMap(ClassCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<T> clazz = classCarrier.getClazz();
         if (isEnumMap(clazz)) {
             Class<?> enumClass = (Class<?>) classCarrier.getArgumentTypes().get(0);
@@ -90,7 +87,7 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForSet(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private <T> T populateForSet(ClassCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<T> clazz = classCarrier.getClazz();
         if (isEnumSet(clazz)) {
             Class<?> enumClass = (Class<?>) classCarrier.getArgumentTypes().get(0);
@@ -115,7 +112,7 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForMapEntry(CollectionCarrier<T> classCarrier, Populator populator) {
+    private <T> T populateForMapEntry(ClassCarrier<T> classCarrier, Populator populator) {
         classCarrier.getObjectFactory().mapEntry(classCarrier.getClazz());
         Object key = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
         Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1)), populator);
@@ -123,7 +120,7 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForCollection(CollectionCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private <T> T populateForCollection(ClassCarrier<T> classCarrier, Populator populator) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<T> clazz = classCarrier.getClazz();
         if (classCarrier.hasConstructors()) {
             classCarrier.getObjectFactory().list(clazz);
@@ -141,17 +138,17 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForStream(CollectionCarrier<T> classCarrier, Populator populator) {
+    private <T> T populateForStream(ClassCarrier<T> classCarrier, Populator populator) {
         Class<T> clazz = classCarrier.getClazz();
         classCarrier.getObjectFactory().stream(clazz);
         if (clazz.equals(IntStream.class)) {
-            int val = populator.populate(classCarrier.toClassCarrier(int.class));
+            int val = populator.populate(classCarrier.createChild(int.class));
             return (T) IntStream.of(val);
         } else if (clazz.equals(LongStream.class)) {
-            long val = populator.populate(classCarrier.toClassCarrier(long.class));
+            long val = populator.populate(classCarrier.createChild(long.class));
             return (T) LongStream.of(val);
         } else if (clazz.equals(DoubleStream.class)) {
-            double val = populator.populate(classCarrier.toClassCarrier(double.class));
+            double val = populator.populate(classCarrier.createChild(double.class));
             return (T) DoubleStream.of(val);
         } else {
             Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
@@ -160,35 +157,35 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForIterator(CollectionCarrier<T> classCarrier, Populator populator) {
+    private <T> T populateForIterator(ClassCarrier<T> classCarrier, Populator populator) {
         classCarrier.getObjectFactory().iterator(classCarrier.getClazz());
         Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
         return (T) List.of(value).iterator();
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForScanner(CollectionCarrier<T> classCarrier, Populator populator) {
+    private <T> T populateForScanner(ClassCarrier<T> classCarrier, Populator populator) {
         classCarrier.getObjectFactory().scanner(classCarrier.getClazz());
         String value = (String) continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
         return (T) new Scanner(value);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForFuture(CollectionCarrier<T> classCarrier, Populator populator) {
+    private <T> T populateForFuture(ClassCarrier<T> classCarrier, Populator populator) {
         classCarrier.getObjectFactory().future(classCarrier.getClazz());
         Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
         return (T) CompletableFuture.completedFuture(value);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForIterable(CollectionCarrier<T> classCarrier, Populator populator) {
+    private <T> T populateForIterable(ClassCarrier<T> classCarrier, Populator populator) {
         classCarrier.getObjectFactory().iterable(classCarrier.getClazz());
         Object value = continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator);
         return (T) List.of(value);
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Object, Object> populateMap(CollectionCarrier<?> classCarrier, Populator populator, Map map) {
+    private Map<Object, Object> populateMap(ClassCarrier<?> classCarrier, Populator populator, Map map) {
         Optional<Object> key = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator));
         Optional<Object> value = Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(1)), populator));
         key.ifPresent(k -> map.put(k, value.orElse(null)));
@@ -206,24 +203,36 @@ public class CollectionPopulator implements PopulatingStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    private Collection<Object> populateCollection(CollectionCarrier<?> classCarrier, Populator populator, Collection collection) {
+    private Collection<Object> populateCollection(ClassCarrier<?> classCarrier, Populator populator, Collection collection) {
         Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator))
                 .ifPresent(collection::add);
         return collection;
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T populateForOptional(CollectionCarrier<T> classCarrier, Populator populator) {
+    private <T> T populateForOptional(ClassCarrier<T> classCarrier, Populator populator) {
         classCarrier.getObjectFactory().optional();
         return (T) Optional.ofNullable(continuePopulateWithType(classCarrier.toTypeCarrier(classCarrier.getArgumentTypes().get(0)), populator));
     }
 
     private Object continuePopulateWithType(TypeCarrier typeCarrier, Populator populator) {
         Type type = typeCarrier.getType();
+        if (type instanceof WildcardType) {
+            type = ((WildcardType) type).getUpperBounds()[0];
+            if (type.equals(Object.class)) {
+                type = typeCarrier.getPopulateConfig().getWildcardFallbackType();
+            }
+        }
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
-            return populator.populate(typeCarrier.toCollectionCarrier(parameterizedType.getRawType(), parameterizedType.getActualTypeArguments()));
+            return populator.populate(typeCarrier.createChild(parameterizedType.getRawType(), parameterizedType.getActualTypeArguments()));
         }
-        return populator.populate(typeCarrier.toClassCarrier(type));
+        if (type instanceof TypeVariable) {
+            type = typeCarrier.getPopulateConfig().getWildcardFallbackType();
+        }
+        if (type instanceof GenericArrayType) {
+            type = ((GenericArrayType) type).getGenericComponentType();
+        }
+        return populator.populate(typeCarrier.createChild(type));
     }
 }

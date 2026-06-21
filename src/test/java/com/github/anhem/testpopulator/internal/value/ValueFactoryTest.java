@@ -216,6 +216,8 @@ class ValueFactoryTest {
         assertThat(value2).isInstanceOf(clazz);
         if (hasOverriddenEquals(clazz)) {
             assertThat(value1).isEqualTo(value2);
+        } else if (clazz == Object.class) {
+            assertThat(value1).isNotEqualTo(value2);
         } else {
             assertThat(value1).hasToString(value2.toString());
         }

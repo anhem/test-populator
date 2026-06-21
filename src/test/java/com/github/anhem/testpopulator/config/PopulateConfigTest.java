@@ -11,11 +11,10 @@ import static com.github.anhem.testpopulator.config.ConstructorType.SMALLEST;
 import static com.github.anhem.testpopulator.config.PopulateConfig.*;
 import static com.github.anhem.testpopulator.config.Strategy.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PopulateConfigTest {
 
-    private static final PopulateConfig DEFAULT_POPULATE_CONFIG = PopulateConfig.builder().build();
+    private static final PopulateConfig DEFAULT_POPULATE_CONFIG = PopulateConfig.builder().wildcardFallbackType(String.class).build();
 
     @Test
     void buildingPopulateConfigResultsInDefaultValues() {
@@ -37,7 +36,7 @@ class PopulateConfigTest {
 
     @Test
     void buildingCustomPopulateConfig1() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(LOMBOK)
                 .and()
@@ -68,7 +67,7 @@ class PopulateConfigTest {
 
     @Test
     void buildingCustomPopulateConfig2() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(IMMUTABLES)
                 .and()
@@ -89,7 +88,7 @@ class PopulateConfigTest {
 
     @Test
     void buildingCustomPopulateConfig3() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .staticMethodStrategy()
                 .methodType(MethodType.SMALLEST)
                 .and()
@@ -104,7 +103,7 @@ class PopulateConfigTest {
 
     @Test
     void buildingCustomPopulateConfig4() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(CUSTOM)
                 .builderMethod("create")
@@ -121,7 +120,7 @@ class PopulateConfigTest {
 
     @Test
     void reorderStrategiesOnFreshBuilderWorks() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .reorderStrategies(SETTER, CONSTRUCTOR)
                 .build();
 
@@ -130,7 +129,7 @@ class PopulateConfigTest {
 
     @Test
     void reorderStrategiesWorks() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .constructorStrategy()
                 .and()
                 .setterStrategy()
@@ -143,7 +142,7 @@ class PopulateConfigTest {
 
     @Test
     void setBlacklistedMethodsReplacesExisting() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setBlacklistedMethods("m1", "m2")
                 .build();
 
@@ -152,7 +151,7 @@ class PopulateConfigTest {
 
     @Test
     void addBlacklistedMethodsAddsToExisting() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addBlacklistedMethods("m1")
                 .addBlacklistedMethods("m2")
                 .build();
@@ -162,7 +161,7 @@ class PopulateConfigTest {
 
     @Test
     void setBlacklistedFieldsReplacesExisting() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setBlacklistedFields("f1", "f2")
                 .build();
 
@@ -171,7 +170,7 @@ class PopulateConfigTest {
 
     @Test
     void addBlacklistedFieldsAddsToExisting() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addBlacklistedFields("f1")
                 .addBlacklistedFields("f2")
                 .build();
@@ -185,7 +184,7 @@ class PopulateConfigTest {
         overrides.put(Integer.class, () -> 1);
         overrides.put(Double.class, () -> 2.0);
 
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setClassOverrides(overrides)
                 .build();
 
@@ -196,7 +195,7 @@ class PopulateConfigTest {
 
     @Test
     void addClassOverridesAddsToExisting() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(Integer.class, () -> 1)
                 .addClassOverrides(Map.of(Double.class, () -> 3.0))
                 .build();
@@ -212,7 +211,7 @@ class PopulateConfigTest {
         overrides.put(OverrideTarget.of("name1", String.class), () -> "val1");
         overrides.put(OverrideTarget.of("name2", String.class), () -> "val2");
 
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setNameOverrides(overrides)
                 .build();
 
@@ -223,7 +222,7 @@ class PopulateConfigTest {
 
     @Test
     void addNameOverridesAddsToExisting() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride("name1", String.class, () -> "val1")
                 .addNameOverrides(Map.of(OverrideTarget.of("name2", String.class), () -> "val3"))
                 .build();
@@ -235,28 +234,28 @@ class PopulateConfigTest {
 
     @Test
     void setterPrefixesMethods() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setterStrategy()
                 .setPrefixes(List.of("with"))
                 .and()
                 .build();
         assertThat(populateConfig.getSetterPrefixes()).containsExactly("with");
 
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setterStrategy()
                 .setPrefixes("with")
                 .and()
                 .build();
         assertThat(populateConfig.getSetterPrefixes()).containsExactly("with");
 
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setterStrategy()
                 .addPrefixes(List.of("set"))
                 .and()
                 .build();
         assertThat(populateConfig.getSetterPrefixes()).contains("set");
 
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setterStrategy()
                 .addPrefixes("set")
                 .and()
@@ -266,7 +265,7 @@ class PopulateConfigTest {
 
     @Test
     void toBuilderCreatesCopy() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addOverride(Integer.class, () -> 1)
                 .addOverride("name", String.class, () -> "val")
                 .build();
@@ -278,31 +277,19 @@ class PopulateConfigTest {
     }
 
     @Test
-    void validateThrowsExceptionWhenAccessNonPublicConstructorsAndObjectFactoryEnabled() {
-        assertThatThrownBy(() -> PopulateConfig.builder()
+    void accessNonPublicConstructorsAndObjectFactoryCanBeCombined() {
+        assertThat(PopulateConfig.builder().wildcardFallbackType(String.class)
                 .accessNonPublicConstructors(true)
                 .objectFactory(true)
                 .and()
                 .build())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY);
+                .isNotNull();
     }
 
-    @Test
-    void validateThrowsExceptionWhenFieldStrategyAndObjectFactoryEnabled() {
-        assertThatThrownBy(() -> PopulateConfig.builder()
-                .fieldStrategy()
-                .and()
-                .objectFactory(true)
-                .and()
-                .build())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
-    }
 
     @Test
     void builderPatternSpecificMethodNames() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(PROTOBUF)
                 .and()
@@ -312,7 +299,7 @@ class PopulateConfigTest {
         assertThat(populateConfig.getBuilderMethod()).isEqualTo(PROTOBUF_BUILDER_METHOD);
         assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
 
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(LOMBOK)
                 .and()
@@ -322,7 +309,7 @@ class PopulateConfigTest {
         assertThat(populateConfig.getBuilderMethod()).isEqualTo(DEFAULT_BUILDER_METHOD);
         assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
 
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(IMMUTABLES)
                 .and()
@@ -332,7 +319,7 @@ class PopulateConfigTest {
         assertThat(populateConfig.getBuilderMethod()).isEqualTo(DEFAULT_BUILDER_METHOD);
         assertThat(populateConfig.getBuildMethod()).isEqualTo(DEFAULT_BUILD_METHOD);
 
-        populateConfig = PopulateConfig.builder()
+        populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(CUSTOM)
                 .and()
@@ -345,7 +332,7 @@ class PopulateConfigTest {
 
     @Test
     void builderConfigResetRevertsToDefaults() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .builderMethod("create")
                 .buildMethod("finish")
@@ -359,7 +346,7 @@ class PopulateConfigTest {
 
     @Test
     void builderConfigResetWithProtobufRevertsToDefaults() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .pattern(PROTOBUF)
                 .and()
@@ -383,7 +370,7 @@ class PopulateConfigTest {
 
     @Test
     void clearStrategiesWorks() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .constructorStrategy()
                 .and()
                 .clearStrategies()
@@ -396,7 +383,7 @@ class PopulateConfigTest {
 
     @Test
     void implicitStrategyRegistration() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .builderStrategy()
                 .and()
                 .setterStrategy()
@@ -416,7 +403,7 @@ class PopulateConfigTest {
 
     @Test
     void canSetEmptyBlacklistedMethods() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setBlacklistedMethods(List.of())
                 .build();
 
@@ -425,7 +412,7 @@ class PopulateConfigTest {
 
     @Test
     void canSetEmptyBlacklistedFields() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setBlacklistedFields(List.of())
                 .build();
 
@@ -434,7 +421,7 @@ class PopulateConfigTest {
 
     @Test
     void canSetEmptySetterPrefixes() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .setterStrategy()
                 .setPrefixes(List.of())
                 .build();
@@ -444,7 +431,7 @@ class PopulateConfigTest {
 
     @Test
     void objectFactoryConfigWorks() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .objectFactory(true)
                 .path("custom/path")
                 .and()
@@ -456,7 +443,7 @@ class PopulateConfigTest {
 
     @Test
     void objectFactoryPathIsNullWhenDisabled() {
-        PopulateConfig populateConfig = PopulateConfig.builder()
+        PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .objectFactory(false)
                 .build();
 
@@ -466,7 +453,7 @@ class PopulateConfigTest {
 
     @Test
     void testClearMethods() {
-        PopulateConfig baseConfig = PopulateConfig.builder()
+        PopulateConfig baseConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .addBlacklistedMethods("m1")
                 .addBlacklistedFields("f1")
                 .addOverride(String.class, () -> "v1")

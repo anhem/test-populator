@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.concatenate;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.endBuilder;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.concatenate;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.endBuilder;
 
 public class TemplateObjectBuilder extends ObjectBuilder {
 
@@ -70,7 +70,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         return concatenate(
                 buildChildren(),
                 Stream.of(codeTemplate.render(PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, buildArguments(getArgumentChildren()))),
-                createMethods(),
+                renderBuilderMethodCalls(),
                 endBuilder(buildMethodName)
         ).collect(Collectors.toList());
     }

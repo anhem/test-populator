@@ -97,10 +97,11 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         assertThatThrownBy(() -> populateFactory.populate(clazz)).isInstanceOf(PopulateException.class);
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        AllArgsConstructorPrivate value1 = populateAndAssert(clazz);
-        AllArgsConstructorPrivate value2 = populateAndAssert(clazz);
+        AllArgsConstructorPrivate value1 = populateAndAssertWithGeneratedCode(clazz);
+        AllArgsConstructorPrivate value2 = populateAndAssertWithGeneratedCode(clazz);
         assertRandomlyPopulatedValues(value1, value2);
     }
 
@@ -115,10 +116,11 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
 
         populateConfig = populateConfig.toBuilder()
                 .accessNonPublicConstructors(true)
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
-        AllArgsConstructorProtected value1 = populateAndAssert(clazz);
-        AllArgsConstructorProtected value2 = populateAndAssert(clazz);
+        AllArgsConstructorProtected value1 = populateAndAssertWithGeneratedCode(clazz);
+        AllArgsConstructorProtected value2 = populateAndAssertWithGeneratedCode(clazz);
         assertRandomlyPopulatedValues(value1, value2);
     }
 
@@ -213,16 +215,6 @@ class PopulateFactoryWithConstructorTypeStrategyTest {
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(clazz);
         assertGeneratedCode(value, populateConfig);
-
-        return value;
-    }
-
-    private <T> T populateAndAssert(Class<T> clazz) {
-        assertThat(populateConfig.isObjectFactoryEnabled()).isFalse();
-        assertThat(populateConfig.getStrategyOrder()).containsExactly(CONSTRUCTOR);
-        T value = populateFactory.populate(clazz);
-        assertThat(value).isNotNull();
-        assertThat(value).isInstanceOf(clazz);
 
         return value;
     }
