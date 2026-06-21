@@ -24,10 +24,6 @@ public class PopulateUtil {
     private PopulateUtil() {
     }
 
-    public static List<Type> toArgumentTypes(Parameter parameter, Class<?> wildcardFallbackType) {
-        return toArgumentTypes(parameter.getParameterizedType(), parameter.getType(), wildcardFallbackType);
-    }
-
     public static List<Type> toArgumentTypes(Type type, Class<?> clazz, Class<?> wildcardFallbackType) {
         if (type instanceof ParameterizedType) {
             return Arrays.stream(((ParameterizedType) type).getActualTypeArguments())

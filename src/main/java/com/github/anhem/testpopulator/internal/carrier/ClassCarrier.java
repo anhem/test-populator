@@ -7,17 +7,19 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 public class ClassCarrier<T> extends Carrier {
 
     private final Class<T> clazz;
     private final String name;
     private final Map<String, Type> typeVariables;
+    private final List<Type> argumentTypes;
 
     public ClassCarrier(
             Class<T> clazz,
@@ -25,7 +27,7 @@ public class ClassCarrier<T> extends Carrier {
             List<String> visited,
             PopulateConfig populateConfig
     ) {
-        this(clazz, null, objectFactory, visited, populateConfig, Collections.emptyMap());
+        this(clazz, null, objectFactory, visited, populateConfig, emptyMap());
     }
 
     public ClassCarrier(
@@ -35,7 +37,7 @@ public class ClassCarrier<T> extends Carrier {
             List<String> visited,
             PopulateConfig populateConfig
     ) {
-        this(clazz, name, objectFactory, visited, populateConfig, Collections.emptyMap());
+        this(clazz, name, objectFactory, visited, populateConfig, emptyMap());
     }
 
     public ClassCarrier(
@@ -46,10 +48,23 @@ public class ClassCarrier<T> extends Carrier {
             PopulateConfig populateConfig,
             Map<String, Type> typeVariables
     ) {
+        this(clazz, name, objectFactory, visited, populateConfig, typeVariables, emptyList());
+    }
+
+    public ClassCarrier(
+            Class<T> clazz,
+            String name,
+            ObjectFactory objectFactory,
+            List<String> visited,
+            PopulateConfig populateConfig,
+            Map<String, Type> typeVariables,
+            List<Type> argumentTypes
+    ) {
         super(objectFactory, visited, populateConfig);
         this.clazz = clazz;
         this.name = name;
         this.typeVariables = typeVariables;
+        this.argumentTypes = argumentTypes;
     }
 
     public Class<T> getClazz() {
@@ -60,52 +75,24 @@ public class ClassCarrier<T> extends Carrier {
         return name;
     }
 
+    public List<Type> getArgumentTypes() {
+        return argumentTypes;
+    }
+
     public Type resolveType(Type type) {
         return type instanceof TypeVariable ? typeVariables.getOrDefault(((TypeVariable<?>) type).getName(), type) : type;
     }
 
-    public <V> ClassCarrier<V> toClassCarrier(Class<V> clazz) {
+    public <V> ClassCarrier<V> createChild(Class<V> clazz) {
         return new ClassCarrier<>(clazz, name, objectFactory, new ArrayList<>(visited), populateConfig, typeVariables);
     }
 
-    public <V> ClassCarrier<V> toClassCarrier(Class<V> clazz, String name) {
+    public <V> ClassCarrier<V> createChild(Class<V> clazz, String name) {
         return new ClassCarrier<>(clazz, name, objectFactory, new ArrayList<>(visited), populateConfig, typeVariables);
     }
 
     @SuppressWarnings("unchecked")
-    public <V> ClassCarrier<V> toClassCarrier(Type type, String name) {
-        Type resolvedType = type instanceof TypeVariable ? typeVariables.getOrDefault(((TypeVariable<?>) type).getName(), type) : type;
-        Class<V> targetClass = (Class<V>) resolveClass(resolvedType, populateConfig.getWildcardFallbackType());
-        Map<String, Type> newTypeVariables = buildTypeVariables(targetClass, resolvedType, typeVariables);
-        return new ClassCarrier<>(targetClass, name, objectFactory, new ArrayList<>(visited), populateConfig, newTypeVariables);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <V> ClassCarrier<V> toClassCarrier(Parameter parameter) {
-        return toClassCarrier(parameter.getParameterizedType(), parameter.getName());
-    }
-
-    @SuppressWarnings("unchecked")
-    public <V> ClassCarrier<V> toClassCarrier(Parameter parameter, String name) {
-        return toClassCarrier(parameter.getParameterizedType(), name);
-    }
-
-    public TypeCarrier toTypeCarrier(Type type) {
-        return new TypeCarrier(type, name, objectFactory, visited, populateConfig);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <V> CollectionCarrier<V> toCollectionCarrier(Parameter parameter) {
-        return toCollectionCarrier(parameter.getParameterizedType(), parameter.getName());
-    }
-
-    @SuppressWarnings("unchecked")
-    public <V> CollectionCarrier<V> toCollectionCarrier(Parameter parameter, String name) {
-        return toCollectionCarrier(parameter.getParameterizedType(), name);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <V> CollectionCarrier<V> toCollectionCarrier(Type type, String name) {
+    public <V> ClassCarrier<V> createChild(Type type, String name) {
         Type resolvedType = type instanceof TypeVariable ? typeVariables.getOrDefault(((TypeVariable<?>) type).getName(), type) : type;
         Class<V> targetClass = (Class<V>) resolveClass(resolvedType, populateConfig.getWildcardFallbackType());
         Map<String, Type> newTypeVariables = buildTypeVariables(targetClass, resolvedType, typeVariables);
@@ -116,27 +103,19 @@ public class ClassCarrier<T> extends Carrier {
             resolvedArgTypes.add(arg instanceof TypeVariable ? newTypeVariables.getOrDefault(((TypeVariable<?>) arg).getName(), arg) : arg);
         }
 
-        return new CollectionCarrier<>(
-                targetClass,
-                name,
-                resolvedArgTypes.toArray(new Type[0]),
-                objectFactory,
-                visited,
-                populateConfig,
-                newTypeVariables
-        );
+        return new ClassCarrier<>(targetClass, name, objectFactory, new ArrayList<>(visited), populateConfig, newTypeVariables, resolvedArgTypes);
     }
 
-    public <V> CollectionCarrier<V> toCollectionCarrier(Class<V> clazz) {
-        return new CollectionCarrier<>(
-                clazz,
-                name,
-                toArgumentTypes(null, clazz, populateConfig.getWildcardFallbackType()).toArray(new Type[0]),
-                objectFactory,
-                visited,
-                populateConfig,
-                typeVariables
-        );
+    public <V> ClassCarrier<V> createChild(Parameter parameter) {
+        return createChild(parameter.getParameterizedType(), parameter.getName());
+    }
+
+    public <V> ClassCarrier<V> createChild(Parameter parameter, String name) {
+        return createChild(parameter.getParameterizedType(), name);
+    }
+
+    public TypeCarrier toTypeCarrier(Type type) {
+        return new TypeCarrier(type, name, objectFactory, visited, populateConfig);
     }
 
     public boolean alreadyVisited() {

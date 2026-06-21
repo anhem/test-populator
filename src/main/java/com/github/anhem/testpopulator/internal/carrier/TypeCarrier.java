@@ -31,7 +31,7 @@ public class TypeCarrier extends Carrier {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> ClassCarrier<T> toClassCarrier(Type type) {
+    public <T> ClassCarrier<T> createChild(Type type) {
         return new ClassCarrier<>((Class<T>) type, name, objectFactory, new ArrayList<>(visited), populateConfig);
     }
 }

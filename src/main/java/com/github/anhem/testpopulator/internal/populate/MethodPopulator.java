@@ -4,12 +4,9 @@ import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CALL_METHOD;
-import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isCollectionLike;
-import static com.github.anhem.testpopulator.internal.util.PopulateUtil.resolveClass;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufAndHasNullArgument;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufByteString;
 import static java.lang.String.format;
@@ -23,15 +20,9 @@ public abstract class MethodPopulator {
             Object[] args = Stream.of(method.getParameters())
                     .map(parameter -> {
                         if (isProtobufByteString(parameter, classCarrier.getPopulateConfig())) {
-                            return populator.populate(classCarrier.toClassCarrier(parameter, methodName));
+                            return populator.populate(classCarrier.createChild(parameter, methodName));
                         }
-                        Type resolvedType = classCarrier.resolveType(parameter.getParameterizedType());
-                        Class<?> targetClass = resolveClass(resolvedType, classCarrier.getPopulateConfig().getWildcardFallbackType());
-                        if (isCollectionLike(targetClass)) {
-                            return populator.populate(classCarrier.toCollectionCarrier(parameter, methodName));
-                        } else {
-                            return populator.populate(classCarrier.toClassCarrier(parameter, methodName));
-                        }
+                        return populator.populate(classCarrier.createChild(parameter, methodName));
                     }).toArray();
             if (isProtobufAndHasNullArgument(classCarrier.getPopulateConfig(), args)) {
                 return;

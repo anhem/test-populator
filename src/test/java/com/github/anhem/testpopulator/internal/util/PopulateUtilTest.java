@@ -2,7 +2,6 @@ package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.internal.carrier.Carrier;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
 import com.github.anhem.testpopulator.model.java.HasBlackListed;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,14 +29,6 @@ import static com.github.anhem.testpopulator.testutil.PopulateConfigTestUtil.DEF
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulateUtilTest {
-
-    @Test
-    void toArgumentTypesReturnsParameterArgumentTypes() {
-        List<Type> argumentTypes = toArgumentTypes(getArbitraryParameter(), Object.class);
-
-        assertThat(argumentTypes).hasSize(1);
-        assertThat(argumentTypes.get(0)).isEqualTo(String.class);
-    }
 
     @Test
     void getDeclaredFieldsReturnsAllDeclaredFields() {
@@ -216,8 +206,8 @@ class PopulateUtilTest {
         return Carrier.initialize(String.class, new ObjectFactoryVoid(), null);
     }
 
-    private static <T> CollectionCarrier<T> createCollectionCarrier(Class<T> clazz) {
-        return new CollectionCarrier<>(clazz, getArbitraryParameter(), new ObjectFactoryVoid(), new ArrayList<>(), null);
+    private static <T> ClassCarrier<T> createClassCarrier(Class<T> clazz) {
+        return new ClassCarrier<>(clazz, "dummy", new ObjectFactoryVoid(), new java.util.ArrayList<>(), com.github.anhem.testpopulator.config.PopulateConfig.builder().build(), java.util.Collections.emptyMap());
     }
 
     private static Method getArbitraryMethod() {

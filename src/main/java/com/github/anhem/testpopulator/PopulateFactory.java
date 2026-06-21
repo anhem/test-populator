@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.anhem.testpopulator.internal.carrier.CollectionCarrier.initialize;
+import static com.github.anhem.testpopulator.internal.carrier.Carrier.initialize;
 
 /**
  * Factory for creating populated objects from classes

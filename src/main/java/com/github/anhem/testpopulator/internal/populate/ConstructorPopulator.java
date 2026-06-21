@@ -4,7 +4,10 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -12,7 +15,8 @@ import java.util.stream.Stream;
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
 import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isKotlinConstructor;
-import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.getLargestConstructor;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.setAccessible;
 import static java.lang.String.format;
 
 public class ConstructorPopulator implements PopulatingStrategy {
@@ -53,14 +57,7 @@ public class ConstructorPopulator implements PopulatingStrategy {
 
     private <T> Object populateArgument(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator, int i) {
         Parameter parameter = constructor.getParameters()[i];
-        Type resolvedType = classCarrier.resolveType(parameter.getParameterizedType());
-        Class<?> targetClass = resolveClass(resolvedType, classCarrier.getPopulateConfig().getWildcardFallbackType());
-
-        if (isCollectionLike(targetClass)) {
-            return populator.populate(classCarrier.toCollectionCarrier(parameter));
-        } else {
-            return populator.populate(classCarrier.toClassCarrier(parameter));
-        }
+        return populator.populate(classCarrier.createChild(parameter));
     }
 
     private <T> Object[] populateKotlinArguments(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator) {

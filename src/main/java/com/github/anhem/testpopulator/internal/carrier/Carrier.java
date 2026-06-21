@@ -32,12 +32,12 @@ public abstract class Carrier {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> CollectionCarrier<T> toCollectionCarrier(Type type, Type[] typeArguments) {
-        return new CollectionCarrier<>((Class<T>) type, typeArguments, objectFactory, visited, populateConfig);
+    public <T> ClassCarrier<T> createChild(Type type, Type[] typeArguments) {
+        return new ClassCarrier<>((Class<T>) type, null, objectFactory, visited, populateConfig, java.util.Collections.emptyMap(), java.util.Arrays.asList(typeArguments));
     }
 
     @SuppressWarnings("unchecked")
-    public <T> CollectionCarrier<T> toCollectionCarrier(Type type, String name, Type[] typeArguments) {
-        return new CollectionCarrier<>((Class<T>) type, name, typeArguments, objectFactory, visited, populateConfig);
+    public <T> ClassCarrier<T> createChild(Type type, String name, Type[] typeArguments) {
+        return new ClassCarrier<>((Class<T>) type, name, objectFactory, visited, populateConfig, java.util.Collections.emptyMap(), java.util.Arrays.asList(typeArguments));
     }
 }

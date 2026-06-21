@@ -2,7 +2,6 @@ package com.github.anhem.testpopulator.internal.populate;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
 import com.github.anhem.testpopulator.internal.value.ValueFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,10 +43,10 @@ class ArrayPopulatorTest {
     }
 
     @Test
-    void populateWithCollectionCarrier() {
+    void populateWithClassCarrierWithTypeArguments() {
         Class<String[]> clazz = String[].class;
         Type[] typeArguments = new Type[]{String.class};
-        CollectionCarrier<String[]> collectionCarrier = new CollectionCarrier<>(clazz, typeArguments, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build());
+        ClassCarrier<String[]> collectionCarrier = new ClassCarrier<>(clazz, null, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build(), Collections.emptyMap(), java.util.Arrays.asList(typeArguments));
 
         String[] result = arrayPopulator.populate(collectionCarrier, populator);
 
