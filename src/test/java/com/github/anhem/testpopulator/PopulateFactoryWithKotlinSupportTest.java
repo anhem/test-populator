@@ -19,6 +19,7 @@ class PopulateFactoryWithKotlinSupportTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .kotlinSupport(true)
                 .and()
                 .constructorStrategy()
@@ -124,7 +125,9 @@ class PopulateFactoryWithKotlinSupportTest {
 
     @Test
     void cannotPopulateKotlinSingletonWhenKotlinSupportIsDisabled() {
-        populateConfig = PopulateConfig.builder().build();
+        populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
+                .build();
         populateFactory = new PopulateFactory(populateConfig);
 
         assertThatThrownBy(() -> populateFactory.populate(KotlinLikeSingleton.class))
@@ -143,6 +146,26 @@ class PopulateFactoryWithKotlinSupportTest {
     @Test
     void canPopulateKotlinLikeClassWithGenerics() {
         populateAndAssertWithGeneratedCode(KotlinLikeWithGenerics.class);
+    }
+
+    @Test
+    void canPopulateKotlinPairWithinWrapper() {
+        populateAndAssertWithGeneratedCode(KotlinLikePairWrapper.class);
+    }
+
+    @Test
+    void canPopulateKotlinLikeSealedClass() {
+        populateAndAssertWithGeneratedCode(KotlinLikeSealedClass.class);
+    }
+
+    @Test
+    void canPopulateKotlinLikeValueClass() {
+        populateAndAssertWithGeneratedCode(KotlinLikeValueClass.class);
+    }
+
+    @Test
+    void canPopulateKotlinLikeJvmOverloads() {
+        populateAndAssertWithGeneratedCode(KotlinLikeJvmOverloads.class);
     }
 
     private <T> void populateAndAssertWithGeneratedCode(Class<T> clazz) {
