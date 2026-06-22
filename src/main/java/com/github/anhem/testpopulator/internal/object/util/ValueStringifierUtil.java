@@ -21,7 +21,7 @@ public class ValueStringifierUtil {
         }
 
         if (KotlinUtil.isKotlinSingleton(clazz, config.isKotlinSupport())) {
-            return String.format("%s.INSTANCE", clazz.getSimpleName());
+            return config.isKotlinSupport() ? clazz.getSimpleName() : String.format("%s.INSTANCE", clazz.getSimpleName());
         }
 
         if (name != null) {
@@ -39,6 +39,9 @@ public class ValueStringifierUtil {
 
         String formatted = ValueFormatter.format(value, clazz);
         if (formatted != null) {
+            if (config.isKotlinSupport() && formatted.startsWith("new ")) {
+                return formatted.substring(4);
+            }
             return formatted;
         }
 

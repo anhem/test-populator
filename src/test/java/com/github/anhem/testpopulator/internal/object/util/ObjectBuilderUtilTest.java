@@ -228,7 +228,7 @@ class ObjectBuilderUtilTest {
 
     @Test
     void getHelperMethodReturnsUrlHelperForUrlClass() {
-        String result = getHelperMethod(URL.class);
+        String result = getHelperMethod(URL.class, false);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
                 "\tprivate static java.net.URL toUrl(String url) {",
@@ -251,20 +251,20 @@ class ObjectBuilderUtilTest {
                 "\t\t}",
                 "\t}");
 
-        assertThat(getHelperMethod(InetAddress.class)).isEqualTo(expected);
-        assertThat(getHelperMethod(Inet4Address.class)).isEqualTo(expected);
-        assertThat(getHelperMethod(Inet6Address.class)).isEqualTo(expected);
-        assertThat(getHelperMethod(InetSocketAddress.class)).isEqualTo(expected);
+        assertThat(getHelperMethod(InetAddress.class, false)).isEqualTo(expected);
+        assertThat(getHelperMethod(Inet4Address.class, false)).isEqualTo(expected);
+        assertThat(getHelperMethod(Inet6Address.class, false)).isEqualTo(expected);
+        assertThat(getHelperMethod(InetSocketAddress.class, false)).isEqualTo(expected);
     }
 
     @Test
     void getHelperMethodReturnsNullForUnrelatedClass() {
-        assertThat(getHelperMethod(Pojo.class)).isNull();
+        assertThat(getHelperMethod(Pojo.class, false)).isNull();
     }
 
     @Test
     void getHelperMethodReturnsNullForNullInput() {
-        assertThat(getHelperMethod(null)).isNull();
+        assertThat(getHelperMethod(null, false)).isNull();
     }
 
     @Test
@@ -277,7 +277,7 @@ class ObjectBuilderUtilTest {
                 Pojo.class,
                 "createPojo_0",
                 new Class<?>[]{String.class, int.class},
-                classNames, imports, staticImports);
+                classNames, imports, staticImports, false);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
                 "\tprivate static Pojo createPojo_0(",
@@ -314,7 +314,7 @@ class ObjectBuilderUtilTest {
                 Pojo.class,
                 "createPojo_0",
                 new Class<?>[0],
-                classNames, imports, staticImports);
+                classNames, imports, staticImports, false);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
                 "\tprivate static Pojo createPojo_0() {",
@@ -338,7 +338,7 @@ class ObjectBuilderUtilTest {
                 Pojo.class,
                 "createPojo_0",
                 new Class<?>[]{String.class, Integer.class},
-                classNames, imports, staticImports);
+                classNames, imports, staticImports, false);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
                 "\tprivate static Pojo createPojo_0(",
@@ -374,7 +374,7 @@ class ObjectBuilderUtilTest {
                 Pojo.class,
                 "createPojo_0",
                 List.of(stringValueField, integerValueField),
-                classNames, imports, staticImports);
+                classNames, imports, staticImports, false);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
                 "\tprivate static Pojo createPojo_0(",
@@ -404,7 +404,7 @@ class ObjectBuilderUtilTest {
         Set<String> imports = new HashSet<>();
         Set<String> staticImports = new HashSet<>();
 
-        String result = getSetFieldMethod(classNames, imports, staticImports);
+        String result = getSetFieldMethod(classNames, imports, staticImports, false);
 
         assertThat(result).isEqualTo(String.join(System.lineSeparator(),
                 "\tprivate static void setField(Object obj, Class<?> clazz, String fieldName, Object value) {",
