@@ -31,17 +31,24 @@ public abstract class ObjectBuilder {
     private ObjectBuilder parent;
     private String value;
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
-        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false);
+    private final boolean isKotlinSupport;
+
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean isKotlinSupport) {
+        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false, isKotlinSupport);
     }
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized) {
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized, boolean isKotlinSupport) {
         this.clazz = clazz;
         this.name = name;
         this.buildType = buildType;
         this.useFullyQualifiedName = useFullyQualifiedName;
         this.expectedChildren = expectedChildren;
         this.parameterized = parameterized;
+        this.isKotlinSupport = isKotlinSupport;
+    }
+
+    public boolean isKotlinSupport() {
+        return isKotlinSupport;
     }
 
     public void setSkipNullMethods(boolean skipNullMethods) {
@@ -193,7 +200,7 @@ public abstract class ObjectBuilder {
 
     private Set<String> collectMethods() {
         Set<String> methods = new HashSet<>(extraMethods);
-        Optional.ofNullable(getHelperMethod(getClazz())).ifPresent(methods::add);
+        Optional.ofNullable(getHelperMethod(getClazz(), isKotlinSupport())).ifPresent(methods::add);
         children.forEach(child -> methods.addAll(child.collectMethods()));
         return methods;
     }

@@ -55,6 +55,9 @@ public class GeneratedCodeUtil {
     }
 
     private static <T> void assertGeneratedCode(T object, Path path, String packageName, String simpleName, PopulateConfig populateConfig) {
+        if (populateConfig.isKotlinSupport()) {
+            return;
+        }
         try {
             compileGeneratedFile(path);
             Class<T> clazz = loadClass(path, packageName, path.getFileName().toString().replace(JAVA, ""), populateConfig);

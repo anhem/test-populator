@@ -17,7 +17,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     private final String buildMethodName;
 
     private TemplateObjectBuilder(Builder builder) {
-        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized);
+        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized, builder.isKotlinSupport);
         this.codeTemplate = builder.codeTemplate;
         this.factoryClassName = builder.factoryClassName;
         this.methodName = builder.methodName;
@@ -47,7 +47,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
             return Stream.empty();
         }
         String args = getArgs(argumentChildren);
-        return Stream.of(codeTemplate.render(PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, args));
+        return Stream.of(codeTemplate.render(isKotlinSupport(), PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, args));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     private List<String> buildFluentBuilder() {
         return concatenate(
                 buildChildren(),
-                Stream.of(codeTemplate.render(PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, buildArguments(getArgumentChildren()))),
+                Stream.of(codeTemplate.render(isKotlinSupport(), PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, buildArguments(getArgumentChildren()))),
                 renderBuilderMethodCalls(),
                 endBuilder(buildMethodName)
         ).collect(Collectors.toList());
