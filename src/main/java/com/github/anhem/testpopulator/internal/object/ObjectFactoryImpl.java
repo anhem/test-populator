@@ -4,6 +4,8 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.object.util.ValueStringifierUtil;
 import com.github.anhem.testpopulator.internal.util.ProtobufUtil;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -32,34 +34,38 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes) {
+    public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Parameter[] parameters) {
+        List<Boolean> isVarargs = Arrays.stream(parameters).map(Parameter::isVarArgs).collect(Collectors.toList());
         if (isNonPublicConstructor) {
-            TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren).codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR);
+            TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren).codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR).isVarargs(isVarargs);
             String helperMethodName = getHelperMethodName(builder.name);
             TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();
             Set<String> extraImports = new HashSet<>();
             Set<String> extraStaticImports = new HashSet<>();
-            objectBuilder.addMethod(getPrivateConstructorHelperMethod(clazz, helperMethodName, constructorParameterTypes, classNames, extraImports, extraStaticImports, populateConfig.isKotlinSupport()));
+            Class<?>[] parameterTypes = Arrays.stream(parameters).map(Parameter::getType).toArray(Class<?>[]::new);
+            objectBuilder.addMethod(getPrivateConstructorHelperMethod(clazz, helperMethodName, parameterTypes, classNames, extraImports, extraStaticImports, populateConfig.isKotlinSupport()));
             objectBuilder.addImports(extraImports);
             objectBuilder.addStaticImports(extraStaticImports);
             setNextObjectBuilder(objectBuilder);
         } else {
             setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
                     .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                    .isVarargs(isVarargs)
                     .build());
         }
     }
 
     @Override
-    public <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, List<String> parameterNames) {
+    public <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, List<String> parameterNames, List<Boolean> isVarargs) {
         setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
                 .codeTemplate(CodeTemplate.CONSTRUCTOR)
                 .kotlinParameterNames(parameterNames)
+                .isVarargs(isVarargs)
                 .build());
     }
 
     @Override
-    public <T> void field(Class<T> clazz, int expectedChildren, java.util.List<java.lang.reflect.Field> fields) {
+    public <T> void field(Class<T> clazz, int expectedChildren, List<Field> fields) {
         TemplateObjectBuilder.Builder builder = templateBuilder(clazz, FIELD, expectedChildren).codeTemplate(CodeTemplate.FIELD);
         String helperMethodName = getHelperMethodName(builder.name);
         TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();

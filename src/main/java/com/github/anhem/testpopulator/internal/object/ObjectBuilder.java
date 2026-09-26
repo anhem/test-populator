@@ -238,6 +238,10 @@ public abstract class ObjectBuilder {
                     if (buildType == BuildType.BUILDER) {
                         return String.format("\t.%s(%s)", child.getName(), child.buildArguments());
                     }
+                    if (isKotlinSupport && child.getName().startsWith("set") && child.getName().length() > 3 && Character.isUpperCase(child.getName().charAt(3))) {
+                        String propertyName = Character.toLowerCase(child.getName().charAt(3)) + child.getName().substring(4);
+                        return String.format("%s.%s = %s", name, propertyName, child.buildArguments());
+                    }
                     return String.format("%s.%s(%s);", name, child.getName(), child.buildArguments());
                 });
     }

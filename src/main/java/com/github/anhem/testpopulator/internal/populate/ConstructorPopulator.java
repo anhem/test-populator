@@ -51,7 +51,7 @@ public class ConstructorPopulator implements PopulatingStrategy {
                     classCarrier.getClazz(),
                     realParameterCount,
                     !Modifier.isPublic(constructor.getModifiers()),
-                    constructor.getParameterTypes()
+                    primaryConstructor.getParameters()
             );
             Object[] arguments = populateKotlinArguments(primaryConstructor, classCarrier, populator, realParameterCount, maskCount);
             return constructor.newInstance(arguments);
@@ -61,7 +61,7 @@ public class ConstructorPopulator implements PopulatingStrategy {
                 classCarrier.getClazz(),
                 parameterCount,
                 !Modifier.isPublic(constructor.getModifiers()),
-                constructor.getParameterTypes()
+                constructor.getParameters()
         );
         Object[] arguments = populateArguments(constructor, classCarrier, populator, parameterCount);
         return constructor.newInstance(arguments);
@@ -72,16 +72,19 @@ public class ConstructorPopulator implements PopulatingStrategy {
 
         int nonDefaultCount = realParamCount - defaultedIndices.size();
         java.util.List<String> parameterNames = new java.util.ArrayList<>();
+        java.util.List<Boolean> isVarargs = new java.util.ArrayList<>();
         for (int i = 0; i < realParamCount; i++) {
             if (!defaultedIndices.contains(i)) {
                 parameterNames.add(primaryCtor.getParameters()[i].getName());
+                isVarargs.add(primaryCtor.getParameters()[i].isVarArgs());
             }
         }
 
         classCarrier.getObjectFactory().kotlinDefaultConstructor(
                 classCarrier.getClazz(),
                 nonDefaultCount,
-                parameterNames
+                parameterNames,
+                isVarargs
         );
 
         Object[] realArgs = new Object[realParamCount];

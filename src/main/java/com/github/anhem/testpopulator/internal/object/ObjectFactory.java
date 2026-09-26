@@ -1,12 +1,14 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import java.util.List;
+
 public interface ObjectFactory {
 
-    <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes);
+    <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, java.lang.reflect.Parameter[] parameters);
 
-    <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, java.util.List<String> parameterNames);
+    <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, List<String> parameterNames, List<Boolean> isVarargs);
 
-    <T> void field(Class<T> clazz, int expectedChildren, java.util.List<java.lang.reflect.Field> fields);
+    <T> void field(Class<T> clazz, int expectedChildren, List<java.lang.reflect.Field> fields);
 
     <T> void setter(Class<T> clazz, int expectedChildren);
 
