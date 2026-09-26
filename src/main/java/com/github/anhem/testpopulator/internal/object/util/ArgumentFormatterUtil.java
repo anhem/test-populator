@@ -68,7 +68,7 @@ public class ArgumentFormatterUtil {
                 .collect(Collectors.joining(delimiter, prefix, suffix));
     }
 
-    static String getChildArgument(ObjectBuilder child) {
+    public static String getChildArgument(ObjectBuilder child) {
         if (child.isNullValue()) {
             return NULL;
         }

@@ -10,6 +10,7 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
     protected boolean parameterized;
     protected Class<?>[] referencedClasses = new Class<?>[0];
     protected boolean isKotlinSupport;
+    protected java.util.List<String> kotlinParameterNames;
 
     public B clazz(Class<?> clazz) {
         this.clazz = clazz;
@@ -48,6 +49,11 @@ public abstract class BaseBuilder<B extends BaseBuilder<B>> {
 
     public B isKotlinSupport(boolean isKotlinSupport) {
         this.isKotlinSupport = isKotlinSupport;
+        return (B) this;
+    }
+
+    public B kotlinParameterNames(java.util.List<String> kotlinParameterNames) {
+        this.kotlinParameterNames = kotlinParameterNames;
         return (B) this;
     }
 

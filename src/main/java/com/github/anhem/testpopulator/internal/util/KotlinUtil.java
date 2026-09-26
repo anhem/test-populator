@@ -129,4 +129,85 @@ public class KotlinUtil {
     public static String getCompanionMethodName(Method companionMethod) {
         return "Companion." + companionMethod.getName();
     }
+
+    public static <T> Set<Integer> detectDefaultedParameters(
+            Constructor<T> syntheticCtor,
+            Constructor<T> primaryCtor,
+            com.github.anhem.testpopulator.internal.carrier.ClassCarrier<T> carrier,
+            com.github.anhem.testpopulator.internal.populate.Populator populator,
+            int realParamCount,
+            int maskCount) {
+        try {
+            com.github.anhem.testpopulator.internal.object.ObjectFactory dummyFactory = new com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid();
+            com.github.anhem.testpopulator.internal.carrier.ClassCarrier<T> dummyCarrier = carrier.mutateObjectFactory(dummyFactory);
+
+            Object[] validArgs = new Object[realParamCount];
+            for (int i = 0; i < realParamCount; i++) {
+                validArgs[i] = populator.populate(dummyCarrier.createChild(primaryCtor.getParameters()[i]));
+            }
+
+            Object[] baseArgs = Arrays.copyOf(validArgs, realParamCount + maskCount + 1);
+            for (int i = 0; i < maskCount; i++) {
+                baseArgs[realParamCount + i] = 0;
+            }
+            baseArgs[baseArgs.length - 1] = null;
+
+            T baseObj = syntheticCtor.newInstance(baseArgs);
+
+            Set<Integer> defaultedIndices = new HashSet<>();
+            for (int i = 0; i < realParamCount; i++) {
+                Object[] testArgs = baseArgs.clone();
+                int maskIndex = i / 32;
+                int bitPosition = i % 32;
+                testArgs[realParamCount + maskIndex] = (1 << bitPosition);
+
+                T testObj = syntheticCtor.newInstance(testArgs);
+
+                if (!objectsAreEqual(baseObj, testObj)) {
+                    defaultedIndices.add(i);
+                }
+            }
+            return defaultedIndices;
+        } catch (Exception e) {
+            return Collections.emptySet();
+        }
+    }
+
+    private static boolean objectsAreEqual(Object obj1, Object obj2) {
+        if (obj1 == null || obj2 == null) {
+            return obj1 == obj2;
+        }
+        try {
+            if (obj1.equals(obj2) && obj1.getClass().getMethod("equals", Object.class).getDeclaringClass() != Object.class) {
+                return true;
+            }
+            for (Field field : obj1.getClass().getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+                field.setAccessible(true);
+                if (!Objects.equals(field.get(obj1), field.get(obj2))) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static Object getDefaultValueForType(Class<?> type) {
+        if (!type.isPrimitive()) {
+            return null;
+        }
+        if (type == boolean.class) return false;
+        if (type == char.class) return '\0';
+        if (type == byte.class) return (byte) 0;
+        if (type == short.class) return (short) 0;
+        if (type == int.class) return 0;
+        if (type == long.class) return 0L;
+        if (type == float.class) return 0.0f;
+        if (type == double.class) return 0.0d;
+        return null;
+    }
 }

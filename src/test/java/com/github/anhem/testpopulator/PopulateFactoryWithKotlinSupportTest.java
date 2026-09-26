@@ -67,6 +67,16 @@ class PopulateFactoryWithKotlinSupportTest {
         assertThat(result.getValue()).isEqualTo("default_value");
         assertThat(result.getId()).isNotZero();
         assertThat(result.getInnerClass()).isNotNull();
+
+        com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCodeContains(result, populateConfig,
+                "KotlinLikeClass("
+        );
+        try {
+            com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCodeContains(result, populateConfig, "arg0 = ");
+            org.junit.jupiter.api.Assertions.fail("Should not contain 'arg0 = '");
+        } catch (AssertionError e) {
+            // expected
+        }
     }
 
     @Test

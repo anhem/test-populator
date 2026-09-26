@@ -4,6 +4,8 @@ public interface ObjectFactory {
 
     <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes);
 
+    <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, java.util.List<String> parameterNames);
+
     <T> void field(Class<T> clazz, int expectedChildren, java.util.List<java.lang.reflect.Field> fields);
 
     <T> void setter(Class<T> clazz, int expectedChildren);

@@ -51,6 +51,14 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
+    public <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, List<String> parameterNames) {
+        setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
+                .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                .kotlinParameterNames(parameterNames)
+                .build());
+    }
+
+    @Override
     public <T> void field(Class<T> clazz, int expectedChildren, java.util.List<java.lang.reflect.Field> fields) {
         TemplateObjectBuilder.Builder builder = templateBuilder(clazz, FIELD, expectedChildren).codeTemplate(CodeTemplate.FIELD);
         String helperMethodName = getHelperMethodName(builder.name);

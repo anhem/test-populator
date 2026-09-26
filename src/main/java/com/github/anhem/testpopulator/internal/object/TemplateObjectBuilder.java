@@ -15,6 +15,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     private final boolean skipIfNull;
     private final boolean clearArgsIfNullChild;
     private final String buildMethodName;
+    private final List<String> kotlinParameterNames;
 
     private TemplateObjectBuilder(Builder builder) {
         super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized, builder.isKotlinSupport);
@@ -24,6 +25,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         this.skipIfNull = builder.skipIfNull;
         this.clearArgsIfNullChild = builder.clearArgsIfNullChild;
         this.buildMethodName = builder.buildMethodName;
+        this.kotlinParameterNames = builder.kotlinParameterNames;
         for (Class<?> referencedClass : builder.referencedClasses) {
             addReferencedClass(referencedClass);
         }
@@ -54,6 +56,18 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     protected String buildArguments(List<ObjectBuilder> children) {
         if (clearArgsIfNullChild && children.stream().anyMatch(ObjectBuilder::isNullValue)) {
             return "";
+        }
+        if (kotlinParameterNames != null && !kotlinParameterNames.isEmpty()) {
+            return java.util.stream.IntStream.range(0, children.size())
+                    .mapToObj(i -> {
+                        String argument = com.github.anhem.testpopulator.internal.object.util.ArgumentFormatterUtil.getChildArgument(children.get(i));
+                        String paramName = kotlinParameterNames.get(i);
+                        if (!paramName.matches("arg\\d+")) {
+                            return paramName + " = " + argument;
+                        }
+                        return argument;
+                    })
+                    .collect(Collectors.joining(", "));
         }
         return super.buildArguments(children);
     }

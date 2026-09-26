@@ -102,6 +102,10 @@ public class ClassCarrier<T> extends Carrier {
         visited.add(clazz.getName());
         return true;
     }
+
+    public ClassCarrier<T> mutateObjectFactory(ObjectFactory newObjectFactory) {
+        return new ClassCarrier<>(clazz, name, newObjectFactory, visited, populateConfig, typeVariables, argumentTypes);
+    }
 }
 
 
