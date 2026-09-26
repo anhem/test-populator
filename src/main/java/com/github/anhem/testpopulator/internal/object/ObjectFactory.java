@@ -4,7 +4,11 @@ import java.util.List;
 
 public interface ObjectFactory {
 
-    <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, java.lang.reflect.Parameter[] parameters);
+    <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes);
+
+    default <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes, java.util.List<Boolean> isVarargs) {
+        constructor(clazz, expectedChildren, isNonPublicConstructor, constructorParameterTypes);
+    }
 
     <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, List<String> parameterNames, List<Boolean> isVarargs);
 

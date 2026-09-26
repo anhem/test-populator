@@ -47,21 +47,25 @@ public class ConstructorPopulator implements PopulatingStrategy {
                 return populateWithKotlinDefaults(constructor, primaryConstructor, classCarrier, populator, realParameterCount, maskCount);
             }
 
+            java.util.List<Boolean> isVarargs = java.util.Arrays.stream(primaryConstructor.getParameters()).map(java.lang.reflect.Parameter::isVarArgs).collect(java.util.stream.Collectors.toList());
             classCarrier.getObjectFactory().constructor(
                     classCarrier.getClazz(),
                     realParameterCount,
                     !Modifier.isPublic(constructor.getModifiers()),
-                    primaryConstructor.getParameters()
+                    primaryConstructor.getParameterTypes(),
+                    isVarargs
             );
             Object[] arguments = populateKotlinArguments(primaryConstructor, classCarrier, populator, realParameterCount, maskCount);
             return constructor.newInstance(arguments);
         }
 
+        java.util.List<Boolean> isVarargs = java.util.Arrays.stream(constructor.getParameters()).map(java.lang.reflect.Parameter::isVarArgs).collect(java.util.stream.Collectors.toList());
         classCarrier.getObjectFactory().constructor(
                 classCarrier.getClazz(),
                 parameterCount,
                 !Modifier.isPublic(constructor.getModifiers()),
-                constructor.getParameters()
+                constructor.getParameterTypes(),
+                isVarargs
         );
         Object[] arguments = populateArguments(constructor, classCarrier, populator, parameterCount);
         return constructor.newInstance(arguments);
