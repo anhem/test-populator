@@ -178,6 +178,19 @@ class PopulateFactoryWithKotlinSupportTest {
         populateAndAssertWithGeneratedCode(KotlinLikeJvmOverloads.class);
     }
 
+    @Test
+    void canPopulateKotlinLikeClassWithCollections() {
+        populateAndAssertWithGeneratedCode(KotlinLikeClassWithCollections.class);
+    }
+
+    @Test
+    void generatesKotlinMapWithToSyntax() {
+        KotlinLikeClassWithCollections result = populateFactory.populate(KotlinLikeClassWithCollections.class);
+
+        assertThat(result).isNotNull();
+        com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCodeContains(result, populateConfig, " to ");
+    }
+
     private <T> void populateAndAssertWithGeneratedCode(Class<T> clazz) {
         T result = populateFactory.populate(clazz);
 

@@ -256,7 +256,7 @@ public abstract class ObjectBuilder {
         if (children.isEmpty()) {
             return "";
         }
-        return ArgumentFormatterUtil.format(children, getBuildType(), getName(), useFullyQualifiedName);
+        return ArgumentFormatterUtil.format(children, getBuildType(), getName(), useFullyQualifiedName, isKotlinSupport);
     }
 
     protected String formatTypes() {
