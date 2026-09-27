@@ -19,7 +19,7 @@ public class ArgumentFormatterUtil {
     private ArgumentFormatterUtil() {
     }
 
-    public static String format(List<ObjectBuilder> children, BuildType buildType, String name, boolean useFullyQualifiedName) {
+    public static String format(List<ObjectBuilder> children, BuildType buildType, String name, boolean useFullyQualifiedName, boolean isKotlinSupport) {
         if (children.isEmpty()) {
             return "";
         }
@@ -38,22 +38,37 @@ public class ArgumentFormatterUtil {
             String prefixTabs = isMethodLevel ? "\t\t\t\t" : "\t\t\t";
             String suffixTabs = isMethodLevel ? "\t\t" : "\t";
             if (isMap) {
-                return formatMapArguments(arguments, prefixTabs, suffixTabs);
+                return formatMapArguments(arguments, prefixTabs, suffixTabs, isKotlinSupport);
             }
             return formatMultilineArguments(arguments, prefixTabs, suffixTabs);
+        }
+        if (isMap && isKotlinSupport) {
+            return formatKotlinMapArguments(arguments);
         }
         return String.join(ARGUMENT_DELIMITER, arguments);
     }
 
-    private static String formatMapArguments(List<String> arguments, String prefixTabs, String suffixTabs) {
+    private static String formatKotlinMapArguments(List<String> arguments) {
+        return IntStream.iterate(0, i -> i < arguments.size(), i -> i + 2)
+                .mapToObj(i -> {
+                    if (i + 1 < arguments.size()) {
+                        return arguments.get(i) + " to " + arguments.get(i + 1);
+                    }
+                    return arguments.get(i);
+                })
+                .collect(Collectors.joining(ARGUMENT_DELIMITER));
+    }
+
+    private static String formatMapArguments(List<String> arguments, String prefixTabs, String suffixTabs, boolean isKotlinSupport) {
         String prefix = System.lineSeparator() + prefixTabs;
         String suffix = System.lineSeparator() + suffixTabs;
         String pairDelimiter = "," + System.lineSeparator() + prefixTabs;
+        String pairSeparator = isKotlinSupport ? " to " : ", ";
 
         return IntStream.iterate(0, i -> i < arguments.size(), i -> i + 2)
                 .mapToObj(i -> {
                     if (i + 1 < arguments.size()) {
-                        return arguments.get(i) + ", " + arguments.get(i + 1);
+                        return arguments.get(i) + pairSeparator + arguments.get(i + 1);
                     }
                     return arguments.get(i);
                 })
@@ -68,7 +83,7 @@ public class ArgumentFormatterUtil {
                 .collect(Collectors.joining(delimiter, prefix, suffix));
     }
 
-    static String getChildArgument(ObjectBuilder child) {
+    public static String getChildArgument(ObjectBuilder child) {
         if (child.isNullValue()) {
             return NULL;
         }

@@ -107,23 +107,43 @@ public class ObjectBuilderUtil {
         return false;
     }
 
-    public static String getHelperMethod(Class<?> clazz) {
+    public static String getHelperMethod(Class<?> clazz, boolean isKotlinSupport) {
         if (clazz != null && clazz.equals(java.net.URL.class)) {
+            if (isKotlinSupport) {
+                return String.join(System.lineSeparator(),
+                        "	private fun toUrl(url: String): java.net.URL {",
+                        "		try {",
+                        "			return java.net.URL(url)",
+                        "		} catch (e: java.net.MalformedURLException) {",
+                        "			throw RuntimeException(e)",
+                        "		}",
+                        "	}");
+            }
             return String.join(System.lineSeparator(),
-                    "\tprivate static java.net.URL toUrl(String url) {",
+                    "	private static java.net.URL toUrl(String url) {",
                     TRY_START,
-                    "\t\t\treturn new java.net.URL(url);",
-                    "\t\t} catch (java.net.MalformedURLException e) {",
+                    "			return new java.net.URL(url);",
+                    "		} catch (java.net.MalformedURLException e) {",
                     THROW_RUNTIME_EXCEPTION,
                     BLOCK_END,
                     METHOD_END);
         }
         if (clazz != null && (clazz.equals(InetAddress.class) || clazz.equals(Inet4Address.class) || clazz.equals(Inet6Address.class) || clazz.equals(InetSocketAddress.class))) {
+            if (isKotlinSupport) {
+                return String.join(System.lineSeparator(),
+                        "	private fun toInetAddress(host: String): java.net.InetAddress {",
+                        "		try {",
+                        "			return java.net.InetAddress.getByName(host)",
+                        "		} catch (e: java.net.UnknownHostException) {",
+                        "			throw RuntimeException(e)",
+                        "		}",
+                        "	}");
+            }
             return String.join(System.lineSeparator(),
-                    "\tprivate static java.net.InetAddress toInetAddress(String host) {",
+                    "	private static java.net.InetAddress toInetAddress(String host) {",
                     TRY_START,
-                    "\t\t\treturn java.net.InetAddress.getByName(host);",
-                    "\t\t} catch (java.net.UnknownHostException e) {",
+                    "			return java.net.InetAddress.getByName(host);",
+                    "		} catch (java.net.UnknownHostException e) {",
                     THROW_RUNTIME_EXCEPTION,
                     BLOCK_END,
                     METHOD_END);
@@ -131,7 +151,33 @@ public class ObjectBuilderUtil {
         return null;
     }
 
-    public static String getPrivateConstructorHelperMethod(Class<?> clazz, String helperMethodName, Class<?>[] parameterTypes, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+    public static String getPrivateConstructorHelperMethod(Class<?> clazz, String helperMethodName, Class<?>[] parameterTypes, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports, boolean isKotlinSupport) {
+        if (isKotlinSupport) {
+            String className = getClassName(clazz, classNames, imports, staticImports);
+            String parameterDeclarations = getKotlinParameterDeclarations(parameterTypes, classNames, imports, staticImports);
+            String parameterTypeClasses = getKotlinParameterTypeClasses(parameterTypes, classNames, imports, staticImports);
+            String parameterArguments = getParameterArguments(parameterTypes);
+            return String.join(System.lineSeparator(),
+                    String.format(
+                            "	private fun %s(%s): %s {",
+                            helperMethodName,
+                            parameterDeclarations,
+                            className
+                    ),
+                    "		try {",
+                    String.format(
+                            "			val constructor = %s::class.java.getDeclaredConstructor(%s)",
+                            className,
+                            parameterTypeClasses
+                    ),
+                    "			constructor.isAccessible = true",
+                    String.format("			return constructor.newInstance(%s)", parameterArguments),
+                    "		} catch (e: Exception) {",
+                    "			throw RuntimeException(e)",
+                    "		}",
+                    "	}"
+            );
+        }
         String className = getClassName(clazz, classNames, imports, staticImports);
         String constructorClassName = getClassName(java.lang.reflect.Constructor.class, classNames, imports, staticImports);
         String parameterDeclarations = getParameterDeclarations(parameterTypes, classNames, imports, staticImports);
@@ -139,49 +185,75 @@ public class ObjectBuilderUtil {
         String parameterArguments = getParameterArguments(parameterTypes);
         return String.join(System.lineSeparator(),
                 String.format(
-                        "\tprivate static %s %s(%s) {",
+                        "	private static %s %s(%s) {",
                         className,
                         helperMethodName,
                         parameterDeclarations
                 ),
                 TRY_START,
                 String.format(
-                        "\t\t\t%s<%s> constructor = %s.class.getDeclaredConstructor(%s);",
+                        "			%s<%s> constructor = %s.class.getDeclaredConstructor(%s);",
                         constructorClassName,
                         className,
                         className,
                         parameterTypeClasses
                 ),
-                "\t\t\tconstructor.setAccessible(true);",
-                String.format("\t\t\treturn constructor.newInstance(%s);", parameterArguments),
-                "\t\t} catch (Exception e) {",
+                "			constructor.setAccessible(true);",
+                String.format("			return constructor.newInstance(%s);", parameterArguments),
+                "		} catch (Exception e) {",
                 THROW_RUNTIME_EXCEPTION,
                 BLOCK_END,
                 METHOD_END
         );
     }
 
-    public static String getFieldHelperMethod(Class<?> clazz, String helperMethodName, List<java.lang.reflect.Field> fields, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+    public static String getFieldHelperMethod(Class<?> clazz, String helperMethodName, List<java.lang.reflect.Field> fields, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports, boolean isKotlinSupport) {
+        if (isKotlinSupport) {
+            String className = getClassName(clazz, classNames, imports, staticImports);
+            Class<?>[] parameterTypes = getParameterTypes(fields);
+            String parameterDeclarations = getKotlinParameterDeclarations(parameterTypes, classNames, imports, staticImports);
+
+            List<String> lines = new ArrayList<>();
+            lines.add(String.format("	private fun %s(%s): %s {", helperMethodName, parameterDeclarations, className));
+            lines.add("		try {");
+            lines.add(String.format("			val constructor = %s::class.java.getDeclaredConstructor()", className));
+            lines.add("			constructor.isAccessible = true");
+            lines.add(String.format("			val obj = constructor.newInstance()"));
+
+            for (int i = 0; i < fields.size(); i++) {
+                java.lang.reflect.Field field = fields.get(i);
+                String declaringClassName = getClassName(field.getDeclaringClass(), classNames, imports, staticImports);
+                lines.add(String.format("			setField(obj, %s::class.java, \"%s\", p%d)", declaringClassName, field.getName(), i));
+            }
+
+            lines.add("			return obj");
+            lines.add("		} catch (e: Exception) {");
+            lines.add("			throw RuntimeException(e)");
+            lines.add("		}");
+            lines.add("	}");
+
+            return String.join(System.lineSeparator(), lines);
+        }
         String className = getClassName(clazz, classNames, imports, staticImports);
         String constructorClassName = getClassName(java.lang.reflect.Constructor.class, classNames, imports, staticImports);
         Class<?>[] parameterTypes = getParameterTypes(fields);
         String parameterDeclarations = getParameterDeclarations(parameterTypes, classNames, imports, staticImports);
 
         List<String> lines = new ArrayList<>();
-        lines.add(String.format("\tprivate static %s %s(%s) {", className, helperMethodName, parameterDeclarations));
+        lines.add(String.format("	private static %s %s(%s) {", className, helperMethodName, parameterDeclarations));
         lines.add(TRY_START);
-        lines.add(String.format("\t\t\t%s<%s> constructor = %s.class.getDeclaredConstructor();", constructorClassName, className, className));
-        lines.add("\t\t\tconstructor.setAccessible(true);");
-        lines.add(String.format("\t\t\t%s obj = constructor.newInstance();", className));
+        lines.add(String.format("			%s<%s> constructor = %s.class.getDeclaredConstructor();", constructorClassName, className, className));
+        lines.add("			constructor.setAccessible(true);");
+        lines.add(String.format("			%s obj = constructor.newInstance();", className));
 
         for (int i = 0; i < fields.size(); i++) {
             java.lang.reflect.Field field = fields.get(i);
             String declaringClassName = getClassName(field.getDeclaringClass(), classNames, imports, staticImports);
-            lines.add(String.format("\t\t\tsetField(obj, %s.class, \"%s\", p%d);", declaringClassName, field.getName(), i));
+            lines.add(String.format("			setField(obj, %s.class, \"%s\", p%d);", declaringClassName, field.getName(), i));
         }
 
-        lines.add("\t\t\treturn obj;");
-        lines.add("\t\t} catch (Exception e) {");
+        lines.add("			return obj;");
+        lines.add("		} catch (Exception e) {");
         lines.add(THROW_RUNTIME_EXCEPTION);
         lines.add(BLOCK_END);
         lines.add(METHOD_END);
@@ -189,15 +261,27 @@ public class ObjectBuilderUtil {
         return String.join(System.lineSeparator(), lines);
     }
 
-    public static String getSetFieldMethod(Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+    public static String getSetFieldMethod(Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports, boolean isKotlinSupport) {
+        if (isKotlinSupport) {
+            return String.join(System.lineSeparator(),
+                    "	private fun setField(obj: Any, clazz: Class<*>, fieldName: String, value: Any?) {",
+                    "		try {",
+                    "			val field = clazz.getDeclaredField(fieldName)",
+                    "			field.isAccessible = true",
+                    "			field.set(obj, value)",
+                    "		} catch (e: Exception) {",
+                    "			throw RuntimeException(e)",
+                    "		}",
+                    "	}");
+        }
         String fieldClassName = getClassName(java.lang.reflect.Field.class, classNames, imports, staticImports);
         return String.join(System.lineSeparator(),
-                "\tprivate static void setField(Object obj, Class<?> clazz, String fieldName, Object value) {",
+                "	private static void setField(Object obj, Class<?> clazz, String fieldName, Object value) {",
                 TRY_START,
-                String.format("\t\t\t%s field = clazz.getDeclaredField(fieldName);", fieldClassName),
-                "\t\t\tfield.setAccessible(true);",
-                "\t\t\tfield.set(obj, value);",
-                "\t\t} catch (Exception e) {",
+                String.format("			%s field = clazz.getDeclaredField(fieldName);", fieldClassName),
+                "			field.setAccessible(true);",
+                "			field.set(obj, value);",
+                "		} catch (Exception e) {",
                 THROW_RUNTIME_EXCEPTION,
                 BLOCK_END,
                 METHOD_END);
@@ -242,6 +326,30 @@ public class ObjectBuilderUtil {
         }
         return java.util.stream.IntStream.range(0, parameterTypes.length)
                 .mapToObj(i -> "p" + i)
+                .collect(java.util.stream.Collectors.joining(", "));
+    }
+
+    private static String getKotlinParameterDeclarations(Class<?>[] parameterTypes, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        if (parameterTypes.length > 1) {
+            return System.lineSeparator() + "\t\t\t" + java.util.stream.IntStream.range(0, parameterTypes.length)
+                    .mapToObj(i -> String.format("p%d: %s", i, getClassName(parameterTypes[i], classNames, imports, staticImports)))
+                    .collect(java.util.stream.Collectors.joining("," + System.lineSeparator() + "\t\t\t")) +
+                    System.lineSeparator() + "\t";
+        }
+        return java.util.stream.IntStream.range(0, parameterTypes.length)
+                .mapToObj(i -> String.format("p%d: %s", i, getClassName(parameterTypes[i], classNames, imports, staticImports)))
+                .collect(java.util.stream.Collectors.joining(", "));
+    }
+
+    private static String getKotlinParameterTypeClasses(Class<?>[] parameterTypes, Map<String, Class<?>> classNames, Set<String> imports, Set<String> staticImports) {
+        if (parameterTypes.length > 1) {
+            return System.lineSeparator() + "\t\t\t\t\t" + Arrays.stream(parameterTypes)
+                    .map(p -> String.format("%s::class.java", getClassName(p, classNames, imports, staticImports)))
+                    .collect(java.util.stream.Collectors.joining("," + System.lineSeparator() + "\t\t\t\t\t")) +
+                    System.lineSeparator() + "\t\t\t\t";
+        }
+        return Arrays.stream(parameterTypes)
+                .map(p -> String.format("%s::class.java", getClassName(p, classNames, imports, staticImports)))
                 .collect(java.util.stream.Collectors.joining(", "));
     }
 

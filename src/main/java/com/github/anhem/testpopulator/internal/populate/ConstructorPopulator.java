@@ -8,16 +8,20 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
-import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isKotlinConstructor;
+import static com.github.anhem.testpopulator.internal.util.KotlinUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.getLargestConstructor;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.setAccessible;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 public class ConstructorPopulator implements PopulatingStrategy {
 
@@ -36,18 +40,74 @@ public class ConstructorPopulator implements PopulatingStrategy {
 
     protected <T> T populateUsingConstructor(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         int parameterCount = constructor.getParameterCount();
+        boolean isKotlinConstructor = isKotlinConstructor(constructor, classCarrier.getPopulateConfig().isKotlinSupport());
+
+        if (isKotlinConstructor) {
+            int maskCount = (parameterCount - 2) / 32 + 1;
+            int realParameterCount = parameterCount - maskCount - 1;
+            Constructor<T> primaryConstructor = findPrimaryConstructor(constructor, realParameterCount);
+
+            if (classCarrier.getPopulateConfig().isUseKotlinDefaultValues()) {
+                return populateWithKotlinDefaults(constructor, primaryConstructor, classCarrier, populator, realParameterCount, maskCount);
+            }
+
+            List<Boolean> isVarargs = Arrays.stream(primaryConstructor.getParameters()).map(Parameter::isVarArgs).collect(toList());
+            classCarrier.getObjectFactory().constructor(
+                    classCarrier.getClazz(),
+                    realParameterCount,
+                    !Modifier.isPublic(constructor.getModifiers()),
+                    primaryConstructor.getParameterTypes(),
+                    isVarargs
+            );
+            Object[] arguments = populateKotlinArguments(primaryConstructor, classCarrier, populator, realParameterCount, maskCount);
+            return constructor.newInstance(arguments);
+        }
+
+        List<Boolean> isVarargs = Arrays.stream(constructor.getParameters()).map(Parameter::isVarArgs).collect(toList());
         classCarrier.getObjectFactory().constructor(
                 classCarrier.getClazz(),
                 parameterCount,
                 !Modifier.isPublic(constructor.getModifiers()),
-                constructor.getParameterTypes()
+                constructor.getParameterTypes(),
+                isVarargs
         );
-        Object[] arguments = isKotlinConstructor(constructor, classCarrier.getPopulateConfig().isKotlinSupport()) ?
-                populateKotlinArguments(constructor, classCarrier, populator) :
-                populateArguments(constructor, classCarrier, populator, parameterCount);
+        Object[] arguments = populateArguments(constructor, classCarrier, populator, parameterCount);
         return constructor.newInstance(arguments);
     }
 
+    private <T> T populateWithKotlinDefaults(Constructor<T> syntheticCtor, Constructor<T> primaryCtor, ClassCarrier<T> classCarrier, Populator populator, int realParamCount, int maskCount) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        Set<Integer> defaultedIndices = detectDefaultedParameters(syntheticCtor, primaryCtor, classCarrier, populator, realParamCount, maskCount);
+
+        int nonDefaultCount = realParamCount - defaultedIndices.size();
+        List<String> parameterNames = new ArrayList<>();
+        List<Boolean> isVarargs = new ArrayList<>();
+        for (int i = 0; i < realParamCount; i++) {
+            if (!defaultedIndices.contains(i)) {
+                parameterNames.add(primaryCtor.getParameters()[i].getName());
+                isVarargs.add(primaryCtor.getParameters()[i].isVarArgs());
+            }
+        }
+
+        classCarrier.getObjectFactory().kotlinDefaultConstructor(
+                classCarrier.getClazz(),
+                nonDefaultCount,
+                parameterNames,
+                isVarargs
+        );
+
+        Object[] realArgs = new Object[realParamCount];
+        for (int i = 0; i < realParamCount; i++) {
+            if (defaultedIndices.contains(i)) {
+                realArgs[i] = getDefaultValueForType(primaryCtor.getParameterTypes()[i]);
+            } else {
+                realArgs[i] = populateArgument(primaryCtor, classCarrier, populator, i);
+            }
+        }
+
+        Object[] masks = IntStream.range(0, maskCount).mapToObj(i -> -1).toArray();
+        Object[] arguments = Stream.concat(Arrays.stream(realArgs), Stream.concat(Arrays.stream(masks), Stream.of((Object) null))).toArray();
+        return syntheticCtor.newInstance(arguments);
+    }
 
     private <T> Object[] populateArguments(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator, int parameterCount) {
         return IntStream.range(0, parameterCount)
@@ -60,22 +120,13 @@ public class ConstructorPopulator implements PopulatingStrategy {
         return populator.populate(classCarrier.createChild(parameter));
     }
 
-    private <T> Object[] populateKotlinArguments(Constructor<T> constructor, ClassCarrier<T> classCarrier, Populator populator) {
-        int parameterCount = constructor.getParameterCount();
-        int maskCount = (parameterCount - 2) / 32 + 1;
-        int realParameterCount = parameterCount - maskCount - 1;
-        boolean useKotlinDefaultValues = classCarrier.getPopulateConfig().isUseKotlinDefaultValues();
-        Constructor<T> primaryConstructor = findPrimaryConstructor(constructor, realParameterCount);
-
+    private <T> Object[] populateKotlinArguments(Constructor<T> primaryConstructor, ClassCarrier<T> classCarrier, Populator populator, int realParameterCount, int maskCount) {
         Object[] arguments = IntStream.range(0, realParameterCount)
                 .mapToObj(i -> populateArgument(primaryConstructor, classCarrier, populator, i))
                 .toArray();
-        int maskValue = useKotlinDefaultValues ? -1 : 0;
         Object[] masks = IntStream.range(0, maskCount)
-                .mapToObj(i -> maskValue)
-                .peek(mask -> classCarrier.getObjectFactory().value(mask, int.class, null))
+                .mapToObj(i -> 0)
                 .toArray();
-        classCarrier.getObjectFactory().nullValue(constructor.getParameterTypes()[parameterCount - 1]);
         return Stream.concat(Arrays.stream(arguments), Stream.concat(Arrays.stream(masks), Stream.of((Object) null)))
                 .toArray();
     }

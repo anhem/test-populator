@@ -4,8 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.anhem.testpopulator.internal.object.util.ArgumentFormatterUtil.getChildArgument;
 import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.concatenate;
 import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.endBuilder;
+import static java.lang.String.format;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.stream.IntStream.range;
 
 public class TemplateObjectBuilder extends ObjectBuilder {
 
@@ -15,15 +19,19 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     private final boolean skipIfNull;
     private final boolean clearArgsIfNullChild;
     private final String buildMethodName;
+    private final List<String> kotlinParameterNames;
+    private final List<Boolean> isVarargs;
 
     private TemplateObjectBuilder(Builder builder) {
-        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized);
+        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized, builder.isKotlinSupport);
         this.codeTemplate = builder.codeTemplate;
         this.factoryClassName = builder.factoryClassName;
         this.methodName = builder.methodName;
         this.skipIfNull = builder.skipIfNull;
         this.clearArgsIfNullChild = builder.clearArgsIfNullChild;
         this.buildMethodName = builder.buildMethodName;
+        this.kotlinParameterNames = builder.kotlinParameterNames;
+        this.isVarargs = builder.isVarargs;
         for (Class<?> referencedClass : builder.referencedClasses) {
             addReferencedClass(referencedClass);
         }
@@ -46,14 +54,41 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         if (codeTemplate == null || (skipIfNull && isNullValue())) {
             return Stream.empty();
         }
+        if (isKotlinSupport() && getClazz() != null && getClazz().isMemberClass() && !isStatic(getClazz().getModifiers()) && !argumentChildren.isEmpty()) {
+            String outerInstance = getChildArgument(argumentChildren.get(0));
+            List<ObjectBuilder> remainingArgs = argumentChildren.subList(1, argumentChildren.size());
+            String remainingArgsString = getArgs(remainingArgs);
+            String outerClassName = isUseFullyQualifiedName() ? getClazz().getDeclaringClass().getCanonicalName() : getClazz().getDeclaringClass().getSimpleName();
+            String innerClassName = getClazz().getSimpleName();
+            String typeName = outerClassName + "." + innerClassName;
+            return Stream.of(format("%s %s: %s = %s.%s(%s)", PSF, getName(), typeName, outerInstance, innerClassName, remainingArgsString));
+        }
         String args = getArgs(argumentChildren);
-        return Stream.of(codeTemplate.render(PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, args));
+        return Stream.of(codeTemplate.render(isKotlinSupport(), PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, args));
     }
 
     @Override
     protected String buildArguments(List<ObjectBuilder> children) {
         if (clearArgsIfNullChild && children.stream().anyMatch(ObjectBuilder::isNullValue)) {
             return "";
+        }
+        boolean hasKotlinNames = kotlinParameterNames != null && !kotlinParameterNames.isEmpty();
+        if (hasKotlinNames || (isVarargs != null && !isVarargs.isEmpty())) {
+            return range(0, children.size())
+                    .mapToObj(i -> {
+                        String argument = getChildArgument(children.get(i));
+                        if (isKotlinSupport() && isVarargs != null && i < isVarargs.size() && isVarargs.get(i) && !argument.equals(NULL)) {
+                            argument = "*" + argument;
+                        }
+                        if (hasKotlinNames) {
+                            String paramName = kotlinParameterNames.get(i);
+                            if (!paramName.matches("arg\\d+")) {
+                                return paramName + " = " + argument;
+                            }
+                        }
+                        return argument;
+                    })
+                    .collect(Collectors.joining(", "));
         }
         return super.buildArguments(children);
     }
@@ -69,7 +104,7 @@ public class TemplateObjectBuilder extends ObjectBuilder {
     private List<String> buildFluentBuilder() {
         return concatenate(
                 buildChildren(),
-                Stream.of(codeTemplate.render(PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, buildArguments(getArgumentChildren()))),
+                Stream.of(codeTemplate.render(isKotlinSupport(), PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, buildArguments(getArgumentChildren()))),
                 renderBuilderMethodCalls(),
                 endBuilder(buildMethodName)
         ).collect(Collectors.toList());
@@ -82,6 +117,8 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         private boolean skipIfNull;
         private boolean clearArgsIfNullChild;
         private String buildMethodName;
+        private List<String> kotlinParameterNames;
+        private List<Boolean> isVarargs;
 
         public Builder codeTemplate(CodeTemplate codeTemplate) {
             this.codeTemplate = codeTemplate;
@@ -110,6 +147,16 @@ public class TemplateObjectBuilder extends ObjectBuilder {
 
         public Builder buildMethodName(String buildMethodName) {
             this.buildMethodName = buildMethodName;
+            return this;
+        }
+
+        public Builder kotlinParameterNames(List<String> kotlinParameterNames) {
+            this.kotlinParameterNames = kotlinParameterNames;
+            return this;
+        }
+
+        public Builder isVarargs(List<Boolean> isVarargs) {
+            this.isVarargs = isVarargs;
             return this;
         }
 

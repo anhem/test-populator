@@ -4,6 +4,7 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.object.util.ValueStringifierUtil;
 import com.github.anhem.testpopulator.internal.util.ProtobufUtil;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -33,32 +34,47 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes) {
+        constructor(clazz, expectedChildren, isNonPublicConstructor, constructorParameterTypes, Collections.emptyList());
+    }
+
+    @Override
+    public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes, List<Boolean> isVarargs) {
         if (isNonPublicConstructor) {
-            TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren).codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR);
+            TemplateObjectBuilder.Builder builder = templateBuilder(clazz, CONSTRUCTOR, expectedChildren).codeTemplate(CodeTemplate.PRIVATE_CONSTRUCTOR).isVarargs(isVarargs);
             String helperMethodName = getHelperMethodName(builder.name);
             TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();
             Set<String> extraImports = new HashSet<>();
             Set<String> extraStaticImports = new HashSet<>();
-            objectBuilder.addMethod(getPrivateConstructorHelperMethod(clazz, helperMethodName, constructorParameterTypes, classNames, extraImports, extraStaticImports));
+            objectBuilder.addMethod(getPrivateConstructorHelperMethod(clazz, helperMethodName, constructorParameterTypes, classNames, extraImports, extraStaticImports, populateConfig.isKotlinSupport()));
             objectBuilder.addImports(extraImports);
             objectBuilder.addStaticImports(extraStaticImports);
             setNextObjectBuilder(objectBuilder);
         } else {
             setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
                     .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                    .isVarargs(isVarargs)
                     .build());
         }
     }
 
     @Override
-    public <T> void field(Class<T> clazz, int expectedChildren, java.util.List<java.lang.reflect.Field> fields) {
+    public <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, List<String> parameterNames, List<Boolean> isVarargs) {
+        setNextObjectBuilder(templateBuilder(clazz, CONSTRUCTOR, expectedChildren)
+                .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                .kotlinParameterNames(parameterNames)
+                .isVarargs(isVarargs)
+                .build());
+    }
+
+    @Override
+    public <T> void field(Class<T> clazz, int expectedChildren, List<Field> fields) {
         TemplateObjectBuilder.Builder builder = templateBuilder(clazz, FIELD, expectedChildren).codeTemplate(CodeTemplate.FIELD);
         String helperMethodName = getHelperMethodName(builder.name);
         TemplateObjectBuilder objectBuilder = builder.methodName(helperMethodName).build();
         Set<String> extraImports = new HashSet<>();
         Set<String> extraStaticImports = new HashSet<>();
-        objectBuilder.addMethod(getFieldHelperMethod(clazz, helperMethodName, fields, classNames, extraImports, extraStaticImports));
-        objectBuilder.addMethod(getSetFieldMethod(classNames, extraImports, extraStaticImports));
+        objectBuilder.addMethod(getFieldHelperMethod(clazz, helperMethodName, fields, classNames, extraImports, extraStaticImports, populateConfig.isKotlinSupport()));
+        objectBuilder.addMethod(getSetFieldMethod(classNames, extraImports, extraStaticImports, populateConfig.isKotlinSupport()));
         objectBuilder.addImports(extraImports);
         objectBuilder.addStaticImports(extraStaticImports);
         setNextObjectBuilder(objectBuilder);
@@ -67,7 +83,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void setter(Class<T> clazz, int expectedChildren) {
         setNextObjectBuilder(containerBuilder(clazz, SETTER, expectedChildren)
-                .template(CodeTemplate.SETTER.getFormat())
+                .template(CodeTemplate.SETTER.getFormat(populateConfig.isKotlinSupport()))
                 .build());
     }
 
@@ -98,17 +114,23 @@ public class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
-        setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, expectedChildren)
-                .codeTemplate(CodeTemplate.STATIC_METHOD)
-                .factoryClassName(clazz.getSimpleName())
-                .methodName(methodName)
-                .build());
+        if (populateConfig.isKotlinSupport() && "box-impl".equals(methodName)) {
+            setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, expectedChildren)
+                    .codeTemplate(CodeTemplate.CONSTRUCTOR)
+                    .build());
+        } else {
+            setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, expectedChildren)
+                    .codeTemplate(CodeTemplate.STATIC_METHOD)
+                    .factoryClassName(clazz.getSimpleName())
+                    .methodName(methodName)
+                    .build());
+        }
     }
 
     @Override
     public <T> void set(Class<T> clazz) {
         setNextObjectBuilder(containerBuilder(clazz, SET, 1)
-                .template(CodeTemplate.TYPED_COLLECTION.getFormat())
+                .template(CodeTemplate.TYPED_COLLECTION.getFormat(populateConfig.isKotlinSupport()))
                 .parameterized(true)
                 .build());
         method("add", 1);
@@ -119,8 +141,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
         setNextObjectBuilder(templateBuilder(Set.class, SET, 1)
                 .codeTemplate(CodeTemplate.IMMUTABLE)
                 .parameterized(true)
-                .factoryClassName(Set.class.getSimpleName())
-                .methodName("of")
+                .factoryClassName(populateConfig.isKotlinSupport() ? "" : Set.class.getSimpleName())
+                .methodName(populateConfig.isKotlinSupport() ? "setOf" : "of")
                 .clearArgsIfNullChild(true)
                 .build());
     }
@@ -128,7 +150,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void enumSet(Class<T> clazz, Class<?> enumClazz) {
         setNextObjectBuilder(containerBuilder(clazz, ENUM_SET, 1)
-                .template(CodeTemplate.ENUM_SET.getFormat())
+                .template(CodeTemplate.ENUM_SET.getFormat(populateConfig.isKotlinSupport()))
                 .parameterized(true)
                 .referencedClassName(enumClazz.getSimpleName())
                 .referencedClasses(enumClazz)
@@ -139,7 +161,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     @Override
     public <T> void list(Class<T> clazz) {
         setNextObjectBuilder(containerBuilder(clazz, LIST, 1)
-                .template(CodeTemplate.TYPED_COLLECTION.getFormat())
+                .template(CodeTemplate.TYPED_COLLECTION.getFormat(populateConfig.isKotlinSupport()))
                 .parameterized(true)
                 .build());
         method("add", 1);
@@ -150,8 +172,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
         setNextObjectBuilder(templateBuilder(List.class, LIST, 1)
                 .codeTemplate(CodeTemplate.IMMUTABLE)
                 .parameterized(true)
-                .factoryClassName(List.class.getSimpleName())
-                .methodName("of")
+                .factoryClassName(populateConfig.isKotlinSupport() ? "" : List.class.getSimpleName())
+                .methodName(populateConfig.isKotlinSupport() ? "listOf" : "of")
                 .clearArgsIfNullChild(true)
                 .build());
     }
@@ -161,7 +183,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         boolean parameterized = !clazz.equals(Properties.class);
         CodeTemplate codeTemplate = parameterized ? CodeTemplate.TYPED_COLLECTION : CodeTemplate.COLLECTION;
         setNextObjectBuilder(containerBuilder(clazz, MAP, 1)
-                .template(codeTemplate.getFormat())
+                .template(codeTemplate.getFormat(populateConfig.isKotlinSupport()))
                 .parameterized(parameterized)
                 .build());
         method("put", 2);
@@ -172,8 +194,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
         setNextObjectBuilder(templateBuilder(Map.class, MAP, 2)
                 .codeTemplate(CodeTemplate.IMMUTABLE)
                 .parameterized(true)
-                .factoryClassName(Map.class.getSimpleName())
-                .methodName("of")
+                .factoryClassName(populateConfig.isKotlinSupport() ? "" : Map.class.getSimpleName())
+                .methodName(populateConfig.isKotlinSupport() ? "mapOf" : "of")
                 .clearArgsIfNullChild(true)
                 .build());
     }
@@ -183,7 +205,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
         boolean parameterized = !clazz.equals(Properties.class);
         CodeTemplate codeTemplate = parameterized ? CodeTemplate.ENUM_MAP : CodeTemplate.COLLECTION;
         setNextObjectBuilder(containerBuilder(clazz, ENUM_MAP, 1)
-                .template(codeTemplate.getFormat())
+                .template(codeTemplate.getFormat(populateConfig.isKotlinSupport()))
                 .parameterized(parameterized)
                 .referencedClassName(enumClazz.getSimpleName())
                 .referencedClasses(enumClazz)
@@ -318,10 +340,10 @@ public class ObjectFactoryImpl implements ObjectFactory {
             createOrOverwriteFile(path);
             writePackage(objectResult, path);
             writeImports(objectResult, path);
-            writeStaticImports(objectResult, path);
+            writeStaticImports(objectResult, path, populateConfig);
             writeStartClass(objectResult, path, populateConfig);
-            writeObjects(objectResult, path);
-            writeMethods(objectResult, path);
+            writeObjects(objectResult, path, populateConfig);
+            writeMethods(objectResult, path, populateConfig);
             writeEndClass(path);
         }
     }
@@ -339,7 +361,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .name(getName(clazz))
                 .buildType(buildType)
                 .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(expectedChildren);
+                .expectedChildren(expectedChildren)
+                .isKotlinSupport(populateConfig.isKotlinSupport());
     }
 
     private ContainerObjectBuilder.Builder containerBuilder(Class<?> clazz, BuildType buildType, int expectedChildren) {
@@ -348,7 +371,8 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 .name(getName(clazz))
                 .buildType(buildType)
                 .useFullyQualifiedName(useFullyQualifiedName(clazz, classNames))
-                .expectedChildren(expectedChildren);
+                .expectedChildren(expectedChildren)
+                .isKotlinSupport(populateConfig.isKotlinSupport());
     }
 
     private void setNextObjectBuilder(ObjectBuilder objectBuilder) {

@@ -31,17 +31,24 @@ public abstract class ObjectBuilder {
     private ObjectBuilder parent;
     private String value;
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren) {
-        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false);
+    private final boolean isKotlinSupport;
+
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean isKotlinSupport) {
+        this(clazz, name, buildType, useFullyQualifiedName, expectedChildren, false, isKotlinSupport);
     }
 
-    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized) {
+    protected ObjectBuilder(Class<?> clazz, String name, BuildType buildType, boolean useFullyQualifiedName, int expectedChildren, boolean parameterized, boolean isKotlinSupport) {
         this.clazz = clazz;
         this.name = name;
         this.buildType = buildType;
         this.useFullyQualifiedName = useFullyQualifiedName;
         this.expectedChildren = expectedChildren;
         this.parameterized = parameterized;
+        this.isKotlinSupport = isKotlinSupport;
+    }
+
+    public boolean isKotlinSupport() {
+        return isKotlinSupport;
     }
 
     public void setSkipNullMethods(boolean skipNullMethods) {
@@ -101,6 +108,10 @@ public abstract class ObjectBuilder {
                 .flatMap(child -> {
                     if (!child.methodChildren.isEmpty()) {
                         return child.renderMethodCalls(child.methodChildren);
+                    }
+                    if (isKotlinSupport && child.getName().startsWith("set") && child.getName().length() > 3 && Character.isUpperCase(child.getName().charAt(3))) {
+                        String propertyName = Character.toLowerCase(child.getName().charAt(3)) + child.getName().substring(4);
+                        return Stream.of(String.format("%s.%s = %s", getMethodTargetName(), propertyName, child.buildArguments()));
                     }
                     return Stream.of(String.format("%s.%s(%s);", getMethodTargetName(), child.getName(), child.buildArguments()));
                 });
@@ -193,7 +204,7 @@ public abstract class ObjectBuilder {
 
     private Set<String> collectMethods() {
         Set<String> methods = new HashSet<>(extraMethods);
-        Optional.ofNullable(getHelperMethod(getClazz())).ifPresent(methods::add);
+        Optional.ofNullable(getHelperMethod(getClazz(), isKotlinSupport())).ifPresent(methods::add);
         children.forEach(child -> methods.addAll(child.collectMethods()));
         return methods;
     }
@@ -231,6 +242,10 @@ public abstract class ObjectBuilder {
                     if (buildType == BuildType.BUILDER) {
                         return String.format("\t.%s(%s)", child.getName(), child.buildArguments());
                     }
+                    if (isKotlinSupport && child.getName().startsWith("set") && child.getName().length() > 3 && Character.isUpperCase(child.getName().charAt(3))) {
+                        String propertyName = Character.toLowerCase(child.getName().charAt(3)) + child.getName().substring(4);
+                        return String.format("%s.%s = %s", name, propertyName, child.buildArguments());
+                    }
                     return String.format("%s.%s(%s);", name, child.getName(), child.buildArguments());
                 });
     }
@@ -249,7 +264,7 @@ public abstract class ObjectBuilder {
         if (children.isEmpty()) {
             return "";
         }
-        return ArgumentFormatterUtil.format(children, getBuildType(), getName(), useFullyQualifiedName);
+        return ArgumentFormatterUtil.format(children, getBuildType(), getName(), useFullyQualifiedName, isKotlinSupport);
     }
 
     protected String formatTypes() {

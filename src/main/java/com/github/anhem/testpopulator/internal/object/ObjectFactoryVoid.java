@@ -1,5 +1,7 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import java.util.List;
+
 import static com.github.anhem.testpopulator.internal.object.ObjectResult.EMPTY_OBJECT_RESULT;
 
 public class ObjectFactoryVoid implements ObjectFactory {
@@ -9,7 +11,12 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
-    public <T> void field(Class<T> clazz, int expectedChildren, java.util.List<java.lang.reflect.Field> fields) {
+    public <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, List<String> parameterNames, List<Boolean> isVarargs) {
+        //ignored
+    }
+
+    @Override
+    public <T> void field(Class<T> clazz, int expectedChildren, List<java.lang.reflect.Field> fields) {
         //ignored
     }
 
