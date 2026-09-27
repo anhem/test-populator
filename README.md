@@ -9,7 +9,7 @@
 
 Test-Populator is a Java library that automatically creates and populates objects with fixed or random data, simplifying the creation of test data.
 
-## 🚀 Quick Start
+## Quick Start
 
 Get up and running in seconds. No complex setup required.
 
@@ -18,7 +18,7 @@ Get up and running in seconds. No complex setup required.
 <dependency>
     <groupId>com.github.anhem</groupId>
     <artifactId>test-populator</artifactId>
-    <version>1.0.1</version>
+  <version>1.1.0</version>
     <scope>test</scope>
 </dependency>
 ```
