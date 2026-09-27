@@ -117,7 +117,6 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         private boolean skipIfNull;
         private boolean clearArgsIfNullChild;
         private String buildMethodName;
-        private List<String> kotlinParameterNames;
         private List<Boolean> isVarargs;
 
         public Builder codeTemplate(CodeTemplate codeTemplate) {
@@ -147,11 +146,6 @@ public class TemplateObjectBuilder extends ObjectBuilder {
 
         public Builder buildMethodName(String buildMethodName) {
             this.buildMethodName = buildMethodName;
-            return this;
-        }
-
-        public Builder kotlinParameterNames(List<String> kotlinParameterNames) {
-            this.kotlinParameterNames = kotlinParameterNames;
             return this;
         }
 
