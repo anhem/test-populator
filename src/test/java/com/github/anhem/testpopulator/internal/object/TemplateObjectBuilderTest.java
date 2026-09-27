@@ -151,8 +151,8 @@ class TemplateObjectBuilderTest {
 
         assertThat(result).containsExactly(
                 "public static final Object myObject = Object.builder()",
-                "    .name(\"foo\")",
-                "    .build();"
+                "\t.name(\"foo\")",
+                "\t.build();"
         );
     }
 }

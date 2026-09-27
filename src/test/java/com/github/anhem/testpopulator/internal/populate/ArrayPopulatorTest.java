@@ -2,7 +2,6 @@ package com.github.anhem.testpopulator.internal.populate;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.object.ObjectFactoryVoid;
 import com.github.anhem.testpopulator.internal.value.ValueFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +33,7 @@ class ArrayPopulatorTest {
     @Test
     void populateWithClassCarrier() {
         Class<String[]> clazz = String[].class;
-        ClassCarrier<String[]> classCarrier = new ClassCarrier<>(clazz, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build());
+        ClassCarrier<String[]> classCarrier = new ClassCarrier<>(clazz, null, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build(), Collections.emptyMap(), Collections.emptyList());
 
         String[] result = arrayPopulator.populate(classCarrier, populator);
 
@@ -44,10 +43,10 @@ class ArrayPopulatorTest {
     }
 
     @Test
-    void populateWithCollectionCarrier() {
+    void populateWithClassCarrierWithTypeArguments() {
         Class<String[]> clazz = String[].class;
         Type[] typeArguments = new Type[]{String.class};
-        CollectionCarrier<String[]> collectionCarrier = new CollectionCarrier<>(clazz, typeArguments, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build());
+        ClassCarrier<String[]> collectionCarrier = new ClassCarrier<>(clazz, null, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build(), Collections.emptyMap(), java.util.Arrays.asList(typeArguments));
 
         String[] result = arrayPopulator.populate(collectionCarrier, populator);
 
@@ -59,7 +58,7 @@ class ArrayPopulatorTest {
     @Test
     void populateWithPrimitiveArray() {
         Class<int[]> clazz = int[].class;
-        ClassCarrier<int[]> classCarrier = new ClassCarrier<>(clazz, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build());
+        ClassCarrier<int[]> classCarrier = new ClassCarrier<>(clazz, null, new ObjectFactoryVoid(), Collections.emptyList(), PopulateConfig.builder().build(), Collections.emptyMap(), Collections.emptyList());
 
         int[] result = arrayPopulator.populate(classCarrier, populator);
 

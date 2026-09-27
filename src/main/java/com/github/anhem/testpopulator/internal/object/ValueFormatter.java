@@ -13,7 +13,7 @@ import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.formatBytes;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.formatBytes;
 
 public class ValueFormatter {
 
@@ -23,6 +23,9 @@ public class ValueFormatter {
     }
 
     static {
+        stringSuppliers.put(Class.class, object -> String.format("%s.class", ((Class<?>) object).getSimpleName()));
+        stringSuppliers.put(Object.class, object -> "new Object()");
+        stringSuppliers.put(Number.class, Object::toString);
         stringSuppliers.put(Integer.class, Object::toString);
         stringSuppliers.put(int.class, Object::toString);
         stringSuppliers.put(Long.class, object -> object + "L");

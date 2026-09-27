@@ -21,9 +21,9 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.internal.util.FileWriterUtil.getPath;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.formatClassName;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.getPackageName;
+import static com.github.anhem.testpopulator.internal.object.util.FileWriterUtil.getPath;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.formatClassName;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.getPackageName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GeneratedCodeUtil {
@@ -55,6 +55,9 @@ public class GeneratedCodeUtil {
     }
 
     private static <T> void assertGeneratedCode(T object, Path path, String packageName, String simpleName, PopulateConfig populateConfig) {
+        if (populateConfig.isKotlinSupport()) {
+            return;
+        }
         try {
             compileGeneratedFile(path);
             Class<T> clazz = loadClass(path, packageName, path.getFileName().toString().replace(JAVA, ""), populateConfig);
@@ -92,7 +95,8 @@ public class GeneratedCodeUtil {
 
     @SuppressWarnings("unchecked")
     private static <T> T getStaticObjectFromClass(Class<T> clazz, String simpleName) {
-        String variableName = String.format("%s_0", Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1));
+        String snakeCaseName = simpleName.replaceAll("([a-z])([A-Z]+)", "$1_$2").toUpperCase();
+        String variableName = String.format("%s_0", snakeCaseName);
         try {
             return (T) clazz.getDeclaredField(variableName).get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {

@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.RECURSIVE_ASSERTION_CONFIGURATION;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
+import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCodeContains;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class PopulateFactoryWithKotlinSupportTest {
 
@@ -19,6 +21,7 @@ class PopulateFactoryWithKotlinSupportTest {
     @BeforeEach
     void setUp() {
         populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
                 .kotlinSupport(true)
                 .and()
                 .constructorStrategy()
@@ -66,6 +69,16 @@ class PopulateFactoryWithKotlinSupportTest {
         assertThat(result.getValue()).isEqualTo("default_value");
         assertThat(result.getId()).isNotZero();
         assertThat(result.getInnerClass()).isNotNull();
+
+        assertGeneratedCodeContains(result, populateConfig,
+                "KotlinLikeClass("
+        );
+        try {
+            assertGeneratedCodeContains(result, populateConfig, "arg0 = ");
+            fail("Should not contain 'arg0 = '");
+        } catch (AssertionError e) {
+            // expected
+        }
     }
 
     @Test
@@ -124,7 +137,9 @@ class PopulateFactoryWithKotlinSupportTest {
 
     @Test
     void cannotPopulateKotlinSingletonWhenKotlinSupportIsDisabled() {
-        populateConfig = PopulateConfig.builder().build();
+        populateConfig = PopulateConfig.builder()
+                .wildcardFallbackType(String.class)
+                .build();
         populateFactory = new PopulateFactory(populateConfig);
 
         assertThatThrownBy(() -> populateFactory.populate(KotlinLikeSingleton.class))
@@ -143,6 +158,70 @@ class PopulateFactoryWithKotlinSupportTest {
     @Test
     void canPopulateKotlinLikeClassWithGenerics() {
         populateAndAssertWithGeneratedCode(KotlinLikeWithGenerics.class);
+    }
+
+    @Test
+    void canPopulateKotlinPairWithinWrapper() {
+        populateAndAssertWithGeneratedCode(KotlinLikePairWrapper.class);
+    }
+
+    @Test
+    void canPopulateKotlinLikeSealedClass() {
+        populateAndAssertWithGeneratedCode(KotlinLikeSealedClass.class);
+    }
+
+    @Test
+    void canPopulateKotlinLikeValueClass() {
+        populateAndAssertWithGeneratedCode(KotlinLikeValueClass.class);
+    }
+
+    @Test
+    void canPopulateKotlinLikeJvmOverloads() {
+        populateAndAssertWithGeneratedCode(KotlinLikeJvmOverloads.class);
+    }
+
+    @Test
+    void canPopulateKotlinLikeClassWithCollections() {
+        populateAndAssertWithGeneratedCode(KotlinLikeClassWithCollections.class);
+    }
+
+    @Test
+    void generatesKotlinMapWithToSyntax() {
+        KotlinLikeClassWithCollections result = populateFactory.populate(KotlinLikeClassWithCollections.class);
+
+        assertThat(result).isNotNull();
+        assertGeneratedCodeContains(result, populateConfig, " to ");
+    }
+
+    @Test
+    void canPopulateKotlinLikeMutableClassUsingSetterStrategy() {
+        populateConfig = populateConfig.toBuilder()
+                .clearStrategies()
+                .setterStrategy()
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        KotlinLikeMutableClass result = populateFactory.populate(KotlinLikeMutableClass.class);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getStringValue()).isNotBlank();
+        assertThat(result.getIntValue()).isNotZero();
+        assertGeneratedCodeContains(result, populateConfig,
+                "KOTLIN_LIKE_MUTABLE_CLASS_0.stringValue = ",
+                "KOTLIN_LIKE_MUTABLE_CLASS_0.intValue = "
+        );
+    }
+
+    @Test
+    void canPopulateKotlinLikeInnerClass() {
+        KotlinLikeOuterClass.KotlinLikeInnerClass result = populateFactory.populate(KotlinLikeOuterClass.KotlinLikeInnerClass.class);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getInnerValue()).isNotBlank();
+        assertGeneratedCodeContains(result, populateConfig,
+                ": KotlinLikeOuterClass.KotlinLikeInnerClass = ",
+                ".KotlinLikeInnerClass("
+        );
     }
 
     private <T> void populateAndAssertWithGeneratedCode(Class<T> clazz) {

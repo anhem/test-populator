@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CALL_STATIC_METHOD;
-import static com.github.anhem.testpopulator.internal.util.PopulateUtil.isCollectionLike;
 import static com.github.anhem.testpopulator.internal.util.StaticMethodUtil.getStaticMethod;
 import static java.lang.String.format;
 
@@ -29,11 +28,7 @@ public class StaticMethodPopulator implements PopulatingStrategy {
             classCarrier.getObjectFactory().staticMethod(clazz, staticMethod.getName(), staticMethod.getParameters().length);
             return (T) staticMethod.invoke(null, Stream.of(staticMethod.getParameters())
                     .map(parameter -> {
-                        if (isCollectionLike(parameter.getType())) {
-                            return populator.populate(classCarrier.toCollectionCarrier(parameter));
-                        } else {
-                            return populator.populate(classCarrier.toClassCarrier(parameter));
-                        }
+                        return populator.populate(classCarrier.createChild(parameter));
                     }).toArray());
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CALL_STATIC_METHOD, staticMethod.getName(), clazz.getName()), e);

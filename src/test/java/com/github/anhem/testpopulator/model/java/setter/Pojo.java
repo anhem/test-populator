@@ -130,5 +130,36 @@ public class Pojo {
     private Inet4Address inet4Address;
     private Inet6Address inet6Address;
     private InetSocketAddress inetSocketAddress;
-
+    private Map<String, ? extends Integer> mapWithWildcardValue;
+    private List<? extends Integer> listWithWildcard;
+    private Set<? extends Integer> setWithWildcard;
+    private Map<? extends String, ? extends Integer> mapWithWildcardKeyAndValue;
+    private Queue<? extends String> queueWithWildcard;
+    private Deque<? extends String> dequeWithWildcard;
+    private SortedSet<? extends String> sortedSetWithWildcard;
+    private NavigableSet<? extends String> navigableSetWithWildcard;
+    private SortedMap<? extends String, ? extends Integer> sortedMapWithWildcard;
+    private NavigableMap<? extends String, ? extends Integer> navigableMapWithWildcard;
+    private ConcurrentMap<? extends String, ? extends String> concurrentMapWithWildcard;
+    private ConcurrentNavigableMap<? extends String, ? extends String> concurrentNavigableMapWithWildcard;
+    private ConcurrentSkipListMap<? extends String, ? extends String> concurrentSkipListMapWithWildcard;
+    private CopyOnWriteArrayList<? extends String> copyOnWriteArrayListWithWildcard;
+    private CopyOnWriteArraySet<? extends String> copyOnWriteArraySetWithWildcard;
+    private ConcurrentSkipListSet<? extends String> concurrentSkipListSetWithWildcard;
+    private TreeMap<? extends String, ? extends String> treeMapWithWildcard;
+    private TreeSet<? extends String> treeSetWithWildcard;
+    private ArrayList<? extends String> arrayListWithWildcard;
+    private LinkedList<? extends String> linkedListWithWildcard;
+    private HashMap<? extends String, ? extends String> hashMapWithWildcard;
+    private LinkedHashMap<? extends String, ? extends String> linkedHashMapWithWildcard;
+    private HashSet<? extends String> hashSetWithWildcard;
+    private LinkedHashSet<? extends String> linkedHashSetWithWildcard;
+    private Map.Entry<? extends String, ? extends String> mapEntryWithWildcard;
+    private Hashtable<? extends String, ? extends Integer> hashtableWithWildcard;
+    private Vector<? extends String> vectorWithWildcard;
+    private Stack<? extends String> stackWithWildcard;
+    private Number number;
+    private Set<?> setWithUnboundWildcard;
+    private List<?> listWithUnboundWildcard;
+    private Map<?, ?> mapWithUnboundWildcard;
 }

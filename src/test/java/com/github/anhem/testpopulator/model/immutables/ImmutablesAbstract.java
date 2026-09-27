@@ -230,4 +230,6 @@ public abstract class ImmutablesAbstract {
 
     public abstract InetSocketAddress getInetSocketAddress();
 
+    public abstract Number getNumber();
+
 }

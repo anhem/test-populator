@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0]
+
+### Deep Type & Generics Support
+
+- **Deep Generic Resolution:** Automatically resolves nested generic type arguments down the object graph (e.g., custom nested types like
+  `Pair<String, Integer>` without type erasure).
+- **Wildcard Type Resolution:** Added support for complex parameterized types with unbounded wildcards (`List<?>`, `Set<?>`, `Map<?, ?>`) and
+  upper-bounded wildcards (`? extends T`).
+- **Configurable Wildcard Fallback:** Added `wildcardFallbackType(Class<?>)` to `PopulateConfig.Builder` (defaulting to `String.class`) to guarantee
+  that wildcard elements work reliably with value-based equality (`equals()`/`hashCode()`).
+
+### Code Generation
+
+- **FIELD Strategy Support:** Added code generation support for objects instantiated via the `FIELD` strategy, generating direct field assignment
+  blocks.
+- **Non-Public Constructors:** Added support for generating code when `accessNonPublicConstructors(true)` is enabled, producing reflection-based
+  instantiation helpers for private or protected constructors.
+- **Import Resolution:** Generated files now use standard `import` statements instead of fully qualified class names where possible, with automatic
+  collision detection falling back to fully qualified names.
+- **Cleaner Source Formatting:** Consolidated static blocks into a single static block, introduced helper methods (e.g., `setField`) for repeated
+  reflection operations, and improved line wrapping and indentation.
+- **SHA-256 Configuration Hashing:** Switched from MD5 to SHA-256 for generating configuration hash suffixes in generated file names.
+
+### Internal Improvements
+
+- **Carrier Unification:** Merged `CollectionCarrier` into `ClassCarrier` to streamline state propagation and simplify strategy populator
+  implementations.
+
 ## [1.0.1] - 2026-05-18
 
 ### Configuration (PopulateConfig)

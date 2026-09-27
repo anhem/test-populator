@@ -5,12 +5,11 @@ import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.config.Strategy;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
-import com.github.anhem.testpopulator.internal.carrier.CollectionCarrier;
 import com.github.anhem.testpopulator.internal.value.ValueFactory;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.internal.util.BuilderUtil.isMatchingBuilderStrategy;
-import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isMatchingKotlinSingletonOrCompanion;
+import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isKotlinSpecialType;
 import static com.github.anhem.testpopulator.internal.util.MutatorUtil.isMatchingMutatorStrategy;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.*;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufByteString;
@@ -46,16 +45,13 @@ public class Populator {
         if (clazz.isArray()) {
             return arrayPopulator.populate(classCarrier, this);
         }
-        if (classCarrier instanceof CollectionCarrier) {
-            return collectionPopulator.populate(classCarrier, this);
-        }
         if (isProtobufByteString(clazz, classCarrier.getPopulateConfig())) {
             return staticMethodPopulator.populate(classCarrier, this, MethodType.SIMPLEST);
         }
         if (isCollectionLike(clazz)) {
-            return populate(classCarrier.toCollectionCarrier(clazz));
+            return collectionPopulator.populate(classCarrier, this);
         }
-        if (isMatchingKotlinSingletonOrCompanion(clazz, classCarrier.getPopulateConfig().isKotlinSupport())) {
+        if (isKotlinSpecialType(clazz, classCarrier.getPopulateConfig().isKotlinSupport())) {
             return kotlinPopulator.populate(classCarrier, this);
         }
         return populateWithStrategies(classCarrier);

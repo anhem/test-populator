@@ -127,5 +127,36 @@ public class AllArgsConstructor {
     private final Inet4Address inet4Address;
     private final Inet6Address inet6Address;
     private final InetSocketAddress inetSocketAddress;
-
+    private final Map<String, ? extends Integer> mapWithWildcardValue;
+    private final List<? extends Integer> listWithWildcard;
+    private final Set<? extends Integer> setWithWildcard;
+    private final Map<? extends String, ? extends Integer> mapWithWildcardKeyAndValue;
+    private final Queue<? extends String> queueWithWildcard;
+    private final Deque<? extends String> dequeWithWildcard;
+    private final SortedSet<? extends String> sortedSetWithWildcard;
+    private final NavigableSet<? extends String> navigableSetWithWildcard;
+    private final SortedMap<? extends String, ? extends Integer> sortedMapWithWildcard;
+    private final NavigableMap<? extends String, ? extends Integer> navigableMapWithWildcard;
+    private final ConcurrentMap<? extends String, ? extends String> concurrentMapWithWildcard;
+    private final ConcurrentNavigableMap<? extends String, ? extends String> concurrentNavigableMapWithWildcard;
+    private final ConcurrentSkipListMap<? extends String, ? extends String> concurrentSkipListMapWithWildcard;
+    private final CopyOnWriteArrayList<? extends String> copyOnWriteArrayListWithWildcard;
+    private final CopyOnWriteArraySet<? extends String> copyOnWriteArraySetWithWildcard;
+    private final ConcurrentSkipListSet<? extends String> concurrentSkipListSetWithWildcard;
+    private final TreeMap<? extends String, ? extends String> treeMapWithWildcard;
+    private final TreeSet<? extends String> treeSetWithWildcard;
+    private final ArrayList<? extends String> arrayListWithWildcard;
+    private final LinkedList<? extends String> linkedListWithWildcard;
+    private final HashMap<? extends String, ? extends String> hashMapWithWildcard;
+    private final LinkedHashMap<? extends String, ? extends String> linkedHashMapWithWildcard;
+    private final HashSet<? extends String> hashSetWithWildcard;
+    private final LinkedHashSet<? extends String> linkedHashSetWithWildcard;
+    private final Map.Entry<? extends String, ? extends String> mapEntryWithWildcard;
+    private final Hashtable<? extends String, ? extends Integer> hashtableWithWildcard;
+    private final Vector<? extends String> vectorWithWildcard;
+    private final Stack<? extends String> stackWithWildcard;
+    private final Number number;
+    private final Set<?> setWithUnboundWildcard;
+    private final List<?> listWithUnboundWildcard;
+    private final Map<?, ?> mapWithUnboundWildcard;
 }

@@ -1,4 +1,4 @@
-package com.github.anhem.testpopulator.internal.util;
+package com.github.anhem.testpopulator.internal.object.util;
 
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.ObjectException;
@@ -11,12 +11,14 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.github.anhem.testpopulator.internal.object.ObjectBuilder.PSF;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.STATIC_BLOCK_END;
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.STATIC_BLOCK_START;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.STATIC_BLOCK_END;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.STATIC_BLOCK_START;
 
 public class FileWriterUtil {
 
@@ -28,7 +30,8 @@ public class FileWriterUtil {
     }
 
     public static Path getPath(String packageName, String className, PopulateConfig populateConfig) {
-        return Paths.get(populateConfig.getObjectFactoryPath(), toPackagePath(packageName), String.format("%s_%s.java", className, encode(populateConfig)));
+        String extension = populateConfig.isKotlinSupport() ? ".kt" : ".java";
+        return Paths.get(populateConfig.getObjectFactoryPath(), toPackagePath(packageName), String.format("%s_%s%s", className, encode(populateConfig), extension));
     }
 
     public static void createOrOverwriteFile(Path path) {
@@ -51,22 +54,23 @@ public class FileWriterUtil {
         writeLine(path, "");
     }
 
-    public static void writeStaticImports(ObjectResult objectResult, Path path) {
+    public static void writeStaticImports(ObjectResult objectResult, Path path, PopulateConfig populateConfig) {
         objectResult.getStaticImports().stream()
                 .sorted()
-                .forEach(s -> writeLine(path, String.format("import static %s;", s)));
+                .forEach(s -> writeLine(path, String.format(populateConfig.isKotlinSupport() ? "import %s" : "import static %s;", s)));
         writeLine(path, "");
     }
 
     public static void writeStartClass(ObjectResult objectResult, Path path, PopulateConfig populateConfig) {
-        writeLine(path, String.format("public class %s_%s {%s", objectResult.getClassName(), encode(populateConfig), System.lineSeparator()));
+        String classType = populateConfig.isKotlinSupport() ? "object" : "public class";
+        writeLine(path, String.format("%s %s_%s {%s", classType, objectResult.getClassName(), encode(populateConfig), System.lineSeparator()));
     }
 
     public static void writeEndClass(Path path) {
         writeLine(path, "}");
     }
 
-    public static void writeMethods(ObjectResult objectResult, Path path) {
+    public static void writeMethods(ObjectResult objectResult, Path path, PopulateConfig populateConfig) {
         if (!objectResult.getMethods().isEmpty()) {
             writeLine(path, "");
             objectResult.getMethods().stream()
@@ -75,18 +79,37 @@ public class FileWriterUtil {
         }
     }
 
-    public static void writeObjects(ObjectResult objectResult, Path path) {
-        objectResult.getObjects().forEach(s -> {
+    public static void writeObjects(ObjectResult objectResult, Path path, PopulateConfig populateConfig) {
+        List<String> staticBlockLines = new ArrayList<>();
+        boolean inStaticBlock = false;
+
+        for (String s : objectResult.getObjects()) {
             if (s.startsWith(STATIC_BLOCK_START)) {
-                writeLine(path, String.format("%s\t%s", System.lineSeparator(), s));
+                inStaticBlock = true;
             } else if (s.startsWith(STATIC_BLOCK_END)) {
-                writeLine(path, String.format("\t%s", s));
-            } else if (s.startsWith(PSF)) {
-                writeLine(path, String.format("\t%s", s));
+                inStaticBlock = false;
+            } else if (inStaticBlock) {
+                staticBlockLines.add(s);
             } else {
-                writeLine(path, String.format("\t\t%s", s));
+                if (populateConfig.isKotlinSupport() && s.startsWith(PSF)) {
+                    writeLine(path, String.format("\tval%s", s.substring(PSF.length())));
+                } else if (s.startsWith(PSF)) {
+                    writeLine(path, String.format("\t%s", s));
+                } else {
+                    writeLine(path, String.format("\t\t%s", s));
+                }
             }
-        });
+        }
+
+        if (!staticBlockLines.isEmpty()) {
+            if (populateConfig.isKotlinSupport()) {
+                writeLine(path, String.format("%s\tinit {", System.lineSeparator()));
+            } else {
+                writeLine(path, String.format("%s\t%s", System.lineSeparator(), STATIC_BLOCK_START));
+            }
+            staticBlockLines.forEach(s -> writeLine(path, String.format("\t\t%s", s)));
+            writeLine(path, String.format("\t}"));
+        }
     }
 
     private static void writeLine(Path path, String line) {
@@ -100,11 +123,12 @@ public class FileWriterUtil {
 
     static String encode(PopulateConfig populateConfig) {
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             byte[] bytes = messageDigest.digest(populateConfig.toString().getBytes());
             return IntStream.range(0, bytes.length)
                     .mapToObj(i -> String.format("%02x", bytes[i]))
-                    .collect(Collectors.joining());
+                    .collect(Collectors.joining())
+                    .substring(0, 16);
         } catch (NoSuchAlgorithmException e) {
             throw new ObjectException("Could not encode configuration", e);
         }

@@ -1,10 +1,22 @@
 package com.github.anhem.testpopulator.internal.object;
 
+import java.util.List;
+
 import static com.github.anhem.testpopulator.internal.object.ObjectResult.EMPTY_OBJECT_RESULT;
 
 public class ObjectFactoryVoid implements ObjectFactory {
     @Override
-    public <T> void constructor(Class<T> clazz, int expectedChildren) {
+    public <T> void constructor(Class<T> clazz, int expectedChildren, boolean isNonPublicConstructor, Class<?>[] constructorParameterTypes) {
+        //ignored
+    }
+
+    @Override
+    public <T> void kotlinDefaultConstructor(Class<T> clazz, int expectedChildren, List<String> parameterNames, List<Boolean> isVarargs) {
+        //ignored
+    }
+
+    @Override
+    public <T> void field(Class<T> clazz, int expectedChildren, List<java.lang.reflect.Field> fields) {
         //ignored
     }
 

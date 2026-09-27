@@ -17,8 +17,6 @@ import static com.github.anhem.testpopulator.config.Strategy.*;
  * Calling toBuilder() on a PopulateConfig object will convert it back to a builder, making it easy to make copies of a configuration with slightly different settings.
  */
 public class PopulateConfig {
-    public static final String INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY = "objectFactory can not be enabled while accessNonPublicConstructors is true";
-    public static final String INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY = "objectFactory can not be enabled while strategyOrder contains FIELD";
     public static final Set<String> DEFAULT_BLACKLISTED_METHODS = Set.of("$jacocoInit");
     public static final Set<String> DEFAULT_BLACKLISTED_FIELDS = Set.of("__$lineHits$__", "$jacocoData");
     public static final List<Strategy> DEFAULT_STRATEGY_ORDER = List.of(CONSTRUCTOR, SETTER, STATIC_METHOD);
@@ -35,6 +33,7 @@ public class PopulateConfig {
     public static final MethodType DEFAULT_METHOD_TYPE = MethodType.LARGEST;
     public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
     public static final boolean DEFAULT_USE_KOTLIN_DEFAULT_VALUES = false;
+    public static final Class<?> DEFAULT_WILDCARD_FALLBACK = String.class;
 
     public static class PopulateConfigBuilder {
         private Set<String> blacklistedMethods = null;
@@ -55,6 +54,7 @@ public class PopulateConfig {
         private MethodType methodType;
         private Boolean kotlinSupport;
         private Boolean useKotlinDefaultValues;
+        private Class<?> wildcardFallbackType;
 
         /**
          * Set blacklisted methods, replacing existing ones.
@@ -339,6 +339,17 @@ public class PopulateConfig {
         }
 
         /**
+         * Set the fallback class to use when an unbounded wildcard is encountered (e.g. <?>, List<?>, Map<?, ?>).
+         *
+         * @param wildcardFallbackType class to fallback to
+         * @return PopulateConfigBuilder
+         */
+        public PopulateConfigBuilder wildcardFallbackType(Class<?> wildcardFallbackType) {
+            this.wildcardFallbackType = wildcardFallbackType;
+            return this;
+        }
+
+        /**
          * Configure BUILDER strategy options
          * @return configuration for BUILDER strategy
          */
@@ -409,7 +420,6 @@ public class PopulateConfig {
          */
         public PopulateConfig build() {
             PopulateConfig populateConfig = new PopulateConfig(this);
-            populateConfig.validate();
             return populateConfig;
         }
 
@@ -452,6 +462,7 @@ public class PopulateConfig {
     private final MethodType methodType;
     private final boolean kotlinSupport;
     private final boolean useKotlinDefaultValues;
+    private final Class<?> wildcardFallbackType;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
         this.blacklistedMethods = collectionOrDefault(populateConfigBuilder.blacklistedMethods, DEFAULT_BLACKLISTED_METHODS);
@@ -474,6 +485,7 @@ public class PopulateConfig {
         this.methodType = valueOrDefault(populateConfigBuilder.methodType, DEFAULT_METHOD_TYPE);
         this.kotlinSupport = valueOrDefault(populateConfigBuilder.kotlinSupport, DEFAULT_KOTLIN_SUPPORT);
         this.useKotlinDefaultValues = valueOrDefault(populateConfigBuilder.useKotlinDefaultValues, DEFAULT_USE_KOTLIN_DEFAULT_VALUES);
+        this.wildcardFallbackType = valueOrDefault(populateConfigBuilder.wildcardFallbackType, DEFAULT_WILDCARD_FALLBACK);
     }
 
     public Set<String> getBlacklistedMethods() {
@@ -548,6 +560,10 @@ public class PopulateConfig {
         return useKotlinDefaultValues;
     }
 
+    public Class<?> getWildcardFallbackType() {
+        return wildcardFallbackType;
+    }
+
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -572,18 +588,11 @@ public class PopulateConfig {
         populateConfigBuilder.methodType = methodType;
         populateConfigBuilder.kotlinSupport = kotlinSupport;
         populateConfigBuilder.useKotlinDefaultValues = useKotlinDefaultValues;
+        populateConfigBuilder.wildcardFallbackType = wildcardFallbackType;
         populateConfigBuilder.strategyOrder = strategyOrder != null ? new ArrayList<>(strategyOrder) : null;
         return populateConfigBuilder;
     }
 
-    private void validate() {
-        if (accessNonPublicConstructors && objectFactoryEnabled) {
-            throw new IllegalArgumentException(INVALID_CONFIG_NON_PUBLIC_CONSTRUCTOR_AND_OBJECT_FACTORY);
-        }
-        if (strategyOrder.contains(FIELD) && objectFactoryEnabled) {
-            throw new IllegalArgumentException(INVALID_CONFIG_FIELD_STRATEGY_AND_OBJECT_FACTORY);
-        }
-    }
 
     private static <T> T valueOrDefault(T value, T defaultValue) {
         return value == null ? defaultValue : value;
@@ -617,6 +626,7 @@ public class PopulateConfig {
                 ", methodType=" + methodType +
                 ", kotlinSupport=" + kotlinSupport +
                 ", useKotlinDefaultValues=" + useKotlinDefaultValues +
+                ", wildcardFallbackType=" + wildcardFallbackType +
                 '}';
     }
 

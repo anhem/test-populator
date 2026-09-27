@@ -20,6 +20,7 @@ import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptio
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.NO_MATCHING_STRATEGY;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertCircularDependency;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
+import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,6 +35,7 @@ class PopulateFactoryWithFieldStrategyTest {
         populateConfig = PopulateConfig.builder()
                 .fieldStrategy()
                 .and()
+                .objectFactory(true)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
     }
@@ -183,7 +185,8 @@ class PopulateFactoryWithFieldStrategyTest {
 
     @Test
     void canOverrideCollectionByName() {
-        Pojo pojo = populateFactory.populate(Pojo.class, "listOfStrings", List.class, () -> List.of("foo", "bar"));
+        PopulateFactory factoryWithoutObjectFactory = new PopulateFactory(populateConfig.toBuilder().objectFactory(false).build());
+        Pojo pojo = factoryWithoutObjectFactory.populate(Pojo.class, "listOfStrings", List.class, () -> List.of("foo", "bar"));
 
         assertThat(pojo.getListOfStrings()).containsExactly("foo", "bar");
     }
@@ -193,12 +196,12 @@ class PopulateFactoryWithFieldStrategyTest {
     }
 
     private <T> T populateAndAssert(Class<T> clazz) {
-        assertThat(populateConfig.isObjectFactoryEnabled()).isFalse();
+        assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(FIELD);
         T value = populateFactory.populate(clazz);
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(clazz);
-
+        assertGeneratedCode(value, populateConfig);
         return value;
     }
 

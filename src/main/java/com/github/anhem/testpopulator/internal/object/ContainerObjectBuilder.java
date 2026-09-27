@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.github.anhem.testpopulator.internal.util.ObjectBuilderUtil.collectionHasNullValues;
+import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.collectionHasNullValues;
 
 public class ContainerObjectBuilder extends ObjectBuilder {
 
@@ -12,7 +12,7 @@ public class ContainerObjectBuilder extends ObjectBuilder {
     private final String referencedClassName;
 
     private ContainerObjectBuilder(Builder builder) {
-        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized);
+        super(builder.clazz, builder.name, builder.buildType, builder.useFullyQualifiedName, builder.expectedChildren, builder.parameterized, builder.isKotlinSupport);
         this.template = builder.template;
         this.referencedClassName = builder.referencedClassName;
         for (Class<?> referencedClass : builder.referencedClasses) {
