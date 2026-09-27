@@ -109,6 +109,10 @@ public abstract class ObjectBuilder {
                     if (!child.methodChildren.isEmpty()) {
                         return child.renderMethodCalls(child.methodChildren);
                     }
+                    if (isKotlinSupport && child.getName().startsWith("set") && child.getName().length() > 3 && Character.isUpperCase(child.getName().charAt(3))) {
+                        String propertyName = Character.toLowerCase(child.getName().charAt(3)) + child.getName().substring(4);
+                        return Stream.of(String.format("%s.%s = %s", getMethodTargetName(), propertyName, child.buildArguments()));
+                    }
                     return Stream.of(String.format("%s.%s(%s);", getMethodTargetName(), child.getName(), child.buildArguments()));
                 });
     }

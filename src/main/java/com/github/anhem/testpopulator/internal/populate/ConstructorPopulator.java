@@ -8,16 +8,20 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
-import static com.github.anhem.testpopulator.internal.util.KotlinUtil.isKotlinConstructor;
+import static com.github.anhem.testpopulator.internal.util.KotlinUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.getLargestConstructor;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.setAccessible;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 public class ConstructorPopulator implements PopulatingStrategy {
 
@@ -47,7 +51,7 @@ public class ConstructorPopulator implements PopulatingStrategy {
                 return populateWithKotlinDefaults(constructor, primaryConstructor, classCarrier, populator, realParameterCount, maskCount);
             }
 
-            java.util.List<Boolean> isVarargs = java.util.Arrays.stream(primaryConstructor.getParameters()).map(java.lang.reflect.Parameter::isVarArgs).collect(java.util.stream.Collectors.toList());
+            List<Boolean> isVarargs = Arrays.stream(primaryConstructor.getParameters()).map(Parameter::isVarArgs).collect(toList());
             classCarrier.getObjectFactory().constructor(
                     classCarrier.getClazz(),
                     realParameterCount,
@@ -59,7 +63,7 @@ public class ConstructorPopulator implements PopulatingStrategy {
             return constructor.newInstance(arguments);
         }
 
-        java.util.List<Boolean> isVarargs = java.util.Arrays.stream(constructor.getParameters()).map(java.lang.reflect.Parameter::isVarArgs).collect(java.util.stream.Collectors.toList());
+        List<Boolean> isVarargs = Arrays.stream(constructor.getParameters()).map(Parameter::isVarArgs).collect(toList());
         classCarrier.getObjectFactory().constructor(
                 classCarrier.getClazz(),
                 parameterCount,
@@ -72,11 +76,11 @@ public class ConstructorPopulator implements PopulatingStrategy {
     }
 
     private <T> T populateWithKotlinDefaults(Constructor<T> syntheticCtor, Constructor<T> primaryCtor, ClassCarrier<T> classCarrier, Populator populator, int realParamCount, int maskCount) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        java.util.Set<Integer> defaultedIndices = com.github.anhem.testpopulator.internal.util.KotlinUtil.detectDefaultedParameters(syntheticCtor, primaryCtor, classCarrier, populator, realParamCount, maskCount);
+        Set<Integer> defaultedIndices = detectDefaultedParameters(syntheticCtor, primaryCtor, classCarrier, populator, realParamCount, maskCount);
 
         int nonDefaultCount = realParamCount - defaultedIndices.size();
-        java.util.List<String> parameterNames = new java.util.ArrayList<>();
-        java.util.List<Boolean> isVarargs = new java.util.ArrayList<>();
+        List<String> parameterNames = new ArrayList<>();
+        List<Boolean> isVarargs = new ArrayList<>();
         for (int i = 0; i < realParamCount; i++) {
             if (!defaultedIndices.contains(i)) {
                 parameterNames.add(primaryCtor.getParameters()[i].getName());
@@ -94,7 +98,7 @@ public class ConstructorPopulator implements PopulatingStrategy {
         Object[] realArgs = new Object[realParamCount];
         for (int i = 0; i < realParamCount; i++) {
             if (defaultedIndices.contains(i)) {
-                realArgs[i] = com.github.anhem.testpopulator.internal.util.KotlinUtil.getDefaultValueForType(primaryCtor.getParameterTypes()[i]);
+                realArgs[i] = getDefaultValueForType(primaryCtor.getParameterTypes()[i]);
             } else {
                 realArgs[i] = populateArgument(primaryCtor, classCarrier, populator, i);
             }

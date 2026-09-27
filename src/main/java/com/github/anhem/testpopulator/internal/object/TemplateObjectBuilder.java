@@ -4,8 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.anhem.testpopulator.internal.object.util.ArgumentFormatterUtil.getChildArgument;
 import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.concatenate;
 import static com.github.anhem.testpopulator.internal.object.util.ObjectBuilderUtil.endBuilder;
+import static java.lang.String.format;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.stream.IntStream.range;
 
 public class TemplateObjectBuilder extends ObjectBuilder {
 
@@ -50,11 +54,14 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         if (codeTemplate == null || (skipIfNull && isNullValue())) {
             return Stream.empty();
         }
-        if (isKotlinSupport() && getClazz() != null && getClazz().isMemberClass() && !java.lang.reflect.Modifier.isStatic(getClazz().getModifiers()) && !argumentChildren.isEmpty()) {
-            String outerInstance = com.github.anhem.testpopulator.internal.object.util.ArgumentFormatterUtil.getChildArgument(argumentChildren.get(0));
+        if (isKotlinSupport() && getClazz() != null && getClazz().isMemberClass() && !isStatic(getClazz().getModifiers()) && !argumentChildren.isEmpty()) {
+            String outerInstance = getChildArgument(argumentChildren.get(0));
             List<ObjectBuilder> remainingArgs = argumentChildren.subList(1, argumentChildren.size());
             String remainingArgsString = getArgs(remainingArgs);
-            return Stream.of(String.format("%s %s: %s = %s.%s(%s)", PSF, getName(), formatTypes(), outerInstance, getClassName(), remainingArgsString));
+            String outerClassName = isUseFullyQualifiedName() ? getClazz().getDeclaringClass().getCanonicalName() : getClazz().getDeclaringClass().getSimpleName();
+            String innerClassName = getClazz().getSimpleName();
+            String typeName = outerClassName + "." + innerClassName;
+            return Stream.of(format("%s %s: %s = %s.%s(%s)", PSF, getName(), typeName, outerInstance, innerClassName, remainingArgsString));
         }
         String args = getArgs(argumentChildren);
         return Stream.of(codeTemplate.render(isKotlinSupport(), PSF, getClassName(), formatTypes(), getName(), factoryClassName, methodName, args));
@@ -67,9 +74,9 @@ public class TemplateObjectBuilder extends ObjectBuilder {
         }
         boolean hasKotlinNames = kotlinParameterNames != null && !kotlinParameterNames.isEmpty();
         if (hasKotlinNames || (isVarargs != null && !isVarargs.isEmpty())) {
-            return java.util.stream.IntStream.range(0, children.size())
+            return range(0, children.size())
                     .mapToObj(i -> {
-                        String argument = com.github.anhem.testpopulator.internal.object.util.ArgumentFormatterUtil.getChildArgument(children.get(i));
+                        String argument = getChildArgument(children.get(i));
                         if (isKotlinSupport() && isVarargs != null && i < isVarargs.size() && isVarargs.get(i) && !argument.equals(NULL)) {
                             argument = "*" + argument;
                         }
