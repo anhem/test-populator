@@ -11,7 +11,6 @@ import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGe
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCodeContains;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class PopulateFactoryWithKotlinSupportTest {
 
@@ -75,7 +74,6 @@ class PopulateFactoryWithKotlinSupportTest {
         );
         try {
             assertGeneratedCodeContains(result, populateConfig, "arg0 = ");
-            fail("Should not contain 'arg0 = '");
         } catch (AssertionError e) {
             // expected
         }
