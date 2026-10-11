@@ -52,10 +52,38 @@ class MutatorFieldAccessTest {
         MutatorWithBothSettersAndFields value1 = populateAndAssertWithGeneratedCode(MutatorWithBothSettersAndFields.class);
         MutatorWithBothSettersAndFields value2 = populateAndAssertWithGeneratedCode(MutatorWithBothSettersAndFields.class);
 
-        assertThat(value1.isSetterInvoked()).isTrue();
-        assertThat(value1.x).isGreaterThanOrEqualTo(1000f);
+        assertThat(value1.x).isNotZero();
         assertThat(value1.y).isNotZero();
         assertRandomlyPopulatedValues(value1, value2);
+    }
+
+    @Test
+    void testClassWithBothSettersAndFieldsDisablingPublicFields() {
+        populateConfig = populateConfig.toBuilder()
+                .mutatorStrategy()
+                .publicFields(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        MutatorWithBothSettersAndFields value = populateAndAssertWithGeneratedCode(MutatorWithBothSettersAndFields.class);
+
+        assertThat(value.x).isGreaterThanOrEqualTo(1000f);
+        assertThat(value.y).isZero();
+    }
+
+    @Test
+    void testClassWithBothSettersAndFieldsDisablingMutatorMethods() {
+        populateConfig = populateConfig.toBuilder()
+                .mutatorStrategy()
+                .mutatorMethods(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        MutatorWithBothSettersAndFields value = populateAndAssertWithGeneratedCode(MutatorWithBothSettersAndFields.class);
+
+        assertThat(value.x).isNotZero();
+        assertThat(value.x).isLessThan(1000f);
+        assertThat(value.y).isNotZero();
     }
 
     @Test

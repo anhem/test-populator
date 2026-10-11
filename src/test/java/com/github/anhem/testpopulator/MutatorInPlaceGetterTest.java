@@ -127,6 +127,21 @@ class MutatorInPlaceGetterTest {
         assertThat(value.getTarget().y).isNotZero();
     }
 
+    @Test
+    void testDisablingInPlaceGetters() {
+        populateConfig = populateConfig.toBuilder()
+                .mutatorStrategy()
+                .inPlaceGetters(false)
+                .build();
+        populateFactory = new PopulateFactory(populateConfig);
+
+        NamedTargetComponent value = populateAndAssertWithGeneratedCode(NamedTargetComponent.class);
+
+        assertThat(value.getName()).isNotNull();
+        assertThat(value.getTarget().x).isZero();
+        assertThat(value.getTarget().y).isZero();
+    }
+
     private <T> T populateAndAssertWithGeneratedCode(Class<T> clazz) {
         assertThat(populateConfig.isObjectFactoryEnabled()).isTrue();
         assertThat(populateConfig.getStrategyOrder()).containsExactly(MUTATOR);

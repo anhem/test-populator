@@ -37,15 +37,25 @@ class MutatorUtilTest {
     }
 
     @Test
+    void isMatchingMutatorStrategyRespectsToggles() {
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, true, false, true)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, false, true, false)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, false, true, true)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, true, false, false)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, TargetPositionComponent.class, false, NO_ARGS, true, true, false)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, TargetPositionComponent.class, false, NO_ARGS, false, false, true)).isTrue();
+    }
+
+    @Test
     void getMutatorGettersReturnsGettersForClass() {
-        List<Method> getters = getMutatorGetters(TargetPositionComponent.class, emptyList(), emptySet());
+        List<Method> getters = getMutatorGetters(TargetPositionComponent.class, emptySet());
         assertThat(getters).extracting(Method::getName).containsExactly("getTarget");
     }
 
     @Test
     void getMutatorGettersForObjectReturnsMutatorGetters() {
         TargetPositionComponent component = new TargetPositionComponent();
-        List<MutatorGetter> getters = getMutatorGetters(component, TargetPositionComponent.class, emptyList(), PopulateConfig.builder().build());
+        List<MutatorGetter> getters = getMutatorGetters(component, TargetPositionComponent.class, PopulateConfig.builder().build());
         assertThat(getters).hasSize(1);
         assertThat(getters.get(0).getGetter().getName()).isEqualTo("getTarget");
         assertThat(getters.get(0).getExpectedChildren()).isEqualTo(2);
@@ -66,20 +76,20 @@ class MutatorUtilTest {
 
     @Test
     void getPublicFieldsReturnsMutableFields() {
-        List<Field> fields = getPublicFields(Vector.class, emptyList(), emptySet());
+        List<Field> fields = getPublicFields(Vector.class, emptySet());
         assertThat(fields).extracting(Field::getName).containsExactly("x", "y");
     }
 
     @Test
     void getPublicFieldsIgnoresStaticFinalAndBlacklisted() {
-        List<Field> fields = getPublicFields(Vector.class, emptyList(), Set.of("x"));
+        List<Field> fields = getPublicFields(Vector.class, Set.of("x"));
         assertThat(fields).extracting(Field::getName).containsExactly("y");
     }
 
     @Test
-    void getPublicFieldsFiltersPropertiesMatchingMutatorMethods() {
-        List<Field> fields = getPublicFields(MutatorWithBothSettersAndFields.class, getMutatorMethods(MutatorWithBothSettersAndFields.class, emptySet()), emptySet());
-        assertThat(fields).extracting(Field::getName).containsExactly("y");
+    void getPublicFieldsReturnsAllPublicFieldsIndependentlyOfMethods() {
+        List<Field> fields = getPublicFields(MutatorWithBothSettersAndFields.class, emptySet());
+        assertThat(fields).extracting(Field::getName).containsExactly("x", "y");
     }
 
     @Test

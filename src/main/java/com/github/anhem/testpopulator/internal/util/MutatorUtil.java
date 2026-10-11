@@ -22,8 +22,22 @@ public class MutatorUtil {
     }
 
     public static <T> boolean isMatchingMutatorStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor, ConstructorType constructorType) {
+        return isMatchingMutatorStrategy(strategy, clazz, accessNonPublicConstructor, constructorType, true, true, true);
+    }
+
+    public static <T> boolean isMatchingMutatorStrategy(
+            Strategy strategy,
+            Class<T> clazz,
+            boolean accessNonPublicConstructor,
+            ConstructorType constructorType,
+            boolean mutatorMethods,
+            boolean mutatorPublicFields,
+            boolean mutatorInPlaceGetters
+    ) {
         if (strategy.equals(MUTATOR) && hasAccessibleConstructor(clazz, accessNonPublicConstructor, constructorType)) {
-            return hasMutatorMethods(clazz) || hasPublicFields(clazz) || hasMutatorGetters(clazz);
+            return (mutatorMethods && hasMutatorMethods(clazz))
+                    || (mutatorPublicFields && hasPublicFields(clazz))
+                    || (mutatorInPlaceGetters && hasMutatorGetters(clazz));
         }
         return false;
     }
@@ -34,13 +48,11 @@ public class MutatorUtil {
                 .collect(Collectors.toList());
     }
 
-    public static <T> List<Field> getPublicFields(Class<T> clazz, List<Method> mutatorMethods, Set<String> blacklistedFields) {
-        Set<String> populatedProperties = getPopulatedPropertyNames(mutatorMethods);
+    public static <T> List<Field> getPublicFields(Class<T> clazz, Set<String> blacklistedFields) {
         return stream(clazz.getFields())
                 .filter(field -> !Modifier.isStatic(field.getModifiers()))
                 .filter(field -> !Modifier.isFinal(field.getModifiers()))
                 .filter(field -> !blacklistedFields.contains(field.getName()))
-                .filter(field -> !populatedProperties.contains(field.getName().toLowerCase()))
                 .sorted(Comparator.comparing(Field::getName))
                 .collect(Collectors.toList());
     }
@@ -48,16 +60,14 @@ public class MutatorUtil {
     public static <T> List<MutatorGetter> getMutatorGetters(
             T objectOfClass,
             Class<T> clazz,
-            List<Method> mutatorMethods,
             PopulateConfig populateConfig
     ) {
-        return getMutatorGetters(objectOfClass, clazz, mutatorMethods, populateConfig, Collections.newSetFromMap(new IdentityHashMap<>()));
+        return getMutatorGetters(objectOfClass, clazz, populateConfig, Collections.newSetFromMap(new IdentityHashMap<>()));
     }
 
-    public static <T> List<Method> getMutatorGetters(Class<T> clazz, List<Method> mutatorMethods, Set<String> blacklistedMethods) {
-        Set<String> populatedProperties = getPopulatedPropertyNames(mutatorMethods);
+    public static <T> List<Method> getMutatorGetters(Class<T> clazz, Set<String> blacklistedMethods) {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
-                .filter(method -> isMutatorGetter(method, populatedProperties, new HashSet<>(List.of(clazz))))
+                .filter(method -> isMutatorGetter(method, new HashSet<>(List.of(clazz))))
                 .sorted(Comparator.comparing(Method::getName))
                 .collect(Collectors.toList());
     }
@@ -66,7 +76,6 @@ public class MutatorUtil {
     private static <T> List<MutatorGetter> getMutatorGetters(
             T objectOfClass,
             Class<T> clazz,
-            List<Method> mutatorMethods,
             PopulateConfig populateConfig,
             Set<Object> visitedObjects
     ) {
@@ -75,9 +84,8 @@ public class MutatorUtil {
         }
         visitedObjects.add(objectOfClass);
 
-        Set<String> populatedProperties = getPopulatedPropertyNames(mutatorMethods);
         List<Method> candidateGetters = getDeclaredMethods(clazz, populateConfig.getBlacklistedMethods()).stream()
-                .filter(method -> isMutatorGetterCandidate(method, populatedProperties))
+                .filter(MutatorUtil::isMutatorGetterCandidate)
                 .sorted(Comparator.comparing(Method::getName))
                 .collect(Collectors.toList());
 
@@ -88,9 +96,15 @@ public class MutatorUtil {
                 Object targetObject = getter.invoke(objectOfClass);
                 if (targetObject != null && !visitedObjects.contains(targetObject)) {
                     Class<?> targetClass = targetObject.getClass();
-                    List<Method> childMutatorMethods = getMutatorMethods(targetClass, populateConfig.getBlacklistedMethods());
-                    List<Field> childPublicFields = getPublicFields(targetClass, childMutatorMethods, populateConfig.getBlacklistedFields());
-                    List<MutatorGetter> childMutatorGetters = getMutatorGetters(targetObject, (Class<Object>) targetClass, childMutatorMethods, populateConfig, visitedObjects);
+                    List<Method> childMutatorMethods = populateConfig.isMutatorMethods()
+                            ? getMutatorMethods(targetClass, populateConfig.getBlacklistedMethods())
+                            : Collections.emptyList();
+                    List<Field> childPublicFields = populateConfig.isMutatorPublicFields()
+                            ? getPublicFields(targetClass, populateConfig.getBlacklistedFields())
+                            : Collections.emptyList();
+                    List<MutatorGetter> childMutatorGetters = populateConfig.isMutatorInPlaceGetters()
+                            ? getMutatorGetters(targetObject, (Class<Object>) targetClass, populateConfig, visitedObjects)
+                            : Collections.emptyList();
                     int expectedChildren = childMutatorMethods.size() + childPublicFields.size() + childMutatorGetters.size();
                     if (expectedChildren > 0) {
                         mutatorGetters.add(new MutatorGetter(getter, targetObject, childMutatorMethods, childPublicFields, childMutatorGetters));
@@ -110,10 +124,8 @@ public class MutatorUtil {
         if (isJavaBaseClass(clazz) || clazz.isPrimitive() || clazz.isEnum() || clazz.isArray() || isCollectionLike(clazz)) {
             return false;
         }
-        List<Method> mutatorMethods = getMutatorMethods(clazz, Collections.emptySet());
-        Set<String> populatedProperties = getPopulatedPropertyNames(mutatorMethods);
         return getDeclaredMethods(clazz, Collections.emptySet()).stream()
-                .filter(method -> isMutatorGetterCandidate(method, populatedProperties))
+                .filter(MutatorUtil::isMutatorGetterCandidate)
                 .map(Method::getReturnType)
                 .filter(returnType -> !visitedClasses.contains(returnType))
                 .anyMatch(returnType -> {
@@ -122,8 +134,8 @@ public class MutatorUtil {
                 });
     }
 
-    private static boolean isMutatorGetter(Method method, Set<String> populatedProperties, Set<Class<?>> visitedClasses) {
-        if (!isMutatorGetterCandidate(method, populatedProperties)) {
+    private static boolean isMutatorGetter(Method method, Set<Class<?>> visitedClasses) {
+        if (!isMutatorGetterCandidate(method)) {
             return false;
         }
         Class<?> returnType = method.getReturnType();
@@ -134,7 +146,7 @@ public class MutatorUtil {
         return hasMutatorMethods(returnType) || hasPublicFields(returnType) || hasMutatorGetters(returnType, visitedClasses);
     }
 
-    private static boolean isMutatorGetterCandidate(Method method, Set<String> populatedProperties) {
+    private static boolean isMutatorGetterCandidate(Method method) {
         if (method.getParameterCount() != 0 || method.getReturnType().equals(void.class) || isStatic(method) || !Modifier.isPublic(method.getModifiers())) {
             return false;
         }
@@ -144,10 +156,6 @@ public class MutatorUtil {
         String name = method.getName();
         if (!(name.startsWith("get") && name.length() > 3 && Character.isUpperCase(name.charAt(3)))
                 && !(name.startsWith("is") && name.length() > 2 && Character.isUpperCase(name.charAt(2)))) {
-            return false;
-        }
-        String propertyName = getPropertyName(name);
-        if (populatedProperties.contains(propertyName) || populatedProperties.contains(name.toLowerCase())) {
             return false;
         }
         Class<?> returnType = method.getReturnType();
@@ -160,16 +168,6 @@ public class MutatorUtil {
                 && !returnType.isEnum()
                 && !returnType.isArray()
                 && !isCollectionLike(returnType);
-    }
-
-    private static String getPropertyName(String name) {
-        if (name.startsWith("get") && name.length() > 3 && Character.isUpperCase(name.charAt(3))) {
-            return name.substring(3).toLowerCase();
-        }
-        if (name.startsWith("is") && name.length() > 2 && Character.isUpperCase(name.charAt(2))) {
-            return name.substring(2).toLowerCase();
-        }
-        return name.toLowerCase();
     }
 
     private static <T> boolean hasMutatorMethods(Class<T> clazz) {
@@ -187,18 +185,6 @@ public class MutatorUtil {
         return getDeclaredFields(clazz, Collections.emptySet()).stream()
                 .filter(field -> !Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()))
                 .allMatch(field -> Modifier.isPublic(field.getModifiers()));
-    }
-
-    private static Set<String> getPopulatedPropertyNames(List<Method> mutatorMethods) {
-        Set<String> propertyNames = new HashSet<>();
-        for (Method method : mutatorMethods) {
-            String name = method.getName();
-            propertyNames.add(name.toLowerCase());
-            if (name.startsWith("set") && name.length() > 3 && Character.isUpperCase(name.charAt(3))) {
-                propertyNames.add(name.substring(3).toLowerCase());
-            }
-        }
-        return propertyNames;
     }
 
     private static <T> boolean hasAccessibleConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor, ConstructorType constructorType) {

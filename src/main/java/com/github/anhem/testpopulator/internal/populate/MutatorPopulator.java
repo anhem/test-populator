@@ -37,9 +37,15 @@ public class MutatorPopulator extends MethodPopulator implements PopulatingStrat
             } else {
                 objectOfClass = constructor.newInstance();
             }
-            List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
-            List<Field> publicFields = getPublicFields(clazz, methods, populateConfig.getBlacklistedFields());
-            List<MutatorGetter> mutatorGetters = getMutatorGetters(objectOfClass, clazz, methods, populateConfig);
+            List<Method> methods = populateConfig.isMutatorMethods()
+                    ? getMutatorMethods(clazz, populateConfig.getBlacklistedMethods())
+                    : java.util.Collections.emptyList();
+            List<Field> publicFields = populateConfig.isMutatorPublicFields()
+                    ? getPublicFields(clazz, populateConfig.getBlacklistedFields())
+                    : java.util.Collections.emptyList();
+            List<MutatorGetter> mutatorGetters = populateConfig.isMutatorInPlaceGetters()
+                    ? getMutatorGetters(objectOfClass, clazz, populateConfig)
+                    : java.util.Collections.emptyList();
             int totalExpectedChildren = methods.size() + publicFields.size() + mutatorGetters.size();
             if (constructor.getParameterCount() > 0) {
                 classCarrier.getObjectFactory().mutator(clazz, totalExpectedChildren);

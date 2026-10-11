@@ -78,7 +78,7 @@ public class Populator {
             if (isMatchingSetterStrategy(strategy, clazz, populateConfig.getSetterPrefixes(), populateConfig.isAccessNonPublicConstructors())) {
                 return setterPopulator.populate(classCarrier, this);
             }
-            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.isAccessNonPublicConstructors(), populateConfig.getConstructorType())) {
+            if (isMatchingMutatorStrategy(strategy, clazz, populateConfig.isAccessNonPublicConstructors(), populateConfig.getConstructorType(), populateConfig.isMutatorMethods(), populateConfig.isMutatorPublicFields(), populateConfig.isMutatorInPlaceGetters())) {
                 return mutatorPopulator.populate(classCarrier, this);
             }
             if (isMatchingFieldStrategy(strategy, clazz, populateConfig.isAccessNonPublicConstructors())) {
