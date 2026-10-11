@@ -16,6 +16,7 @@ import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptio
 import static com.github.anhem.testpopulator.internal.util.MutatorUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.setAccessible;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 
 public class MutatorPopulator extends MethodPopulator implements PopulatingStrategy {
 
@@ -40,13 +41,13 @@ public class MutatorPopulator extends MethodPopulator implements PopulatingStrat
             }
             List<Method> methods = populateConfig.isMutatorMethods()
                     ? getMutatorMethods(clazz, populateConfig.getBlacklistedMethods())
-                    : java.util.Collections.emptyList();
+                    : emptyList();
             List<Field> publicFields = populateConfig.isMutatorPublicFields()
                     ? getPublicFields(clazz, populateConfig.getBlacklistedFields())
-                    : java.util.Collections.emptyList();
+                    : emptyList();
             List<MutatorGetter> mutatorGetters = populateConfig.isMutatorInPlaceGetters()
                     ? getMutatorGetters(objectOfClass, clazz, populateConfig)
-                    : java.util.Collections.emptyList();
+                    : emptyList();
             int totalExpectedChildren = methods.size() + publicFields.size() + mutatorGetters.size();
             if (constructor.getParameterCount() > 0) {
                 classCarrier.getObjectFactory().mutator(clazz, totalExpectedChildren);
