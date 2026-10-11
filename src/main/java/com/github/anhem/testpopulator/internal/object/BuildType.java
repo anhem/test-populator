@@ -7,6 +7,8 @@ public enum BuildType {
     MUTATOR,
     BUILDER,
     METHOD,
+    PUBLIC_FIELD,
+    GETTER,
     STATIC_METHOD,
     SET,
     ENUM_SET,

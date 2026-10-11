@@ -3,15 +3,16 @@ package com.github.anhem.testpopulator.internal.populate;
 import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
+import com.github.anhem.testpopulator.internal.util.MutatorGetter;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
-import static com.github.anhem.testpopulator.internal.util.MutatorUtil.getConstructor;
-import static com.github.anhem.testpopulator.internal.util.MutatorUtil.getMutatorMethods;
+import static com.github.anhem.testpopulator.internal.util.MutatorUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.setAccessible;
 import static java.lang.String.format;
 
@@ -31,20 +32,37 @@ public class MutatorPopulator extends MethodPopulator implements PopulatingStrat
             Constructor<T> constructor = getConstructor(clazz, populateConfig.isAccessNonPublicConstructors(), populateConfig.getConstructorType());
             setAccessible(constructor, populateConfig.isAccessNonPublicConstructors());
             T objectOfClass;
-            List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
             if (constructor.getParameterCount() > 0) {
                 objectOfClass = constructorPopulator.populateUsingConstructor(constructor, classCarrier, populator);
-                classCarrier.getObjectFactory().mutator(clazz, methods.size());
-                methods.forEach(method -> populateForMethod(objectOfClass, method, classCarrier, populator));
             } else {
                 objectOfClass = constructor.newInstance();
-                classCarrier.getObjectFactory().setter(clazz, methods.size());
-                methods.forEach(method -> populateForMethod(objectOfClass, method, classCarrier, populator));
             }
+            List<Method> methods = getMutatorMethods(clazz, populateConfig.getBlacklistedMethods());
+            List<Field> publicFields = getPublicFields(clazz, methods, populateConfig.getBlacklistedFields());
+            List<MutatorGetter> mutatorGetters = getMutatorGetters(objectOfClass, clazz, methods, populateConfig);
+            int totalExpectedChildren = methods.size() + publicFields.size() + mutatorGetters.size();
+            if (constructor.getParameterCount() > 0) {
+                classCarrier.getObjectFactory().mutator(clazz, totalExpectedChildren);
+            } else {
+                classCarrier.getObjectFactory().setter(clazz, totalExpectedChildren);
+            }
+            methods.forEach(method -> populateForMethod(objectOfClass, method, classCarrier, populator));
+            publicFields.forEach(field -> populateForField(objectOfClass, field, classCarrier, populator));
+            mutatorGetters.forEach(mutatorGetter -> populateForGetter(mutatorGetter, classCarrier, populator));
             return objectOfClass;
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CREATE_OBJECT, clazz.getName(), MUTATOR), e);
         }
+    }
+
+    private <T> void populateForGetter(MutatorGetter mutatorGetter, ClassCarrier<T> classCarrier, Populator populator) {
+        Method getter = mutatorGetter.getGetter();
+        Object targetObject = mutatorGetter.getTargetObject();
+        ClassCarrier<?> childCarrier = classCarrier.createChild(getter.getGenericReturnType(), getter.getName());
+        classCarrier.getObjectFactory().getter(getter.getName(), mutatorGetter.getExpectedChildren());
+        mutatorGetter.getChildMutatorMethods().forEach(method -> populateForMethod(targetObject, method, childCarrier, populator));
+        mutatorGetter.getChildPublicFields().forEach(field -> populateForField(targetObject, field, childCarrier, populator));
+        mutatorGetter.getChildMutatorGetters().forEach(childGetter -> populateForGetter(childGetter, childCarrier, populator));
     }
 
 }

@@ -653,6 +653,45 @@ class ObjectFactoryImplTest {
         );
     }
 
+    @Test
+    void createObjectUsingGetterAndPublicField() {
+        objectFactoryImpl.setter(MyClass.class, 1);
+        objectFactoryImpl.getter("getTarget", 2);
+        objectFactoryImpl.publicField("x", 1);
+        objectFactoryImpl.value(1.0f, Float.class, null);
+        objectFactoryImpl.publicField("y", 1);
+        objectFactoryImpl.value(2.0f, Float.class, null);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final MyClass MY_CLASS_0 = new MyClass();",
+                "static {",
+                "MY_CLASS_0.getTarget().x = 1.0f;",
+                "MY_CLASS_0.getTarget().y = 2.0f;",
+                "}"
+        ));
+    }
+
+    @Test
+    void createObjectUsingGetterInKotlin() {
+        objectFactoryImpl = new ObjectFactoryImpl(PopulateConfig.builder().kotlinSupport(true).build());
+        objectFactoryImpl.setter(MyClass.class, 1);
+        objectFactoryImpl.getter("getTarget", 2);
+        objectFactoryImpl.publicField("x", 1);
+        objectFactoryImpl.value(1.0f, Float.class, null);
+        objectFactoryImpl.publicField("y", 1);
+        objectFactoryImpl.value(2.0f, Float.class, null);
+
+        ObjectResult objectResult = objectFactoryImpl.build();
+        assertThat(objectResult.getObjects()).isEqualTo(List.of(
+                "public static final MY_CLASS_0: MyClass = MyClass()",
+                "static {",
+                "MY_CLASS_0.target.x = 1.0f",
+                "MY_CLASS_0.target.y = 2.0f",
+                "}"
+        ));
+    }
+
     private String getExpectedMyClassStaticImport() {
         return String.format("%s.%s.%s", PACKAGE, this.getClass().getSimpleName(), MyClass.class.getSimpleName());
     }

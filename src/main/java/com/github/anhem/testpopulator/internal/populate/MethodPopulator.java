@@ -3,10 +3,13 @@ package com.github.anhem.testpopulator.internal.populate;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.internal.carrier.ClassCarrier;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CALL_METHOD;
+import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_SET_FIELD;
+import static com.github.anhem.testpopulator.internal.util.PopulateUtil.setAccessible;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufAndHasNullArgument;
 import static com.github.anhem.testpopulator.internal.util.ProtobufUtil.isProtobufByteString;
 import static java.lang.String.format;
@@ -30,6 +33,17 @@ public abstract class MethodPopulator {
             method.invoke(objectOfClass, args);
         } catch (Exception e) {
             throw new PopulateException(format(FAILED_TO_CALL_METHOD, methodName, objectOfClass.getClass().getName()), e);
+        }
+    }
+
+    public <T, V> void populateForField(V objectOfClass, Field field, ClassCarrier<T> classCarrier, Populator populator) {
+        String fieldName = field.getName();
+        try {
+            classCarrier.getObjectFactory().publicField(fieldName, 1);
+            setAccessible(field, objectOfClass);
+            field.set(objectOfClass, populator.populate(classCarrier.createChild(field.getGenericType(), fieldName)));
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_SET_FIELD, fieldName, objectOfClass.getClass().getName()), e);
         }
     }
 }

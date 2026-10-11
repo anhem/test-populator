@@ -109,21 +109,51 @@ public abstract class ObjectBuilder {
                     if (!child.methodChildren.isEmpty()) {
                         return child.renderMethodCalls(child.methodChildren);
                     }
+                    if (child.getBuildType() == BuildType.PUBLIC_FIELD) {
+                        if (isKotlinSupport) {
+                            return Stream.of(String.format("%s.%s = %s", getMethodTargetName(), child.getName(), child.buildArguments()));
+                        }
+                        return Stream.of(String.format("%s.%s = %s;", getMethodTargetName(), child.getName(), child.buildArguments()));
+                    }
                     if (isKotlinSupport && child.getName().startsWith("set") && child.getName().length() > 3 && Character.isUpperCase(child.getName().charAt(3))) {
                         String propertyName = Character.toLowerCase(child.getName().charAt(3)) + child.getName().substring(4);
                         return Stream.of(String.format("%s.%s = %s", getMethodTargetName(), propertyName, child.buildArguments()));
+                    }
+                    if (isKotlinSupport) {
+                        return Stream.of(String.format("%s.%s(%s)", getMethodTargetName(), child.getName(), child.buildArguments()));
                     }
                     return Stream.of(String.format("%s.%s(%s);", getMethodTargetName(), child.getName(), child.buildArguments()));
                 });
     }
 
     protected String getMethodTargetName() {
+        if (buildType == BuildType.GETTER && parent != null) {
+            String parentTarget = parent.getMethodTargetName();
+            if (isKotlinSupport) {
+                String propertyName = getKotlinPropertyName(name);
+                return String.format("%s.%s", parentTarget, propertyName);
+            }
+            return String.format("%s.%s()", parentTarget, name);
+        }
         return getName();
+    }
+
+    private static String getKotlinPropertyName(String name) {
+        if (name.startsWith("get") && name.length() > 3 && Character.isUpperCase(name.charAt(3))) {
+            return Character.toLowerCase(name.charAt(3)) + name.substring(4);
+        }
+        if (name.startsWith("is") && name.length() > 2 && Character.isUpperCase(name.charAt(2))) {
+            return name;
+        }
+        return name + "()";
     }
 
     public void addChild(ObjectBuilder child) {
         children.add(child);
-        if (child.getBuildType() == BuildType.MUTATOR || child.getBuildType() == BuildType.METHOD) {
+        if (child.getBuildType() == BuildType.MUTATOR
+                || child.getBuildType() == BuildType.METHOD
+                || child.getBuildType() == BuildType.PUBLIC_FIELD
+                || child.getBuildType() == BuildType.GETTER) {
             methodChildren.add(child);
         } else {
             argumentChildren.add(child);
@@ -241,6 +271,12 @@ public abstract class ObjectBuilder {
                 .map(child -> {
                     if (buildType == BuildType.BUILDER) {
                         return String.format("\t.%s(%s)", child.getName(), child.buildArguments());
+                    }
+                    if (child.getBuildType() == BuildType.PUBLIC_FIELD) {
+                        if (isKotlinSupport) {
+                            return String.format("%s.%s = %s", name, child.getName(), child.buildArguments());
+                        }
+                        return String.format("%s.%s = %s;", name, child.getName(), child.buildArguments());
                     }
                     if (isKotlinSupport && child.getName().startsWith("set") && child.getName().length() > 3 && Character.isUpperCase(child.getName().charAt(3))) {
                         String propertyName = Character.toLowerCase(child.getName().charAt(3)) + child.getName().substring(4);
