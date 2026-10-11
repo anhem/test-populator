@@ -46,11 +46,6 @@ public class ObjectFactoryVoid implements ObjectFactory {
     }
 
     @Override
-    public void getter(String getterName, int expectedChildren) {
-        //ignored
-    }
-
-    @Override
     public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
         //ignored
     }

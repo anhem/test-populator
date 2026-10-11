@@ -123,17 +123,6 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public void getter(String getterName, int expectedChildren) {
-        setNextObjectBuilder(TemplateObjectBuilder.builder()
-                .name(getterName)
-                .buildType(GETTER)
-                .expectedChildren(expectedChildren)
-                .useFullyQualifiedName(false)
-                .isKotlinSupport(populateConfig.isKotlinSupport())
-                .build());
-    }
-
-    @Override
     public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
         if (populateConfig.isKotlinSupport() && "box-impl".equals(methodName)) {
             setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, expectedChildren)

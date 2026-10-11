@@ -169,7 +169,7 @@ Defines the order of strategies to try when creating an object. If the first str
 * **Available Strategies**:
     * `CONSTRUCTOR`: Uses the constructor with the most parameters.
     * `SETTER`: Uses a no-arg constructor, then calls standard setter methods (e.g., `setName()`).
-    * `MUTATOR`: Uses a constructor, then calls state-changing methods (including fluent setters like `withName()`), populates public mutable fields, and mutates nested objects exposed via in-place getters.
+  * `MUTATOR`: Uses a constructor, then calls state-changing methods (including fluent setters like `withName()`) and populates public mutable fields.
     * `FIELD`: Uses a no-arg constructor and populates fields directly using reflection.
     * `BUILDER`: Uses a builder pattern (e.g., from Lombok or Immutables).
     * `STATIC_METHOD`: Uses a public static factory method to create an instance.
@@ -325,8 +325,6 @@ Allows the library to use private or protected constructors.
       `.mutatorStrategy().mutatorMethods(...)`.
     * `publicFields`: Whether to populate public non-final fields directly. Default is `true`. Configure via
       `.mutatorStrategy().publicFields(...)`.
-    * `inPlaceGetters`: Whether to populate pre-instantiated nested objects returned by getters in place. Default is `true`. Configure via
-      `.mutatorStrategy().inPlaceGetters(...)`.
 
 * **For `STATIC_METHOD` strategy**:
 

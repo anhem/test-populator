@@ -127,33 +127,14 @@ public abstract class ObjectBuilder {
     }
 
     protected String getMethodTargetName() {
-        if (buildType == BuildType.GETTER && parent != null) {
-            String parentTarget = parent.getMethodTargetName();
-            if (isKotlinSupport) {
-                String propertyName = getKotlinPropertyName(name);
-                return String.format("%s.%s", parentTarget, propertyName);
-            }
-            return String.format("%s.%s()", parentTarget, name);
-        }
         return getName();
-    }
-
-    private static String getKotlinPropertyName(String name) {
-        if (name.startsWith("get") && name.length() > 3 && Character.isUpperCase(name.charAt(3))) {
-            return Character.toLowerCase(name.charAt(3)) + name.substring(4);
-        }
-        if (name.startsWith("is") && name.length() > 2 && Character.isUpperCase(name.charAt(2))) {
-            return name;
-        }
-        return name + "()";
     }
 
     public void addChild(ObjectBuilder child) {
         children.add(child);
         if (child.getBuildType() == BuildType.MUTATOR
                 || child.getBuildType() == BuildType.METHOD
-                || child.getBuildType() == BuildType.PUBLIC_FIELD
-                || child.getBuildType() == BuildType.GETTER) {
+                || child.getBuildType() == BuildType.PUBLIC_FIELD) {
             methodChildren.add(child);
         } else {
             argumentChildren.add(child);

@@ -1,7 +1,6 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.ConstructorType;
-import com.github.anhem.testpopulator.config.PopulateConfig;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
@@ -9,11 +8,9 @@ import com.github.anhem.testpopulator.model.java.mutator.MutatorWithBothSettersA
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
 import com.github.anhem.testpopulator.model.java.mutator.Vector;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
-import com.github.anhem.testpopulator.model.kotlin.TargetPositionComponent;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +19,6 @@ import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
 import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
 import static com.github.anhem.testpopulator.internal.util.MutatorUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.NO_CONSTRUCTOR_FOUND;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,32 +29,14 @@ class MutatorUtilTest {
     void isMatchingMutatorStrategyReturnsTrue() {
         assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS)).isTrue();
         assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS)).isTrue();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, TargetPositionComponent.class, false, NO_ARGS)).isTrue();
     }
 
     @Test
     void isMatchingMutatorStrategyRespectsToggles() {
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, true, false, true)).isFalse();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, false, true, false)).isTrue();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, false, true, true)).isFalse();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, true, false, false)).isTrue();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, TargetPositionComponent.class, false, NO_ARGS, true, true, false)).isFalse();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, TargetPositionComponent.class, false, NO_ARGS, false, false, true)).isTrue();
-    }
-
-    @Test
-    void getMutatorGettersReturnsGettersForClass() {
-        List<Method> getters = getMutatorGetters(TargetPositionComponent.class, emptySet());
-        assertThat(getters).extracting(Method::getName).containsExactly("getTarget");
-    }
-
-    @Test
-    void getMutatorGettersForObjectReturnsMutatorGetters() {
-        TargetPositionComponent component = new TargetPositionComponent();
-        List<MutatorGetter> getters = getMutatorGetters(component, TargetPositionComponent.class, PopulateConfig.builder().build());
-        assertThat(getters).hasSize(1);
-        assertThat(getters.get(0).getGetter().getName()).isEqualTo("getTarget");
-        assertThat(getters.get(0).getExpectedChildren()).isEqualTo(2);
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, true, false)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, false, true)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, false, true)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, true, false)).isTrue();
     }
 
     @Test

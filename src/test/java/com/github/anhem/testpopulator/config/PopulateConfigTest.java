@@ -33,7 +33,6 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.getMethodType()).isEqualTo(MethodType.LARGEST);
         assertThat(DEFAULT_POPULATE_CONFIG.isMutatorMethods()).isTrue();
         assertThat(DEFAULT_POPULATE_CONFIG.isMutatorPublicFields()).isTrue();
-        assertThat(DEFAULT_POPULATE_CONFIG.isMutatorInPlaceGetters()).isTrue();
         assertEqual(DEFAULT_POPULATE_CONFIG.toBuilder().build(), DEFAULT_POPULATE_CONFIG);
     }
 
@@ -95,13 +94,11 @@ class PopulateConfigTest {
                 .mutatorStrategy()
                 .mutatorMethods(false)
                 .publicFields(false)
-                .inPlaceGetters(false)
                 .and()
                 .build();
 
         assertThat(populateConfig.isMutatorMethods()).isFalse();
         assertThat(populateConfig.isMutatorPublicFields()).isFalse();
-        assertThat(populateConfig.isMutatorInPlaceGetters()).isFalse();
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
     }
 

@@ -36,7 +36,6 @@ public class PopulateConfig {
     public static final Class<?> DEFAULT_WILDCARD_FALLBACK = String.class;
     public static final boolean DEFAULT_MUTATOR_METHODS = true;
     public static final boolean DEFAULT_MUTATOR_PUBLIC_FIELDS = true;
-    public static final boolean DEFAULT_MUTATOR_IN_PLACE_GETTERS = true;
 
     public static class PopulateConfigBuilder {
         private Set<String> blacklistedMethods = null;
@@ -60,7 +59,6 @@ public class PopulateConfig {
         private Class<?> wildcardFallbackType;
         private Boolean mutatorMethods;
         private Boolean mutatorPublicFields;
-        private Boolean mutatorInPlaceGetters;
 
         /**
          * Set blacklisted methods, replacing existing ones.
@@ -471,7 +469,6 @@ public class PopulateConfig {
     private final Class<?> wildcardFallbackType;
     private final boolean mutatorMethods;
     private final boolean mutatorPublicFields;
-    private final boolean mutatorInPlaceGetters;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
         this.blacklistedMethods = collectionOrDefault(populateConfigBuilder.blacklistedMethods, DEFAULT_BLACKLISTED_METHODS);
@@ -497,7 +494,6 @@ public class PopulateConfig {
         this.wildcardFallbackType = valueOrDefault(populateConfigBuilder.wildcardFallbackType, DEFAULT_WILDCARD_FALLBACK);
         this.mutatorMethods = valueOrDefault(populateConfigBuilder.mutatorMethods, DEFAULT_MUTATOR_METHODS);
         this.mutatorPublicFields = valueOrDefault(populateConfigBuilder.mutatorPublicFields, DEFAULT_MUTATOR_PUBLIC_FIELDS);
-        this.mutatorInPlaceGetters = valueOrDefault(populateConfigBuilder.mutatorInPlaceGetters, DEFAULT_MUTATOR_IN_PLACE_GETTERS);
     }
 
     public Set<String> getBlacklistedMethods() {
@@ -584,10 +580,6 @@ public class PopulateConfig {
         return mutatorPublicFields;
     }
 
-    public boolean isMutatorInPlaceGetters() {
-        return mutatorInPlaceGetters;
-    }
-
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -615,7 +607,6 @@ public class PopulateConfig {
         populateConfigBuilder.wildcardFallbackType = wildcardFallbackType;
         populateConfigBuilder.mutatorMethods = mutatorMethods;
         populateConfigBuilder.mutatorPublicFields = mutatorPublicFields;
-        populateConfigBuilder.mutatorInPlaceGetters = mutatorInPlaceGetters;
         populateConfigBuilder.strategyOrder = strategyOrder != null ? new ArrayList<>(strategyOrder) : null;
         return populateConfigBuilder;
     }
@@ -656,7 +647,6 @@ public class PopulateConfig {
                 ", wildcardFallbackType=" + wildcardFallbackType +
                 ", mutatorMethods=" + mutatorMethods +
                 ", mutatorPublicFields=" + mutatorPublicFields +
-                ", mutatorInPlaceGetters=" + mutatorInPlaceGetters +
                 '}';
     }
 
@@ -829,11 +819,6 @@ public class PopulateConfig {
 
         public MutatorConfig publicFields(boolean publicFields) {
             parent.mutatorPublicFields = publicFields;
-            return this;
-        }
-
-        public MutatorConfig inPlaceGetters(boolean inPlaceGetters) {
-            parent.mutatorInPlaceGetters = inPlaceGetters;
             return this;
         }
     }
