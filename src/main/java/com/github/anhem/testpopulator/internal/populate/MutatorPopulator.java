@@ -12,6 +12,7 @@ import java.util.List;
 
 import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
 import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_CREATE_OBJECT;
+import static com.github.anhem.testpopulator.internal.populate.PopulatorExceptionMessages.FAILED_TO_SET_FIELD;
 import static com.github.anhem.testpopulator.internal.util.MutatorUtil.*;
 import static com.github.anhem.testpopulator.internal.util.PopulateUtil.setAccessible;
 import static java.lang.String.format;
@@ -69,6 +70,17 @@ public class MutatorPopulator extends MethodPopulator implements PopulatingStrat
         mutatorGetter.getChildMutatorMethods().forEach(method -> populateForMethod(targetObject, method, childCarrier, populator));
         mutatorGetter.getChildPublicFields().forEach(field -> populateForField(targetObject, field, childCarrier, populator));
         mutatorGetter.getChildMutatorGetters().forEach(childGetter -> populateForGetter(childGetter, childCarrier, populator));
+    }
+
+    private <T, V> void populateForField(V objectOfClass, Field field, ClassCarrier<T> classCarrier, Populator populator) {
+        String fieldName = field.getName();
+        try {
+            classCarrier.getObjectFactory().publicField(fieldName, 1);
+            setAccessible(field, objectOfClass);
+            field.set(objectOfClass, populator.populate(classCarrier.createChild(field.getGenericType(), fieldName)));
+        } catch (Exception e) {
+            throw new PopulateException(format(FAILED_TO_SET_FIELD, fieldName, objectOfClass.getClass().getName()), e);
+        }
     }
 
 }
