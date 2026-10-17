@@ -48,6 +48,7 @@ MyMessage message = new PopulateFactory(PopulateConfig.builder()
   - [Other Options](#other-options)
 - [Kotlin Support](#kotlin-support)
 - [Usage Examples](#usage-examples)
+- [Example Projects](#example-projects)
 - [Code Generation](#code-generation)
 - [Comparison to Similar Libraries](#comparison-to-similar-libraries)
 - [Technical Insights](#technical-insights)
@@ -464,7 +465,7 @@ MyClass obj = factory.populate(MyClass.class, mixedOverrides);
 ### Global Setup for a Project
 
 It's often useful to create a static helper class with a shared configuration for your entire test suite. This makes it easy to access the population
-logic from any test while keeping your configuration centralized.
+logic from any test while keeping your configuration centralized (see [Example Projects](#example-projects) for real-world setups).
 
 ```java
 public class TestPopulator {
@@ -599,6 +600,21 @@ class MyServiceTest {
     }
 }
 ```
+
+-----
+
+## Example Projects
+
+To see Test-Populator integrated into complete, production-grade applications, explore the following reference repositories:
+
+* **[howto](https://github.com/anhem/howto)**: A reference community forum web application built with **Java 21**, **Spring Boot**, and **Maven**. It
+  demonstrates clean enterprise architecture with a strict unidirectional layered design, Flyway database migrations, a modern React single-page
+  frontend, and automated test data generation using `test-populator` for unit and full-stack integration testing (with Testcontainers and
+  Playwright).
+* **[howto-kotlin](https://github.com/anhem/howto-kotlin)**: The **Kotlin** and **Gradle** counterpart to `howto`. It showcases idiomatic Kotlin test
+  setup leveraging `test-populator` with reified type parameters and default values in a modern Spring Boot forum backend with a React frontend.
+
+-----
 
 ## Code Generation
 
