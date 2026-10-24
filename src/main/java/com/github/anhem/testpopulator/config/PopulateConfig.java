@@ -34,6 +34,7 @@ public class PopulateConfig {
     public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
     public static final boolean DEFAULT_USE_KOTLIN_DEFAULT_VALUES = false;
     public static final Class<?> DEFAULT_WILDCARD_FALLBACK = String.class;
+    public static final MutatorType DEFAULT_MUTATOR_TYPE = MutatorType.ALL;
 
     public static class PopulateConfigBuilder {
         private Set<String> blacklistedMethods = null;
@@ -55,6 +56,7 @@ public class PopulateConfig {
         private Boolean kotlinSupport;
         private Boolean useKotlinDefaultValues;
         private Class<?> wildcardFallbackType;
+        private MutatorType mutatorType;
 
         /**
          * Set blacklisted methods, replacing existing ones.
@@ -463,6 +465,7 @@ public class PopulateConfig {
     private final boolean kotlinSupport;
     private final boolean useKotlinDefaultValues;
     private final Class<?> wildcardFallbackType;
+    private final MutatorType mutatorType;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
         this.blacklistedMethods = collectionOrDefault(populateConfigBuilder.blacklistedMethods, DEFAULT_BLACKLISTED_METHODS);
@@ -486,6 +489,7 @@ public class PopulateConfig {
         this.kotlinSupport = valueOrDefault(populateConfigBuilder.kotlinSupport, DEFAULT_KOTLIN_SUPPORT);
         this.useKotlinDefaultValues = valueOrDefault(populateConfigBuilder.useKotlinDefaultValues, DEFAULT_USE_KOTLIN_DEFAULT_VALUES);
         this.wildcardFallbackType = valueOrDefault(populateConfigBuilder.wildcardFallbackType, DEFAULT_WILDCARD_FALLBACK);
+        this.mutatorType = valueOrDefault(populateConfigBuilder.mutatorType, DEFAULT_MUTATOR_TYPE);
     }
 
     public Set<String> getBlacklistedMethods() {
@@ -564,6 +568,10 @@ public class PopulateConfig {
         return wildcardFallbackType;
     }
 
+    public MutatorType getMutatorType() {
+        return mutatorType;
+    }
+
     /**
      * Convert PopulateConfig back to a builder
      *
@@ -589,6 +597,7 @@ public class PopulateConfig {
         populateConfigBuilder.kotlinSupport = kotlinSupport;
         populateConfigBuilder.useKotlinDefaultValues = useKotlinDefaultValues;
         populateConfigBuilder.wildcardFallbackType = wildcardFallbackType;
+        populateConfigBuilder.mutatorType = mutatorType;
         populateConfigBuilder.strategyOrder = strategyOrder != null ? new ArrayList<>(strategyOrder) : null;
         return populateConfigBuilder;
     }
@@ -627,6 +636,7 @@ public class PopulateConfig {
                 ", kotlinSupport=" + kotlinSupport +
                 ", useKotlinDefaultValues=" + useKotlinDefaultValues +
                 ", wildcardFallbackType=" + wildcardFallbackType +
+                ", mutatorType=" + mutatorType +
                 '}';
     }
 
@@ -789,6 +799,11 @@ public class PopulateConfig {
 
         public MutatorConfig constructorType(ConstructorType type) {
             parent.constructorType = type;
+            return this;
+        }
+
+        public MutatorConfig mutatorType(MutatorType mutatorType) {
+            parent.mutatorType = mutatorType;
             return this;
         }
     }

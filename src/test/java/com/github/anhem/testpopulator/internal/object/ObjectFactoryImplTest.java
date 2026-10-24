@@ -653,6 +653,7 @@ class ObjectFactoryImplTest {
         );
     }
 
+
     private String getExpectedMyClassStaticImport() {
         return String.format("%s.%s.%s", PACKAGE, this.getClass().getSimpleName(), MyClass.class.getSimpleName());
     }

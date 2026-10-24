@@ -113,6 +113,16 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
+    public void publicField(String fieldName, int expectedChildren) {
+        setNextObjectBuilder(TemplateObjectBuilder.builder()
+                .name(fieldName)
+                .buildType(PUBLIC_FIELD)
+                .expectedChildren(expectedChildren)
+                .useFullyQualifiedName(false)
+                .build());
+    }
+
+    @Override
     public <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren) {
         if (populateConfig.isKotlinSupport() && "box-impl".equals(methodName)) {
             setNextObjectBuilder(templateBuilder(clazz, STATIC_METHOD, expectedChildren)

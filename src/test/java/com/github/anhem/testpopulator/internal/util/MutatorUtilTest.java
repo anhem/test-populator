@@ -1,12 +1,19 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.ConstructorType;
+import com.github.anhem.testpopulator.config.MutatorType;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
+import com.github.anhem.testpopulator.model.java.mutator.MutatorWithBothSettersAndFields;
 import com.github.anhem.testpopulator.model.java.mutator.MutatorWithMultipleConstructors;
+import com.github.anhem.testpopulator.model.java.mutator.Vector;
 import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Set;
 
 import static com.github.anhem.testpopulator.config.ConstructorType.*;
 import static com.github.anhem.testpopulator.config.Strategy.CONSTRUCTOR;
@@ -22,6 +29,28 @@ class MutatorUtilTest {
     @Test
     void isMatchingMutatorStrategyReturnsTrue() {
         assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS)).isTrue();
+    }
+
+    @Test
+    void isMatchingMutatorStrategyRespectsMutatorType() {
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, MutatorType.METHODS)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, MutatorType.FIELDS)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, MutatorType.ALL)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, MutatorType.FIELDS)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, MutatorType.METHODS)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, MutatorType.ALL)).isTrue();
+    }
+
+    @Test
+    void shouldPopulateMethodsAndFields() {
+        assertThat(shouldPopulateMethods(MutatorType.ALL)).isTrue();
+        assertThat(shouldPopulateMethods(MutatorType.METHODS)).isTrue();
+        assertThat(shouldPopulateMethods(MutatorType.FIELDS)).isFalse();
+
+        assertThat(shouldPopulateFields(MutatorType.ALL)).isTrue();
+        assertThat(shouldPopulateFields(MutatorType.FIELDS)).isTrue();
+        assertThat(shouldPopulateFields(MutatorType.METHODS)).isFalse();
     }
 
     @Test
@@ -35,6 +64,24 @@ class MutatorUtilTest {
     @Test
     void getMutatorMethodsReturnsMethods() {
         assertThat(getMutatorMethods(Mutator.class, emptySet())).hasSize(8);
+    }
+
+    @Test
+    void getPublicFieldsReturnsMutableFields() {
+        List<Field> fields = getPublicFields(Vector.class, emptySet());
+        assertThat(fields).extracting(Field::getName).containsExactly("x", "y");
+    }
+
+    @Test
+    void getPublicFieldsIgnoresStaticFinalAndBlacklisted() {
+        List<Field> fields = getPublicFields(Vector.class, Set.of("x"));
+        assertThat(fields).extracting(Field::getName).containsExactly("y");
+    }
+
+    @Test
+    void getPublicFieldsReturnsAllPublicFieldsIndependentlyOfMethods() {
+        List<Field> fields = getPublicFields(MutatorWithBothSettersAndFields.class, emptySet());
+        assertThat(fields).extracting(Field::getName).containsExactly("x", "y");
     }
 
     @Test

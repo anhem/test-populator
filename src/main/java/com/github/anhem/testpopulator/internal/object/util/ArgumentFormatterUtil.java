@@ -34,7 +34,7 @@ public class ArgumentFormatterUtil {
         int totalLength = arguments.stream().mapToInt(String::length).sum() + Math.max(0, arguments.size() - 1) * ARGUMENT_DELIMITER.length();
 
         if (totalLength > MAX_LINE_LENGTH || forceMultiline) {
-            boolean isMethodLevel = buildType == BuildType.METHOD;
+            boolean isMethodLevel = buildType == BuildType.METHOD || buildType == BuildType.PUBLIC_FIELD;
             String prefixTabs = isMethodLevel ? "\t\t\t\t" : "\t\t\t";
             String suffixTabs = isMethodLevel ? "\t\t" : "\t";
             if (isMap) {

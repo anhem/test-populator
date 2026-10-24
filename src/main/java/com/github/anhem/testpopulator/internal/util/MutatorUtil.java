@@ -1,14 +1,14 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.ConstructorType;
+import com.github.anhem.testpopulator.config.MutatorType;
 import com.github.anhem.testpopulator.config.Strategy;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
@@ -22,18 +22,68 @@ public class MutatorUtil {
     }
 
     public static <T> boolean isMatchingMutatorStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor, ConstructorType constructorType) {
+        return isMatchingMutatorStrategy(strategy, clazz, accessNonPublicConstructor, constructorType, MutatorType.ALL);
+    }
+
+    public static <T> boolean isMatchingMutatorStrategy(
+            Strategy strategy,
+            Class<T> clazz,
+            boolean accessNonPublicConstructor,
+            ConstructorType constructorType,
+            MutatorType mutatorType
+    ) {
         if (strategy.equals(MUTATOR) && hasAccessibleConstructor(clazz, accessNonPublicConstructor, constructorType)) {
-            return getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
-                    .filter(method -> !isWaitMethod(method))
-                    .anyMatch(method -> isMutatorMethod(method, clazz));
+            switch (mutatorType) {
+                case METHODS:
+                    return hasMutatorMethods(clazz);
+                case FIELDS:
+                    return hasPublicFields(clazz);
+                case ALL:
+                default:
+                    return hasMutatorMethods(clazz) || hasPublicFields(clazz);
+            }
         }
         return false;
+    }
+
+    public static boolean shouldPopulateMethods(MutatorType mutatorType) {
+        return mutatorType == MutatorType.ALL || mutatorType == MutatorType.METHODS;
+    }
+
+    public static boolean shouldPopulateFields(MutatorType mutatorType) {
+        return mutatorType == MutatorType.ALL || mutatorType == MutatorType.FIELDS;
     }
 
     public static <T> List<Method> getMutatorMethods(Class<T> clazz, Set<String> blacklistedMethods) {
         return getDeclaredMethods(clazz, blacklistedMethods).stream()
                 .filter(method -> isMutatorMethod(method, clazz))
                 .collect(Collectors.toList());
+    }
+
+    public static <T> List<Field> getPublicFields(Class<T> clazz, Set<String> blacklistedFields) {
+        return stream(clazz.getFields())
+                .filter(field -> !Modifier.isStatic(field.getModifiers()))
+                .filter(field -> !Modifier.isFinal(field.getModifiers()))
+                .filter(field -> !blacklistedFields.contains(field.getName()))
+                .sorted(Comparator.comparing(Field::getName))
+                .collect(Collectors.toList());
+    }
+
+    private static <T> boolean hasMutatorMethods(Class<T> clazz) {
+        return getAllDeclaredMethods(clazz, new ArrayList<>()).stream()
+                .filter(method -> !isWaitMethod(method))
+                .anyMatch(method -> isMutatorMethod(method, clazz));
+    }
+
+    private static <T> boolean hasPublicFields(Class<T> clazz) {
+        boolean hasPublic = stream(clazz.getFields())
+                .anyMatch(field -> !Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()));
+        if (!hasPublic) {
+            return false;
+        }
+        return getDeclaredFields(clazz, Collections.emptySet()).stream()
+                .filter(field -> !Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()))
+                .allMatch(field -> Modifier.isPublic(field.getModifiers()));
     }
 
     private static <T> boolean hasAccessibleConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor, ConstructorType constructorType) {
@@ -59,10 +109,15 @@ public class MutatorUtil {
 
     @SuppressWarnings("unchecked")
     private static <T> Constructor<T> getSmallestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
-        return (Constructor<T>) stream(clazz.getDeclaredConstructors())
+        List<Constructor<T>> constructors = (List<Constructor<T>>) (List<?>) stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
                 .filter(constructor -> constructor.getParameterCount() != 0)
+                .collect(Collectors.toList());
+
+        return constructors.stream()
+                .filter(constructor -> !hasSelfReferencingParameter(constructor, clazz))
                 .min(comparingInt(Constructor::getParameterCount))
+                .or(() -> constructors.stream().min(comparingInt(Constructor::getParameterCount)))
                 .orElseGet(() -> getNoArgsConstructor(clazz, canAccessNonPublicConstructor));
     }
 

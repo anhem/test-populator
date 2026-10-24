@@ -3,7 +3,7 @@
 [![CI](https://github.com/anhem/test-populator/workflows/CI/badge.svg)](https://github.com/anhem/test-populator/actions)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=anhem_test-populator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=anhem_test-populator)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.anhem/test-populator.svg)](https://central.sonatype.com/artifact/com.github.anhem/test-populator/)
-[![Java Version](https://img.shields.io/badge/Java-11%2C%2017%2C%2021%2C%2025-brightgreen)](https://github.com/anhem/test-populator/actions/workflows/build.yml)
+[![Java Version](https://img.shields.io/badge/Java-11%2C%2017%2C%2021%2C%2025%2C%2027-brightgreen)](https://github.com/anhem/test-populator/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Changelog](https://img.shields.io/badge/changelog-v1.0.1-blue)](CHANGELOG.md)
 
@@ -48,6 +48,7 @@ MyMessage message = new PopulateFactory(PopulateConfig.builder()
   - [Other Options](#other-options)
 - [Kotlin Support](#kotlin-support)
 - [Usage Examples](#usage-examples)
+- [Example Projects](#example-projects)
 - [Code Generation](#code-generation)
 - [Comparison to Similar Libraries](#comparison-to-similar-libraries)
 - [Technical Insights](#technical-insights)
@@ -109,7 +110,7 @@ MyClass{
 ## Key Features
 
 * **Automatic Object Population**: Instantly create fully-populated, complex Java objects with a single line of code.
-* **Broad Java Compatibility**: Rigorously tested on **Java 11, 17, 21, and 25**.
+* **Broad Java Compatibility**: Rigorously tested on **Java 11, 17, 21, 25, and 27**.
 * **Deep Type Support**: Automatically resolves generic type arguments down the object graph (e.g., properly populating custom nested generics like
   `Pair<String, Integer>` without type erasure), and handles complex parameterized types including unbound wildcards (`List<?>`, `Set<?>`,
   `Map<?, ?>`).
@@ -169,7 +170,7 @@ Defines the order of strategies to try when creating an object. If the first str
 * **Available Strategies**:
     * `CONSTRUCTOR`: Uses the constructor with the most parameters.
     * `SETTER`: Uses a no-arg constructor, then calls standard setter methods (e.g., `setName()`).
-    * `MUTATOR`: Uses a constructor, then calls any state-changing methods (including fluent setters like `withName()`).
+  * `MUTATOR`: Uses a constructor, then calls state-changing methods (including fluent setters like `withName()`) and populates public mutable fields.
     * `FIELD`: Uses a no-arg constructor and populates fields directly using reflection.
     * `BUILDER`: Uses a builder pattern (e.g., from Lombok or Immutables).
     * `STATIC_METHOD`: Uses a public static factory method to create an instance.
@@ -321,6 +322,9 @@ Allows the library to use private or protected constructors.
 
     * `constructorType`: The preferred constructor to use. Options are `NO_ARGS`, `SMALLEST`, `LARGEST`. Default is `NO_ARGS`. Configure via
       `.mutatorStrategy().constructorType(...)`.
+  * `mutatorType`: Which targets to mutate. Options are `ALL` (invokes state-changing methods and populates public fields), `METHODS` (only methods),
+    `FIELDS` (only public fields). Default is `ALL`. Configure via
+    `.mutatorStrategy().mutatorType(...)`.
 
 * **For `STATIC_METHOD` strategy**:
 
@@ -460,7 +464,7 @@ MyClass obj = factory.populate(MyClass.class, mixedOverrides);
 ### Global Setup for a Project
 
 It's often useful to create a static helper class with a shared configuration for your entire test suite. This makes it easy to access the population
-logic from any test while keeping your configuration centralized.
+logic from any test while keeping your configuration centralized (see [Example Projects](#example-projects) for real-world setups).
 
 ```java
 public class TestPopulator {
@@ -595,6 +599,21 @@ class MyServiceTest {
     }
 }
 ```
+
+-----
+
+## Example Projects
+
+To see Test-Populator integrated into complete, production-grade applications, explore the following reference repositories:
+
+* **[howto](https://github.com/anhem/howto)**: A reference community forum web application built with **Java 21**, **Spring Boot**, and **Maven**. It
+  demonstrates clean enterprise architecture with a strict unidirectional layered design, Flyway database migrations, a modern React single-page
+  frontend, and automated test data generation using `test-populator` for unit and full-stack integration testing (with Testcontainers and
+  Playwright).
+* **[howto-kotlin](https://github.com/anhem/howto-kotlin)**: The **Kotlin** and **Gradle** counterpart to `howto`. It showcases idiomatic Kotlin test
+  setup leveraging `test-populator` with reified type parameters and default values in a modern Spring Boot forum backend with a React frontend.
+
+-----
 
 ## Code Generation
 

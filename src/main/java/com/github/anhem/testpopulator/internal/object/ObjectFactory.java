@@ -22,6 +22,8 @@ public interface ObjectFactory {
 
     void method(String methodName, int expectedChildren);
 
+    void publicField(String fieldName, int expectedChildren);
+
     <T> void staticMethod(Class<T> clazz, String methodName, int expectedChildren);
 
     <T> void set(Class<T> clazz);
