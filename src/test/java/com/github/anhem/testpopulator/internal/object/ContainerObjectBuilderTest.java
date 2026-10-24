@@ -112,4 +112,80 @@ class ContainerObjectBuilderTest {
                 "}"
         );
     }
+
+    @Test
+    void buildPublicField() {
+        ContainerObjectBuilder builder = ContainerObjectBuilder.builder()
+                .clazz(Object.class)
+                .name("myObj")
+                .buildType(SETTER)
+                .template(CodeTemplate.SETTER.getFormat())
+                .useFullyQualifiedName(false)
+                .expectedChildren(1)
+                .parameterized(false)
+                .build();
+        TemplateObjectBuilder field = TemplateObjectBuilder.builder()
+                .name("x")
+                .buildType(PUBLIC_FIELD)
+                .expectedChildren(1)
+                .build();
+        TemplateObjectBuilder val = TemplateObjectBuilder.builder()
+                .clazz(Float.class)
+                .name("float_0")
+                .buildType(BuildType.VALUE)
+                .expectedChildren(0)
+                .build();
+        val.setValue("1.0f");
+        field.addChild(val);
+        builder.addChild(field);
+
+        List<String> result = builder.build();
+
+        assertThat(result).containsExactly(
+                "public static final Object myObj = new Object();",
+                "static {",
+                "myObj.x = 1.0f;",
+                "}"
+        );
+    }
+
+    @Test
+    void buildPublicFieldKotlin() {
+        ContainerObjectBuilder builder = ContainerObjectBuilder.builder()
+                .clazz(Object.class)
+                .name("myObj")
+                .buildType(SETTER)
+                .template(CodeTemplate.SETTER.getFormat(true))
+                .useFullyQualifiedName(false)
+                .expectedChildren(1)
+                .parameterized(false)
+                .isKotlinSupport(true)
+                .build();
+        TemplateObjectBuilder field = TemplateObjectBuilder.builder()
+                .name("x")
+                .buildType(PUBLIC_FIELD)
+                .expectedChildren(1)
+                .isKotlinSupport(true)
+                .build();
+        TemplateObjectBuilder val = TemplateObjectBuilder.builder()
+                .clazz(Float.class)
+                .name("float_0")
+                .buildType(BuildType.VALUE)
+                .expectedChildren(0)
+                .isKotlinSupport(true)
+                .build();
+        val.setValue("1.0f");
+        field.addChild(val);
+        builder.addChild(field);
+
+        List<String> result = builder.build();
+
+        assertThat(result).containsExactly(
+                "public static final myObj: Object = Object()",
+                "static {",
+                "myObj.x = 1.0f",
+                "}"
+        );
+    }
+
 }
