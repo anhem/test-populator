@@ -15,6 +15,7 @@ import com.github.anhem.testpopulator.model.java.setter.PojoPrivateConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -203,6 +204,28 @@ class PopulateUtilTest {
         Field field = getField("stringValue", Pojo.class);
 
         assertThat(isBlackListed(field, DEFAULT_POPULATE_CONFIG.getBlacklistedFields())).isFalse();
+    }
+
+    @Test
+    void getLargestConstructorPrefersNonSelfReferencingConstructor() {
+        Constructor<java.io.File> constructor = getLargestConstructor(java.io.File.class, false);
+
+        assertThat(constructor).isNotNull();
+        assertThat(constructor.getParameterTypes()).containsExactly(String.class, String.class);
+    }
+
+    @Test
+    void hasSelfReferencingParameterReturnsTrue() throws NoSuchMethodException {
+        Constructor<java.io.File> constructor = java.io.File.class.getConstructor(java.io.File.class, String.class);
+
+        assertThat(hasSelfReferencingParameter(constructor, java.io.File.class)).isTrue();
+    }
+
+    @Test
+    void hasSelfReferencingParameterReturnsFalse() throws NoSuchMethodException {
+        Constructor<java.io.File> constructor = java.io.File.class.getConstructor(String.class, String.class);
+
+        assertThat(hasSelfReferencingParameter(constructor, java.io.File.class)).isFalse();
     }
 
     private static ClassCarrier<String> createClassCarrier() {

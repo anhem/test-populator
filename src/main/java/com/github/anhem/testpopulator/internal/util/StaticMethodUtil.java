@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -64,28 +62,7 @@ public class StaticMethodUtil {
     }
 
     static boolean hasSelfReferencingParameter(Method method, Class<?> clazz) {
-        for (Type paramType : method.getGenericParameterTypes()) {
-            if (isOrContainsType(paramType, clazz)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isOrContainsType(Type type, Class<?> clazz) {
-        if (clazz.equals(type)) {
-            return true;
-        }
-
-        if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            for (Type typeArgument : parameterizedType.getActualTypeArguments()) {
-                if (isOrContainsType(typeArgument, clazz)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return PopulateUtil.hasSelfReferencingParameter(method, clazz);
     }
 
     private static double getAverageParameterComplexity(Method method) {

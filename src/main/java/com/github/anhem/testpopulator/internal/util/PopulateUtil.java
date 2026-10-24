@@ -223,11 +223,41 @@ public class PopulateUtil {
 
     @SuppressWarnings("unchecked")
     public static <T> Constructor<T> getLargestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
-        return (Constructor<T>) stream(clazz.getDeclaredConstructors())
+        List<Constructor<T>> constructors = (List<Constructor<T>>) (List<?>) stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
                 .filter(constructor -> constructor.getParameterCount() != 0)
+                .collect(Collectors.toList());
+
+        return constructors.stream()
+                .filter(constructor -> !hasSelfReferencingParameter(constructor, clazz))
                 .max(comparingInt(Constructor::getParameterCount))
+                .or(() -> constructors.stream().max(comparingInt(Constructor::getParameterCount)))
                 .orElseGet(() -> getNoArgsConstructor(clazz, canAccessNonPublicConstructor));
+    }
+
+    public static boolean hasSelfReferencingParameter(Executable executable, Class<?> clazz) {
+        for (Type paramType : executable.getGenericParameterTypes()) {
+            if (isOrContainsType(paramType, clazz)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isOrContainsType(Type type, Class<?> clazz) {
+        if (clazz.equals(type)) {
+            return true;
+        }
+
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            for (Type typeArgument : parameterizedType.getActualTypeArguments()) {
+                if (isOrContainsType(typeArgument, clazz)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     static <T> Constructor<T> getNoArgsConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {

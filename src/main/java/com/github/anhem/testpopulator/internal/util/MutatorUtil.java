@@ -109,10 +109,15 @@ public class MutatorUtil {
 
     @SuppressWarnings("unchecked")
     private static <T> Constructor<T> getSmallestConstructor(Class<T> clazz, boolean canAccessNonPublicConstructor) {
-        return (Constructor<T>) stream(clazz.getDeclaredConstructors())
+        List<Constructor<T>> constructors = (List<Constructor<T>>) (List<?>) stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> canAccessNonPublicConstructor || Modifier.isPublic(constructor.getModifiers()))
                 .filter(constructor -> constructor.getParameterCount() != 0)
+                .collect(Collectors.toList());
+
+        return constructors.stream()
+                .filter(constructor -> !hasSelfReferencingParameter(constructor, clazz))
                 .min(comparingInt(Constructor::getParameterCount))
+                .or(() -> constructors.stream().min(comparingInt(Constructor::getParameterCount)))
                 .orElseGet(() -> getNoArgsConstructor(clazz, canAccessNonPublicConstructor));
     }
 
