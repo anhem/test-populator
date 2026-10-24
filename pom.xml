@@ -27,8 +27,8 @@
         <java.version>11</java.version>
         <sonar.organization>anhem-github</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <lombok.version>1.18.46</lombok.version>
-        <immutables.version>2.12.1</immutables.version>
+        <lombok.version>1.18.48</lombok.version>
+        <immutables.version>2.12.3</immutables.version>
     </properties>
 
     <scm>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>4.34.1</version>
+            <version>4.36.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
