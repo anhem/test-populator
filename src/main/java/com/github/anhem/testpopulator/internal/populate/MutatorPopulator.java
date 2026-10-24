@@ -38,10 +38,10 @@ public class MutatorPopulator extends MethodPopulator implements PopulatingStrat
             } else {
                 objectOfClass = constructor.newInstance();
             }
-            List<Method> methods = populateConfig.isMutatorMethods()
+            List<Method> methods = shouldPopulateMethods(populateConfig.getMutatorType())
                     ? getMutatorMethods(clazz, populateConfig.getBlacklistedMethods())
                     : emptyList();
-            List<Field> publicFields = populateConfig.isMutatorPublicFields()
+            List<Field> publicFields = shouldPopulateFields(populateConfig.getMutatorType())
                     ? getPublicFields(clazz, populateConfig.getBlacklistedFields())
                     : emptyList();
             int totalExpectedChildren = methods.size() + publicFields.size();

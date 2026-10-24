@@ -31,8 +31,7 @@ class PopulateConfigTest {
         assertThat(DEFAULT_POPULATE_CONFIG.getObjectFactoryPath()).isNull();
         assertThat(DEFAULT_POPULATE_CONFIG.isNullOnCircularDependency()).isFalse();
         assertThat(DEFAULT_POPULATE_CONFIG.getMethodType()).isEqualTo(MethodType.LARGEST);
-        assertThat(DEFAULT_POPULATE_CONFIG.isMutatorMethods()).isTrue();
-        assertThat(DEFAULT_POPULATE_CONFIG.isMutatorPublicFields()).isTrue();
+        assertThat(DEFAULT_POPULATE_CONFIG.getMutatorType()).isEqualTo(MutatorType.ALL);
         assertEqual(DEFAULT_POPULATE_CONFIG.toBuilder().build(), DEFAULT_POPULATE_CONFIG);
     }
 
@@ -92,13 +91,11 @@ class PopulateConfigTest {
     void mutatorStrategyOptions() {
         PopulateConfig populateConfig = PopulateConfig.builder().wildcardFallbackType(String.class)
                 .mutatorStrategy()
-                .mutatorMethods(false)
-                .publicFields(false)
+                .mutatorType(MutatorType.METHODS)
                 .and()
                 .build();
 
-        assertThat(populateConfig.isMutatorMethods()).isFalse();
-        assertThat(populateConfig.isMutatorPublicFields()).isFalse();
+        assertThat(populateConfig.getMutatorType()).isEqualTo(MutatorType.METHODS);
         assertEqual(populateConfig.toBuilder().build(), populateConfig);
     }
 

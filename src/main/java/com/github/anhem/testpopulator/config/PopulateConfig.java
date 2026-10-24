@@ -34,8 +34,7 @@ public class PopulateConfig {
     public static final boolean DEFAULT_KOTLIN_SUPPORT = false;
     public static final boolean DEFAULT_USE_KOTLIN_DEFAULT_VALUES = false;
     public static final Class<?> DEFAULT_WILDCARD_FALLBACK = String.class;
-    public static final boolean DEFAULT_MUTATOR_METHODS = true;
-    public static final boolean DEFAULT_MUTATOR_PUBLIC_FIELDS = true;
+    public static final MutatorType DEFAULT_MUTATOR_TYPE = MutatorType.ALL;
 
     public static class PopulateConfigBuilder {
         private Set<String> blacklistedMethods = null;
@@ -57,8 +56,7 @@ public class PopulateConfig {
         private Boolean kotlinSupport;
         private Boolean useKotlinDefaultValues;
         private Class<?> wildcardFallbackType;
-        private Boolean mutatorMethods;
-        private Boolean mutatorPublicFields;
+        private MutatorType mutatorType;
 
         /**
          * Set blacklisted methods, replacing existing ones.
@@ -467,8 +465,7 @@ public class PopulateConfig {
     private final boolean kotlinSupport;
     private final boolean useKotlinDefaultValues;
     private final Class<?> wildcardFallbackType;
-    private final boolean mutatorMethods;
-    private final boolean mutatorPublicFields;
+    private final MutatorType mutatorType;
 
     private PopulateConfig(PopulateConfigBuilder populateConfigBuilder) {
         this.blacklistedMethods = collectionOrDefault(populateConfigBuilder.blacklistedMethods, DEFAULT_BLACKLISTED_METHODS);
@@ -492,8 +489,7 @@ public class PopulateConfig {
         this.kotlinSupport = valueOrDefault(populateConfigBuilder.kotlinSupport, DEFAULT_KOTLIN_SUPPORT);
         this.useKotlinDefaultValues = valueOrDefault(populateConfigBuilder.useKotlinDefaultValues, DEFAULT_USE_KOTLIN_DEFAULT_VALUES);
         this.wildcardFallbackType = valueOrDefault(populateConfigBuilder.wildcardFallbackType, DEFAULT_WILDCARD_FALLBACK);
-        this.mutatorMethods = valueOrDefault(populateConfigBuilder.mutatorMethods, DEFAULT_MUTATOR_METHODS);
-        this.mutatorPublicFields = valueOrDefault(populateConfigBuilder.mutatorPublicFields, DEFAULT_MUTATOR_PUBLIC_FIELDS);
+        this.mutatorType = valueOrDefault(populateConfigBuilder.mutatorType, DEFAULT_MUTATOR_TYPE);
     }
 
     public Set<String> getBlacklistedMethods() {
@@ -572,12 +568,8 @@ public class PopulateConfig {
         return wildcardFallbackType;
     }
 
-    public boolean isMutatorMethods() {
-        return mutatorMethods;
-    }
-
-    public boolean isMutatorPublicFields() {
-        return mutatorPublicFields;
+    public MutatorType getMutatorType() {
+        return mutatorType;
     }
 
     /**
@@ -605,8 +597,7 @@ public class PopulateConfig {
         populateConfigBuilder.kotlinSupport = kotlinSupport;
         populateConfigBuilder.useKotlinDefaultValues = useKotlinDefaultValues;
         populateConfigBuilder.wildcardFallbackType = wildcardFallbackType;
-        populateConfigBuilder.mutatorMethods = mutatorMethods;
-        populateConfigBuilder.mutatorPublicFields = mutatorPublicFields;
+        populateConfigBuilder.mutatorType = mutatorType;
         populateConfigBuilder.strategyOrder = strategyOrder != null ? new ArrayList<>(strategyOrder) : null;
         return populateConfigBuilder;
     }
@@ -645,8 +636,7 @@ public class PopulateConfig {
                 ", kotlinSupport=" + kotlinSupport +
                 ", useKotlinDefaultValues=" + useKotlinDefaultValues +
                 ", wildcardFallbackType=" + wildcardFallbackType +
-                ", mutatorMethods=" + mutatorMethods +
-                ", mutatorPublicFields=" + mutatorPublicFields +
+                ", mutatorType=" + mutatorType +
                 '}';
     }
 
@@ -812,13 +802,8 @@ public class PopulateConfig {
             return this;
         }
 
-        public MutatorConfig mutatorMethods(boolean mutatorMethods) {
-            parent.mutatorMethods = mutatorMethods;
-            return this;
-        }
-
-        public MutatorConfig publicFields(boolean publicFields) {
-            parent.mutatorPublicFields = publicFields;
+        public MutatorConfig mutatorType(MutatorType mutatorType) {
+            parent.mutatorType = mutatorType;
             return this;
         }
     }

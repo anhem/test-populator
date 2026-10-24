@@ -322,10 +322,9 @@ Allows the library to use private or protected constructors.
 
     * `constructorType`: The preferred constructor to use. Options are `NO_ARGS`, `SMALLEST`, `LARGEST`. Default is `NO_ARGS`. Configure via
       `.mutatorStrategy().constructorType(...)`.
-    * `mutatorMethods`: Whether to invoke state-changing methods / setters. Default is `true`. Configure via
-      `.mutatorStrategy().mutatorMethods(...)`.
-    * `publicFields`: Whether to populate public non-final fields directly. Default is `true`. Configure via
-      `.mutatorStrategy().publicFields(...)`.
+  * `mutatorType`: Which targets to mutate. Options are `ALL` (invokes state-changing methods and populates public fields), `METHODS` (only methods),
+    `FIELDS` (only public fields). Default is `ALL`. Configure via
+    `.mutatorStrategy().mutatorType(...)`.
 
 * **For `STATIC_METHOD` strategy**:
 

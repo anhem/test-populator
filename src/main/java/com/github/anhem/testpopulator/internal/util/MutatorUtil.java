@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.ConstructorType;
+import com.github.anhem.testpopulator.config.MutatorType;
 import com.github.anhem.testpopulator.config.Strategy;
 
 import java.lang.reflect.Constructor;
@@ -21,7 +22,7 @@ public class MutatorUtil {
     }
 
     public static <T> boolean isMatchingMutatorStrategy(Strategy strategy, Class<T> clazz, boolean accessNonPublicConstructor, ConstructorType constructorType) {
-        return isMatchingMutatorStrategy(strategy, clazz, accessNonPublicConstructor, constructorType, true, true);
+        return isMatchingMutatorStrategy(strategy, clazz, accessNonPublicConstructor, constructorType, MutatorType.ALL);
     }
 
     public static <T> boolean isMatchingMutatorStrategy(
@@ -29,14 +30,28 @@ public class MutatorUtil {
             Class<T> clazz,
             boolean accessNonPublicConstructor,
             ConstructorType constructorType,
-            boolean mutatorMethods,
-            boolean mutatorPublicFields
+            MutatorType mutatorType
     ) {
         if (strategy.equals(MUTATOR) && hasAccessibleConstructor(clazz, accessNonPublicConstructor, constructorType)) {
-            return (mutatorMethods && hasMutatorMethods(clazz))
-                    || (mutatorPublicFields && hasPublicFields(clazz));
+            switch (mutatorType) {
+                case METHODS:
+                    return hasMutatorMethods(clazz);
+                case FIELDS:
+                    return hasPublicFields(clazz);
+                case ALL:
+                default:
+                    return hasMutatorMethods(clazz) || hasPublicFields(clazz);
+            }
         }
         return false;
+    }
+
+    public static boolean shouldPopulateMethods(MutatorType mutatorType) {
+        return mutatorType == MutatorType.ALL || mutatorType == MutatorType.METHODS;
+    }
+
+    public static boolean shouldPopulateFields(MutatorType mutatorType) {
+        return mutatorType == MutatorType.ALL || mutatorType == MutatorType.FIELDS;
     }
 
     public static <T> List<Method> getMutatorMethods(Class<T> clazz, Set<String> blacklistedMethods) {

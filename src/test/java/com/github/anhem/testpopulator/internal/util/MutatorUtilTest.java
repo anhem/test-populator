@@ -1,6 +1,7 @@
 package com.github.anhem.testpopulator.internal.util;
 
 import com.github.anhem.testpopulator.config.ConstructorType;
+import com.github.anhem.testpopulator.config.MutatorType;
 import com.github.anhem.testpopulator.exception.PopulateException;
 import com.github.anhem.testpopulator.model.java.constructor.AllArgsConstructor;
 import com.github.anhem.testpopulator.model.java.mutator.Mutator;
@@ -32,11 +33,24 @@ class MutatorUtilTest {
     }
 
     @Test
-    void isMatchingMutatorStrategyRespectsToggles() {
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, true, false)).isFalse();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, false, true)).isTrue();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, false, true)).isFalse();
-        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, true, false)).isTrue();
+    void isMatchingMutatorStrategyRespectsMutatorType() {
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, MutatorType.METHODS)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, MutatorType.FIELDS)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Vector.class, false, NO_ARGS, MutatorType.ALL)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, MutatorType.FIELDS)).isFalse();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, MutatorType.METHODS)).isTrue();
+        assertThat(isMatchingMutatorStrategy(MUTATOR, Mutator.class, false, NO_ARGS, MutatorType.ALL)).isTrue();
+    }
+
+    @Test
+    void shouldPopulateMethodsAndFields() {
+        assertThat(shouldPopulateMethods(MutatorType.ALL)).isTrue();
+        assertThat(shouldPopulateMethods(MutatorType.METHODS)).isTrue();
+        assertThat(shouldPopulateMethods(MutatorType.FIELDS)).isFalse();
+
+        assertThat(shouldPopulateFields(MutatorType.ALL)).isTrue();
+        assertThat(shouldPopulateFields(MutatorType.FIELDS)).isTrue();
+        assertThat(shouldPopulateFields(MutatorType.METHODS)).isFalse();
     }
 
     @Test

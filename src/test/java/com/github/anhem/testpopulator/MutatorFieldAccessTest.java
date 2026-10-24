@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.github.anhem.testpopulator.config.ConstructorType.LARGEST;
+import static com.github.anhem.testpopulator.config.MutatorType.FIELDS;
+import static com.github.anhem.testpopulator.config.MutatorType.METHODS;
 import static com.github.anhem.testpopulator.config.Strategy.MUTATOR;
 import static com.github.anhem.testpopulator.testutil.AssertTestUtil.assertRandomlyPopulatedValues;
 import static com.github.anhem.testpopulator.testutil.GeneratedCodeUtil.assertGeneratedCode;
@@ -58,10 +60,10 @@ class MutatorFieldAccessTest {
     }
 
     @Test
-    void testClassWithBothSettersAndFieldsDisablingPublicFields() {
+    void testClassWithBothSettersAndFieldsUsingMethodsOnly() {
         populateConfig = populateConfig.toBuilder()
                 .mutatorStrategy()
-                .publicFields(false)
+                .mutatorType(METHODS)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 
@@ -72,10 +74,10 @@ class MutatorFieldAccessTest {
     }
 
     @Test
-    void testClassWithBothSettersAndFieldsDisablingMutatorMethods() {
+    void testClassWithBothSettersAndFieldsUsingFieldsOnly() {
         populateConfig = populateConfig.toBuilder()
                 .mutatorStrategy()
-                .mutatorMethods(false)
+                .mutatorType(FIELDS)
                 .build();
         populateFactory = new PopulateFactory(populateConfig);
 
